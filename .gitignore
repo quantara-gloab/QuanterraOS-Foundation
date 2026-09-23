@@ -9,6 +9,7 @@ yarn-error.log*
 # Environment and secrets
 .env
 .env.*
+*.pem
 
 # Build output
 build/
