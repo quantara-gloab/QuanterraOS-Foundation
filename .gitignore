@@ -17,8 +17,14 @@ coverage/
 
 # Local databases
 *.db
+*.db-shm
+*.db-wal
 *.sqlite
 *.sqlite3
+
+# Scratch / debug files
+tmp-check.mjs
+tmp-*.mjs
 
 # OS/editor noise
 .DS_Store
