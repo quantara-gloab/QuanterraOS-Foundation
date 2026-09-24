@@ -25,7 +25,12 @@ export const db = drizzle(sqlite, { schema });
 export function runMigrations(): void {
   const here = path.dirname(fileURLToPath(import.meta.url));
   const migrationsDir = path.join(here, "..", "migrations");
-  for (const migration of ["0001_foundation.sql", "0002_research_resolutions.sql"]) {
+  for (const migration of [
+    "0001_foundation.sql",
+    "0002_research_resolutions.sql",
+    "0003_btc_index_ticks.sql",
+    "0004_exchange_prices.sql",
+  ]) {
     const migrationPath = path.join(migrationsDir, migration);
     sqlite.exec(readFileSync(migrationPath, "utf-8"));
   }

@@ -169,3 +169,34 @@ export const edgeScores = sqliteTable(
     bucketIdx: index("edge_scores_bucket").on(table.bucket),
   })
 );
+
+export const btcIndexTicks = sqliteTable(
+  "btc_index_ticks",
+  {
+    id: text("id").primaryKey(),
+    receivedAt: integer("received_at").notNull(),
+    loggedAt: text("logged_at").notNull(),
+    rawValue: text("raw_value").notNull(),
+    trailing60sAvg: text("trailing_60s_avg"),
+    rawJson: text("raw_json").notNull(),
+  },
+  (table) => ({
+    receivedAtIdx: index("btc_index_ticks_received_at").on(table.receivedAt),
+  })
+);
+
+export const exchangePrices = sqliteTable(
+  "exchange_prices",
+  {
+    id: text("id").primaryKey(),
+    exchangeName: text("exchange_name").notNull(),
+    price: real("price").notNull(),
+    fetchedAt: integer("fetched_at").notNull(),
+  },
+  (table) => ({
+    exchangeTimeIdx: index("exchange_prices_exchange_time").on(
+      table.exchangeName,
+      table.fetchedAt,
+    ),
+  })
+);
