@@ -1,0 +1,7 @@
+* text=auto
+
+# Files consumed by Linux on the Lightsail host must keep LF endings;
+# bash and systemd both fail on trailing \r.
+*.sh text eol=lf
+*.service text eol=lf
+Caddyfile text eol=lf
