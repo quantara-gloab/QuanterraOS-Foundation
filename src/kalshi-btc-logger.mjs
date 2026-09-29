@@ -14,6 +14,31 @@ const keyId = process.env.KALSHI_KEY_ID;
 const configuredKeyPath = process.env.KALSHI_PRIVATE_KEY_PATH;
 const reconnectBaseMs = 1000;
 const reconnectMaxMs = 30000;
+const heartbeatIntervalMs = 300000;
+const websocketSilenceMs = 30000;
+const indexAssets = {
+  BRTI: "BTC",
+  ETHUSD_RTI: "ETH",
+  SOLUSD_RTI: "SOL",
+  XRPUSD_RTI: "XRP",
+  DOGEUSD_RTI: "DOGE",
+  AAVEUSD_RTI: "AAVE",
+  ADAUSD_RTI: "ADA",
+  BCHUSD_RTI: "BCH",
+  BNBUSD_RTI: "BNB",
+  DOTUSD_RTI: "DOT",
+  HBARUSD_RTI: "HBAR",
+  HYPEUSD_RTI: "HYPE",
+  LINKUSD_RTI: "LINK",
+  LTCUSD_RTI: "LTC",
+  NEARUSD_RTI: "NEAR",
+  SHIBUSD_RTI: "SHIB",
+  SUIUSD_RTI: "SUI",
+  VVVUSD_RTI: "VVV",
+  WLDUSD_RTI: "WLD",
+  XLMUSD_RTI: "XLM",
+  ZECUSD_RTI: "ZEC",
+};
 
 if (!keyId || !configuredKeyPath) {
   throw new Error("KALSHI_KEY_ID and KALSHI_PRIVATE_KEY_PATH must be set in .env");
@@ -62,7 +87,8 @@ function parseTick(messageText) {
     return null;
   }
 
-  if (message?.type !== "cfbenchmarks_value" || message.msg?.index_id !== "BRTI") {
+  const indexId = message?.msg?.index_id;
+  if (message?.type !== "cfbenchmarks_value" || !indexAssets[indexId]) {
     return null;
   }
 
@@ -76,6 +102,7 @@ function parseTick(messageText) {
 
   return {
     id: randomUUID(),
+    asset: indexAssets[indexId],
     receivedAt: payload.received_at,
     loggedAt: localTimestamp(),
     rawValue: String(rawValue),
@@ -92,6 +119,26 @@ function startConnection(onClosed) {
   const websocket = new WebSocket(websocketUrl, {
     headers: signRequest("GET", websocketPath),
   });
+  let silenceTimer;
+  let closedHandled = false;
+
+  const handleClosed = (code, reason) => {
+    if (closedHandled) {
+      return;
+    }
+    closedHandled = true;
+    clearTimeout(silenceTimer);
+    onClosed(websocket, code, reason);
+  };
+
+  const resetSilenceTimer = () => {
+    clearTimeout(silenceTimer);
+    silenceTimer = setTimeout(() => {
+      console.error("Kalshi websocket silent for 30 seconds; reconnecting...");
+      handleClosed("SILENCE", "no messages received");
+      websocket.terminate();
+    }, websocketSilenceMs);
+  };
 
   websocket.once("open", () => {
     websocket.send(JSON.stringify({
@@ -99,12 +146,14 @@ function startConnection(onClosed) {
       cmd: "subscribe",
       params: {
         channels: ["cfbenchmarks_value"],
-        index_ids: ["BRTI"],
+        index_ids: ["all"],
       },
     }));
+    resetSilenceTimer();
   });
 
   websocket.on("message", (message) => {
+    resetSilenceTimer();
     const tick = parseTick(message.toString());
     if (!tick) {
       return;
@@ -112,20 +161,22 @@ function startConnection(onClosed) {
 
     db.insert(btcIndexTicks).values({
       id: tick.id,
+      asset: tick.asset,
       receivedAt: tick.receivedAt,
       loggedAt: tick.loggedAt,
       rawValue: tick.rawValue,
       trailing60sAvg: tick.trailing60sAvg,
       rawJson: tick.rawJson,
     }).run();
-    console.log(`${tick.displayTimestamp} BRTI ${tick.displayValue}`);
+    ticksCaptured += 1;
+    console.log(`${tick.displayTimestamp} ${tick.asset} ${tick.displayValue}`);
   });
 
   websocket.once("error", (error) => {
     console.error(`Kalshi websocket error: ${error.message}`);
   });
   websocket.once("close", (code, reason) => {
-    onClosed(websocket, code, reason.toString());
+    handleClosed(code, reason.toString());
   });
 
   return websocket;
@@ -135,6 +186,8 @@ runMigrations();
 let reconnectAttempt = 0;
 let stopping = false;
 let reconnectTimer;
+let heartbeatTimer;
+let ticksCaptured = 0;
 
 function connect() {
   if (stopping) {
@@ -150,6 +203,7 @@ function connect() {
       reconnectMaxMs,
     );
     reconnectAttempt += 1;
+    console.error("Reconnecting to Kalshi websocket...");
     console.error(`Kalshi websocket closed; reconnecting in ${delay}ms`);
     reconnectTimer = setTimeout(connect, delay);
   });
@@ -160,6 +214,9 @@ function stop() {
   if (reconnectTimer) {
     clearTimeout(reconnectTimer);
   }
+  if (heartbeatTimer) {
+    clearInterval(heartbeatTimer);
+  }
   closeDb();
 }
 
@@ -167,3 +224,6 @@ process.once("SIGINT", stop);
 process.once("SIGTERM", stop);
 
 connect();
+heartbeatTimer = setInterval(() => {
+  console.log(`Logger running, ${ticksCaptured} ticks captured so far`);
+}, heartbeatIntervalMs);

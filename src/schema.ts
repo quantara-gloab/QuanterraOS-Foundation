@@ -179,6 +179,7 @@ export const btcIndexTicks = sqliteTable(
     rawValue: text("raw_value").notNull(),
     trailing60sAvg: text("trailing_60s_avg"),
     rawJson: text("raw_json").notNull(),
+    asset: text("asset").notNull().default("BTC"),
   },
   (table) => ({
     receivedAtIdx: index("btc_index_ticks_received_at").on(table.receivedAt),
@@ -192,11 +193,77 @@ export const exchangePrices = sqliteTable(
     exchangeName: text("exchange_name").notNull(),
     price: real("price").notNull(),
     fetchedAt: integer("fetched_at").notNull(),
+    asset: text("asset").notNull().default("BTC"),
   },
   (table) => ({
     exchangeTimeIdx: index("exchange_prices_exchange_time").on(
       table.exchangeName,
       table.fetchedAt,
+    ),
+  })
+);
+
+export const marketOutcomes = sqliteTable(
+  "market_outcomes",
+  {
+    id: text("id").primaryKey(),
+    marketTicker: text("market_ticker").notNull().unique(),
+    strikePrice: real("strike_price"),
+    openTime: integer("open_time").notNull(),
+    closeTime: integer("close_time").notNull(),
+    result: text("result").notNull(),
+    fetchedAt: integer("fetched_at").notNull(),
+    asset: text("asset").notNull().default("BTC"),
+  },
+  (table) => ({
+    closeTimeIdx: index("market_outcomes_close_time").on(table.closeTime),
+  })
+);
+
+export const orderbookSnapshots = sqliteTable(
+  "orderbook_snapshots",
+  {
+    id: text("id").primaryKey(),
+    asset: text("asset").notNull(),
+    marketTicker: text("market_ticker").notNull(),
+    capturedAt: integer("captured_at").notNull(),
+    bestYesPrice: real("best_yes_price"),
+    bestNoPrice: real("best_no_price"),
+    bestYesSize: real("best_yes_size"),
+    bestNoSize: real("best_no_size"),
+    topImbalance: real("top_imbalance"),
+    depthImbalance: real("depth_imbalance"),
+    yesLevelsJson: text("yes_levels_json").notNull(),
+    noLevelsJson: text("no_levels_json").notNull(),
+  },
+  (table) => ({
+    assetMarketTimeIdx: index("orderbook_snapshots_asset_market_time").on(
+      table.asset,
+      table.marketTicker,
+      table.capturedAt,
+    ),
+  })
+);
+
+export const falconRecommendations = sqliteTable(
+  "falcon_recommendations",
+  {
+    id: text("id").primaryKey(),
+    owner: text("owner").notNull(),
+    contract: text("contract").notNull(),
+    suggestedProbability: real("suggested_probability").notNull(),
+    rationale: text("rationale").notNull(),
+    evidenceJson: text("evidence_json").notNull(),
+    status: text("status").notNull().default("proposed"), // 'proposed' | 'accepted' | 'edited' | 'rejected'
+    finalProbability: real("final_probability"),
+    observationId: text("observation_id"),
+    createdAt: text("created_at").notNull(),
+    decidedAt: text("decided_at"),
+  },
+  (table) => ({
+    ownerContractIdx: index("falcon_recommendations_owner_contract").on(
+      table.owner,
+      table.contract,
     ),
   })
 );

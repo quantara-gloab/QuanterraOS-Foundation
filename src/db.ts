@@ -30,8 +30,22 @@ export function runMigrations(): void {
     "0002_research_resolutions.sql",
     "0003_btc_index_ticks.sql",
     "0004_exchange_prices.sql",
+    "0005_market_outcomes.sql",
+    "0006_multi_asset.sql",
+    "0007_orderbook_snapshots.sql",
+    "0008_falcon_recommendations.sql",
   ]) {
     const migrationPath = path.join(migrationsDir, migration);
+    if (migration === "0006_multi_asset.sql") {
+      for (const table of ["btc_index_ticks", "exchange_prices", "market_outcomes"]) {
+        const columns = sqlite.prepare(`PRAGMA table_info(${table})`).all() as Array<{ name: string }>;
+        if (!columns.some((column) => column.name === "asset")) {
+          sqlite.exec(`ALTER TABLE ${table} ADD COLUMN asset text NOT NULL DEFAULT 'BTC'`);
+        }
+      }
+      sqlite.exec(readFileSync(migrationPath, "utf-8").split(/ALTER TABLE[^;]+;/).slice(-1)[0]);
+      continue;
+    }
     sqlite.exec(readFileSync(migrationPath, "utf-8"));
   }
 }

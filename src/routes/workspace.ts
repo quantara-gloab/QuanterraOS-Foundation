@@ -98,3 +98,40 @@ export async function handleEdgeScore(
 export function scoreOne(observation: ObservationRow, resolution: ResolutionRow) {
   return scoreObservation(observation, resolution);
 }
+
+export interface ObserveInput {
+  owner: string;
+  contract: string;
+  source: string;
+  direction: string;
+  hypothesis: string;
+  probability: number | null;
+}
+
+export interface ObserveDeps {
+  /** Generates the new row's id — injected so tests can supply a fixed id. */
+  generateId: () => string;
+  saveObservation: (row: ObservationRow) => Promise<void>;
+}
+
+/** The one real "record a forecast" path: used both for a manually-typed
+ * forecast and for a human-confirmed agent recommendation (see
+ * routes/falcon.ts), so every forecast — human or agent-assisted —
+ * goes through identical storage and is scored identically later. */
+export async function handleObserve(
+  input: ObserveInput,
+  deps: ObserveDeps
+): Promise<{ status: 200; body: ObservationRow }> {
+  const row: ObservationRow = {
+    id: deps.generateId(),
+    owner: input.owner,
+    contract: input.contract,
+    source: input.source,
+    direction: input.direction,
+    hypothesis: input.hypothesis,
+    probability: input.probability,
+    created: new Date().toISOString(),
+  };
+  await deps.saveObservation(row);
+  return { status: 200, body: row };
+}

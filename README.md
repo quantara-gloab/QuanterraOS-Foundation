@@ -34,6 +34,15 @@ publicly scores itself against real outcomes over time.
   routes from `workspace.ts`. It also exposes
   `/api/workspace/calibration`, which returns the performance summary,
   calibration bins, and observation streak. Run it with `npm run dev`.
+- `src/plan.ts` — subscription gating through **Clerk Billing**
+  (`@clerk/backend`, an external dependency and hosted service).
+  `currentPlan(req)` calls `authenticateRequest(...).toAuth().has({ plan: "pro" })`
+  on every request. With no Clerk keys set, every request is treated as the free plan.
+  Needs `CLERK_SECRET_KEY` and `CLERK_PUBLISHABLE_KEY` in `.env`. You can also set
+  `CLERK_AUTHORIZED_PARTIES` (comma-separated origins). Plans themselves are created in
+  the Clerk dashboard; this code never calls Stripe.
+  `/calibration/market-price` stays public: free users get a once-daily cached result, and Pro adds
+  live recomputation and the full per-bin table.
 
 **Still a stub:**
 - `src/schema.ts` — `founderAudit`, `founderControls`, and

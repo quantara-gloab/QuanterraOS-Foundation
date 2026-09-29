@@ -1,0 +1,21 @@
+[Unit]
+Description=QuanterraOS Kalshi BRTI logger
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=quanterraos
+Group=quanterraos
+WorkingDirectory=/opt/quanterraos/app
+EnvironmentFile=/opt/quanterraos/app/.env
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node src/kalshi-btc-logger.mjs
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
