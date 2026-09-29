@@ -14,18 +14,15 @@ for unit in "$unit_dir"/*.service; do
 done
 
 systemctl daemon-reload
-systemctl enable --now \
-  quantterra-web.service \
-  quantterra-dashboard.service \
-  quantterra-kalshi-btc-logger.service \
-  quantterra-exchange-price-poller.service \
-  quantterra-outcome-tracker.service \
-  quantterra-orderbook-watchdog.service
 
-systemctl --no-pager --full status \
-  quantterra-web.service \
-  quantterra-dashboard.service \
-  quantterra-kalshi-btc-logger.service \
-  quantterra-exchange-price-poller.service \
-  quantterra-outcome-tracker.service \
-  quantterra-orderbook-watchdog.service
+units=(
+  quanterra-web.service
+  quanterra-dashboard.service
+  quanterra-kalshi-btc-logger.service
+  quanterra-exchange-price-poller.service
+  quanterra-outcome-tracker.service
+  quanterra-orderbook-watchdog.service
+)
+
+systemctl enable --now "${units[@]}"
+systemctl --no-pager --plain --legend=false list-units --state=active "${units[@]}"
