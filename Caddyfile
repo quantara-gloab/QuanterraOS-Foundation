@@ -1,4 +1,15 @@
 quanterraos.com, www.quanterraos.com {
 	encode zstd gzip
-	reverse_proxy 127.0.0.1:3102
+	handle /api/stats* {
+		reverse_proxy 127.0.0.1:3000
+	}
+	handle /api/history* {
+		reverse_proxy 127.0.0.1:3000
+	}
+	handle_path /spread* {
+		reverse_proxy 127.0.0.1:3000
+	}
+	handle {
+		reverse_proxy 127.0.0.1:3102
+	}
 }

@@ -34,6 +34,7 @@ export function runMigrations(): void {
     "0006_multi_asset.sql",
     "0007_orderbook_snapshots.sql",
     "0008_falcon_recommendations.sql",
+    "0009_dashboard_query_indexes.sql",
   ]) {
     const migrationPath = path.join(migrationsDir, migration);
     if (migration === "0006_multi_asset.sql") {

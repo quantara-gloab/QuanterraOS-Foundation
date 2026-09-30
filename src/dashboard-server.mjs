@@ -160,7 +160,31 @@ function readRows(asset = "BTC") {
 
 function nearestTick(ticks, timestamp) {
   if (ticks.length === 0) return null;
-  return ticks.reduce((best, tick) => Math.abs(tick.timestamp - timestamp) < Math.abs(best.timestamp - timestamp) ? tick : best);
+  let low = 0;
+  let high = ticks.length - 1;
+  while (low < high) {
+    const middle = Math.floor((low + high) / 2);
+    if (ticks[middle].timestamp < timestamp) low = middle + 1;
+    else high = middle;
+  }
+  const right = ticks[low];
+  const left = ticks[low - 1];
+  if (!left) return right;
+  return Math.abs(right.timestamp - timestamp) < Math.abs(left.timestamp - timestamp) ? right : left;
+}
+
+function matchedExchangeRows(brti, exchanges) {
+  const matched = [];
+  let tickIndex = 0;
+  for (const row of exchanges) {
+    while (tickIndex + 1 < brti.length && Math.abs(brti[tickIndex + 1].timestamp - row.timestamp) <= Math.abs(brti[tickIndex].timestamp - row.timestamp)) {
+      tickIndex += 1;
+    }
+    const tick = brti[tickIndex];
+    if (!tick || Math.abs(tick.timestamp - row.timestamp) > maxMatchDifferenceMs) continue;
+    matched.push({ ...row, brti: tick.value, brtiTimestamp: tick.timestamp, spread: row.value - tick.value });
+  }
+  return matched;
 }
 
 // Coinbase previously showed a near-coinflip wrong-direction rate because exchange-price-poller
@@ -177,13 +201,10 @@ function computeStats(asset = "BTC") {
   const spreads = [];
   const grouped = new Map();
   let previousByExchange = new Map();
-  for (const row of exchanges) {
-    const tick = nearestTick(brti, row.timestamp);
-    if (!tick || Math.abs(tick.timestamp - row.timestamp) > maxMatchDifferenceMs) continue;
-    const sample = { ...row, brti: tick.value, brtiTimestamp: tick.timestamp, spread: row.value - tick.value };
-    const samples = grouped.get(row.exchange) ?? [];
+  for (const sample of matchedExchangeRows(brti, exchanges)) {
+    const samples = grouped.get(sample.exchange) ?? [];
     samples.push(sample);
-    grouped.set(row.exchange, samples);
+    grouped.set(sample.exchange, samples);
   }
   for (const [exchange, samples] of grouped) {
     let spreadTotal = 0;
@@ -235,10 +256,8 @@ function computeStats(asset = "BTC") {
 function computeHistory(asset = "BTC") {
   const { brti, exchanges } = readRows(asset);
   const grouped = new Map();
-  for (const row of exchanges) {
-    const tick = nearestTick(brti, row.timestamp);
-    if (!tick || Math.abs(tick.timestamp - row.timestamp) > maxMatchDifferenceMs) continue;
-    const point = grouped.get(row.timestamp) ?? { timestamp: row.timestamp, brti: tick.value };
+  for (const row of matchedExchangeRows(brti, exchanges)) {
+    const point = grouped.get(row.timestamp) ?? { timestamp: row.timestamp, brti: row.brti };
     point[row.exchange] = row.value;
     grouped.set(row.timestamp, point);
   }

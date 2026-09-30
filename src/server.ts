@@ -798,6 +798,10 @@ window.addEventListener("load", async function () {
 </body>
 </html>`;
 
+app.get("/", (_req, res) => {
+  res.redirect(302, "/calibration/market-price");
+});
+
 app.get("/calibration/market-price", (_req, res) => {
   res.type("html").send(marketPriceCalibrationPage);
 });
