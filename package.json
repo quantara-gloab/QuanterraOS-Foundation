@@ -9,6 +9,9 @@
     "start": "node --experimental-strip-types src/server.ts",
     "ingest": "node --experimental-strip-types src/ingest.ts",
     "test": "node --experimental-strip-types --test src/__tests__/*.ts",
+    "test:highlow": "node --experimental-strip-types --test src/__tests__/falcon-highlow.test.ts",
+    "test:jev": "node --experimental-strip-types --test src/__tests__/falcon-jev.test.ts",
+    "backtest:highlow": "node --experimental-strip-types src/highlow-backtest.ts",
     "typecheck": "tsc --noEmit"
   },
   "engines": {

@@ -35,16 +35,29 @@ export function runMigrations(): void {
     "0007_orderbook_snapshots.sql",
     "0008_falcon_recommendations.sql",
     "0009_dashboard_query_indexes.sql",
+    "0010_paper_trades.sql",
   ]) {
     const migrationPath = path.join(migrationsDir, migration);
     if (migration === "0006_multi_asset.sql") {
-      for (const table of ["btc_index_ticks", "exchange_prices", "market_outcomes"]) {
-        const columns = sqlite.prepare(`PRAGMA table_info(${table})`).all() as Array<{ name: string }>;
+      for (const table of [
+        "btc_index_ticks",
+        "exchange_prices",
+        "market_outcomes",
+      ]) {
+        const columns = sqlite
+          .prepare(`PRAGMA table_info(${table})`)
+          .all() as Array<{ name: string }>;
         if (!columns.some((column) => column.name === "asset")) {
-          sqlite.exec(`ALTER TABLE ${table} ADD COLUMN asset text NOT NULL DEFAULT 'BTC'`);
+          sqlite.exec(
+            `ALTER TABLE ${table} ADD COLUMN asset text NOT NULL DEFAULT 'BTC'`,
+          );
         }
       }
-      sqlite.exec(readFileSync(migrationPath, "utf-8").split(/ALTER TABLE[^;]+;/).slice(-1)[0]);
+      sqlite.exec(
+        readFileSync(migrationPath, "utf-8")
+          .split(/ALTER TABLE[^;]+;/)
+          .slice(-1)[0],
+      );
       continue;
     }
     sqlite.exec(readFileSync(migrationPath, "utf-8"));

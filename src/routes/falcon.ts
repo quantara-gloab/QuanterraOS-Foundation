@@ -7,8 +7,19 @@
  * here, not reimplemented — and only runs after a human decision.
  * Falcon never calls anything resolution/settlement-related.
  */
-import { computeFalconRecommendation, type OrderbookEvidence } from "../agents/falcon.ts";
+import {
+  computeFalconRecommendation,
+  type OrderbookEvidence,
+} from "../agents/falcon.ts";
+import { computeFalconJevRecommendation } from "../agents/falcon-jev.ts";
 import { handleObserve, type ObserveDeps } from "./workspace.ts";
+import {
+  suggestPaperTrade,
+  buildPaperTradeRow,
+  recommendPaperTrade,
+  type PaperTradeRow,
+  type MarketQuote,
+} from "../paper-trading.ts";
 
 export interface FalconRecommendationRow {
   id: string;
@@ -37,9 +48,12 @@ export interface RecommendDeps {
 
 export async function handleFalconRecommend(
   input: RecommendInput,
-  deps: RecommendDeps
+  deps: RecommendDeps,
 ): Promise<{ status: 200; body: FalconRecommendationRow }> {
-  const recommendation = computeFalconRecommendation(input.contract, input.evidence);
+  const recommendation = computeFalconRecommendation(
+    input.contract,
+    input.evidence,
+  );
   const row: FalconRecommendationRow = {
     id: deps.generateId(),
     owner: input.owner,
@@ -47,6 +61,57 @@ export async function handleFalconRecommend(
     suggestedProbability: recommendation.suggestedProbability,
     rationale: recommendation.rationale,
     evidenceJson: JSON.stringify(recommendation.evidence),
+    status: "proposed",
+    finalProbability: null,
+    observationId: null,
+    createdAt: recommendation.generatedAt,
+    decidedAt: null,
+  };
+  await deps.saveRecommendation(row);
+  return { status: 200, body: row };
+}
+
+export interface FalconJevRecommendInput {
+  owner: string;
+  contract: string;
+  strike?: number;
+  barrierType?: "high" | "low" | "auto";
+  remainingSeconds?: number;
+  pricesOrTicks?:
+    | number[]
+    | { at?: number; timestamp?: number; value?: number; price?: number }[];
+  evidence?: OrderbookEvidence[];
+}
+
+export async function handleFalconJevRecommend(
+  input: FalconJevRecommendInput,
+  deps: RecommendDeps,
+): Promise<{ status: 200; body: FalconRecommendationRow }> {
+  const strike = input.strike ?? 100_000;
+  const remainingSeconds = input.remainingSeconds ?? 900;
+  const pricesOrTicks = input.pricesOrTicks ?? [
+    strike * 0.999,
+    strike * 1.0005,
+    strike * 0.9998,
+  ];
+  const latestEvidence = input.evidence?.at(0) ?? null;
+
+  const recommendation = await computeFalconJevRecommendation({
+    contract: input.contract,
+    strike,
+    barrierType: input.barrierType ?? "auto",
+    remainingSeconds,
+    pricesOrTicks,
+    orderbookEvidence: latestEvidence,
+  });
+
+  const row: FalconRecommendationRow = {
+    id: deps.generateId(),
+    owner: input.owner,
+    contract: input.contract,
+    suggestedProbability: recommendation.suggestedProbability,
+    rationale: recommendation.rationale,
+    evidenceJson: JSON.stringify(recommendation.curatedFeatures),
     status: "proposed",
     finalProbability: null,
     observationId: null,
@@ -74,27 +139,40 @@ export interface DecisionDeps {
 
 export async function handleFalconDecision(
   input: DecisionInput,
-  deps: DecisionDeps
+  deps: DecisionDeps,
 ): Promise<{ status: 200 | 400 | 404 | 409; body: unknown }> {
   const recommendation = await deps.getRecommendation(input.recommendationId);
   if (!recommendation || recommendation.owner !== input.owner) {
     return { status: 404, body: { error: "recommendation_not_found" } };
   }
   if (recommendation.status !== "proposed") {
-    return { status: 409, body: { error: "already_decided", status: recommendation.status } };
+    return {
+      status: 409,
+      body: { error: "already_decided", status: recommendation.status },
+    };
   }
 
   if (input.action === "reject") {
-    const updated: FalconRecommendationRow = { ...recommendation, status: "rejected", decidedAt: new Date().toISOString() };
+    const updated: FalconRecommendationRow = {
+      ...recommendation,
+      status: "rejected",
+      decidedAt: new Date().toISOString(),
+    };
     await deps.updateRecommendation(updated);
     return { status: 200, body: updated };
   }
 
-  if (input.action === "edit" && (input.probability === undefined || input.probability === null)) {
+  if (
+    input.action === "edit" &&
+    (input.probability === undefined || input.probability === null)
+  ) {
     return { status: 400, body: { error: "probability_required_for_edit" } };
   }
 
-  const finalProbability = input.action === "edit" ? (input.probability as number) : recommendation.suggestedProbability;
+  const finalProbability =
+    input.action === "edit"
+      ? (input.probability as number)
+      : recommendation.suggestedProbability;
 
   const observationResult = await handleObserve(
     {
@@ -105,7 +183,7 @@ export async function handleFalconDecision(
       hypothesis: input.hypothesis ?? recommendation.rationale,
       probability: finalProbability,
     },
-    deps.observeDeps
+    deps.observeDeps,
   );
 
   const updated: FalconRecommendationRow = {
@@ -116,5 +194,59 @@ export async function handleFalconDecision(
     decidedAt: new Date().toISOString(),
   };
   await deps.updateRecommendation(updated);
-  return { status: 200, body: { recommendation: updated, observation: observationResult.body } };
+  return {
+    status: 200,
+    body: { recommendation: updated, observation: observationResult.body },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Paper trading — high/low barrier model
+// ---------------------------------------------------------------------------
+
+export interface PaperTradeRequest {
+  owner: string;
+  contract: string;
+  modelProbability: number;
+  modelSource: "quant" | "jev";
+  barrierType: "high" | "low";
+  market: MarketQuote;
+  edgeThreshold?: number;
+}
+
+export interface PaperTradeDeps {
+  savePaperTrade: (row: PaperTradeRow) => Promise<void>;
+  generateId: () => string;
+}
+
+export async function handlePaperTrade(
+  input: PaperTradeRequest,
+  deps: PaperTradeDeps,
+): Promise<{ status: 200; body: PaperTradeRow }> {
+  const decision = suggestPaperTrade({
+    owner: input.owner,
+    contract: input.contract,
+    modelProbability: input.modelProbability,
+    modelSource: input.modelSource,
+    barrierType: input.barrierType,
+    market: input.market,
+    edgeThreshold: input.edgeThreshold,
+  });
+
+  const row = buildPaperTradeRow(
+    {
+      owner: input.owner,
+      contract: input.contract,
+      modelProbability: input.modelProbability,
+      modelSource: input.modelSource,
+      barrierType: input.barrierType,
+      market: input.market,
+      edgeThreshold: input.edgeThreshold,
+    },
+    decision,
+    deps.generateId,
+  );
+
+  await deps.savePaperTrade(row);
+  return { status: 200, body: row };
 }

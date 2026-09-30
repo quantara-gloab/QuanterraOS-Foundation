@@ -42,7 +42,7 @@ export const founderControls = sqliteTable(
   },
   (table) => ({
     pk: primaryKey({ columns: [table.owner, table.key] }),
-  })
+  }),
 );
 
 export const researchObservations = sqliteTable("research_observations", {
@@ -74,7 +74,7 @@ export const researchResolutions = sqliteTable(
   },
   (table) => ({
     pk: primaryKey({ columns: [table.owner, table.contract] }),
-  })
+  }),
 );
 
 export const researchResolutionHistory = sqliteTable(
@@ -92,9 +92,9 @@ export const researchResolutionHistory = sqliteTable(
   (table) => ({
     ownerContractIdx: index("resolution_history_owner_contract").on(
       table.owner,
-      table.contract
+      table.contract,
     ),
-  })
+  }),
 );
 
 // ---------------------------------------------------------------------------
@@ -117,9 +117,9 @@ export const exchangeTicks = sqliteTable(
   (table) => ({
     assetTimeIdx: index("exchange_ticks_asset_time").on(
       table.asset,
-      table.observedAt
+      table.observedAt,
     ),
-  })
+  }),
 );
 
 /** One row per (asset, timestamp): the computed composite index value,
@@ -137,9 +137,9 @@ export const compositeIndexTicks = sqliteTable(
   (table) => ({
     assetTimeIdx: index("composite_index_asset_time").on(
       table.asset,
-      table.computedAt
+      table.computedAt,
     ),
-  })
+  }),
 );
 
 /** One row per edge-score computation shown to a user for a specific
@@ -164,10 +164,10 @@ export const edgeScores = sqliteTable(
   (table) => ({
     ownerContractIdx: index("edge_scores_owner_contract").on(
       table.owner,
-      table.contract
+      table.contract,
     ),
     bucketIdx: index("edge_scores_bucket").on(table.bucket),
-  })
+  }),
 );
 
 export const btcIndexTicks = sqliteTable(
@@ -183,7 +183,7 @@ export const btcIndexTicks = sqliteTable(
   },
   (table) => ({
     receivedAtIdx: index("btc_index_ticks_received_at").on(table.receivedAt),
-  })
+  }),
 );
 
 export const exchangePrices = sqliteTable(
@@ -200,7 +200,7 @@ export const exchangePrices = sqliteTable(
       table.exchangeName,
       table.fetchedAt,
     ),
-  })
+  }),
 );
 
 export const marketOutcomes = sqliteTable(
@@ -217,7 +217,7 @@ export const marketOutcomes = sqliteTable(
   },
   (table) => ({
     closeTimeIdx: index("market_outcomes_close_time").on(table.closeTime),
-  })
+  }),
 );
 
 export const orderbookSnapshots = sqliteTable(
@@ -242,7 +242,7 @@ export const orderbookSnapshots = sqliteTable(
       table.marketTicker,
       table.capturedAt,
     ),
-  })
+  }),
 );
 
 export const falconRecommendations = sqliteTable(
@@ -254,7 +254,7 @@ export const falconRecommendations = sqliteTable(
     suggestedProbability: real("suggested_probability").notNull(),
     rationale: text("rationale").notNull(),
     evidenceJson: text("evidence_json").notNull(),
-    status: text("status").notNull().default("proposed"), // 'proposed' | 'accepted' | 'edited' | 'rejected'
+    status: text("status").notNull().default("proposed"),
     finalProbability: real("final_probability"),
     observationId: text("observation_id"),
     createdAt: text("created_at").notNull(),
@@ -265,5 +265,44 @@ export const falconRecommendations = sqliteTable(
       table.owner,
       table.contract,
     ),
-  })
+  }),
+);
+
+/**
+ * Paper trades — every BUY/SKIP decision from the high/low barrier model
+ * is logged here unconditionally, so the track record shows flag rate
+ * alongside hit rate (mirroring falcon_recommendations' "log always,
+ * score later" convention).
+ */
+export const paperTrades = sqliteTable(
+  "paper_trades",
+  {
+    id: text("id").primaryKey(),
+    owner: text("owner").notNull(),
+    contract: text("contract").notNull(),
+    modelProbability: real("model_probability").notNull(),
+    modelSource: text("model_source").notNull(), // 'quant' | 'jev'
+    barrierType: text("barrier_type").notNull(), // 'high' | 'low'
+    side: text("side"), // 'yes' | 'no' | null (null = skip)
+    decision: text("decision").notNull(), // 'buy' | 'skip'
+    entryPrice: real("entry_price"), // null when skipped
+    breakevenProbability: real("breakeven_probability").notNull(),
+    edge: real("edge").notNull(),
+    feeEstimate: real("fee_estimate").notNull(),
+    rationale: text("rationale").notNull(),
+    evidenceJson: text("evidence_json").notNull(),
+    status: text("status").notNull().default("proposed"), // 'proposed' | 'resolved'
+    resolvedAt: text("resolved_at"),
+    outcome: text("outcome"), // 'YES' | 'NO' | 'VOID' | null
+    brierScore: real("brier_score"),
+    pnl: real("pnl"),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => ({
+    ownerContractIdx: index("paper_trades_owner_contract").on(
+      table.owner,
+      table.contract,
+    ),
+    statusIdx: index("paper_trades_status").on(table.status),
+  }),
 );

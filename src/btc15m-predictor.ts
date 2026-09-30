@@ -113,3 +113,22 @@ export function buildPrediction(market: LiveMarket, ticks: { at: number; value: 
     evidence: BACKTEST_EVIDENCE,
   };
 }
+
+export {
+  oneTouchProbability,
+  oneTouchHighProbability,
+  oneTouchLowProbability,
+  oneTouchFromMinuteVol,
+  computeRealizedVolatility,
+  realizedVolatilityPerSecond,
+  annualizedRealizedVolatility,
+  oneTouchFromPriceSeries,
+  type OneTouchProbabilityInput,
+  type OneTouchProbabilityOptions,
+  type RealizedVolatilityOptions,
+  type RealizedVolatilityResult,
+  type PriceSeriesInput,
+  type TimestampedPrice,
+} from "./barrier-touch.ts";
+
+

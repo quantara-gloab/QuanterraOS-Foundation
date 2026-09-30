@@ -15,7 +15,8 @@ import { getChatGPTUser } from "./auth.ts";
 import { researchObservations, researchResolutions, researchResolutionHistory, edgeScores, falconRecommendations, btcIndexTicks } from "./schema.ts";
 import { buildPrediction, type LiveMarket } from "./btc15m-predictor.ts";
 import { handleResolve, handleEdgeScore, handleObserve } from "./routes/workspace.ts";
-import { handleFalconRecommend, handleFalconDecision, type FalconRecommendationRow } from "./routes/falcon.ts";
+import { handleFalconRecommend, handleFalconJevRecommend, handleFalconDecision, type FalconRecommendationRow } from "./routes/falcon.ts";
+
 import { latestOrderbookEvidence, computeFalconTrackRecord } from "./agents/falcon.ts";
 import { computeMarketPriceCalibration, type MarketPriceCalibrationReport } from "./market-price-calibration.ts";
 import { currentPlan, hasFeature } from "./plan.ts";
@@ -219,6 +220,35 @@ app.post("/api/agents/falcon/recommend", async (req, res) => {
     res.status(422).json({ error: "no_evidence", message: (error as Error).message });
   }
 });
+
+app.post(["/api/agents/falcon/recommend-jev", "/api/falcon/recommend-jev"], async (req, res) => {
+  const user = getChatGPTUser(req);
+  const contract = req.body.contract as string;
+  const evidence = latestOrderbookEvidence(contract);
+  try {
+    const result = await handleFalconJevRecommend(
+      {
+        owner: user.ownerId,
+        contract,
+        strike: req.body.strike ? Number(req.body.strike) : undefined,
+        barrierType: req.body.barrierType,
+        remainingSeconds: req.body.remainingSeconds ? Number(req.body.remainingSeconds) : undefined,
+        pricesOrTicks: req.body.pricesOrTicks,
+        evidence,
+      },
+      {
+        generateId: () => randomUUID(),
+        saveRecommendation: async (row) => {
+          db.insert(falconRecommendations).values(row).run();
+        },
+      }
+    );
+    res.status(result.status).json(result.body);
+  } catch (error) {
+    res.status(422).json({ error: "error", message: (error as Error).message });
+  }
+});
+
 
 app.post("/api/agents/falcon/:id/decision", async (req, res) => {
   const user = getChatGPTUser(req);
