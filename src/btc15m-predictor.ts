@@ -1,7 +1,7 @@
 /**
  * KXBTC15M fair-value model. YES settles when the 60s-average BRTI at close is
  * >= the strike, so P(YES) is modeled as a driftless lognormal digital:
- *   P = Φ( ln(S/K) / (σ·√τ) ), σ = realized per-minute log-return volatility.
+ *   P = Φ( (ln(S/K) - 0.5·σ²·τ) / (σ·√τ) ), σ = realized per-minute log-return volatility.
  * The model says nothing about direction beyond where price sits vs. the strike.
  */
 
@@ -28,7 +28,9 @@ export function perMinuteVolatility(prices: number[]): number | null {
 export function probabilityYes(input: { price: number; strike: number; minutesLeft: number; sigmaPerMinute: number }): number {
   const { price, strike, minutesLeft, sigmaPerMinute } = input;
   if (minutesLeft <= 0 || sigmaPerMinute <= 0) return price >= strike ? 1 : 0;
-  const p = normalCdf(Math.log(price / strike) / (sigmaPerMinute * Math.sqrt(minutesLeft)));
+  const variance = sigmaPerMinute * sigmaPerMinute * minutesLeft;
+  const d2 = (Math.log(price / strike) - 0.5 * variance) / (sigmaPerMinute * Math.sqrt(minutesLeft));
+  const p = normalCdf(d2);
   return Math.min(0.999, Math.max(0.001, p));
 }
 
@@ -65,17 +67,12 @@ export interface LiveMarket {
   no_ask_dollars: string;
 }
 
-// Measured by src/btc15m-predictor-backtest.ts on 2026-09-28 over 1,316 settled markets.
-export const BACKTEST_EVIDENCE = {
-  run: "2026-09-28",
-  markets: 1316,
-  brierByMinute: {
-    4: { market: 0.2001, model: 0.2063 },
-    7: { market: 0.1685, model: 0.1755 },
-    10: { market: 0.1248, model: 0.1333 },
-    13: { market: 0.0731, model: 0.0835 },
-  },
-  tradingOnModelDisagreement: "lost money at minutes 4, 7 and 10; roughly break-even (+0.4¢) at minute 13",
+// Audited evidence reference: reports/btc15m-predictor-backtest-2026-10-03.txt
+export const BACKTEST_EVIDENCE_REF = {
+  evidenceReport: "reports/btc15m-predictor-backtest-2026-10-03.txt",
+  calibrationEndpoint: "/api/calibration/market-price",
+  methodology: "Historical backtest computes Brier scores per checkpoint against stored settlements without lookahead.",
+  finding: "Neither the model nor any tested heuristic has beaten the market's own price out of sample.",
 };
 
 export function buildPrediction(market: LiveMarket, ticks: { at: number; value: number }[], nowMs: number) {
@@ -110,7 +107,7 @@ export function buildPrediction(market: LiveMarket, ticks: { at: number; value: 
       expectedValuePerContract: yesAsk > 0 ? expectedValues(modelP, yesAsk, noAsk) : null,
     },
     edge: "None measured. Neither the model nor any tested rule has beaten the market's own price out of sample.",
-    evidence: BACKTEST_EVIDENCE,
+    evidence: BACKTEST_EVIDENCE_REF,
   };
 }
 

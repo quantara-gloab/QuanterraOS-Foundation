@@ -80,6 +80,7 @@ export interface MarketPriceCalibrationReport {
   skippedNoEntryCandle: number;
   sampleSize: number;
   averageBrierScore: number | null;
+  baseRateBrierScore: number | null;
   calibration: CalibrationBin[];
   entryMinute: number;
   claim: string;
@@ -131,11 +132,16 @@ export function computeCalibrationFromMarkets(markets: CalibrationMarket[]): Omi
   }
 
   const summary = summarizePerformance(scored);
+  const yesCount = scored.filter((s) => s.scorable && s.resolution.outcome === "YES").length;
+  const baseRate = summary.scored > 0 ? yesCount / summary.scored : 0.5;
+  const baseRateBrierScore = summary.scored > 0 ? Number((baseRate * (1 - baseRate)).toFixed(4)) : null;
+
   return {
     totalUniqueMarkets: markets.length,
     skippedNoEntryCandle,
     sampleSize: summary.scored,
     averageBrierScore: summary.averageBrierScore,
+    baseRateBrierScore,
     calibration: computeCalibrationCurve(scored),
     entryMinute,
   };
@@ -149,7 +155,7 @@ export async function computeMarketPriceCalibration(
   const base = computeCalibrationFromMarkets(markets);
   return {
     ...base,
-    claim: `The market's own entry price has been verified well-calibrated over ${base.sampleSize} settled 15-minute BTC contracts.`,
-    notTheClaim: "This is not a claim that this project predicts better than the market — no tested feature or agent has shown that yet.",
+    claim: `The market's own entry price has an average Brier score of ${base.averageBrierScore?.toFixed(4)} over ${base.sampleSize} settled 15-minute BTC contracts (vs. base-rate climatology of ${base.baseRateBrierScore?.toFixed(4)}).`,
+    notTheClaim: "This is an empirical audit of the market's own pricing calibration, not a claim of predictive edge over it.",
   };
 }

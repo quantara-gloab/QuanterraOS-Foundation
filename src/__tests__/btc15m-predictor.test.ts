@@ -8,9 +8,12 @@ test("normalCdf matches known values", () => {
   assert.ok(Math.abs(normalCdf(-1.96) - 0.025) < 1e-3);
 });
 
-test("probabilityYes is 50% at the strike and moves with distance and time", () => {
+test("probabilityYes reflects Ito convexity at the strike and moves with distance and time", () => {
   const base = { strike: 100_000, sigmaPerMinute: 0.0005 };
-  assert.ok(Math.abs(probabilityYes({ ...base, price: 100_000, minutesLeft: 10 }) - 0.5) < 1e-6);
+  const atStrike = probabilityYes({ ...base, price: 100_000, minutesLeft: 10 });
+  // With Ito correction -0.5*sigma^2*tau, P is slightly below 0.5 (median < mean in lognormal)
+  assert.ok(Math.abs(atStrike - 0.5) < 1e-3);
+  assert.ok(atStrike < 0.5);
   const above = probabilityYes({ ...base, price: 100_100, minutesLeft: 10 });
   assert.ok(above > 0.5);
   assert.ok(probabilityYes({ ...base, price: 100_100, minutesLeft: 1 }) > above);

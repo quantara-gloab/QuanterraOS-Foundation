@@ -1,4 +1,4 @@
-﻿/**
+/**
  * The actual running server. This is what turns everything else in
  * this repo from "code that type-checks" into "a program you can
  * send a real HTTP request to and get a real answer back."
@@ -542,13 +542,19 @@ ${clerkScripts}
 </head>
 <body>
 <main>
-  <nav class="site-nav"><a href="/calibration/market-price">QuanterraOS</a><div class="auth-links"><a class="auth-link" href="/subscribe">Plans</a><span id="clerk-controls">${clerkConfigured ? "Loading account…" : "Sign-in setup pending"}</span></div></nav>
-  <h1>Verified Calibration</h1>
+  <nav class="site-nav"><a href="/">← QuanterraOS Home</a><div class="auth-links"><a class="auth-link" href="/calibration/market-price">Calibration Dashboard</a><a class="auth-link" href="/subscribe">Plans</a><span id="clerk-controls">${clerkConfigured ? "Loading account…" : "Sign-in setup pending"}</span></div></nav>
+  <h1>Market Calibration</h1>
+  <div class="panel" style="border-left: 4px solid #f0b3b3; margin: 16px 0 20px;">
+    <div style="font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: #f0b3b3; font-weight: 700; margin-bottom: 4px;">Calibration verdict: computing — methodology in progress</div>
+    <div style="font-size: 0.95rem; color: #e8edf2; margin-bottom: 6px;">Scoring Kalshi 15-minute BTC entry mid-prices directly against real settlement outcomes without lookahead.</div>
+    <div style="font-size: 0.8rem; color: #91a1af;">Benchmarks contract pricing against the empirical base-rate (climatology) Brier score and evaluates calibration consistency per probability bin. Historical calibration measures past markets and is not a forecast or investment advice.</div>
+  </div>
   <p class="claim" id="claim">Loading…</p>
   <p class="not-claim" id="not-claim"></p>
   <div class="panel">
     <div class="stat-row">
-      <div class="stat"><div class="value" id="brier">—</div><div class="label">Average Brier score</div></div>
+      <div class="stat"><div class="value" id="brier">—</div><div class="label">Market Mid Brier Score</div></div>
+      <div class="stat"><div class="value" id="base-rate-brier" style="color: #9ee0b8;">—</div><div class="label">Base-Rate Climatology Brier</div></div>
       <div class="stat"><div class="value" id="sample-size">—</div><div class="label">Settled contracts scored</div></div>
     </div>
   </div>
@@ -643,6 +649,7 @@ async function load() {
   document.getElementById("claim").textContent = report.claim;
   document.getElementById("not-claim").textContent = report.notTheClaim;
   document.getElementById("brier").textContent = report.averageBrierScore === null ? "n/a" : report.averageBrierScore.toFixed(4);
+  document.getElementById("base-rate-brier").textContent = report.baseRateBrierScore === null ? "n/a" : report.baseRateBrierScore.toFixed(4);
   document.getElementById("sample-size").textContent = report.sampleSize;
 
   const fullTable = report.calibration.every(function (bin) { return "count" in bin; });
@@ -650,7 +657,7 @@ async function load() {
   document.getElementById("caption").textContent = thinBins.length
     ? "Green points are well-populated bins; red points (" + thinBins.map(function (b) { return fullTable ? b.label + ", n=" + b.count : b.label; }).join("; ") + ") are thin-sample and lower-confidence, not equally reliable."
     : "All bins shown have at least " + lowConfidenceThreshold + " settled contracts.";
-  document.getElementById("freshness").textContent = (report.realtime ? "Live: recomputed on this request at " : "Updated daily; last computed ") + report.computedAt + ".";
+  document.getElementById("freshness").textContent = (report.realtime ? "Live: recomputed on this request at " : "Updated daily; last computed ") + report.computedAt + ". Auto-refreshes every 30s.";
 
   drawChart(report.calibration);
   if (!fullTable) {
@@ -670,6 +677,7 @@ async function load() {
   document.getElementById("calibration-rows").innerHTML = rows;
 }
 load();
+setInterval(load, 30000);
 </script>
 </body>
 </html>`;
@@ -1248,21 +1256,23 @@ ${clerkScripts}
       <span class="wordmark">QUANTERRAOS</span>
     </div>
     <div class="links">
+      <a href="/calibration/market-price">Verified Calibration</a>
       <a href="/#council">The Council</a>
       <a href="/#how">How it Works</a>
-      <a href="/#dashboard">Dashboard</a>
+      <a href="/#dashboard">Calibration Telemetry</a>
     </div>
     <div class="auth">
+      <a href="/calibration/market-price"><button class="ghost-btn" style="border-color: var(--accent); color: var(--accent);">Live Calibration</button></a>
       <button class="ghost-btn" onclick="window.location.href='${clerkConfigured ? '/signup' : '/account'}'">Request Access</button>
     </div>
   </nav>
 
   <section class="hero">
-    <div class="eyebrow">SOVEREIGN ENTERPRISE INTELLIGENCE</div>
-    <h1 class="serif-headline">A council of AI executives,<br>working your capital.</h1>
-    <p class="subhead">No single model makes the decisions. A coordinated council of AI agents — each specialized in a different domain of financial intelligence — surface, weigh, and execute opportunities with full auditability.</p>
+    <div class="eyebrow">PREDICTION MARKET PRICING &amp; CALIBRATION VERIFICATION</div>
+    <h1 class="serif-headline">A council of AI specialists,<br>verifying market truth.</h1>
+    <p class="subhead">Empirical prediction-market intelligence. A coordinated council of AI agents verifies market pricing efficiency, audits order-book dynamics, and benchmarks contract probabilities against real settlement data with mathematical transparency.</p>
     <div class="cta-group">
-      <a href="/signup"><button class="primary-btn">Request Access</button></a>
+      <a href="/calibration/market-price"><button class="primary-btn">View Verified Calibration</button></a>
       <button class="secondary-btn" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">How it works</button>
     </div>
     <div class="seal-container">
@@ -1281,57 +1291,57 @@ ${clerkScripts}
   <section class="council-section" id="council">
     <div class="section-header">
       <div class="eyebrow">The Council</div>
-      <h2>Eight specialists. One portfolio.</h2>
-      <p class="section-subhead">Each agent represents a distinct layer of financial expertise — market structure, volatility, risk, execution, and research synthesis.</p>
+      <h2>Eight specialists. One objective: Pricing Truth.</h2>
+      <p class="section-subhead">Each agent executes an independent verification discipline — data integrity, market microstructure, latency profiling, and settlement calibration.</p>
     </div>
     <div class="council-grid">
       <div class="agent-card">
         <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg></div>
-        <div class="role">OPPORTUNITY INTELLIGENCE</div>
+        <div class="role">Order-Book Depth Monitoring (research)</div>
         <div class="name">Falcon</div>
-        <div class="desc">Surfaces mispriced opportunities from live market structure</div>
+        <div class="desc">Collects order-book depth snapshots and tracks bid/ask imbalance; accumulating sample size before conclusions</div>
       </div>
       <div class="agent-card">
         <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V5l-9-4z"/><path d="M9.5 12.5l2 2 2.5-3"/></svg></div>
-        <div class="role">SYSTEMS MONITORING</div>
+        <div class="role">CALIBRATION SURVEILLANCE</div>
         <div class="name">Sentinel</div>
-        <div class="desc">Continuous risk surveillance across all active positions</div>
+        <div class="desc">Continuous drift monitoring and real-time Brier score tracking across venues</div>
       </div>
       <div class="agent-card">
         <div class="icon"><svg viewBox="0 0 24 24"><path d="M21 16.5c0-.27-.02-.55-.07-.82A4.5 4.5 0 0 0 19 11.5a4.4 4.4 0 0 0-.33-1.7l1.17-1.17a.5.5 0 0 0-.3-.87l-2.17-.44a4.5 4.5 0 0 0-.9 1.83 4.6 4.6 0 0 0-2.15-1.44L10.5 7v2.5l5.83 1.17A4.5 4.5 0 0 1 19 12c0 .23-.02.46-.07.68l1.17.67a.5.5 0 0 1 0 .8z"/></svg></div>
-        <div class="role">STRATEGIC ANALYSIS</div>
+        <div class="role">QUANTITATIVE MODELING</div>
         <div class="name">Quantum Fox</div>
-        <div class="desc">Quantitative modeling and scenario analysis</div>
+        <div class="desc">Rigorous baseline modeling, volatility analytics, and convexity validation</div>
       </div>
       <div class="agent-card">
         <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 8v4l2 2m-2-6a9 9 0 1 1 0 18 9 9 0 0 1 0-18z"/><path d="M5 12h14"/></svg></div>
-        <div class="role">REAL-TIME EXECUTION</div>
+        <div class="role">TELEMETRY PIPELINE</div>
         <div class="name">Phoenix</div>
-        <div class="desc">High-speed order routing and trade execution</div>
+        <div class="desc">High-throughput ingestion pipeline and low-latency market-data dispatch</div>
       </div>
       <div class="agent-card">
         <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7v10c0 5 6 9 10 9s10-4 10-9V7l-10-5z"/>m-2 8l2 2 4-4-1-1-3 3-1 1z"/></svg></div>
         <div class="role">DATA INTEGRITY</div>
         <div class="name">Draco</div>
-        <div class="desc">Data quality verification and pipeline monitoring</div>
+        <div class="desc">Data verification, staleness detection, and pipeline anomaly mitigation</div>
       </div>
       <div class="agent-card">
         <div class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 10v6m8.66-9H17m-5 0H5.34"/></svg></div>
         <div class="role">MARKET MICROSTRUCTURE</div>
         <div class="name">Wolf</div>
-        <div class="desc">Order-book dynamics and liquidity analysis</div>
+        <div class="desc">Order-book skew dynamics, spread attribution, and liquidity structure analysis</div>
       </div>
       <div class="agent-card">
         <div class="icon"><svg viewBox="0 0 24 24"><path d="M3 12c0 4.97 4.03 9 9 9s9-4.03 9-9-4.03-9-9-9-9 4.03-9 9zm9 4a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm0-3a1 1 0 0 1 1-1h1a1 1 0 0 1 0 2h-1a1 1 0 0 1-1 0zm2-3a1 1 0 0 1 1 1v1h1a1 1 0 0 1 0 2h-1v1a1 1 0 0 1-2 0v-1a1 1 0 0 1 1-1h1v-1a1 1 0 0 1 1-1z"/></svg></div>
         <div class="role">RISK OVERSIGHT</div>
         <div class="name">Kraken</div>
-        <div class="desc">Portfolio-level risk aggregation and stress testing</div>
+        <div class="desc">Cross-venue divergence stress-testing and tail-risk calibration checks</div>
       </div>
       <div class="agent-card">
         <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 7V3l8 9-8 9v-4a4 4 0 0 1-4-4v-1zm0 0V7z"/><circle cx="12" cy="12" r="5"/></svg></div>
-        <div class="role">PORTFOLIO SYNTHESIS</div>
+        <div class="role">CALIBRATION SYNTHESIS</div>
         <div class="name">Lion</div>
-        <div class="desc">Final decision synthesis and portfolio-level coordination</div>
+        <div class="desc">Cross-agent consensus audit, empirical calibration grading, and reproducible measurement</div>
       </div>
     </div>
   </section>
@@ -1339,49 +1349,55 @@ ${clerkScripts}
   <section class="how-section" id="how">
     <div class="how-content">
       <div class="eyebrow">How the Council moves</div>
-      <h2>Three layers. No single point of failure.</h2>
+      <h2>Three layers of verification. No ungrounded claims.</h2>
       <div class="how-steps">
         <div class="step">
           <div class="number">1</div>
-          <div class="label">Surface</div>
-          <div class="detail">Falcon and Kraken identify mispriced opportunities from live market data</div>
+          <div class="label">Ingest &amp; Verify</div>
+          <div class="detail">Draco and Phoenix ingest multi-exchange feeds, filtering stale ticks and verifying data integrity</div>
         </div>
         <div class="step">
           <div class="number">2</div>
-          <div class="label">Weigh</div>
-          <div class="detail">Quantum Fox and Sentinel stress-test and calibrate each opportunity</div>
+          <div class="label">Structure &amp; Scan</div>
+          <div class="detail">Falcon and Wolf profile order-book depth, spread compression, and liquidity dynamics</div>
         </div>
         <div class="step">
           <div class="number">3</div>
-          <div class="label">Execute</div>
-          <div class="detail">Lion synthesizes the final call and routes the trade</div>
+          <div class="label">Calibrate &amp; Grade</div>
+          <div class="detail">Lion, Quantum Fox, and Kraken score market-implied probabilities against actual settlement for reproducible calibration measurement</div>
         </div>
       </div>
     </div>
   </section>
 
   <section id="dashboard" class="dashboard-section">
-    <div class="eyebrow">Inside the room</div>
-    <h2>Council activity dashboard</h2>
-    <p style="text-align: center; color: var(--muted); margin-top: 12px; font-size: 0.85rem;">Layout preview — live telemetry connects once your account is active.</p>
-    <div class="dashboard-preview">
+    <div class="eyebrow">Empirical Verification</div>
+    <h2>Live Market Calibration Telemetry</h2>
+    <p style="text-align: center; color: var(--muted); margin-top: 12px; font-size: 0.85rem;">Scoring Kalshi market-implied probabilities against actual settlement outcomes.</p>
+    <div class="dashboard-preview" style="padding: 28px;">
       <div class="preview-header">
-        <span class="label">Council Status</span>
-        <span class="badge">8/8 Online</span>
+        <span class="label" style="font-weight:600; color: var(--text);">Kalshi 15M BTC Empirical Benchmark</span>
+        <span class="badge" id="home-cal-badge" style="color: #f0b3b3; border-color: rgba(240,179,179,0.3); background: rgba(58,30,30,0.5);">Calibration verdict: computing — methodology in progress</span>
       </div>
-      <div class="preview-rows">
-        <div class="preview-row">
-          <span class="placeholder-text">[Falcon activity]</span>
-          <div class="bar" style="--width: 55%"></div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 24px 0;">
+        <div style="background: rgba(11,13,16,0.6); padding: 16px; border-radius: 8px; border: 1px solid var(--panel-line);">
+          <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--muted);">Market Mid Brier Score</div>
+          <div id="home-brier" style="font-size: 1.8rem; font-weight: 700; color: #9ee0b8; margin-top: 4px;">—</div>
+          <div style="font-size: 0.75rem; color: var(--muted); margin-top: 4px;">entry minute mid-price probability</div>
         </div>
-        <div class="preview-row">
-          <span class="placeholder-text">[Quantum Fox models]</span>
-          <div class="bar" style="--width: 38%"></div>
+        <div style="background: rgba(11,13,16,0.6); padding: 16px; border-radius: 8px; border: 1px solid var(--panel-line);">
+          <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--muted);">Base-Rate Climatology Brier</div>
+          <div id="home-base-rate" style="font-size: 1.8rem; font-weight: 700; color: var(--text); margin-top: 4px;">—</div>
+          <div style="font-size: 0.75rem; color: var(--muted); margin-top: 4px;">unconditional base-rate benchmark</div>
         </div>
-        <div class="preview-row">
-          <span class="placeholder-text">[Risk exposure]</span>
-          <div class="bar" style="--width: 22%"></div>
+        <div style="background: rgba(11,13,16,0.6); padding: 16px; border-radius: 8px; border: 1px solid var(--panel-line);">
+          <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--muted);">Scored Settlements</div>
+          <div id="home-sample" style="font-size: 1.8rem; font-weight: 700; color: var(--text); margin-top: 4px;">—</div>
+          <div style="font-size: 0.75rem; color: var(--muted); margin-top: 4px;">15-min contracts verified</div>
         </div>
+      </div>
+      <div style="text-align: center; margin-top: 20px;">
+        <a href="/calibration/market-price"><button class="primary-btn" style="padding: 10px 24px; font-size: 0.9rem;">Open Full Calibration Curve &amp; Bin Table →</button></a>
       </div>
     </div>
   </section>
@@ -1397,7 +1413,7 @@ ${clerkScripts}
   </footer>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
   const seal = document.querySelector('.seal');
   if (seal) {
     // Animate nodes connecting to hub after load
@@ -1405,6 +1421,23 @@ document.addEventListener('DOMContentLoaded', function() {
     nodes.forEach((node, i) => {
       setTimeout(() => node.style.opacity = '1', i * 100);
     });
+  }
+  try {
+    const res = await fetch('/api/calibration/market-price');
+    if (res.ok) {
+      const data = await res.json();
+      if (data.averageBrierScore !== null && document.getElementById('home-brier')) {
+        document.getElementById('home-brier').textContent = data.averageBrierScore.toFixed(4);
+      }
+      if (data.baseRateBrierScore !== null && document.getElementById('home-base-rate')) {
+        document.getElementById('home-base-rate').textContent = data.baseRateBrierScore.toFixed(4);
+      }
+      if (data.sampleSize && document.getElementById('home-sample')) {
+        document.getElementById('home-sample').textContent = data.sampleSize.toLocaleString();
+      }
+    }
+  } catch (e) {
+    console.error('Failed to load homepage calibration telemetry', e);
   }
 });
 </script>

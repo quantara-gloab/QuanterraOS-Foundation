@@ -1,7 +1,6 @@
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
-import DatabaseSync from "node:sqlite";
-import { openDb } from "../store.ts";
+import { openDb, type DatabaseSync } from "../store.ts";
 import { runPaperTradingCycle, type PaperTradeCycleInput } from "../paper-trading-cycle.ts";
 import { computeHighLowRecommendation } from "../agents/falcon-highlow.ts";
 
