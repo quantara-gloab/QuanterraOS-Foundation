@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `paper_trades` (
   `outcome` text,               -- 'YES' | 'NO' | 'VOID' | null
   `brier_score` real,
   `pnl` real,
-  `created_at` text NOT NULL,
+  `created_at` text NOT NULL
 );
 
 CREATE INDEX IF NOT EXISTS `paper_trades_owner_contract`

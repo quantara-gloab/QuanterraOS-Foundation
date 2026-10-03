@@ -1,4 +1,4 @@
-/**
+﻿/**
  * The actual running server. This is what turns everything else in
  * this repo from "code that type-checks" into "a program you can
  * send a real HTTP request to and get a real answer back."
@@ -828,8 +828,1081 @@ window.addEventListener("load", async function () {
 </body>
 </html>`;
 
+const landingPage = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QuanterraOS — Sovereign Enterprise Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,340;0,9..144,600;1,9..144,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+${clerkScripts}
+<style>
+  :root {
+    --ink: #0B0D10;
+    --panel: #14171C;
+    --panel-line: rgba(243,241,234,0.08);
+    --text: #F3F1EA;
+    --muted: #A9A79C;
+    --accent: #C9A227;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--ink);
+    color: var(--text);
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  h1, h2, .serif-headline { font-family: "Fraunces", serif; font-weight: 340; font-size: 2.25rem; }
+  .serif-emphasis { font-family: "Fraunces", serif; font-weight: 600; }
+  .serif-italic { font-family: "Fraunces", serif; font-style: italic; font-weight: 500; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Navy gradient background with subtle texture */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(1200px 600px at 50% 30%, rgba(13,20,31,0.8), var(--ink));
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  /* Top Nav */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 64px;
+    border-bottom: 1px solid var(--panel-line);
+    position: sticky;
+    top: 0;
+    background: rgba(11,13,16,0.8);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+  }
+  .nav .left { display: flex; align-items: center; gap: 16px; }
+  .nav .logo-circle {
+    width: 32px; height: 32px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Fraunces", serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--ink);
+  }
+  .nav .wordmark { font-family: "Fraunces", serif; font-weight: 600; font-size: 1.1rem; color: var(--text); }
+  .nav .links { display: flex; gap: 24px; }
+  .nav .links a { color: var(--muted); font-size: 0.9rem; transition: color 0.2s; }
+  .nav .links a:hover { color: var(--text); }
+  .nav .auth { display: flex; align-items: center; gap: 16px; }
+  .nav .ghost-btn {
+    border: 1px solid var(--panel-line);
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: var(--text);
+    transition: all 0.2s;
+  }
+  .nav .ghost-btn:hover { border-color: var(--accent); background: rgba(201,162,39,0.08); }
+
+  /* Hero */
+  .hero {
+    padding: 100px 64px 80px;
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .hero .eyebrow {
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-size: 2.75rem;
+    margin-bottom: 24px;
+    color: var(--text);
+  }
+  .hero p.subhead {
+    font-size: 1.125rem;
+    color: var(--muted);
+    margin-bottom: 32px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .hero .cta-group {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 60px;
+  }
+  .hero .primary-btn {
+    background: var(--accent);
+    color: var(--ink);
+    border: none;
+    padding: 14px 36px;
+    border-radius: 8px;
+    font-family: "IBM Plex Sans", sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .hero .primary-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(201,162,39,0.3);
+  }
+  .hero .secondary-btn {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--panel-line);
+    padding: 14px 36px;
+    border-radius: 8px;
+    font-family: "IBM Plex Sans", sans-serif;
+    font-weight: 500;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .hero .secondary-btn:hover { border-color: var(--accent); }
+
+  /* Radial seal */
+  .seal-container {
+    margin: 40px auto 0;
+    width: 240px;
+    height: 240px;
+    position: relative;
+  }
+  .seal {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(201,162,39,0.2), transparent 60%);
+    box-shadow: 0 0 40px rgba(201,162,39,0.15);
+  }
+  .seal .hub {
+    position: absolute;
+    inset: 50%;
+    width: 20px;
+    height: 20px;
+    background: var(--accent);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+  }
+  .seal .ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(201,162,39,0.1);
+  }
+  .seal .ring.outer { width: 100%; height: 100%; }
+  .seal .ring.middle { width: 68%; height: 68%; top: 16%; left: 16%; }
+  .seal .ring.inner { width: 36%; height: 36%; top: 32%; left: 32%; }
+  .seal .nodes {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+  .seal .node {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, 0);
+    box-shadow: 0 0 8px rgba(201,162,39,0.4);
+  }
+  /* 8 nodes around the circle */
+  ${Array.from({length: 8}, (_, i) => {
+    const angle = (i / 8) * Math.PI * 2;
+    const x = 50 + Math.sin(angle) * 40;
+    const y = 50 + Math.cos(angle) * 40;
+    const nx = -Math.sin(angle) * 40;
+    const ny = Math.cos(angle) * 40;
+    return `.seal .node:nth-child(${i + 1}) { transform: translate(calc(-50% + ${nx}px), calc(0% + ${ny}px)); }`;
+  }).join("\n")}
+
+  /* The Council section */
+  .council-section {
+    padding: 80px 64px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .section-header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .section-header .eyebrow {
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .section-header h2 {
+    font-size: 1.75rem;
+    font-family: "Fraunces", serif;
+    font-weight: 340;
+  }
+  .section-subhead {
+    color: var(--muted);
+    margin-top: 12px;
+    font-size: 0.95rem;
+  }
+  .council-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-top: 40px;
+  }
+  .agent-card {
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .agent-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 8px 24px rgba(201,162,39,0.08);
+    transform: translateY(-2px);
+  }
+  .agent-card .icon {
+    width: 44px;
+    height: 44px;
+    margin: 0 auto 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .agent-card .icon svg { width: 28px; height: 28px; fill: var(--accent); }
+  .agent-card .role {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .agent-card .name {
+    font-family: "Fraunces", serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+  }
+  .agent-card .desc {
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+
+  /* How it works */
+  .how-section {
+    padding: 80px 64px;
+    background: var(--panel);
+    border-top: 1px solid var(--panel-line);
+    border-bottom: 1px solid var(--panel-line);
+  }
+  .how-content {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .how-steps {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+  }
+  .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 140px;
+  }
+  .step .number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(201,162,39,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "IBM Plex Sans", sans-serif;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .step .label { font-weight: 500; }
+  .step .detail {
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  /* Dashboard preview */
+  .dashboard-section {
+    padding: 80px 64px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  .dashboard-section .eyebrow { text-align: center; }
+  .dashboard-section h2 { text-align: center; font-size: 1.75rem; }
+  .dashboard-preview {
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    border-radius: 12px;
+    padding: 24px;
+    margin-top: 32px;
+  }
+  .preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--panel-line);
+    padding-bottom: 12px;
+  }
+  .preview-header .label { font-size: 0.8rem; color: var(--muted); }
+  .preview-header .badge {
+    font-size: 0.7rem;
+    color: var(--muted);
+    border: 1px solid var(--panel-line);
+    padding: 4px 10px;
+    border-radius: 6px;
+  }
+  .preview-rows { display: flex; flex-direction: column; gap: 12px; }
+  .preview-row {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+  .preview-row .bar {
+    flex: 1;
+    height: 14px;
+    background: rgba(243,241,234,0.05);
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+  .preview-row .bar::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, var(--accent), transparent 70%)';
+    width: var(--width, 50%);
+    opacity: 0.6;
+  }
+  .preview-row .placeholder-text {
+    font-size: 0.75rem;
+    color: var(--muted);
+    min-width: 120px;
+    text-align: right;
+  }
+
+  /* Footer CTA */
+  .footer-section {
+    padding: 80px 64px;
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .footer-section h2 { font-size: 1.5rem; }
+  .footer-section p { color: var(--muted); margin: 16px 0 32px; font-size: 0.9rem; }
+  .footer-section .primary-btn { width: 100%; }
+
+  .footer {
+    padding: 32px 64px;
+    text-align: center;
+    border-top: 1px solid var(--panel-line);
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 768px) {
+    .hero h1 { font-size: 1.8rem; }
+    .hero .cta-group { flex-direction: column; align-items: center; }
+    .council-grid { grid-template-columns: repeat(2, 1fr); }
+    .how-steps { gap: 16px; }
+  }
+</style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="left">
+      <div class="logo-circle">QG</div>
+      <span class="wordmark">QUANTERRAOS</span>
+    </div>
+    <div class="links">
+      <a href="/#council">The Council</a>
+      <a href="/#how">How it Works</a>
+      <a href="/#dashboard">Dashboard</a>
+    </div>
+    <div class="auth">
+      <button class="ghost-btn" onclick="window.location.href='${clerkConfigured ? '/signup' : '/account'}'">Request Access</button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="eyebrow">SOVEREIGN ENTERPRISE INTELLIGENCE</div>
+    <h1 class="serif-headline">A council of AI executives,<br>working your capital.</h1>
+    <p class="subhead">No single model makes the decisions. A coordinated council of AI agents — each specialized in a different domain of financial intelligence — surface, weigh, and execute opportunities with full auditability.</p>
+    <div class="cta-group">
+      <a href="/signup"><button class="primary-btn">Request Access</button></a>
+      <button class="secondary-btn" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">How it works</button>
+    </div>
+    <div class="seal-container">
+      <div class="seal">
+        <div class="ring outer"></div>
+        <div class="ring middle"></div>
+        <div class="ring inner"></div>
+        <div class="hub"></div>
+        <div class="nodes">
+          ${Array.from({length: 8}, (_, i) => `<div class="node" style="--i:${i}"></div>`).join("")}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="council-section" id="council">
+    <div class="section-header">
+      <div class="eyebrow">The Council</div>
+      <h2>Eight specialists. One portfolio.</h2>
+      <p class="section-subhead">Each agent represents a distinct layer of financial expertise — market structure, volatility, risk, execution, and research synthesis.</p>
+    </div>
+    <div class="council-grid">
+      <div class="agent-card">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg></div>
+        <div class="role">OPPORTUNITY INTELLIGENCE</div>
+        <div class="name">Falcon</div>
+        <div class="desc">Surfaces mispriced opportunities from live market structure</div>
+      </div>
+      <div class="agent-card">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V5l-9-4z"/><path d="M9.5 12.5l2 2 2.5-3"/></svg></div>
+        <div class="role">SYSTEMS MONITORING</div>
+        <div class="name">Sentinel</div>
+        <div class="desc">Continuous risk surveillance across all active positions</div>
+      </div>
+      <div class="agent-card">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M21 16.5c0-.27-.02-.55-.07-.82A4.5 4.5 0 0 0 19 11.5a4.4 4.4 0 0 0-.33-1.7l1.17-1.17a.5.5 0 0 0-.3-.87l-2.17-.44a4.5 4.5 0 0 0-.9 1.83 4.6 4.6 0 0 0-2.15-1.44L10.5 7v2.5l5.83 1.17A4.5 4.5 0 0 1 19 12c0 .23-.02.46-.07.68l1.17.67a.5.5 0 0 1 0 .8z"/></svg></div>
+        <div class="role">STRATEGIC ANALYSIS</div>
+        <div class="name">Quantum Fox</div>
+        <div class="desc">Quantitative modeling and scenario analysis</div>
+      </div>
+      <div class="agent-card">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 8v4l2 2m-2-6a9 9 0 1 1 0 18 9 9 0 0 1 0-18z"/><path d="M5 12h14"/></svg></div>
+        <div class="role">REAL-TIME EXECUTION</div>
+        <div class="name">Phoenix</div>
+        <div class="desc">High-speed order routing and trade execution</div>
+      </div>
+      <div class="agent-card">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7v10c0 5 6 9 10 9s10-4 10-9V7l-10-5z"/>m-2 8l2 2 4-4-1-1-3 3-1 1z"/></svg></div>
+        <div class="role">DATA INTEGRITY</div>
+        <div class="name">Draco</div>
+        <div class="desc">Data quality verification and pipeline monitoring</div>
+      </div>
+      <div class="agent-card">
+        <div class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 10v6m8.66-9H17m-5 0H5.34"/></svg></div>
+        <div class="role">MARKET MICROSTRUCTURE</div>
+        <div class="name">Wolf</div>
+        <div class="desc">Order-book dynamics and liquidity analysis</div>
+      </div>
+      <div class="agent-card">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M3 12c0 4.97 4.03 9 9 9s9-4.03 9-9-4.03-9-9-9-9 4.03-9 9zm9 4a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm0-3a1 1 0 0 1 1-1h1a1 1 0 0 1 0 2h-1a1 1 0 0 1-1 0zm2-3a1 1 0 0 1 1 1v1h1a1 1 0 0 1 0 2h-1v1a1 1 0 0 1-2 0v-1a1 1 0 0 1 1-1h1v-1a1 1 0 0 1 1-1z"/></svg></div>
+        <div class="role">RISK OVERSIGHT</div>
+        <div class="name">Kraken</div>
+        <div class="desc">Portfolio-level risk aggregation and stress testing</div>
+      </div>
+      <div class="agent-card">
+        <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 7V3l8 9-8 9v-4a4 4 0 0 1-4-4v-1zm0 0V7z"/><circle cx="12" cy="12" r="5"/></svg></div>
+        <div class="role">PORTFOLIO SYNTHESIS</div>
+        <div class="name">Lion</div>
+        <div class="desc">Final decision synthesis and portfolio-level coordination</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="how-section" id="how">
+    <div class="how-content">
+      <div class="eyebrow">How the Council moves</div>
+      <h2>Three layers. No single point of failure.</h2>
+      <div class="how-steps">
+        <div class="step">
+          <div class="number">1</div>
+          <div class="label">Surface</div>
+          <div class="detail">Falcon and Kraken identify mispriced opportunities from live market data</div>
+        </div>
+        <div class="step">
+          <div class="number">2</div>
+          <div class="label">Weigh</div>
+          <div class="detail">Quantum Fox and Sentinel stress-test and calibrate each opportunity</div>
+        </div>
+        <div class="step">
+          <div class="number">3</div>
+          <div class="label">Execute</div>
+          <div class="detail">Lion synthesizes the final call and routes the trade</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="dashboard" class="dashboard-section">
+    <div class="eyebrow">Inside the room</div>
+    <h2>Council activity dashboard</h2>
+    <p style="text-align: center; color: var(--muted); margin-top: 12px; font-size: 0.85rem;">Layout preview — live telemetry connects once your account is active.</p>
+    <div class="dashboard-preview">
+      <div class="preview-header">
+        <span class="label">Council Status</span>
+        <span class="badge">8/8 Online</span>
+      </div>
+      <div class="preview-rows">
+        <div class="preview-row">
+          <span class="placeholder-text">[Falcon activity]</span>
+          <div class="bar" style="--width: 55%"></div>
+        </div>
+        <div class="preview-row">
+          <span class="placeholder-text">[Quantum Fox models]</span>
+          <div class="bar" style="--width: 38%"></div>
+        </div>
+        <div class="preview-row">
+          <span class="placeholder-text">[Risk exposure]</span>
+          <div class="bar" style="--width: 22%"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="footer-section">
+    <h2 class="serif-headline">Build your council.</h2>
+    <p>Join the waitlist for early access to the QuanterraOS sovereign intelligence platform.</p>
+    <a href="/signup"><button class="primary-btn">Request Access</button></a>
+  </section>
+
+  <footer class="footer">
+    <p>© 2026 QuanterraOS. All rights reserved. · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></p>
+  </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const seal = document.querySelector('.seal');
+  if (seal) {
+    // Animate nodes connecting to hub after load
+    const nodes = seal.querySelectorAll('.node');
+    nodes.forEach((node, i) => {
+      setTimeout(() => node.style.opacity = '1', i * 100);
+    });
+  }
+});
+</script>
+</body>
+</html>`;
+
+const accessTerminalPage = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QuanterraOS — Access Terminal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+${clerkScripts}
+<style>
+  :root {
+    --bg: #060A12;
+    --panel: rgba(13,20,31,0.72);
+    --panel-line: rgba(79,224,255,0.16);
+    --text: #E7F6FB;
+    --text-dim: #7FA9B6;
+    --accent: #4FE0FF;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "IBM Plex Mono", monospace;
+    min-height: 100vh;
+    overflow: hidden;
+    position: relative;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: 
+      radial-gradient(circle at 50% 50%, rgba(79,224,255,0.03) 0%, transparent 60%),
+      repeating-radial-gradient(circle, rgba(79,224,255,0.02) 1px, transparent 1px);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  /* Top HUD */
+  .hud {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 32px;
+    border-bottom: 1px solid var(--panel-line);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    height: 48px;
+  }
+  .hud .left span { display: flex; align-items: center; gap: 12px; }
+  .hud .center { position: absolute; left: 50%; transform: translateX(-50%); }
+  .hud .status-tag { color: var(--accent); }
+  .hud .right { color: var(--accent); }
+
+  /* Layout */
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr 1fr;
+    gap: 24px;
+    padding: 48px 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+    height: calc(100vh - 48px);
+    align-items: center;
+  }
+  .column { display: flex; flex-direction: column; gap: 20px; }
+
+  /* Telemetry panel */
+  .telemetry-panel {
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    border-radius: 12px;
+    padding: 18px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+  }
+  .telemetry-panel .panel-title {
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .telemetry-panel .panel-title .dot {
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 6px var(--accent);
+  }
+  .telemetry-panel .value {
+    color: var(--text);
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .telemetry-panel .bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 48px;
+    margin-top: 8px;
+  }
+  .telemetry-panel .bar {
+    flex: 1;
+    min-width: 2px;
+    background: var(--accent);
+    border-radius: 2px 2px 0 0;
+    opacity: 0.4;
+    transition: opacity 0.3s;
+  }
+  .telemetry-panel .bar.active { opacity: 1; }
+
+  /* Sparkline */
+  .sparkline {
+    width: 100%;
+    height: 40px;
+  }
+  .sparkline line {
+    stroke: var(--accent);
+    stroke-width: 1.5;
+    fill: none;
+  }
+
+  /* Gauge */
+  .gauge {
+    width: 100%;
+    text-align: center;
+  }
+  .gauge .track {
+    width: 100%;
+    height: 8px;
+    background: rgba(127,169,182,0.2);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 8px 0;
+  }
+  .gauge .fill {
+    height: 100%;
+    background: var(--accent);
+    width: 30%;
+  }
+  .gauge .label {
+    color: var(--text-dim);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* Signal map radar */
+  .radar {
+    width: 160px;
+    height: 160px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .radar .rings {
+    position: absolute;
+    inset: 0;
+    border: 1px solid var(--panel-line);
+    border-radius: 50%;
+  }
+  .radar .rings:nth-child(1) { width: 100%; height: 100%; }
+  .radar .rings:nth-child(2) { width: 70%; height: 70%; top: 15%; left: 15%; }
+  .radar .rings:nth-child(3) { width: 40%; height: 40%; top: 30%; left: 30%; }
+  .radar .blip {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent);
+    top: 25%;
+    left: 60%;
+  }
+  .radar .center {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent);
+  }
+
+  /* Terminal card */
+  .terminal {
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    border-radius: 16px;
+    padding: 32px;
+    position: relative;
+    backdrop-filter: blur(4px);
+  }
+  .terminal::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 16px 16px 0 0;
+    display: flex;
+    gap: 6px;
+    padding: 0 8px;
+  }
+  .terminal::before {
+    content: "";
+  }
+  .terminal .corner-brackets {
+    position: absolute;
+    top: 32px;
+    left: 24px;
+    right: 24px;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+  }
+  .terminal .corner-brackets .bracket {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    opacity: 0.5;
+  }
+
+  .terminal .section-label {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .terminal h1 {
+    font-family: "Fraunces", serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 1.5rem;
+    color: var(--text);
+    margin-bottom: 32px;
+  }
+
+  .form-group {
+    margin-bottom: 24px;
+  }
+  .form-group label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 8px;
+  }
+  .form-group input {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--panel-line);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus {
+    border-color: var(--accent);
+  }
+  .form-group input::placeholder {
+    color: var(--text-dim);
+  }
+
+  .submit-btn {
+    width: 100%;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-family: "IBM Plex Sans", sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    transition: all 0.2s;
+  }
+  .submit-btn:hover {
+    box-shadow: 0 0 20px rgba(79,224,255,0.3);
+  }
+
+  .signup-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.8rem;
+  }
+  .signup-link a {
+    color: var(--accent);
+    font-family: "IBM Plex Sans", sans-serif;
+    font-weight: 500;
+  }
+  .signup-link a:hover { text-decoration: underline; }
+
+  .session-clock {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .footer-honesty {
+    position: fixed;
+    bottom: 16px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    font-family: "IBM Plex Mono", monospace;
+  }
+</style>
+</head>
+<body>
+  <div class="hud">
+    <div class="left">
+      <span><span class="status-tag">●</span> NODE US-WEST-1</span>
+      <span>· LINK SECURE</span>
+      <span>· STATUS NOMINAL</span>
+    </div>
+    <div class="center">QUANTERRAOS ACCESS TERMINAL v1.0</div>
+    <div class="right">
+      <span id="session-clock" class="session-clock">00:00:00</span>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- Left column: telemetry panels -->
+    <div class="column">
+      <div class="telemetry-panel">
+        <div class="panel-title"><span class="dot"></span> COUNCIL STATUS</div>
+        <div class="value">8/8 ONLINE</div>
+        <div class="bars">
+          ${Array.from({length: 8}, (_, i) => 
+            `<div class="bar${i < 8 ? ' active' : ''}" style="--delay:${i * 0.1}s"></div>`
+          ).join("")}
+        </div>
+      </div>
+
+      <div class="telemetry-panel">
+        <div class="panel-title"><span class="dot"></span> MARKET PULSE</div>
+        <div class="value" id="btc-price">83,013</div>
+        <svg class="sparkline" id="sparkline">
+          ${Array.from({length: 20}, (_, i) => 
+            `<line x1="${i * 12}" y1="${60 - Math.random() * 30}" x2="${(i + 1) * 12}" y2="${60 - Math.random() * 30}"></line>`
+          ).join("")}
+        </svg>
+      </div>
+
+      <div class="telemetry-panel">
+        <div class="panel-title">THREAT LEVEL</div>
+        <div class="gauge">
+          <div class="track"><div class="fill"></div></div>
+          <div class="value">NOMINAL</div>
+        </div>
+      </div>
+
+      <div class="telemetry-panel">
+        <div class="panel-title">DATA THROUGHPUT</div>
+        <div class="value" id="throughput">0</div>
+        <div class="bars" id="throughput-bars">
+          ${Array.from({length: 12}, (_, i) => 
+            `<div class="bar" style="--delay:${i * 0.05}s"></div>`
+          ).join("")}
+        </div>
+      </div>
+    </div>
+
+    <!-- Center: terminal card -->
+    <div class="terminal">
+      <div class="corner-brackets">
+        <span class="bracket">◐</span>
+        <span class="bracket">◓</span>
+      </div>
+      <div class="section-label">// ACCESS TERMINAL</div>
+      <h1>Identify yourself.</h1>
+      <div class="form-group">
+        <label for="operator-id">OPERATOR ID</label>
+        <input type="text" id="operator-id" name="operatorId" placeholder="alex@quanterraos.com" autocomplete="email" />
+      </div>
+      <div class="form-group">
+        <label for="access-key">ACCESS KEY</label>
+        <input type="password" id="access-key" name="accessKey" placeholder="••••••••••••••••" autocomplete="off" />
+      </div>
+      <button class="submit-btn" id="init-session">INITIALIZE SESSION →</button>
+      <div class="signup-link">
+        New operator? <a href="/signup">Request clearance →</a>
+      </div>
+
+      <div id="terminal-status" style="font-size:0.75rem; color: var(--text-dim); margin-top: 16px; min-height: 20px;"></div>
+    </div>
+
+    <!-- Right column: more telemetry -->
+    <div class="column">
+      <div class="telemetry-panel">
+        <div class="panel-title"><span class="dot"></span> SESSION CLOCK</div>
+        <div class="value session-clock" id="session-display">00:00:00</div>
+      </div>
+
+      <div class="telemetry-panel">
+        <div class="panel-title"><span class="dot"></span> SIGNAL MAP</div>
+        <div class="radar">
+          <div class="rings"></div>
+          <div class="rings"></div>
+          <div class="rings"></div>
+          <div class="center"></div>
+          <div class="blip"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-honesty">ALL INDICATORS ARE ILLUSTRATIVE — LIVE TELEMETRY CONNECTS ON LAUNCH</div>
+
+<script>
+const clerkConfigured = ${clerkConfigured};
+
+// Session clock
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getUTCHours()).padStart(2, '0');
+  const m = String(now.getUTCMinutes()).padStart(2, '0');
+  const s = String(now.getUTCSeconds()).padStart(2, '0');
+  const timeStr = h + ':' + m + ':' + s;
+  document.querySelectorAll('#session-clock, #session-display').forEach(el => {
+    if (el) el.textContent = timeStr;
+  });
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// Animate telemetry bars
+function animateBars() {
+  const bars = document.querySelectorAll('.telemetry-panel .bar');
+  bars.forEach((bar, i) => {
+    setTimeout(() => {
+      if (bar instanceof HTMLElement) {
+        const height = 10 + Math.random() * 30;
+        bar.style.height = height + 'px';
+        bar.classList.add('active');
+        setTimeout(() => bar.classList.remove('active'), 1000 + Math.random() * 500);
+      }
+    }, i * 100);
+  });
+}
+animateBars();
+setInterval(animateBars, 3000);
+
+// Update throughput counter
+let rate = 0;
+setInterval(() => {
+  rate = Math.floor(9000 + Math.random() * 12000);
+  if (document.getElementById('throughput')) {
+    document.getElementById('throughput').textContent = rate.toLocaleString();
+  }
+}, 1000);
+
+// Terminal form submission — uses Clerk via /account sign-up flow
+document.getElementById('init-session').addEventListener('click', async function() {
+  const status = document.getElementById('terminal-status');
+  if (!clerkConfigured) {
+    status.textContent = 'CLERK NOT CONFIGURED — add CLERK_PUBLISHABLE_KEY to server environment';
+    return;
+  }
+  status.textContent = 'INITIALIZING…';
+  window.location.href = '/account?flow=sign-up';
+});
+</script>
+</body>
+</html>`;
+
 app.get("/", (_req, res) => {
-  res.redirect(302, "/calibration/market-price");
+  res.type("html").send(landingPage);
+});
+
+app.get("/signup", (_req, res) => {
+  res.type("html").send(accessTerminalPage);
 });
 
 app.get("/calibration/market-price", (_req, res) => {
@@ -948,3 +2021,4 @@ const port = Number(process.env.PORT ?? 3000);
 app.listen(port, () => {
   console.log(`QuanterraOS foundation server listening on http://localhost:${port}`);
 });
+
