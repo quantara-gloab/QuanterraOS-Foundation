@@ -7,11 +7,11 @@ import type { IncomingMessage } from "node:http";
 import { createClerkClient, type ClerkClient } from "@clerk/backend";
 
 export type Plan = "free" | "pro";
-export type Feature = "calibration:realtime" | "calibration:bin-table";
+export type Feature = "calibration:realtime" | "calibration:bin-table" | "index:history-extended";
 
 export const PLAN_FEATURES: Record<Plan, readonly Feature[]> = {
   free: [],
-  pro: ["calibration:realtime", "calibration:bin-table"],
+  pro: ["calibration:realtime", "calibration:bin-table", "index:history-extended"],
 };
 
 export function hasFeature(plan: Plan, feature: Feature): boolean {
@@ -41,7 +41,14 @@ function getClerk(): ClerkClient | null {
   return clerk;
 }
 
+import { getUserAuth } from "./auth.ts";
+
 export async function currentPlan(req: IncomingMessage): Promise<Plan> {
+  const localAuth = getUserAuth(req);
+  if (localAuth.tier === "pro" || localAuth.tier === "institutional") {
+    return "pro";
+  }
+
   const client = getClerk();
   if (!client) return "free";
   try {
@@ -55,3 +62,4 @@ export async function currentPlan(req: IncomingMessage): Promise<Plan> {
     return "free";
   }
 }
+

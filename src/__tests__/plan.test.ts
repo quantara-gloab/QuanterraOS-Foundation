@@ -17,11 +17,13 @@ test("toFetchRequest builds an absolute URL and copies headers", () => {
   assert.equal(request.headers.get("x-multi"), "a, b");
 });
 
-test("only pro unlocks real-time recompute and the bin table", () => {
+test("only pro unlocks real-time recompute and the bin table and extended history", () => {
   assert.equal(hasFeature("free", "calibration:realtime"), false);
   assert.equal(hasFeature("free", "calibration:bin-table"), false);
+  assert.equal(hasFeature("free", "index:history-extended"), false);
   assert.equal(hasFeature("pro", "calibration:realtime"), true);
   assert.equal(hasFeature("pro", "calibration:bin-table"), true);
+  assert.equal(hasFeature("pro", "index:history-extended"), true);
 });
 
 test("without Clerk keys every request is free", async () => {

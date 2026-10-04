@@ -1,0 +1,411 @@
+/**
+ * QuanterraOS Account & Session Portal (/account)
+ *
+ * Provides self-serve account registration, login, tier inspection,
+ * CSV download links, API key management (for Institutional), and Stripe billing portal link.
+ */
+import type { UserRecord, UserTier } from "./auth.ts";
+
+export function renderAccountPageHtml(user: UserRecord | null, tier: UserTier, error?: string, success?: string): string {
+  const isAuth = user !== null;
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account &amp; Billing — QuanterraOS</title>
+  <meta name="description" content="Manage your QuanterraOS subscription, API credentials, and data exports.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #06080E;
+      --card: #0E131A;
+      --card-highlight: #121922;
+      --border: #1E2633;
+      --accent: #4FD1C5;
+      --warning: #C65D4A;
+      --text: #F1F3F5;
+      --text-dim: #94A3B8;
+      --muted: #64748B;
+      --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: "IBM Plex Mono", monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      background-image: 
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(79, 209, 197, 0.07), transparent 70%),
+        linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+      background-size: 100% 100%, 48px 48px, 48px 48px;
+      color: var(--text);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      line-height: 1.6;
+      padding-bottom: 80px;
+    }
+    .mono { font-family: var(--font-mono); }
+
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 48px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(6, 8, 14, 0.85);
+      backdrop-filter: blur(20px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    .nav-brand span { color: var(--accent); font-family: var(--font-mono); font-size: 0.8rem; font-weight: 400; }
+    .nav-links { display: flex; gap: 20px; align-items: center; }
+    .nav-links a { color: var(--text-dim); text-decoration: none; font-size: 0.85rem; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .btn-pricing {
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-family: var(--font-mono);
+      text-decoration: none;
+      background: rgba(79, 209, 197, 0.12);
+      border: 1px solid rgba(79, 209, 197, 0.35);
+      color: var(--accent);
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 48px auto 0;
+      padding: 0 24px;
+    }
+
+    .auth-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 36px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #FFFFFF;
+    }
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--text-dim);
+      margin-bottom: 28px;
+    }
+
+    .alert {
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      margin-bottom: 24px;
+      font-family: var(--font-mono);
+    }
+    .alert-error {
+      background: rgba(198, 93, 74, 0.15);
+      border: 1px solid var(--warning);
+      color: #FCA5A5;
+    }
+    .alert-success {
+      background: rgba(79, 209, 197, 0.15);
+      border: 1px solid var(--accent);
+      color: #6EE7B7;
+    }
+
+    .status-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .badge-free { background: rgba(255, 255, 255, 0.08); color: var(--text-dim); border: 1px solid var(--border); }
+    .badge-pro { background: rgba(79, 209, 197, 0.15); color: var(--accent); border: 1px solid var(--accent); }
+    .badge-institutional { background: rgba(168, 85, 247, 0.15); color: #C084FC; border: 1px solid #A855F7; }
+
+    .grid-row {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+    .grid-label { color: var(--muted); font-family: var(--font-mono); font-size: 0.8rem; }
+    .grid-val { color: var(--text); }
+
+    .actions-bar {
+      margin-top: 32px;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary { background: var(--accent); color: #06080E; border: none; }
+    .btn-secondary { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); color: var(--text); }
+    .btn-danger { background: rgba(198, 93, 74, 0.1); border: 1px solid var(--warning); color: #FCA5A5; }
+
+    /* Auth Form Tabs */
+    .tabs-header {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 28px;
+    }
+    .tab-btn {
+      padding: 10px 20px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+      font-family: var(--font-mono);
+    }
+    .form-group input {
+      width: 100%;
+      padding: 12px 14px;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      outline: none;
+    }
+    .form-group input:focus { border-color: var(--accent); }
+
+    .downloads-box {
+      margin-top: 28px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+    }
+    .downloads-box h3 {
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+    .download-links {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .download-link {
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      text-decoration: underline;
+    }
+
+    footer {
+      max-width: 800px;
+      margin: 64px auto 0;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-family: var(--font-mono);
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+  <nav class="top-nav">
+    <a href="/" class="nav-brand">
+      QUANTERRAOS
+      <span>/ ACCOUNT</span>
+    </a>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/research">Research</a>
+      <a href="/predictions">Predictions</a>
+      <a href="/autopilot">Autopilot</a>
+      <a href="/pricing" class="btn-pricing">Pricing</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    ${error ? `<div class="alert alert-error">${error}</div>` : ""}
+    ${success ? `<div class="alert alert-success">${success}</div>` : ""}
+
+    ${isAuth ? `
+      <!-- Authenticated View -->
+      <div class="auth-card">
+        <h1>Operator Console</h1>
+        <p class="subtitle">Account parameters, active subscription tier, and authenticated telemetry routes.</p>
+
+        <div class="grid-row">
+          <div class="grid-label">OPERATOR EMAIL</div>
+          <div class="grid-val font-mono">${user.email}</div>
+        </div>
+
+        <div class="grid-row">
+          <div class="grid-label">ACTIVE TIER</div>
+          <div class="grid-val">
+            <span class="status-badge badge-${tier}">
+              ${tier === "institutional" ? "INSTITUTIONAL API" : tier === "pro" ? "PRO TERMINAL" : "FREE EXPLORER"}
+            </span>
+          </div>
+        </div>
+
+        <div class="grid-row">
+          <div class="grid-label">TELEMETRY ACCESS</div>
+          <div class="grid-val">
+            ${tier === "free" ? "20-minute delayed live feed · Full 1,316 historical replay" : "Sub-second real-time live feed active"}
+          </div>
+        </div>
+
+        <div class="grid-row">
+          <div class="grid-label">SAFETY GATE</div>
+          <div class="grid-val font-mono" style="color:var(--accent);">RULE B5 LOCKED · $0.00 CAPITAL DEPLOYED</div>
+        </div>
+
+        <!-- Downloads & Data Exports (Gated) -->
+        <div class="downloads-box">
+          <h3>Authenticated Data Exports</h3>
+          ${tier === "free" ? `
+            <p style="font-size:0.85rem; color:var(--muted); margin-bottom: 12px;">
+              Automated CSV exports require a Pro or Institutional subscription.
+            </p>
+            <a href="/pricing" class="btn btn-primary" style="display:inline-block; font-size:0.8rem; padding:8px 16px;">
+              Upgrade to Unlock CSV Exports →
+            </a>
+          ` : `
+            <div class="download-links">
+              <a href="/api/export/predictions.csv" class="download-link">↓ Download Predictions Ledger CSV</a>
+              <a href="/api/export/autopilot.csv" class="download-link">↓ Download Autopilot Paper Trades CSV</a>
+              ${tier === "institutional" ? `
+                <a href="/api/export/ticks.csv" class="download-link">↓ Download Raw Market Ticks CSV (19,740 rows)</a>
+              ` : ""}
+            </div>
+          `}
+        </div>
+
+        <!-- Actions -->
+        <div class="actions-bar">
+          ${tier === "free" ? `
+            <a href="/pricing" class="btn btn-primary">Upgrade Plan →</a>
+          ` : `
+            <form action="/api/billing/portal" method="POST" style="margin:0;">
+              <button type="submit" class="btn btn-secondary">Manage Billing &amp; Invoices</button>
+            </form>
+          `}
+          <form action="/api/auth/logout" method="POST" style="margin:0;">
+            <button type="submit" class="btn btn-danger">Log Out</button>
+          </form>
+        </div>
+      </div>
+    ` : `
+      <!-- Unauthenticated Login / Register -->
+      <div class="auth-card">
+        <h1>Clearance Terminal</h1>
+        <p class="subtitle">Sign in or register an operator account to manage your QuanterraOS telemetry tier.</p>
+
+        <div class="tabs-header">
+          <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Sign In</button>
+          <button class="tab-btn" id="tab-register" onclick="switchTab('register')">Create Account</button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="form-login" action="/api/auth/login" method="POST">
+          <div class="form-group">
+            <label for="login-email">OPERATOR EMAIL</label>
+            <input type="email" id="login-email" name="email" placeholder="operator@firm.com" required autocomplete="email" />
+          </div>
+          <div class="form-group">
+            <label for="login-password">ACCESS KEY / PASSWORD</label>
+            <input type="password" id="login-password" name="password" placeholder="••••••••••••" required autocomplete="current-password" />
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;">AUTHENTICATE SESSION →</button>
+        </form>
+
+        <!-- Register Form -->
+        <form id="form-register" action="/api/auth/register" method="POST" style="display:none;">
+          <div class="form-group">
+            <label for="reg-email">OPERATOR EMAIL</label>
+            <input type="email" id="reg-email" name="email" placeholder="operator@firm.com" required autocomplete="email" />
+          </div>
+          <div class="form-group">
+            <label for="reg-password">NEW PASSWORD (SCRYPT ENCRYPTED)</label>
+            <input type="password" id="reg-password" name="password" placeholder="••••••••••••" required autocomplete="new-password" />
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;">CREATE OPERATOR ACCOUNT →</button>
+        </form>
+      </div>
+
+      <script>
+        function switchTab(mode) {
+          const loginTab = document.getElementById('tab-login');
+          const regTab = document.getElementById('tab-register');
+          const loginForm = document.getElementById('form-login');
+          const regForm = document.getElementById('form-register');
+          if (mode === 'login') {
+            loginTab.classList.add('active');
+            regTab.classList.remove('active');
+            loginForm.style.display = 'block';
+            regForm.style.display = 'none';
+          } else {
+            loginTab.classList.remove('active');
+            regTab.classList.add('active');
+            loginForm.style.display = 'none';
+            regForm.style.display = 'block';
+          }
+        }
+      </script>
+    `}
+  </main>
+
+  <footer>
+    <div>QuanterraOS Operational Foundation · SEC Reg D &amp; CFTC 4.41 Compliant</div>
+    <div><a href="/pricing">Pricing</a> · <a href="/legal">Legal</a></div>
+  </footer>
+
+</body>
+</html>`;
+}
