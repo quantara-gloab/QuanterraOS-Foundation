@@ -1,4 +1,4 @@
-import { test, describe } from "node:test";
+import { test, describe, beforeEach, afterEach, mock } from "node:test";
 import assert from "node:assert/strict";
 import { DatabaseSync } from "node:sqlite";
 import { openDb } from "../store.ts";
@@ -35,30 +35,37 @@ function mockBtcTicks() {
 }
 
 describe("runBtcPaperTradingCycle", () => {
-  test("logs paper trades for open contracts using real-style data", async () => {
+  beforeEach(() => {
+    mock.method(Date, "now", () => Date.parse("2026-09-30T15:00:00Z"));
+    mock.method(globalThis, "fetch", async () => Response.json({ markets: [synthMarket()] }));
+  });
+
+  afterEach(() => mock.restoreAll());
+
+  test("logs paper trades for open contracts using real-style data", async (t) => {
     const db = makeDb();
+    t.after(() => db.close());
 
     const deps: BtcPaperTradeCycleDeps = {
       db,
       fetchBtcTicks: () => mockBtcTicks(),
     };
 
-    // Mock fetch by providing kalshiUrl to a local stub
-    // For now, test with the real Kalshi API
     const results = await runBtcPaperTradingCycle(deps, { owner: "trader" });
 
-    // Should have logged at least one paper trade
-    assert.ok(results.length >= 0);
+    assert.equal(results.length, 1);
+    assert.equal(results[0].paperTrade.contract, synthMarket().ticker);
+    assert.equal(results[0].paperTrade.owner, "trader");
+    assert.equal(results[0].paperTrade.status, "proposed");
 
     // Verify trades are in the DB
     const count = db.prepare("SELECT COUNT(*) as n FROM paper_trades").get() as { n: number };
-    assert.ok(count.n >= 0);
-
-    db.close();
+    assert.equal(count.n, 1);
   });
 
-  test("skips contracts where model has no prediction", async () => {
+  test("skips contracts where model has no prediction", async (t) => {
     const db = makeDb();
+    t.after(() => db.close());
 
     const deps: BtcPaperTradeCycleDeps = {
       db,
@@ -70,33 +77,36 @@ describe("runBtcPaperTradingCycle", () => {
     // With no ticks, the model won't produce predictions
     assert.equal(results.length, 0);
 
-    db.close();
+    const count = db.prepare("SELECT COUNT(*) as n FROM paper_trades").get() as { n: number };
+    assert.equal(count.n, 0);
   });
 
-  test("logs every decision (including SKIP) to the store", async () => {
+  test("logs every decision (including SKIP) to the store", async (t) => {
     const db = makeDb();
+    t.after(() => db.close());
 
     const deps: BtcPaperTradeCycleDeps = {
       db,
       fetchBtcTicks: () => mockBtcTicks(),
     };
 
-    await runBtcPaperTradingCycle(deps, { owner: "trader", edgeThreshold: 0.5 });
+    await runBtcPaperTradingCycle(deps, { owner: "trader", edgeThreshold: 1 });
 
     // Even with high threshold (forcing SKIPs), trades should be logged
     const trades = db.prepare("SELECT * FROM paper_trades").all();
-    assert.ok(trades.length > 0);
+    assert.equal(trades.length, 1);
 
     // All should be proposed status
     for (const t of trades) {
       assert.equal(t.status, "proposed");
+      assert.equal(t.decision, "skip");
+      assert.equal(t.side, null);
     }
-
-    db.close();
   });
 
-  test("uses configurable edge threshold", async () => {
+  test("uses configurable edge threshold", async (t) => {
     const db = makeDb();
+    t.after(() => db.close());
 
     const deps: BtcPaperTradeCycleDeps = {
       db,
@@ -109,12 +119,34 @@ describe("runBtcPaperTradingCycle", () => {
       edgeThreshold: 0.0,
     });
 
-    assert.ok(lowThreshold.length > 0);
+    assert.equal(lowThreshold.length, 1);
 
     // Check that at least one was a BUY
     const buys = lowThreshold.filter((r) => r.paperTrade.decision === "buy");
     assert.ok(buys.length > 0, "Expected at least one BUY with threshold=0");
 
-    db.close();
+    const highThreshold = await runBtcPaperTradingCycle(deps, {
+      owner: "trader",
+      edgeThreshold: 1,
+    });
+    assert.equal(highThreshold.length, 1);
+    assert.equal(highThreshold[0].paperTrade.decision, "skip");
+  });
+
+  test("does not log closed contracts", async (t) => {
+    const db = makeDb();
+    t.after(() => db.close());
+    mock.method(globalThis, "fetch", async () => Response.json({
+      markets: [synthMarket({ close_time: new Date(Date.now() - 1).toISOString() })],
+    }));
+
+    const results = await runBtcPaperTradingCycle(
+      { db, fetchBtcTicks: () => mockBtcTicks() },
+      { owner: "trader" },
+    );
+
+    assert.equal(results.length, 0);
+    const count = db.prepare("SELECT COUNT(*) as n FROM paper_trades").get() as { n: number };
+    assert.equal(count.n, 0);
   });
 });
