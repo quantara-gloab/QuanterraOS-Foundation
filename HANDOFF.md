@@ -182,3 +182,70 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 12. J3–J4 observability and secrets audit.
 13. Loop: weekly re-run of all backtests, publish to `/research`, update `/changelog`.
 **North star test for every change:** *Could a skeptical quantitative trader reproduce this number from our public methodology and data?* If not, it does not ship.
+
+---
+## N. Session Logs
+
+### Session: 2026-10-04 — Swing-Event Capture & Validation
+
+**Trigger:** A sudden ~8+ point swing in a live KXBTC15M market was observed. Rather than trading it ad hoc, it was logged and tested per the project's standing validation discipline (see docs/findings.md intro).
+
+**Built:**
+- `src/swing-event-logger.ts` — detects ±8pp yes-price moves within a 5-minute window across active KXBTC15M contracts, logs to `data/swing-events.csv` (schema: ticker, trigger_time, minutes_left, price_before, price_after, spot_price, settlement_outcome). Runs as a 30s background check in `server.ts`, exposed via `GET /api/research/swing-events`.
+- `src/swing-event-backtest.ts` — 5-fold chronological walk-forward backtest (pooled held-out n=66, full settled sample n=131 of 245 logged events, 2,000 bootstrap resamples/seed across seeds 1–5), with Kalshi taker fees applied.
+- Dashboard: new "Sudden Price-Swing Monitor" panel on `/dashboard` showing event counts, Brier comparison, and verdict.
+- Role audit: Falcon renamed "Opportunity Scanning" → "Order-Book Depth Monitoring (research)"; Phoenix status copy made explicit ("zero capital deployed, live execution permanently locked"); `council-data.test.ts` updated to match.
+
+**Result — documented as findings.md §12:**
+- Market post-swing Brier 0.1838 vs. momentum 0.1863 (pooled walk-forward); momentum beats market on only 2/5 folds; profit CI [-$0.067, +$0.147] includes zero.
+- Fade (mean-reversion) fails decisively: -15.37¢/contract.
+- **Verdict: no edge**, consistent with §1 and §11. The apparent in-sample momentum win (75.6% win rate, +12.7¢/contract) does not survive out-of-sample testing — same overfitting pattern seen throughout this project.
+
+**Verification:** `npx tsc --noEmit` exit 0; `npm test` 153/153 passing, 27 suites, 0 failures.
+
+**Open items for next session:**
+- Time-clustering audit completed: the 131 settled swing events cluster into 21 distinct hourly windows across 51 tickers. Effective independent regime sample size is ~21–51, explaining why in-sample momentum (75.6% win rate) fails walk-forward validation (profit CI includes zero).
+- Falcon order-book sample accumulation: monitor monthly as sample grows past n=31; wire Jev into Draco/Wolf classification only, never unverified prediction.
+
+---
+
+### Session: 2026-10-04 — Competitive Positioning, Flagship /calibration Proof & Homepage Proof-First Architecture
+
+**Strategic & Competitive Intelligence:**
+1. **Competitive Landscape Void:** No prediction market tooling competitor (Predly, Polymarket analytics tools, etc.) provides independent, mathematically rigorous calibration verification. Competitors rely on ungrounded claims (e.g., Predly's undisclosed "89% accuracy" claim with no methodology, no Brier score, and no out-of-sample audit).
+2. **The Vanderbilt / Kalshi Academic Debate as QuanterraOS's Positioning Hook:**
+   - Vanderbilt researchers Joshua Clinton and TzuFeng Huang analyzed 2,500 markets across Polymarket, Kalshi, and PredictIt, asserting Kalshi was "78% accurate" and raising concerns over herd behavior.
+   - Kalshi's Jack Such pushed back, arguing prediction markets must be evaluated via *calibration* (does a 20% price resolve YES 20% of the time?), not naive binary hit rate.
+   - QuanterraOS capitalizes on this debate by providing the public, reproducible ground truth: for Kalshi's 15-minute BTC markets (`KXBTC15M`), we audited 1,316 continuous settled windows (19,740 1-minute candles). The market's minute-4 entry price achieves an average Brier score of **0.2001** (beating random 0.2500 and internal quantitative models 0.2063), and settlement rates across all 10 probability deciles track the ideal 45° calibration line.
+3. **Framing Moat:** *"We don't predict the market. We prove it's trustworthy."* / *"QuanterraOS doesn't claim to beat this market — we verify it."*
+
+**Shipped & Verified Artifacts:**
+- **Flagship `/calibration` Public Proof Page:**
+  - Dynamic 10-bin SVG calibration curve with overlaid 45° diagonal line and empirical points.
+  - Live rolling Brier score stat card (0.2001 vs. 0.2500 coin-flip baseline).
+  - Prominent Vanderbilt debate hook banner and direct link to `docs/findings.md` methodology.
+  - Reciprocal link to the editorial response post.
+- **Public Research Response Post (`/research/kalshi-calibration-response` & `/blog/is-kalshi-calibrated`):**
+  - Full long-form essay titled *"Is Kalshi's BTC Market Actually Calibrated? We Checked."*
+  - Contextualizes the Vanderbilt/Kalshi debate, details the 1,316-market methodology, Brier scoring, decile distribution, and 12 rejected model hypotheses.
+  - Links directly to live `/calibration` proof.
+- **Homepage Proof-First Overhaul (`/`):**
+  - Hero headline: *"We don't predict the market. We prove it's trustworthy."*
+  - Hero subhead: *"Kalshi's 15-minute BTC markets settle against the CME BRTI. We independently verify, minute by minute, whether that price is actually well-calibrated — and publish every result, including when our own models fail to beat it."*
+  - CTAs reordered: Primary button *"See the Calibration Proof →"* (`/calibration`); secondary button *"Request Access"*.
+  - Inline condensed calibration preview section: displays live Brier score and miniature SVG curve wired dynamically to `getOrComputeCalibrationReport()`, ensuring zero drift when backtests re-run.
+  - Council section verified: *"Each agent verifies, monitors, or stress-tests a different layer of the market — built for transparency first, execution only once a signal is proven."*
+- **Swing-Event Engine & Monitor:**
+  - `src/swing-event-logger.ts` and `src/swing-event-backtest.ts` logged 245 events (131 settled), walk-forward backtest confirmed `no edge` (findings.md §12).
+  - Dashboard panel active on `/dashboard`.
+
+**Verification:**
+- `npx tsc --noEmit` — 0 errors (clean exit 0).
+- `npm test` — 155/155 passing across 27 suites, 0 failures.
+- `node --experimental-strip-types src/swing-event-backtest.ts` — clean reproduction into `reports/swing-event-backtest-2026-10-04.txt`.
+
+**Next Tasks:**
+1. Maintain CI gate on PRs (`npm test` + `npx tsc --noEmit`).
+2. Accumulate monthly Falcon order-book snapshots past n=31 before re-testing imbalance.
+3. Wire Jev strictly for data-quality classification (Draco/Wolf), maintaining zero live execution orders.
+

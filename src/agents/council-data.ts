@@ -94,8 +94,8 @@ export function getCouncilAgentsData(): CouncilAgent[] {
     {
       id: "falcon",
       name: "Falcon",
-      role: "Opportunity Scanning",
-      shortDesc: "Continuously scans live market structure for pricing anomalies and surfaces them for review — flagged, not acted on.",
+      role: "Order-Book Depth Monitoring (research)",
+      shortDesc: "Monitors live order-book depth and bid/ask volume imbalance across active contracts for research evaluation — flagged, not acted on.",
       expandedDesc: "Falcon continuously monitors live order-book depth and bid/ask volume imbalance across active Kalshi contracts. Rather than acting autonomously or placing trades, it surfaces detected microstructure anomalies solely for human review. In empirical backtesting (n=31), Falcon's heuristic achieved an average Brier score of 0.2736, currently underperforming both random chance (0.2500) and market entry prices (0.2106)—reinforcing its status as an exploratory research module.",
       status: "Research (Small Sample)",
       statusType: "research",
@@ -125,6 +125,7 @@ export function getCouncilAgentsData(): CouncilAgent[] {
         { label: "Pipeline Surveillance", value: "Monitoring — no active alerts" },
         { label: "Monitored Ingesters", value: "Exchange price poller & Kalshi candle logger" },
         { label: "Staleness Threshold", value: "Flagged if venue feed > 5s delayed" },
+        { label: "Swing Events Logged", value: "245 events (131 settled, walk-forward audited)" },
         { label: "Autonomous Orders", value: "Disabled (Surveillance & integrity gate only)" }
       ]
     },
@@ -141,6 +142,7 @@ export function getCouncilAgentsData(): CouncilAgent[] {
         { label: "Corpus Evaluated", value: foxMarkets },
         { label: "Minute-4 Model Brier", value: foxModelBrier },
         { label: "Minute-4 Market Brier", value: `${foxMarketBrier} (Market mid beats model)` },
+        { label: "Price-Swing Backtest", value: "Walk-forward n=131: no edge (findings.md §12)" },
         { label: "Audit Finding", value: "Zero edge claimed; results published transparently" },
         { label: "Itô Correction", value: "Applied (−½σ²τ, verified mathematically correct)" },
         { label: "Audit Provenance", value: "reports/btc15m-predictor-backtest-2026-10-03.txt" }
@@ -152,8 +154,8 @@ export function getCouncilAgentsData(): CouncilAgent[] {
       id: "phoenix",
       name: "Phoenix",
       role: "Execution Readiness",
-      shortDesc: "Standing by to route and execute trades once a signal clears validation — no capital is deployed on unproven models.",
-      expandedDesc: "Phoenix maintains low-latency order routing and execution dispatch architecture, held in strict standby mode. Under QuanterraOS governance rules, no live order placement is authorized and zero capital is deployed until a predictive signal clears pre-registered sample size and out-of-sample edge criteria.",
+      shortDesc: "System execution gate maintained in strict standby mode — zero capital deployed, live execution permanently locked.",
+      expandedDesc: "Phoenix maintains the execution gate architecture, held in strict permanent standby. Under QuanterraOS governance rules, no live order placement is authorized and zero capital is deployed. The execution gate remains locked unless an empirical signal demonstrates verified out-of-sample positive expectancy after all fees.",
       status: "Standby — No Capital Deployed",
       statusType: "standby",
       iconSvg: '<svg viewBox="0 0 24 24"><path d="M12 8v4l2 2m-2-6a9 9 0 1 1 0 18 9 9 0 0 1 0-18z"/><path d="M5 12h14"/></svg>',

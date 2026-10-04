@@ -306,3 +306,33 @@ export const paperTrades = sqliteTable(
     statusIdx: index("paper_trades_status").on(table.status),
   }),
 );
+
+export const councilPipelineRuns = sqliteTable(
+  "council_pipeline_runs",
+  {
+    id: text("id").primaryKey(),
+    runAt: text("run_at").notNull(),
+    cycleNumber: integer("cycle_number").notNull(),
+    lionVerdict: text("lion_verdict").notNull(),
+    lionVerdictCode: text("lion_verdict_code").notNull(),
+    marketCalibrated: integer("market_calibrated").notNull().default(1),
+    signalValidated: integer("signal_validated").notNull().default(0),
+    executionAuthorized: integer("execution_authorized").notNull().default(0),
+    phoenixStatus: text("phoenix_status").notNull(),
+    dracoStatus: text("draco_status").notNull(),
+    wolfStatus: text("wolf_status").notNull(),
+    falconStatus: text("falcon_status").notNull(),
+    quantumFoxStatus: text("quantum_fox_status").notNull(),
+    sentinelStatus: text("sentinel_status").notNull(),
+    krakenStatus: text("kraken_status").notNull(),
+    marketTicker: text("market_ticker"),
+    marketQuoteJson: text("market_quote_json"),
+    allAgentsJson: text("all_agents_json").notNull(),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => ({
+    runAtIdx: index("council_pipeline_runs_run_at").on(table.runAt),
+    cycleIdx: index("council_pipeline_runs_cycle").on(table.cycleNumber),
+  }),
+);
+

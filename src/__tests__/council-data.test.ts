@@ -24,10 +24,10 @@ describe("Council Specialists Calibration-First Data", () => {
     const map = new Map(agents.map((a) => [a.name, a]));
 
     const falcon = map.get("Falcon")!;
-    assert.equal(falcon.role, "Opportunity Scanning");
+    assert.equal(falcon.role, "Order-Book Depth Monitoring (research)");
     assert.equal(
       falcon.shortDesc,
-      "Continuously scans live market structure for pricing anomalies and surfaces them for review — flagged, not acted on.",
+      "Monitors live order-book depth and bid/ask volume imbalance across active contracts for research evaluation — flagged, not acted on.",
     );
 
     const sentinel = map.get("Sentinel")!;
@@ -48,7 +48,7 @@ describe("Council Specialists Calibration-First Data", () => {
     assert.equal(phoenix.role, "Execution Readiness");
     assert.equal(
       phoenix.shortDesc,
-      "Standing by to route and execute trades once a signal clears validation — no capital is deployed on unproven models.",
+      "System execution gate maintained in strict standby mode — zero capital deployed, live execution permanently locked.",
     );
 
     const draco = map.get("Draco")!;

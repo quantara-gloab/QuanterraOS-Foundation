@@ -142,6 +142,34 @@ Every profit CI includes zero or sits mostly below it. The unfitted section 10 m
 - Together with sections 9–10, this further supports the market price itself being the calibrated product. A model built on these features does not beat it.
 - The `/fair-value/btc15m` page is unchanged by this result.
 
+### 12. Sudden Price-Swing Event Backtest (Quantum Fox, n=131 settled events, run 2026-10-04)
+
+Context: A dramatic Kalshi 15m BTC market percentage swing was observed live but not acted on, per findings.md's established bar: no tested rule has beaten the market's own price out of sample (sections 1–11), and ad hoc reactions to price moves (section 1) lost money despite high win rates. Rather than trading this swing, we turned it into a logged, empirical test case (`data/swing-events.csv`, capturing moves >= ±8 percentage points in yes-price within a 5-minute window).
+
+Of 245 total logged swing events spanning 2026-09-26T06:29:06Z to 2026-10-03T17:35:02Z, 131 had settled outcomes in the clean collection window (`reports/swing-event-backtest-2026-10-04.txt`).
+
+Two candidate execution rules were evaluated:
+- **Momentum (Continuation):** Follow the swing (Buy YES on upward swing, Buy NO on downward swing at post-swing price).
+- **Fade (Mean Reversion):** Counter the swing (Buy NO on upward swing, Buy YES on downward swing).
+- **Benchmark:** The market's own post-swing price as probability.
+
+Validation standard (matching section 11):
+- 5-fold walk-forward split (50%, 60%, 70%, 80%, 90% train; next 10% test, pooled held-out n=66).
+- Chronological 50/50 split (65 train, 66 test).
+- Kalshi taker fee: `0.07 * p * (1 - p)`.
+- 2,000 bootstrap resamples across seeds 1–5 (widest 95% interval reported).
+- Verdict rule matching section 11: tradable only if beats market Brier on every fold AND pooled Brier-difference CI < 0 AND pooled profit CI > 0.
+
+| Rule | Full Sample Win Rate (n=131) | Full Sample Net Profit (¢/contract) | Walk-Forward Folds Beating Market | Pooled Held-Out Market Brier | Pooled Held-Out Rule Brier | Pooled Profit 95% CI (¢/contract) | Verdict |
+|---|---|---|---|---|---|---|---|
+| **Momentum** | 75.57% (99/131) | +12.72¢ | 2/5 | 0.1838 | 0.1863 | −6.70¢ … +14.66¢ | **no edge** |
+| **Fade** | 24.43% (32/131) | −15.37¢ | 0/5 | 0.1838 | 0.3083 | −17.19¢ … +4.15¢ | **no edge** |
+
+**Reading:**
+- Like section 1 (minute-13 momentum), following a sudden price swing exhibits an apparent high hit rate (75.6%) in-sample because the contract is already expensive, but out-of-sample walk-forward testing demonstrates that the market's own post-swing price beats the momentum rule on Brier score (0.1838 vs. 0.1863), and the held-out profit interval spans zero (`[-$0.06695, +$0.14662]`).
+- Mean reversion (fading the swing) performs worse than random chance, losing on 0 of 5 folds with an average loss of over 15¢ per contract.
+- The market rapidly incorporates information during sudden swings. Neither chasing nor fading price swings beats the calibrated market price. Phoenix execution gate remains strictly locked.
+
 ## Data-Quality Notes
 
 Coinbase's dashboard wrong-direction rate (50.37%, vs. 35.43% for Kraken) was not a code bug: `exchange-price-poller.mjs` originally used Coinbase's `/v2/prices/{product}/spot` endpoint, which returned an identical stale price on 84.6% of 5-second polls, versus 46.2% for Kraken's live ticker. Fixed by switching Coinbase to the live Exchange ticker endpoint (`api.exchange.coinbase.com/products/{product}/ticker`). Rows collected before this fix remain noisy and should not be used to judge Coinbase divergence.

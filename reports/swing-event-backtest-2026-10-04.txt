@@ -1,0 +1,148 @@
+{
+  "timestamp": "2026-10-04T10:37:12.599Z",
+  "datasetPath": "C:\\Users\\enseg\\OneDrive\\Desktop\\quanterraos-foundation\\quanterraos-foundation\\data\\swing-events.csv",
+  "totalEventsInCsv": 245,
+  "settledSampleN": 131,
+  "dateRange": {
+    "earliest": "2026-09-26T06:29:06.882Z",
+    "latest": "2026-09-29T00:49:32.977Z"
+  },
+  "baselines": {
+    "coinFlipBrier": 0.25,
+    "marketPostSwingBrier": 0.2105
+  },
+  "fullSample": {
+    "momentum": {
+      "ruleName": "momentum",
+      "trades": 131,
+      "wins": 99,
+      "winRate": 0.7557,
+      "grossProfitTotal": 18.396,
+      "netProfitTotal": 16.6632,
+      "netProfitPerContract": 0.1272,
+      "profitCi": [
+        0.04716,
+        0.20373
+      ],
+      "averageBrier": 0.17447,
+      "brierDifferenceVsMarket": -0.03605,
+      "brierDifferenceCi": [
+        -0.06505,
+        -0.00809
+      ]
+    },
+    "fade": {
+      "ruleName": "fade",
+      "trades": 131,
+      "wins": 32,
+      "winRate": 0.2443,
+      "grossProfitTotal": -18.396,
+      "netProfitTotal": -20.1288,
+      "netProfitPerContract": -0.15366,
+      "profitCi": [
+        -0.23049,
+        -0.07341
+      ],
+      "averageBrier": 0.32839,
+      "brierDifferenceVsMarket": 0.11787,
+      "brierDifferenceCi": [
+        0.07838,
+        0.15477
+      ]
+    }
+  },
+  "chronological5050Split": {
+    "trainN": 65,
+    "testN": 66,
+    "momentumHeldOutNet": 0.04326,
+    "fadeHeldOutNet": -0.06929
+  },
+  "walkForward": {
+    "folds": [
+      {
+        "foldIndex": 1,
+        "trainSize": 65,
+        "testSize": 13,
+        "marketBrier": 0.1088,
+        "momentumBrier": 0.12333,
+        "fadeBrier": 0.32923,
+        "momentumBeatsMarket": false,
+        "fadeBeatsMarket": false,
+        "momentumNetPerContract": 0.12832,
+        "fadeNetPerContract": -0.15353
+      },
+      {
+        "foldIndex": 2,
+        "trainSize": 78,
+        "testSize": 13,
+        "marketBrier": 0.1122,
+        "momentumBrier": 0.16819,
+        "fadeBrier": 0.28168,
+        "momentumBeatsMarket": false,
+        "fadeBeatsMarket": false,
+        "momentumNetPerContract": 0.0168,
+        "fadeNetPerContract": -0.04089
+      },
+      {
+        "foldIndex": 3,
+        "trainSize": 91,
+        "testSize": 13,
+        "marketBrier": 0.2493,
+        "momentumBrier": 0.20727,
+        "fadeBrier": 0.32124,
+        "momentumBeatsMarket": true,
+        "fadeBeatsMarket": false,
+        "momentumNetPerContract": 0.05491,
+        "fadeNetPerContract": -0.08355
+      },
+      {
+        "foldIndex": 4,
+        "trainSize": 104,
+        "testSize": 13,
+        "marketBrier": 0.1213,
+        "momentumBrier": 0.15914,
+        "fadeBrier": 0.28717,
+        "momentumBeatsMarket": false,
+        "fadeBeatsMarket": false,
+        "momentumNetPerContract": 0.03697,
+        "fadeNetPerContract": -0.06272
+      },
+      {
+        "foldIndex": 5,
+        "trainSize": 117,
+        "testSize": 14,
+        "marketBrier": 0.3173,
+        "momentumBrier": 0.2674,
+        "fadeBrier": 0.3211,
+        "momentumBeatsMarket": true,
+        "fadeBeatsMarket": false,
+        "momentumNetPerContract": -0.01615,
+        "fadeNetPerContract": -0.01029
+      }
+    ],
+    "pooledHeldOutN": 66,
+    "pooledMarketBrier": 0.1838,
+    "pooledMomentumBrier": 0.1863,
+    "pooledFadeBrier": 0.3083,
+    "momentumFoldsBeatingMarket": "2/5",
+    "fadeFoldsBeatingMarket": "0/5",
+    "momentumPooledProfitCi": [
+      -0.06695,
+      0.14662
+    ],
+    "fadePooledProfitCi": [
+      -0.17192,
+      0.04146
+    ],
+    "momentumBrierDiffCi": [
+      -0.03312,
+      0.03427
+    ],
+    "fadeBrierDiffCi": [
+      0.06116,
+      0.18082
+    ],
+    "verdictMomentum": "no edge",
+    "verdictFade": "no edge"
+  }
+}

@@ -36,6 +36,7 @@ export function runMigrations(): void {
     "0008_falcon_recommendations.sql",
     "0009_dashboard_query_indexes.sql",
     "0010_paper_trades.sql",
+    "0011_council_pipeline.sql",
   ]) {
     const migrationPath = path.join(migrationsDir, migration);
     if (migration === "0006_multi_asset.sql") {
