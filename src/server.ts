@@ -24,6 +24,8 @@ import { computeCalibrationCurve, computeStreak, scoreObservation, summarizePerf
 import type { ObservationRow, ResolutionRow } from "./scoring.ts";
 import { getCouncilAgentsData } from "./agents/council-data.ts";
 import { getLatestCouncilPipelineRun, runCouncilPipelineCycle } from "./agents/council-pipeline.ts";
+import { getCouncilPersona, getAllCouncilPersonas } from "./agents/council-personas.ts";
+import { handleCouncilChat, getCouncilChatAuditLog } from "./agents/council-chat.ts";
 import { renderCouncilDashboardPage } from "./dashboard-terminal.ts";
 import { getSwingEventsSummary, readSwingEventsCsv, checkLiveSwingEvents } from "./swing-event-logger.ts";
 import { getOrComputeCalibrationReport, renderCalibrationHtml } from "./calibration-page.ts";
@@ -516,6 +518,46 @@ app.get("/api/calibration/market-price", async (req, res) => {
 
 app.get("/api/council/agents", (_req, res) => {
   res.json(getCouncilAgentsData());
+});
+
+// Conversational AI Executive Persona Endpoints
+app.get(["/api/executives", "/api/council/personas"], (_req, res) => {
+  res.json(getAllCouncilPersonas());
+});
+
+app.get(["/api/executives/:id/persona", "/api/council/agents/:id/persona"], (req, res) => {
+  const persona = getCouncilPersona(req.params.id);
+  if (!persona) {
+    return res.status(404).json({ error: "persona_not_found", message: `Executive persona '${req.params.id}' not found` });
+  }
+  res.json(persona);
+});
+
+app.post(["/api/executives/:id/chat", "/api/council/agents/:id/chat"], async (req, res) => {
+  try {
+    const { message, history } = req.body || {};
+    if (!message || typeof message !== "string" || message.trim().length === 0) {
+      return res.status(400).json({ error: "invalid_request", message: "Field 'message' is required." });
+    }
+    const persona = getCouncilPersona(req.params.id);
+    if (!persona) {
+      return res.status(404).json({ error: "persona_not_found", message: `Executive persona '${req.params.id}' not found` });
+    }
+    const response = await handleCouncilChat({
+      agentId: req.params.id,
+      message: message.trim(),
+      history: Array.isArray(history) ? history : undefined
+    });
+    res.json(response);
+  } catch (error) {
+    res.status(500).json({ error: "chat_execution_failed", message: (error as Error).message });
+  }
+});
+
+app.get(["/api/executives/audit-log", "/api/council/chat/audit-log"], (req, res) => {
+  const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 50));
+  const logs = getCouncilChatAuditLog(limit);
+  res.json({ count: logs.length, logs });
 });
 
 app.get("/api/council/pipeline/latest", async (_req, res) => {
@@ -1443,6 +1485,215 @@ ${clerkScripts}
     gap: 10px;
   }
 
+  /* Modal Tabs */
+  .modal-tabs-bar {
+    display: flex;
+    gap: 8px;
+    margin: 12px 0 16px;
+    border-bottom: 1px solid var(--panel-line);
+    padding-bottom: 8px;
+  }
+  .modal-tab-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--muted);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .modal-tab-btn:hover {
+    color: var(--text);
+    background: rgba(243,241,234,0.04);
+  }
+  .modal-tab-btn.active {
+    background: rgba(201,162,39,0.14);
+    color: var(--accent);
+    border-color: rgba(201,162,39,0.3);
+    font-weight: 600;
+  }
+
+  /* Chat Pane & Messages */
+  .chat-pane-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .chat-governance-notice {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.72rem;
+    color: #ffd768;
+    background: rgba(201,162,39,0.1);
+    border: 1px solid rgba(201,162,39,0.25);
+    border-radius: 6px;
+    padding: 6px 10px;
+    line-height: 1.4;
+  }
+  .chat-messages-container {
+    max-height: 280px;
+    min-height: 190px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+    background: rgba(11,13,16,0.85);
+    border-radius: 8px;
+    border: 1px solid var(--panel-line);
+  }
+  .chat-bubble {
+    max-width: 88%;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    word-break: break-word;
+  }
+  .chat-bubble.user {
+    align-self: flex-end;
+    background: rgba(79,224,255,0.12);
+    border: 1px solid rgba(79,224,255,0.25);
+    color: var(--text);
+    border-bottom-right-radius: 2px;
+  }
+  .chat-bubble.assistant {
+    align-self: flex-start;
+    background: rgba(20,23,28,0.95);
+    border: 1px solid var(--panel-line);
+    color: var(--text);
+    border-bottom-left-radius: 2px;
+  }
+  .chat-bubble-header {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .chat-bubble-time {
+    color: var(--muted);
+    font-size: 0.62rem;
+    font-weight: normal;
+  }
+  .chat-citations-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 8px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(243,241,234,0.06);
+  }
+  .chat-citation-pill {
+    font-size: 0.64rem;
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    background: rgba(201,162,39,0.1);
+    color: var(--accent);
+    border: 1px solid rgba(201,162,39,0.2);
+    border-radius: 4px;
+    padding: 2px 6px;
+  }
+  .chat-guarded-pill {
+    font-size: 0.62rem;
+    background: rgba(66,211,146,0.15);
+    color: #81c784;
+    border: 1px solid rgba(66,211,146,0.3);
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-weight: 600;
+  }
+  .chat-prompt-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .chat-prompt-chip {
+    font-size: 0.72rem;
+    background: rgba(243,241,234,0.04);
+    color: var(--muted);
+    border: 1px solid var(--panel-line);
+    border-radius: 12px;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+    text-align: left;
+  }
+  .chat-prompt-chip:hover {
+    background: rgba(79,224,255,0.08);
+    color: var(--accent);
+    border-color: rgba(79,224,255,0.25);
+  }
+  .chat-input-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .chat-input {
+    flex: 1;
+    background: rgba(11,13,16,0.8);
+    border: 1px solid var(--panel-line);
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: var(--text);
+    font-size: 0.82rem;
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.15s;
+  }
+  .chat-input:focus {
+    border-color: var(--accent);
+  }
+  .chat-send-btn {
+    background: var(--accent);
+    color: var(--ink);
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .chat-send-btn:hover:not(:disabled) {
+    box-shadow: 0 0 10px rgba(79,224,255,0.3);
+  }
+  .chat-send-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .typing-indicator-bubble {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 12px;
+  }
+  .typing-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--muted);
+    animation: typingBounce 1.2s infinite ease-in-out;
+  }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes typingBounce {
+    0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+    40% { transform: translateY(-4px); opacity: 1; }
+  }
+
   /* How it works */
   .how-section {
     padding: 80px 64px;
@@ -1715,14 +1966,49 @@ ${miniCircles}
         <div class="council-modal-status-wrapper">
           <span class="agent-status-badge" id="council-modal-status"></span>
         </div>
-        <p class="council-modal-desc" id="council-modal-desc"></p>
-        <div class="council-modal-telemetry" id="council-modal-telemetry">
-          <div class="telemetry-header">
-            <span class="telemetry-title">Empirical Telemetry &amp; Provenance</span>
-            <span class="telemetry-badge" id="council-modal-telemetry-badge">AUDITED RECORD</span>
-          </div>
-          <div class="telemetry-grid" id="council-modal-stats"></div>
+
+        <!-- Modal Tab Switcher -->
+        <div class="modal-tabs-bar" role="tablist">
+          <button type="button" class="modal-tab-btn active" id="tab-btn-telemetry" role="tab" aria-selected="true" aria-controls="pane-telemetry">Audit Telemetry</button>
+          <button type="button" class="modal-tab-btn" id="tab-btn-chat" role="tab" aria-selected="false" aria-controls="pane-chat">💬 Conversational Assistant</button>
         </div>
+
+        <!-- Telemetry Pane -->
+        <div id="pane-telemetry" role="tabpanel" aria-labelledby="tab-btn-telemetry">
+          <p class="council-modal-desc" id="council-modal-desc"></p>
+          <div class="council-modal-telemetry" id="council-modal-telemetry">
+            <div class="telemetry-header">
+              <span class="telemetry-title">Empirical Telemetry &amp; Provenance</span>
+              <span class="telemetry-badge" id="council-modal-telemetry-badge">AUDITED RECORD</span>
+            </div>
+            <div class="telemetry-grid" id="council-modal-stats"></div>
+          </div>
+        </div>
+
+        <!-- Conversational Assistant Pane -->
+        <div id="pane-chat" role="tabpanel" aria-labelledby="tab-btn-chat" style="display: none;">
+          <div class="chat-pane-container">
+            <div class="chat-governance-notice">
+              <span>🛡️</span>
+              <span><strong>Calibration Governance:</strong> This specialist reports verified platform metrics. We deploy zero live capital ($0.00) and execute zero automated orders.</span>
+            </div>
+            <div class="chat-messages-container" id="council-chat-messages" aria-live="polite">
+              <!-- Dynamically populated messages -->
+            </div>
+            <div style="font-size: 0.68rem; color: var(--muted); margin-top: 2px;">Suggested Audit Prompts:</div>
+            <div class="chat-prompt-suggestions" id="council-chat-suggestions">
+              <!-- Prompt chips populated via JS -->
+            </div>
+            <form class="chat-input-row" id="council-chat-form">
+              <input type="text" id="council-chat-input" class="chat-input" placeholder="Ask about track record, capital, findings.md, or calibration..." autocomplete="off">
+              <button type="submit" class="chat-send-btn" id="council-chat-send-btn">
+                <span>Send</span>
+                <span>&rarr;</span>
+              </button>
+            </form>
+          </div>
+        </div>
+
         <div class="council-modal-footer">
           <div class="council-modal-note">Independent truth layer &bull; Metrics computed from stored records. No simulated edge.</div>
           <div class="council-modal-actions">
@@ -1841,11 +2127,190 @@ document.addEventListener('DOMContentLoaded', async function() {
     const modalDesc = document.getElementById('council-modal-desc');
     const modalStats = document.getElementById('council-modal-stats');
     const modalLink = document.getElementById('council-modal-link');
-    let activeCard = null;
+    const tabBtnTelemetry = document.getElementById('tab-btn-telemetry');
+    const tabBtnChat = document.getElementById('tab-btn-chat');
+    const paneTelemetry = document.getElementById('pane-telemetry');
+    const paneChat = document.getElementById('pane-chat');
+    const chatMessages = document.getElementById('council-chat-messages');
+    const chatSuggestions = document.getElementById('council-chat-suggestions');
+    const chatForm = document.getElementById('council-chat-form');
+    const chatInput = document.getElementById('council-chat-input');
+    const chatSendBtn = document.getElementById('council-chat-send-btn');
+    let currentAgentId = null;
+
+    function switchTab(tab) {
+      if (tab === 'telemetry') {
+        if (tabBtnTelemetry) {
+          tabBtnTelemetry.classList.add('active');
+          tabBtnTelemetry.setAttribute('aria-selected', 'true');
+        }
+        if (tabBtnChat) {
+          tabBtnChat.classList.remove('active');
+          tabBtnChat.setAttribute('aria-selected', 'false');
+        }
+        if (paneTelemetry) paneTelemetry.style.display = 'block';
+        if (paneChat) paneChat.style.display = 'none';
+      } else {
+        if (tabBtnChat) {
+          tabBtnChat.classList.add('active');
+          tabBtnChat.setAttribute('aria-selected', 'true');
+        }
+        if (tabBtnTelemetry) {
+          tabBtnTelemetry.classList.remove('active');
+          tabBtnTelemetry.setAttribute('aria-selected', 'false');
+        }
+        if (paneTelemetry) paneTelemetry.style.display = 'none';
+        if (paneChat) paneChat.style.display = 'block';
+        if (chatInput) setTimeout(() => chatInput.focus(), 50);
+      }
+    }
+
+    if (tabBtnTelemetry) tabBtnTelemetry.addEventListener('click', () => switchTab('telemetry'));
+    if (tabBtnChat) tabBtnChat.addEventListener('click', () => switchTab('chat'));
+
+    async function initChatForAgent(agentId) {
+      currentAgentId = agentId;
+      if (!chatMessages || !chatSuggestions) return;
+
+      chatMessages.innerHTML = '<div style="font-size:0.75rem; color:var(--muted); text-align:center; padding:10px;">Connecting to specialist session…</div>';
+      chatSuggestions.innerHTML = '';
+
+      try {
+        const res = await fetch('/api/executives/' + agentId + '/persona');
+        if (!res.ok) throw new Error('Persona not found');
+        const persona = await res.json();
+
+        // Render initial greeting
+        chatMessages.innerHTML = '';
+        const greetingBubble = document.createElement('div');
+        greetingBubble.className = 'chat-bubble assistant';
+        const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        greetingBubble.innerHTML = 
+          '<div class="chat-bubble-header">' +
+            '<span>' + escapeHtml(persona.name) + ' &bull; ' + escapeHtml(persona.role) + '</span>' +
+            '<span class="chat-bubble-time">' + now + '</span>' +
+          '</div>' +
+          '<div>' + escapeHtml(persona.initialGreeting) + '</div>';
+        chatMessages.appendChild(greetingBubble);
+
+        // Render suggestions chips
+        chatSuggestions.innerHTML = '';
+        if (Array.isArray(persona.suggestedQuestions)) {
+          persona.suggestedQuestions.forEach(q => {
+            const chip = document.createElement('button');
+            chip.type = 'button';
+            chip.className = 'chat-prompt-chip';
+            chip.textContent = q;
+            chip.addEventListener('click', () => {
+              if (chatInput) chatInput.value = q;
+              sendUserMessage(q);
+            });
+            chatSuggestions.appendChild(chip);
+          });
+        }
+      } catch (err) {
+        chatMessages.innerHTML = '<div style="font-size:0.75rem; color:var(--red); text-align:center;">Failed to initialize conversational assistant.</div>';
+      }
+    }
+
+    async function sendUserMessage(text) {
+      const q = (text || (chatInput ? chatInput.value : '')).trim();
+      if (!q || !currentAgentId || !chatMessages) return;
+
+      if (chatInput) chatInput.value = '';
+      if (chatSendBtn) chatSendBtn.disabled = true;
+      if (chatInput) chatInput.disabled = true;
+
+      // Append user bubble
+      const userBubble = document.createElement('div');
+      userBubble.className = 'chat-bubble user';
+      const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      userBubble.innerHTML = 
+        '<div class="chat-bubble-header" style="justify-content: flex-end;">' +
+          '<span class="chat-bubble-time">' + now + '</span>' +
+        '</div>' +
+        '<div>' + escapeHtml(q) + '</div>';
+      chatMessages.appendChild(userBubble);
+
+      // Append typing indicator
+      const typingBubble = document.createElement('div');
+      typingBubble.className = 'chat-bubble assistant typing-indicator-bubble';
+      typingBubble.id = 'chat-typing-bubble';
+      typingBubble.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+      chatMessages.appendChild(typingBubble);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      try {
+        const res = await fetch('/api/executives/' + currentAgentId + '/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: q })
+        });
+        const data = await res.json();
+        const indicator = document.getElementById('chat-typing-bubble');
+        if (indicator) indicator.remove();
+
+        const replyBubble = document.createElement('div');
+        replyBubble.className = 'chat-bubble assistant';
+        const replyTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        let citationsHtml = '';
+        if (Array.isArray(data.citations) && data.citations.length > 0) {
+          citationsHtml = '<div class="chat-citations-list">' +
+            data.citations.map(c => '<span class="chat-citation-pill">' + escapeHtml(c) + '</span>').join('') +
+            '</div>';
+        }
+
+        let guardedBadge = data.guarded ? '<span class="chat-guarded-pill">🛡️ AUDITED</span>' : '';
+
+        replyBubble.innerHTML = 
+          '<div class="chat-bubble-header">' +
+            '<span>' + escapeHtml(data.agentName || 'Specialist') + ' ' + guardedBadge + '</span>' +
+            '<span class="chat-bubble-time">' + replyTime + '</span>' +
+          '</div>' +
+          '<div>' + escapeHtml(data.reply || '') + '</div>' +
+          citationsHtml;
+        chatMessages.appendChild(replyBubble);
+      } catch (err) {
+        const indicator = document.getElementById('chat-typing-bubble');
+        if (indicator) indicator.remove();
+        const errorBubble = document.createElement('div');
+        errorBubble.className = 'chat-bubble assistant';
+        errorBubble.innerHTML = '<div style="color:var(--red);">Error communicating with executive service. Please try again.</div>';
+        chatMessages.appendChild(errorBubble);
+      } finally {
+        if (chatSendBtn) chatSendBtn.disabled = false;
+        if (chatInput) {
+          chatInput.disabled = false;
+          chatInput.focus();
+        }
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+    }
+
+    if (chatForm) {
+      chatForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        sendUserMessage();
+      });
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
 
     function openModal(agentId) {
       const agent = councilAgents.find(a => a.id === agentId);
       if (!agent || !backdrop) return;
+
+      switchTab('telemetry');
+      initChatForAgent(agentId);
 
       if (modalIcon) modalIcon.innerHTML = agent.iconSvg;
       if (modalRole) modalRole.textContent = agent.role;

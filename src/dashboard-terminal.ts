@@ -581,6 +581,209 @@ ${clerkScripts}
     margin-top: 40px;
     letter-spacing: 0.08em;
   }
+
+  /* Terminal Chat Modal Drawer */
+  .terminal-chat-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(4, 7, 13, 0.85);
+    backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+  }
+  .terminal-chat-backdrop.open { display: flex; }
+  .terminal-chat-modal {
+    background: #090E17;
+    border: 1px solid var(--accent);
+    box-shadow: 0 0 30px rgba(79,224,255,0.25);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 620px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+  .terminal-chat-header {
+    background: rgba(13,20,31,0.9);
+    border-bottom: 1px solid var(--panel-border);
+    padding: 12px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .terminal-chat-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.08em;
+  }
+  .terminal-chat-close {
+    background: transparent;
+    border: 1px solid var(--panel-border);
+    color: var(--text-dim);
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .terminal-chat-close:hover {
+    border-color: var(--red);
+    color: var(--red);
+  }
+  .terminal-chat-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .terminal-chat-governance {
+    background: rgba(201,162,39,0.1);
+    border: 1px solid rgba(201,162,39,0.3);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.68rem;
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .terminal-chat-stream {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(79,224,255,0.12);
+    border-radius: 8px;
+    padding: 12px;
+    max-height: 280px;
+    min-height: 180px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .term-msg {
+    max-width: 88%;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.73rem;
+    line-height: 1.5;
+  }
+  .term-msg.user {
+    align-self: flex-end;
+    background: rgba(79,224,255,0.14);
+    border: 1px solid rgba(79,224,255,0.3);
+    color: var(--text);
+  }
+  .term-msg.agent {
+    align-self: flex-start;
+    background: rgba(13,20,31,0.95);
+    border: 1px solid rgba(79,224,255,0.18);
+    color: var(--text);
+  }
+  .term-msg-head {
+    font-size: 0.62rem;
+    color: var(--accent);
+    margin-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+  }
+  .term-msg-citations {
+    margin-top: 6px;
+    padding-top: 4px;
+    border-top: 1px solid rgba(79,224,255,0.08);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .term-citation {
+    font-size: 0.6rem;
+    background: rgba(201,162,39,0.12);
+    color: var(--gold);
+    padding: 1px 4px;
+    border-radius: 3px;
+    border: 1px solid rgba(201,162,39,0.25);
+  }
+  .term-guarded-badge {
+    font-size: 0.58rem;
+    background: rgba(66,211,146,0.18);
+    color: var(--green);
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+  .terminal-chat-prompts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .term-prompt-btn {
+    background: rgba(79,224,255,0.06);
+    border: 1px solid rgba(79,224,255,0.15);
+    color: var(--text-dim);
+    font-family: inherit;
+    font-size: 0.68rem;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+  }
+  .term-prompt-btn:hover {
+    background: rgba(79,224,255,0.12);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .terminal-chat-form {
+    display: flex;
+    gap: 8px;
+  }
+  .terminal-chat-input {
+    flex: 1;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(79,224,255,0.2);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.75rem;
+    padding: 8px 12px;
+    border-radius: 6px;
+    outline: none;
+  }
+  .terminal-chat-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 8px rgba(79,224,255,0.2);
+  }
+  .terminal-chat-send {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-family: inherit;
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    transition: all 0.2s;
+  }
+  .terminal-chat-send:hover:not(:disabled) {
+    box-shadow: 0 0 10px rgba(79,224,255,0.4);
+  }
+  .terminal-chat-send:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 </style>
 </head>
 <body>
@@ -891,7 +1094,35 @@ ${clerkScripts}
 
     </div>
 
-  </main>
+  <!-- Live Conversational Terminal Modal -->
+  <div class="terminal-chat-backdrop" id="terminal-chat-backdrop" role="presentation" aria-hidden="true">
+    <div class="terminal-chat-modal" role="dialog" aria-modal="true" aria-labelledby="term-chat-title">
+      <div class="terminal-chat-header">
+        <div class="terminal-chat-title">
+          <span class="status-tag">●</span>
+          <span id="term-chat-name">SPECIALIST INTERROGATION</span>
+        </div>
+        <button type="button" class="terminal-chat-close" id="term-chat-close-btn" onclick="closeTerminalAgentChat()" aria-label="Close specialist chat">&times;</button>
+      </div>
+      <div class="terminal-chat-body">
+        <div class="terminal-chat-governance">
+          <span>🔒</span>
+          <span><strong>RULE B5 GOVERNANCE:</strong> Specialization voice only. Zero capital deployed ($0.00). Live execution gate locked.</span>
+        </div>
+        <div class="terminal-chat-stream" id="term-chat-stream" aria-live="polite">
+          <!-- Live conversation stream -->
+        </div>
+        <div style="font-size:0.65rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em;">Auditable Query Shortcuts:</div>
+        <div class="terminal-chat-prompts" id="term-chat-prompts">
+          <!-- Suggested query buttons -->
+        </div>
+        <form class="terminal-chat-form" id="term-chat-form" onsubmit="event.preventDefault(); sendTerminalChatMessage();">
+          <input type="text" class="terminal-chat-input" id="term-chat-input" placeholder="Query specialist on track record, capital, findings.md..." autocomplete="off">
+          <button type="submit" class="terminal-chat-send" id="term-chat-send-btn">TRANSMIT &rarr;</button>
+        </form>
+      </div>
+    </div>
+  </div>
 
   <footer class="footer-bar">
     QUANTERRAOS CALIBRATION-FIRST PLATFORM · AUDITABLE EMPIRICAL BENCHMARKS · ZERO LIVE TRADING CAPITAL DEPLOYED
@@ -934,7 +1165,7 @@ function renderCouncilStatus(agents) {
     const timeText = diffSec < 60 ? diffSec + 's ago' : Math.floor(diffSec / 60) + 'm ago';
 
     return \`
-      <div class="agent-status-item">
+      <div class="agent-status-item" onclick="openTerminalAgentChat('\${a.id}')" style="cursor:pointer;" title="Consult \${a.name} (Live Voice)">
         <div class="agent-status-info">
           <span class="agent-indicator-dot \${a.dotColor}"></span>
           <div>
@@ -1033,6 +1264,11 @@ function renderNodeDetail(agent) {
       <span class="detail-val">\${agent.latencyMs} ms</span>
     </div>
     \${teleRows}
+    <div style="margin-top:14px; padding-top:10px; border-top:1px solid rgba(79,224,255,0.1); display:flex; justify-content:flex-end;">
+      <button type="button" class="run-cycle-btn" style="padding:6px 14px; font-size:0.72rem; background:rgba(79,224,255,0.12); border:1px solid var(--accent); color:var(--accent);" onclick="openTerminalAgentChat('\${agent.id}')">
+        💬 Consult \${agent.name} (Live Voice) &rarr;
+      </button>
+    </div>
   \`;
 }
 
@@ -1163,6 +1399,147 @@ document.getElementById('run-cycle-btn').addEventListener('click', triggerCycle)
 // Initial load & 15-second polling loop
 fetchLatestPipeline();
 setInterval(fetchLatestPipeline, 15000);
+
+// Terminal Executive Chat Controller
+let currentTerminalChatAgentId = null;
+
+async function openTerminalAgentChat(agentId) {
+  currentTerminalChatAgentId = agentId;
+  const backdrop = document.getElementById('terminal-chat-backdrop');
+  const titleEl = document.getElementById('term-chat-name');
+  const streamEl = document.getElementById('term-chat-stream');
+  const promptsEl = document.getElementById('term-chat-prompts');
+  const inputEl = document.getElementById('term-chat-input');
+  if (!backdrop) return;
+
+  backdrop.classList.add('open');
+  backdrop.setAttribute('aria-hidden', 'false');
+  if (streamEl) streamEl.innerHTML = '<div style="font-size:0.7rem; color:var(--text-dim); text-align:center;">Establishing encrypted console stream…</div>';
+  if (promptsEl) promptsEl.innerHTML = '';
+
+  try {
+    const res = await fetch('/api/executives/' + agentId + '/persona');
+    if (!res.ok) throw new Error('Persona not found');
+    const p = await res.json();
+    if (titleEl) titleEl.textContent = p.name.toUpperCase() + ' · ' + p.role.toUpperCase();
+
+    if (streamEl) {
+      streamEl.innerHTML = 
+        '<div class="term-msg agent">' +
+          '<div class="term-msg-head">' +
+            '<span>' + escapeTerminalText(p.name) + ' [' + escapeTerminalText(p.role) + ']</span>' +
+            '<span>' + new Date().toLocaleTimeString() + '</span>' +
+          '</div>' +
+          '<div>' + escapeTerminalText(p.initialGreeting) + '</div>' +
+        '</div>';
+    }
+
+    if (promptsEl && Array.isArray(p.suggestedQuestions)) {
+      promptsEl.innerHTML = p.suggestedQuestions.map(function(q) {
+        var safeQ = q.replace(/'/g, "\\'");
+        return '<button type="button" class="term-prompt-btn" onclick="sendTerminalChatMessage(\'' + safeQ + '\')">' + escapeTerminalText(q) + '</button>';
+      }).join('');
+    }
+
+    if (inputEl) {
+      setTimeout(() => inputEl.focus(), 60);
+    }
+  } catch (err) {
+    if (streamEl) streamEl.innerHTML = '<div style="color:var(--red); font-size:0.7rem;">Failed to load specialist telemetry.</div>';
+  }
+}
+
+function closeTerminalAgentChat() {
+  const backdrop = document.getElementById('terminal-chat-backdrop');
+  if (backdrop) {
+    backdrop.classList.remove('open');
+    backdrop.setAttribute('aria-hidden', 'true');
+  }
+}
+
+async function sendTerminalChatMessage(customText) {
+  const inputEl = document.getElementById('term-chat-input');
+  const streamEl = document.getElementById('term-chat-stream');
+  const sendBtn = document.getElementById('term-chat-send-btn');
+  const text = (customText || (inputEl ? inputEl.value : '')).trim();
+  if (!text || !currentTerminalChatAgentId || !streamEl) return;
+
+  if (inputEl) inputEl.value = '';
+  if (sendBtn) sendBtn.disabled = true;
+
+  // Append user bubble
+  const userDiv = document.createElement('div');
+  userDiv.className = 'term-msg user';
+  userDiv.innerHTML = 
+    '<div class="term-msg-head" style="justify-content:flex-end;">' +
+      '<span>OPERATOR · ' + new Date().toLocaleTimeString() + '</span>' +
+    '</div>' +
+    '<div>' + escapeTerminalText(text) + '</div>';
+  streamEl.appendChild(userDiv);
+
+  // Append typing indicator
+  const waitDiv = document.createElement('div');
+  waitDiv.className = 'term-msg agent';
+  waitDiv.id = 'term-typing-indicator';
+  waitDiv.innerHTML = '<span style="color:var(--accent);">Evaluating query against verified platform records…</span>';
+  streamEl.appendChild(waitDiv);
+  streamEl.scrollTop = streamEl.scrollHeight;
+
+  try {
+    const res = await fetch('/api/executives/' + currentTerminalChatAgentId + '/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text })
+    });
+    const data = await res.json();
+    const ind = document.getElementById('term-typing-indicator');
+    if (ind) ind.remove();
+
+    const agentDiv = document.createElement('div');
+    agentDiv.className = 'term-msg agent';
+    let citationsHtml = '';
+    if (Array.isArray(data.citations) && data.citations.length > 0) {
+      citationsHtml = '<div class="term-msg-citations">' +
+        data.citations.map(c => '<span class="term-citation">' + escapeTerminalText(c) + '</span>').join('') +
+        '</div>';
+    }
+    const guardedBadge = data.guarded ? '<span class="term-guarded-badge">AUDITED RECORD</span>' : '';
+
+    agentDiv.innerHTML = 
+      '<div class="term-msg-head">' +
+        '<span>' + escapeTerminalText(data.agentName || 'SPECIALIST') + ' ' + guardedBadge + '</span>' +
+        '<span>' + new Date().toLocaleTimeString() + '</span>' +
+      '</div>' +
+      '<div>' + escapeTerminalText(data.reply || '') + '</div>' +
+      citationsHtml;
+    streamEl.appendChild(agentDiv);
+  } catch (err) {
+    const ind = document.getElementById('term-typing-indicator');
+    if (ind) ind.remove();
+    const errDiv = document.createElement('div');
+    errDiv.className = 'term-msg agent';
+    errDiv.innerHTML = '<span style="color:var(--red);">Transmission failed. Specialist unavailable.</span>';
+    streamEl.appendChild(errDiv);
+  } finally {
+    if (sendBtn) sendBtn.disabled = false;
+    if (inputEl) inputEl.focus();
+    streamEl.scrollTop = streamEl.scrollHeight;
+  }
+}
+
+function escapeTerminalText(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeTerminalAgentChat();
+});
 </script>
 </body>
 </html>`;
