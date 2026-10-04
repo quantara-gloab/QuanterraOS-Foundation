@@ -1,6 +1,15 @@
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
-import { scoreObservation, summarizePerformance, computeCalibrationCurve, computeStreak } from "../scoring.ts";
+import {
+  scoreObservation,
+  summarizePerformance,
+  computeCalibrationCurve,
+  computeStreak,
+  computeWilsonInterval,
+  computeMurphyDecomposition,
+  computeBrierSkillScore,
+  computeLogLoss,
+} from "../scoring.ts";
 import type { ObservationRow, ResolutionRow } from "../scoring.ts";
 
 function obs(overrides: Partial<ObservationRow> = {}): ObservationRow {
@@ -93,5 +102,59 @@ describe("computeStreak", () => {
       today
     );
     assert.equal(currentStreak, 3);
+  });
+});
+
+describe("computeWilsonInterval", () => {
+  test("computes valid binomial confidence bounds", () => {
+    const interval = computeWilsonInterval(75, 100);
+    assert.equal(interval.pointEstimate, 0.75);
+    assert.ok(interval.lower < 0.75);
+    assert.ok(interval.upper > 0.75);
+    assert.ok(interval.lower >= 0 && interval.upper <= 1);
+  });
+});
+
+describe("computeMurphyDecomposition", () => {
+  test("satisfies Murphy identity: Brier === Reliability - Resolution + Uncertainty", () => {
+    const scored = [
+      scoreObservation(obs({ probability: 0.8 }), res({ outcome: "YES" })),
+      scoreObservation(obs({ probability: 0.8 }), res({ outcome: "YES" })),
+      scoreObservation(obs({ probability: 0.2 }), res({ outcome: "NO" })),
+      scoreObservation(obs({ probability: 0.3 }), res({ outcome: "YES" })),
+      scoreObservation(obs({ probability: 0.9 }), res({ outcome: "NO" })),
+    ];
+    const decomp = computeMurphyDecomposition(scored);
+    assert.ok(decomp !== null);
+    assert.equal(decomp.sampleSize, 5);
+
+    // Verify identity: Reliability - Resolution + Uncertainty ~ Brier
+    const reconstructedBrier = decomp.reliability - decomp.resolution + decomp.uncertainty;
+    assert.ok(Math.abs(reconstructedBrier - decomp.brierScore) < 0.005);
+  });
+});
+
+describe("computeBrierSkillScore", () => {
+  test("computes skill score relative to coin flip or climatology", () => {
+    // 0.2001 vs 0.2500 coin flip
+    const bssCoin = computeBrierSkillScore(0.2001, 0.2500);
+    assert.equal(bssCoin, 0.1996);
+
+    // Negative skill when underperforming reference
+    const bssBad = computeBrierSkillScore(0.3000, 0.2500);
+    assert.equal(bssBad, -0.2);
+  });
+});
+
+describe("computeLogLoss", () => {
+  test("computes cross-entropy on binary resolutions", () => {
+    const scored = [
+      scoreObservation(obs({ probability: 0.9 }), res({ outcome: "YES" })),
+      scoreObservation(obs({ probability: 0.1 }), res({ outcome: "NO" })),
+    ];
+    const loss = computeLogLoss(scored);
+    assert.ok(loss !== null);
+    // Both confident & correct -> loss should be very low (~0.1054)
+    assert.ok(loss < 0.2);
   });
 });

@@ -84,6 +84,32 @@ export interface CalibrationBin {
   rangeEnd: number;
   count: number;
   actualYesRate: number | null;
+  ciLower?: number | null;
+  ciUpper?: number | null;
+  insufficientSample?: boolean;
+}
+
+/**
+ * Wilson score interval with continuity correction for binomial proportions.
+ * Used for calibration curve deciles per HANDOFF.md E2.
+ */
+export function computeWilsonInterval(
+  successes: number,
+  total: number,
+  z = 1.96
+): { lower: number; upper: number; pointEstimate: number } {
+  if (total <= 0) return { lower: 0, upper: 0, pointEstimate: 0 };
+  const p = successes / total;
+  const z2 = z * z;
+  const denom = 1 + z2 / total;
+  const center = (p + z2 / (2 * total)) / denom;
+  const margin = (z * Math.sqrt((p * (1 - p)) / total + z2 / (4 * total * total))) / denom;
+
+  return {
+    lower: Math.max(0, Number((center - margin).toFixed(4))),
+    upper: Math.min(1, Number((center + margin).toFixed(4))),
+    pointEstimate: Number(p.toFixed(4)),
+  };
 }
 
 export function computeCalibrationCurve(scored: ScoredObservation[], binCount = 10): CalibrationBin[] {
@@ -104,14 +130,144 @@ export function computeCalibrationCurve(scored: ScoredObservation[], binCount = 
   return Array.from({ length: binCount }, (_, i) => {
     const rangeStart = i * binSize;
     const rangeEnd = (i + 1) * binSize;
+    const count = totalCounts[i];
+    const yesCount = yesCounts[i];
+    const actualYesRate = count === 0 ? null : yesCount / count;
+    const interval = count > 0 ? computeWilsonInterval(yesCount, count) : null;
+
     return {
       label: `${Math.round(rangeStart * 100)}-${Math.round(rangeEnd * 100)}%`,
       rangeStart,
       rangeEnd,
-      count: totalCounts[i],
-      actualYesRate: totalCounts[i] === 0 ? null : yesCounts[i] / totalCounts[i],
+      count,
+      actualYesRate,
+      ciLower: interval ? interval.lower : null,
+      ciUpper: interval ? interval.upper : null,
+      insufficientSample: count < 30, // HANDOFF.md E2 standard: n < 30 labeled insufficient
     };
   });
+}
+
+/**
+ * Murphy Decomposition of the Brier Score:
+ * Brier = Reliability - Resolution + Uncertainty.
+ *
+ * Reliability = sum(n_k / N * (p_k - o_bar_k)^2) -> Lower is better (0 = perfect calibration).
+ * Resolution  = sum(n_k / N * (o_bar_k - o_bar)^2) -> Higher is better (ability to separate outcomes).
+ * Uncertainty = o_bar * (1 - o_bar) -> Intrinsic difficulty of the dataset.
+ */
+export interface MurphyDecomposition {
+  reliability: number;
+  resolution: number;
+  uncertainty: number;
+  brierScore: number;
+  sampleSize: number;
+}
+
+export function computeMurphyDecomposition(
+  scored: ScoredObservation[],
+  binCount = 10
+): MurphyDecomposition | null {
+  const valid = scored.filter(
+    (s) =>
+      s.scorable &&
+      s.observation.probability !== null &&
+      s.observation.probability !== undefined &&
+      s.resolution.outcome !== "VOID"
+  );
+
+  if (valid.length === 0) return null;
+  const N = valid.length;
+
+  const binSize = 1 / binCount;
+  const binTotal = new Array(binCount).fill(0);
+  const binYes = new Array(binCount).fill(0);
+  const binProbSum = new Array(binCount).fill(0);
+
+  let totalYes = 0;
+  let totalBrier = 0;
+
+  for (const s of valid) {
+    const raw = s.observation.probability as number;
+    const p = raw > 1 ? raw / 100 : raw;
+    const y = s.resolution.outcome === "YES" ? 1 : 0;
+    const binIdx = Math.min(binCount - 1, Math.floor(p * binCount));
+
+    binTotal[binIdx]++;
+    if (y === 1) {
+      binYes[binIdx]++;
+      totalYes++;
+    }
+    binProbSum[binIdx] += p;
+    totalBrier += (p - y) ** 2;
+  }
+
+  const baseRate = totalYes / N;
+  const uncertainty = baseRate * (1 - baseRate);
+
+  let reliability = 0;
+  let resolution = 0;
+
+  for (let k = 0; k < binCount; k++) {
+    const nk = binTotal[k];
+    if (nk === 0) continue;
+    const pkMean = binProbSum[k] / nk;
+    const okMean = binYes[k] / nk;
+
+    reliability += (nk / N) * ((pkMean - okMean) ** 2);
+    resolution += (nk / N) * ((okMean - baseRate) ** 2);
+  }
+
+  const brierScore = totalBrier / N;
+
+  return {
+    reliability: Number(reliability.toFixed(5)),
+    resolution: Number(resolution.toFixed(5)),
+    uncertainty: Number(uncertainty.toFixed(5)),
+    brierScore: Number(brierScore.toFixed(5)),
+    sampleSize: N,
+  };
+}
+
+/**
+ * Computes Brier Skill Score (BSS) relative to a reference benchmark:
+ * BSS = 1 - (Brier / ReferenceBrier).
+ * BSS > 0 means the forecast outperforms the benchmark.
+ */
+export function computeBrierSkillScore(
+  brierScore: number,
+  referenceBrierScore: number
+): number {
+  if (referenceBrierScore <= 0) return 0;
+  return Number((1 - brierScore / referenceBrierScore).toFixed(4));
+}
+
+/**
+ * Log Loss (Cross-Entropy) for binary probabilistic forecasts:
+ * LogLoss = -1/N * sum(y * ln(p) + (1 - y) * ln(1 - p)).
+ */
+export function computeLogLoss(scored: ScoredObservation[], epsilon = 1e-6): number | null {
+  const valid = scored.filter(
+    (s) =>
+      s.scorable &&
+      s.observation.probability !== null &&
+      s.observation.probability !== undefined &&
+      s.resolution.outcome !== "VOID"
+  );
+
+  if (valid.length === 0) return null;
+
+  let totalLoss = 0;
+  for (const s of valid) {
+    const raw = s.observation.probability as number;
+    let p = raw > 1 ? raw / 100 : raw;
+    p = Math.min(1 - epsilon, Math.max(epsilon, p));
+    const y = s.resolution.outcome === "YES" ? 1 : 0;
+
+    totalLoss += -(y * Math.log(p) + (1 - y) * Math.log(1 - p));
+  }
+
+  return Number((totalLoss / valid.length).toFixed(4));
 }
 
 /** Daily ritual streak over research_observations.created timestamps
