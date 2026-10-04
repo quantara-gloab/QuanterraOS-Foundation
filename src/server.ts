@@ -2236,6 +2236,87 @@ ${miniCircles}
     </div>
   </section>
 
+  <!-- The Tesla of Market Intelligence: Architectural Paradigm Shift -->
+  <section class="tesla-intelligence-section" style="max-width: 1140px; margin: 0 auto 72px; padding: 0 24px;">
+    <div style="background: linear-gradient(135deg, rgba(13,20,35,0.95) 0%, rgba(8,12,22,0.98) 100%); border: 1px solid rgba(201,162,39,0.35); border-radius: 16px; padding: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.6), 0 0 30px rgba(201,162,39,0.12);">
+      <div style="text-align: center; max-width: 780px; margin: 0 auto 36px;">
+        <div style="font-family: ui-monospace, monospace; font-size: 0.72rem; letter-spacing: 0.16em; color: var(--accent); text-transform: uppercase; margin-bottom: 10px;">
+          ⚡ ARCHITECTURAL PARADIGM SHIFT // THE TESLA OF INTEL
+        </div>
+        <h2 style="font-family: 'Fraunces', serif; font-size: 2.1rem; color: #ffffff; margin-bottom: 14px; font-weight: 600;">
+          The Tesla of Market Intelligence
+        </h2>
+        <p style="color: var(--muted); font-size: 0.95rem; line-height: 1.6;">
+          Why pay <strong>$31,980/year for 1980s monochrome terminals</strong> or trade blind on retail prediction market order books? QuanterraOS replaces fragmented manual software with autonomous multi-sensor fusion, Full Self-Calibration (FSC), and an automated emergency circuit-breaker.
+        </p>
+      </div>
+
+      <!-- Comparative Benchmark Table -->
+      <div style="overflow-x: auto; margin-bottom: 32px;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem; text-align: left;">
+          <thead>
+            <tr style="border-bottom: 2px solid rgba(201,162,39,0.3); font-family: ui-monospace, monospace; color: var(--muted);">
+              <th style="padding: 12px 14px;">Capability / Dimension</th>
+              <th style="padding: 12px 14px; color: #ffd768; background: rgba(201,162,39,0.1); border-radius: 6px 6px 0 0;">⚡ QuanterraOS (Tesla of Intel)</th>
+              <th style="padding: 12px 14px;">Bloomberg Terminal</th>
+              <th style="padding: 12px 14px;">Kalshi / Polymarket Native</th>
+              <th style="padding: 12px 14px;">Kaiko / Coin Metrics</th>
+            </tr>
+          </thead>
+          <tbody style="color: var(--text);">
+            <tr style="border-bottom: 1px solid rgba(243,241,234,0.06);">
+              <td style="padding: 12px 14px; font-weight: 600;">System Architecture</td>
+              <td style="padding: 12px 14px; color: #ffd768; background: rgba(201,162,39,0.05); font-weight: 600;">Neural Council Multi-Agent Sensor Fusion</td>
+              <td style="padding: 12px 14px; color: var(--muted);">1982 Monolithic Mainframe Codes</td>
+              <td style="padding: 12px 14px; color: var(--muted);">Single-Exchange CLOB / Pool</td>
+              <td style="padding: 12px 14px; color: var(--muted);">Raw Data REST / WS Feeds</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(243,241,234,0.06);">
+              <td style="padding: 12px 14px; font-weight: 600;">Calibration Decomposition</td>
+              <td style="padding: 12px 14px; color: #ffd768; background: rgba(201,162,39,0.05); font-weight: 600;">Murphy Brier Decomposition (10 Bins, Wilson CIs)</td>
+              <td style="padding: 12px 14px; color: var(--muted);">None for event contracts</td>
+              <td style="padding: 12px 14px; color: var(--muted);">None (Last traded price only)</td>
+              <td style="padding: 12px 14px; color: var(--muted);">None (Unweighted L2 tick dumps)</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(243,241,234,0.06);">
+              <td style="padding: 12px 14px; font-weight: 600;">Autonomous Risk Safety Gate</td>
+              <td style="padding: 12px 14px; color: #ffd768; background: rgba(201,162,39,0.05); font-weight: 600;">Phoenix Gate (AEB: Locks execution when no edge)</td>
+              <td style="padding: 12px 14px; color: var(--muted);">None (Manual order tickets)</td>
+              <td style="padding: 12px 14px; color: var(--muted);">None (Retail momentum traps)</td>
+              <td style="padding: 12px 14px; color: var(--muted);">None (Passive data vendor)</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(243,241,234,0.06);">
+              <td style="padding: 12px 14px; font-weight: 600;">Real-Time Sensor Fusion</td>
+              <td style="padding: 12px 14px; color: #ffd768; background: rgba(201,162,39,0.05); font-weight: 600;">Draco Synthetic BRTI (&lt;0.5% Outlier Rejection)</td>
+              <td style="padding: 12px 14px; color: var(--muted);">Unlinked multi-window tabs</td>
+              <td style="padding: 12px 14px; color: var(--muted);">Single order book view</td>
+              <td style="padding: 12px 14px; color: var(--muted);">Raw tables without fusion</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(243,241,234,0.06);">
+              <td style="padding: 12px 14px; font-weight: 600;">Auditable Provenance</td>
+              <td style="padding: 12px 14px; color: #ffd768; background: rgba(201,162,39,0.05); font-weight: 600;">100% Open CI/CD Statistical Reproducibility</td>
+              <td style="padding: 12px 14px; color: var(--muted);">Proprietary black-box algorithms</td>
+              <td style="padding: 12px 14px; color: var(--muted);">Proprietary exchange settlement</td>
+              <td style="padding: 12px 14px; color: var(--muted);">Private enterprise tick archive</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px 14px; font-weight: 600;">Annual Seat Cost</td>
+              <td style="padding: 12px 14px; color: #42D392; background: rgba(201,162,39,0.05); font-weight: 700;">$0 Open Research / Transparent Pro</td>
+              <td style="padding: 12px 14px; color: #ff8585; font-weight: 700;">$31,980 / seat / year</td>
+              <td style="padding: 12px 14px; color: var(--muted);">Taker fees up to 1.75¢ / trade</td>
+              <td style="padding: 12px 14px; color: #ff8585;">$15,000–$50,000+ / yr</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
+        <a href="/council"><button class="primary-btn" style="padding: 12px 28px; box-shadow: 0 0 24px rgba(201,162,39,0.35);">⚡ Launch Live Celestial Bridge Terminal →</button></a>
+        <a href="/calibration"><button class="secondary-btn" style="padding: 12px 28px;">Inspect 1,316-Market Calibration Proof</button></a>
+      </div>
+    </div>
+  </section>
+
   <section class="footer-section">
     <h2 class="serif-headline">Build your council.</h2>
     <p>Join the waitlist for early access to the QuanterraOS sovereign intelligence platform.</p>
