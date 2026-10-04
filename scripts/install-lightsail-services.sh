@@ -9,7 +9,8 @@ if [[ ! -d "$project_dir" || ! -f "$project_dir/.env" ]]; then
   exit 1
 fi
 
-for unit in "$unit_dir"/*.service; do
+for unit in "$unit_dir"/*.service "$unit_dir"/*.timer; do
+  [[ -f "$unit" ]] || continue
   install -o root -g root -m 0644 "$unit" "/etc/systemd/system/$(basename "$unit")"
 done
 
@@ -25,4 +26,6 @@ units=(
 )
 
 systemctl enable --now "${units[@]}"
+systemctl enable --now quanterra-falcon-eval.timer
 systemctl --no-pager --plain --legend=false list-units --state=active "${units[@]}"
+systemctl --no-pager --plain --legend=false list-timers quanterra-falcon-eval.timer

@@ -1,0 +1,17 @@
+[Unit]
+Description=QuanterraOS Falcon order-book research daily evaluation
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=quanterraos
+Group=quanterraos
+WorkingDirectory=/opt/quanterraos/app
+EnvironmentFile=/opt/quanterraos/app/.env
+Environment=NODE_ENV=production
+ExecStart=/bin/bash -c 'mkdir -p reports && /usr/bin/node --experimental-strip-types src/falcon-backtest.ts > "reports/falcon-backtest-$(date +%%Y-%%m-%%d).txt" 2>&1'
+StandardOutput=journal
+StandardError=journal
+NoNewPrivileges=true
+PrivateTmp=true

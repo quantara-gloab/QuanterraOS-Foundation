@@ -1,0 +1,10 @@
+[Unit]
+Description=QuanterraOS Falcon daily evaluation timer
+Requires=quanterra-falcon-eval.service
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+
+[Install]
+WantedBy=timers.target
