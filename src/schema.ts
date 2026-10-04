@@ -336,3 +336,25 @@ export const councilPipelineRuns = sqliteTable(
   }),
 );
 
+export const councilChatLogs = sqliteTable(
+  "council_chat_logs",
+  {
+    id: text("id").primaryKey(),
+    agentId: text("agent_id").notNull(),
+    agentName: text("agent_name").notNull(),
+    userMessage: text("user_message").notNull(),
+    assistantReply: text("assistant_reply").notNull(),
+    citationsJson: text("citations_json").notNull(),
+    guarded: integer("guarded").notNull().default(0),
+    violationsJson: text("violations_json"),
+    pipelineCycleNumber: integer("pipeline_cycle_number"),
+    durationMs: integer("duration_ms").notNull(),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => ({
+    agentIdx: index("council_chat_logs_agent_idx").on(table.agentId),
+    createdAtIdx: index("council_chat_logs_created_at_idx").on(table.createdAt),
+  }),
+);
+
+

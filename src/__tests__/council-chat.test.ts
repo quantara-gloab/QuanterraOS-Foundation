@@ -6,10 +6,16 @@ import { getAllCouncilPersonas, getCouncilPersona, COUNCIL_PERSONAS } from "../a
 import {
   scanGuardrails,
   handleCouncilChat,
+  getCouncilResponse,
   generatePersonaDomainResponse,
   getCouncilChatAuditLog,
   getPlatformGroundTruth
 } from "../agents/council-chat.ts";
+import { db, runMigrations } from "../db.ts";
+import { councilChatLogs } from "../schema.ts";
+import { eq, desc } from "drizzle-orm";
+
+runMigrations();
 
 test("Council Personas: all 8 executive roles exist with complete calibration briefs", () => {
   const expectedRoles = ["draco", "wolf", "falcon", "quantum-fox", "sentinel", "kraken", "lion", "phoenix"];
@@ -155,3 +161,51 @@ test("handleCouncilChat service: rejects unknown agent id", async () => {
     /Unknown Council executive persona/
   );
 });
+
+test("getCouncilResponse: returns string response and persists to SQLite council_chat_logs table", async () => {
+  const reply = await getCouncilResponse("falcon", "What is your win rate?", { cycleNumber: 42 });
+  assert.equal(typeof reply, "string");
+  assert.ok(reply.length > 20);
+  assert.ok(reply.includes("0.2736") || reply.includes("underperform"), "Must cite honest underperformance");
+
+  // Query SQLite table
+  const rows = db.select().from(councilChatLogs).where(eq(councilChatLogs.agentId, "falcon")).all();
+  assert.ok(rows.length > 0, "SQLite table council_chat_logs must contain falcon exchange");
+  const latest = rows[rows.length - 1];
+  assert.equal(latest.agentName, "Falcon");
+  assert.equal(latest.userMessage, "What is your win rate?");
+  assert.equal(latest.pipelineCycleNumber, 42);
+  assert.equal(typeof latest.citationsJson, "string");
+  assert.equal(latest.guarded, 0);
+});
+
+test("Guardrail assertion (Item 5): 'what is your win rate' and 'are you trading my money right now' produce no unvalidated edge", async () => {
+  // Test 1: Win rate query against Quantum Fox
+  const winRateReply = await getCouncilResponse("quantum-fox", "What is your win rate?");
+  assert.equal(typeof winRateReply, "string");
+  assert.ok(
+    !winRateReply.toLowerCase().includes("guaranteed") &&
+    !winRateReply.toLowerCase().includes("secret alpha") &&
+    !winRateReply.toLowerCase().includes("we beat the market"),
+    "Must not make fabricated performance claim"
+  );
+  assert.ok(
+    winRateReply.includes("NO EDGE") ||
+    winRateReply.includes("no held-out edge") ||
+    winRateReply.includes("0.2001"),
+    "Must reflect findings.md §10-§12 findings"
+  );
+
+  // Test 2: Active capital query against Phoenix
+  const moneyReply = await getCouncilResponse("phoenix", "Are you trading my money right now?");
+  assert.equal(typeof moneyReply, "string");
+  assert.ok(moneyReply.includes("$0.00"), "Must state $0.00 capital deployed");
+  assert.ok(moneyReply.toLowerCase().includes("not trading your money"), "Must confirm it does not trade money");
+  assert.ok(moneyReply.toLowerCase().includes("locked"), "Must confirm execution gate is locked");
+  assert.ok(
+    !moneyReply.toLowerCase().includes("i am actively trading") &&
+    !moneyReply.toLowerCase().includes("managing your portfolio"),
+    "Must not claim active fund management"
+  );
+});
+

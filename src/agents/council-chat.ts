@@ -12,16 +12,28 @@ import fs from "node:fs";
 import path from "node:path";
 import { getCouncilPersona, type CouncilPersona } from "./council-personas.ts";
 import { getCouncilAgentsData } from "./council-data.ts";
+import { db } from "../db.ts";
+import { councilChatLogs } from "../schema.ts";
+import { getLatestCouncilPipelineRun } from "./council-pipeline.ts";
 
 export interface ChatMessage {
   role: "user" | "assistant" | "system";
   content: string;
 }
 
+export interface CouncilContext {
+  cycleNumber?: number;
+  marketQuote?: any;
+  pipelineHealth?: string;
+  lionVerdict?: string;
+  source?: string;
+}
+
 export interface CouncilChatRequest {
   agentId: string;
   message: string;
   history?: ChatMessage[];
+  context?: CouncilContext;
 }
 
 export interface CouncilChatResponse {
@@ -360,7 +372,18 @@ export async function handleCouncilChat(request: CouncilChatRequest): Promise<Co
   const durationMs = Date.now() - startTime;
   const auditId = `chat_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
-  // Log exchange for auditable transparency
+  // Query latest pipeline run if cycleNumber not provided
+  let cycleNumber: number | null = request.context?.cycleNumber ?? null;
+  if (cycleNumber === null) {
+    try {
+      const latestRun = await getLatestCouncilPipelineRun();
+      if (latestRun) cycleNumber = latestRun.cycleNumber;
+    } catch {
+      // Pipeline may be uninitialized
+    }
+  }
+
+  // 1. Log exchange to data/council-chat.log file
   logChatExchange({
     id: auditId,
     timestamp: new Date().toISOString(),
@@ -374,6 +397,25 @@ export async function handleCouncilChat(request: CouncilChatRequest): Promise<Co
     durationMs
   });
 
+  // 2. Persist exchange to SQLite council_chat_logs table (migration 0012)
+  try {
+    await db.insert(councilChatLogs).values({
+      id: auditId,
+      agentId: persona.id,
+      agentName: persona.name,
+      userMessage: request.message,
+      assistantReply: replyText,
+      citationsJson: JSON.stringify(citations),
+      guarded: guarded ? 1 : 0,
+      violationsJson: violations ? JSON.stringify(violations) : null,
+      pipelineCycleNumber: cycleNumber,
+      durationMs,
+      createdAt: new Date().toISOString(),
+    });
+  } catch (dbErr) {
+    console.error("Failed to insert council_chat_logs into SQLite:", dbErr);
+  }
+
   return {
     agentId: persona.id,
     agentName: persona.name,
@@ -385,3 +427,21 @@ export async function handleCouncilChat(request: CouncilChatRequest): Promise<Co
     timestamp: new Date().toISOString()
   };
 }
+
+/**
+ * Direct function signature specified in HANDOFF:
+ * getCouncilResponse(agentId: string, userMessage: string, context?: CouncilContext): Promise<string>
+ */
+export async function getCouncilResponse(
+  agentId: string,
+  userMessage: string,
+  context?: CouncilContext
+): Promise<string> {
+  const result = await handleCouncilChat({
+    agentId,
+    message: userMessage,
+    context
+  });
+  return result.reply;
+}
+

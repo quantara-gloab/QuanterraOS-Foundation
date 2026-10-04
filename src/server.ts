@@ -533,18 +533,19 @@ app.get(["/api/executives/:id/persona", "/api/council/agents/:id/persona"], (req
   res.json(persona);
 });
 
-app.post(["/api/executives/:id/chat", "/api/council/agents/:id/chat"], async (req, res) => {
+app.post(["/api/council/:agentId/chat", "/api/council/:id/chat", "/api/council/agents/:id/chat", "/api/executives/:id/chat"], async (req, res) => {
   try {
+    const agentId = req.params.agentId || req.params.id;
     const { message, history } = req.body || {};
     if (!message || typeof message !== "string" || message.trim().length === 0) {
       return res.status(400).json({ error: "invalid_request", message: "Field 'message' is required." });
     }
-    const persona = getCouncilPersona(req.params.id);
+    const persona = getCouncilPersona(agentId);
     if (!persona) {
-      return res.status(404).json({ error: "persona_not_found", message: `Executive persona '${req.params.id}' not found` });
+      return res.status(404).json({ error: "persona_not_found", message: `Executive persona '${agentId}' not found` });
     }
     const response = await handleCouncilChat({
-      agentId: req.params.id,
+      agentId,
       message: message.trim(),
       history: Array.isArray(history) ? history : undefined
     });

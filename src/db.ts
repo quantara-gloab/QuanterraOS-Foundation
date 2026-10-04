@@ -37,6 +37,7 @@ export function runMigrations(): void {
     "0009_dashboard_query_indexes.sql",
     "0010_paper_trades.sql",
     "0011_council_pipeline.sql",
+    "0012_council_chat_log.sql",
   ]) {
     const migrationPath = path.join(migrationsDir, migration);
     if (migration === "0006_multi_asset.sql") {
