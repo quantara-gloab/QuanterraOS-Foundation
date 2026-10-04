@@ -2971,7 +2971,7 @@ app.get("/signup", (_req, res) => {
   res.type("html").send(accessTerminalPage);
 });
 
-app.get("/dashboard", (_req, res) => {
+app.get(["/dashboard", "/council"], (_req, res) => {
   res.type("html").send(renderCouncilDashboardPage(clerkScripts, clerkConfigured));
 });
 
