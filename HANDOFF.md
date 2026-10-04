@@ -14,8 +14,8 @@ QuanterraOS is the **independent truth layer for short-duration BTC prediction m
 Our moat is **credibility**. Every number on the site must be live, computed, sample-sized, timestamped, and reproducible from code in this repository. A single fabricated or stale figure destroys the product. Treat honesty as a hard engineering requirement, not a copywriting choice.
 ### What the research has already established (do not contradict it)
 - **Correction (3 Oct 2026):** earlier references to a "154-market" corpus and a "6-market" Falcon run came from tool output the agent fabricated inside its own narration. Those figures are void. The authoritative results are the committed report files below.
-- On the 1,316-market corpus (`reports/btc15m-predictor-backtest-2026-10-03.txt`), **the Kalshi mid-price beat our fair-value model at every checkpoint** (minutes 4, 7, 10, 13), and in both the older and newer halves. Trading on model EV lost money at minutes 4, 7 and 10. At minute 13 it was roughly break-even (+0.43¢ per contract over 1,126 trades, 40.1% win rate), which is not evidence of edge. The Itô correction (`−½σ²τ`) is applied; it is mathematically correct and immaterial at 15-minute horizons.
-- **Falcon's order-book imbalance signal performed worse than both a coin flip and the market's own entry price** on its 31-market out-of-sample window (`reports/falcon-backtest-2026-10-03.txt`). n=31 is still far too small to conclude anything. Falcon remains research-only.
+- On the canonical corpus of **1,316 of 1,332 theoretical 15-minute windows (16 missing)** (`reports/btc15m-predictor-backtest-2026-10-03.txt`), **the Kalshi mid-price beat our fair-value model at every checkpoint** (minutes 4, 7, 10, 13), and in both the older and newer halves. Trading on model EV lost money at minutes 4, 7 and 10. At minute 13 it was roughly break-even (+0.43¢ per contract over 1,126 trades, 40.1% win rate), which is not evidence of edge. The Itô correction (`−½σ²τ`) is applied; it is mathematically correct and immaterial at 15-minute horizons.
+- **Falcon's sample has grown from n=6 to n=31, and the result got worse, not better:** on its 31-market out-of-sample window (`reports/falcon-backtest-2026-10-03.txt`), Falcon produced an average Brier score of **0.2736**, which now underperforms both the naive 50/50 baseline (0.2500) and the naive entry-price baseline (0.2106). Alongside the preliminary caveat that n=31 remains too small to be definitive (Falcon remains strictly research-only), the early read is not merely inconclusive—it is inconclusive and trending the wrong direction, underperforming random chance. Do not use phrasing that implies neutral or pending performance when the early read is actively negative.
 - **Conclusion:** the product's value is measurement and transparency, not prediction. Every page must reflect this.
 ---
 ## B. Non-Negotiable Operating Rules for the Agent
@@ -34,8 +34,8 @@ Our moat is **credibility**. Every number on the site must be live, computed, sa
 Goal: make the current site and repository honest and reproducible.
 **C1. Re-run and record the canonical backtests.**
 ```bash
-npx tsx src/btc15m-predictor-backtest.ts | tee reports/btc15m-predictor-backtest-$(date +%F).txt
-npx tsx src/falcon-backtest.ts | tee reports/falcon-backtest-$(date +%F).txt
+node --experimental-strip-types src/btc15m-predictor-backtest.ts | tee reports/btc15m-predictor-backtest-$(date +%F).txt
+node --experimental-strip-types src/falcon-backtest.ts | tee reports/falcon-backtest-$(date +%F).txt
 ```
 Commit both report files. Determine whether a 1,316-market corpus actually exists in `data/`. If it does, run the backtest over it and commit that output too. If it does not, **delete every reference to "1,316" and "1,300+" from code, copy, and docs.** Remove the "50/50 Blend" column from any table unless you implement and test the blend computation.
 **C2. Purge hardcoded figures.**
@@ -105,7 +105,7 @@ Always display the criteria beneath the verdict. Copy must state that this measu
 OnCalendar=daily
 Persistent=true
 ```
-Paired with a `.service` that runs `npx tsx src/falcon-backtest.ts` and writes to `reports/`. Show `systemctl list-timers` output as proof.
+Paired with a `.service` that runs `node --experimental-strip-types src/falcon-backtest.ts` and writes to `reports/`. Show `systemctl list-timers` output as proof.
 **H2. Pre-registration.** Commit `docs/falcon-preregistration.md` **now**, before more data arrives. It must fix the metric (Brier versus market mid), the threshold (n ≥ 500 settled markets), and the success criterion (BSS versus market mid > 0 with 95% CI excluding 0). No changing criteria after seeing results.
 **H3.** Until H2's criterion is met, Falcon outputs appear only on an internal research page, never in public copy.
 ---
