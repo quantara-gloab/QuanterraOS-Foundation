@@ -15,7 +15,8 @@ import assert from "node:assert/strict";
 import { createUser, createSession, getUserFromSession, updateUserTier, generateApiKey } from "../auth.ts";
 import { recordPrediction, getPredictionsLedger } from "../prediction-ledger.ts";
 import { getAutopilotLedger, executeAutopilotPaperStep } from "../autopilot-engine.ts";
-import { processBillingEvent } from "../billing.ts";
+import { createHmac } from "node:crypto";
+import { processBillingEvent, verifyStripeSignature } from "../billing.ts";
 
 test("Free tier live ledger is delayed by 20 minutes; Pro tier is real-time", async () => {
   const uniqueId = `test_market_${Date.now()}`;
@@ -130,3 +131,53 @@ test("Institutional tier supports API keys; Free tier is rejected", async () => 
   assert.ok(rawKey.startsWith("qos_inst_"));
   assert.ok(keyPrefix.startsWith("qos_inst_"));
 });
+
+test("Stripe cryptographic webhook signature verification (replay defense, timing safe, secret matching)", () => {
+  const secret = "whsec_test_secret_key_1234567890abcdef";
+  const rawBody = JSON.stringify({ id: "evt_123", type: "checkout.session.completed" });
+  const nowSec = Math.floor(Date.now() / 1000);
+
+  // 1. Generate valid Stripe signature header format: t=timestamp,v1=signature
+  const validPayload = `${nowSec}.${rawBody}`;
+  const validSig = createHmac("sha256", secret).update(validPayload).digest("hex");
+  const validHeader = `t=${nowSec},v1=${validSig}`;
+
+  assert.equal(
+    verifyStripeSignature(rawBody, validHeader, secret),
+    true,
+    "Valid Stripe signature with correct timestamp and secret must verify true"
+  );
+
+  // 2. Reject forged / wrong secret
+  const wrongSecret = "whsec_attacker_controlled_secret";
+  assert.equal(
+    verifyStripeSignature(rawBody, validHeader, wrongSecret),
+    false,
+    "Signature computed with wrong secret must be rejected"
+  );
+
+  // 3. Reject tampered body (even 1 byte difference)
+  const tamperedBody = JSON.stringify({ id: "evt_123", type: "checkout.session.completed", extra: "injected" });
+  assert.equal(
+    verifyStripeSignature(tamperedBody, validHeader, secret),
+    false,
+    "Tampered raw body must fail signature check"
+  );
+
+  // 4. Reject replay attack with expired timestamp (> 300s old)
+  const expiredSec = nowSec - 301;
+  const expiredPayload = `${expiredSec}.${rawBody}`;
+  const expiredSig = createHmac("sha256", secret).update(expiredPayload).digest("hex");
+  const expiredHeader = `t=${expiredSec},v1=${expiredSig}`;
+  assert.equal(
+    verifyStripeSignature(rawBody, expiredHeader, secret, 300),
+    false,
+    "Replay attack with timestamp > 300s old must be rejected"
+  );
+
+  // 5. Reject empty or malformed header
+  assert.equal(verifyStripeSignature(rawBody, "", secret), false);
+  assert.equal(verifyStripeSignature(rawBody, "invalid-header", secret), false);
+  assert.equal(verifyStripeSignature(rawBody, `t=${nowSec}`, secret), false);
+});
+

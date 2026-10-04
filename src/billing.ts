@@ -8,7 +8,7 @@
  * When Stripe keys are pending (e.g. IRS business EIN pending), operates gracefully in
  * sandbox mode to allow full end-to-end testing and verification.
  */
-import { createHmac, randomUUID } from "node:crypto";
+import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 import { eq } from "drizzle-orm";
 import { db } from "./db.ts";
 import { users, billingEvents } from "./schema.ts";
@@ -115,24 +115,52 @@ export async function createCustomerPortalSession(userId: string, returnUrl: str
 }
 
 // ---------------------------------------------------------------------------
-// Webhook Processing
+// Webhook Processing & Cryptographic Signature Verification
 // ---------------------------------------------------------------------------
 
-export function verifyStripeSignature(rawBody: string, signatureHeader: string, secret: string): boolean {
+/**
+ * Verifies the Stripe v1 cryptographic signature against STRIPE_WEBHOOK_SECRET.
+ * Equivalent to stripe.webhooks.constructEvent() verification logic:
+ * 1. Extracts timestamp 't' and v1 signature(s) from 'stripe-signature' header.
+ * 2. Checks timestamp tolerance to prevent replay attacks (default 300s).
+ * 3. Computes HMAC-SHA256 of `${timestamp}.${rawBody}` with secret.
+ * 4. Compares using constant-time timingSafeEqual to prevent timing attacks.
+ */
+export function verifyStripeSignature(
+  rawBody: string | Buffer,
+  signatureHeader: string,
+  secret: string,
+  toleranceSeconds: number = 300
+): boolean {
   try {
+    const rawBodyStr = typeof rawBody === "string" ? rawBody : rawBody.toString("utf8");
     const parts = signatureHeader.split(",");
     let timestamp = "";
-    let signature = "";
+    const signatures: string[] = [];
     for (const part of parts) {
       const [k, v] = part.trim().split("=");
       if (k === "t") timestamp = v;
-      if (k === "v1") signature = v;
+      if (k === "v1" && v) signatures.push(v);
     }
-    if (!timestamp || !signature) return false;
+    if (!timestamp || signatures.length === 0) return false;
 
-    const payload = `${timestamp}.${rawBody}`;
+    // Tolerance check against replay attacks (default 5 minutes)
+    if (toleranceSeconds > 0) {
+      const timestampSec = parseInt(timestamp, 10);
+      const nowSec = Math.floor(Date.now() / 1000);
+      if (isNaN(timestampSec) || Math.abs(nowSec - timestampSec) > toleranceSeconds) {
+        return false;
+      }
+    }
+
+    const payload = `${timestamp}.${rawBodyStr}`;
     const expected = createHmac("sha256", secret).update(payload).digest("hex");
-    return expected === signature;
+    const expectedBuf = Buffer.from(expected, "utf8");
+
+    return signatures.some((sig) => {
+      const sigBuf = Buffer.from(sig, "utf8");
+      return sigBuf.length === expectedBuf.length && timingSafeEqual(sigBuf, expectedBuf);
+    });
   } catch {
     return false;
   }

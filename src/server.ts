@@ -68,7 +68,13 @@ runMigrations();
 seedHistoricalReplay().catch((err) => console.error("Error seeding historical replay:", err));
 
 const app = express();
-app.use(express.json());
+app.use(
+  express.json({
+    verify: (req: any, _res, buf) => {
+      req.rawBody = buf;
+    },
+  })
+);
 app.use(express.urlencoded({ extended: true }));
 
 app.post("/api/workspace/resolve", async (req, res) => {
@@ -2336,19 +2342,50 @@ app.post("/api/billing/portal", async (req, res) => {
 });
 
 app.post("/api/billing/webhook", (req, res) => {
+  const webhookSecret = BILLING_CONFIG.webhookSecret;
   const sig = req.headers["stripe-signature"] as string | undefined;
-  if (BILLING_CONFIG.webhookSecret && sig) {
-    const isValid = verifyStripeSignature(JSON.stringify(req.body), sig, BILLING_CONFIG.webhookSecret);
-    if (!isValid) return res.status(400).send("Invalid signature");
+
+  // In production, missing webhook secret is a critical server configuration defect
+  if (process.env.NODE_ENV === "production" && !webhookSecret) {
+    console.error("[Billing] Webhook rejected: STRIPE_WEBHOOK_SECRET is not configured on production server.");
+    return res.status(500).json({ error: "Webhook secret not configured on server" });
   }
-  const result = processBillingEvent(req.body);
-  res.json(result);
+
+  // If webhook secret is configured, signature verification is strictly MANDATORY
+  if (webhookSecret) {
+    if (!sig) {
+      return res.status(400).json({ error: "Missing stripe-signature header" });
+    }
+    const rawBody = (req as any).rawBody ? (req as any).rawBody.toString("utf8") : JSON.stringify(req.body);
+    const isValid = verifyStripeSignature(rawBody, sig, webhookSecret);
+    if (!isValid) {
+      return res.status(400).json({ error: "Invalid stripe-signature" });
+    }
+  } else {
+    // Only in non-production local development without configured secret do we log a warning
+    console.warn("[Billing] STRIPE_WEBHOOK_SECRET not set; running unverified webhook in development mode only");
+  }
+
+  try {
+    const result = processBillingEvent(req.body);
+    res.json(result);
+  } catch (err) {
+    console.error("[Billing] Webhook processing error:", err);
+    res.status(500).json({ error: (err as Error).message });
+  }
 });
 
-app.post("/api/billing/simulate-webhook", (req, res) => {
-  const result = processBillingEvent(req.body);
-  res.json(result);
-});
+// DEV/TEST ONLY: /api/billing/simulate-webhook is completely disabled and returns 404 in production/staging
+if (process.env.NODE_ENV === "test") {
+  app.post("/api/billing/simulate-webhook", (req, res) => {
+    const result = processBillingEvent(req.body);
+    res.json(result);
+  });
+} else {
+  app.all("/api/billing/simulate-webhook", (_req, res) => {
+    res.status(404).json({ error: "Endpoint not found" });
+  });
+}
 
 app.get("/api/index/btc/latest", (_req, res) => {
   res.json(getLatestCompositeIndex("BTC"));
