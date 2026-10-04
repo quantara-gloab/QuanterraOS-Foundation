@@ -1414,6 +1414,51 @@ ${clerkScripts}
     transform: translateX(2px);
   }
 
+  /* Benchmark 3-Stat Strip & Honest Card Eyebrow */
+  .benchmark-stat-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    max-width: 860px;
+    margin: 36px auto 0;
+    width: 100%;
+    text-align: left;
+    position: relative;
+    z-index: 2;
+  }
+  .stat-tile {
+    background: rgba(14, 18, 26, 0.75);
+    border: 1px solid var(--panel-line);
+    border-radius: 8px;
+    padding: 16px 18px;
+  }
+  .stat-value {
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--accent);
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    letter-spacing: -0.02em;
+  }
+  .stat-label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+  @media (max-width: 720px) {
+    .benchmark-stat-strip { grid-template-columns: 1fr; }
+  }
+  .card-eyebrow {
+    display: inline-block;
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    font-size: 0.62rem;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
   /* Council Specialist Detail Modal */
   .council-modal-backdrop {
     position: fixed;
@@ -1993,14 +2038,30 @@ ${clerkScripts}
     </div>
   </nav>
 
-  <section class="hero">
+  <section class="hero hero-benchmark-section">
     <div class="eyebrow">PREDICTION MARKET PRICING &amp; CALIBRATION VERIFICATION</div>
-    <h1 class="serif-headline">We don't predict the market.<br>We prove it's trustworthy.</h1>
-    <p class="subhead">Kalshi's 15-minute BTC markets settle against the CME BRTI. We independently verify, minute by minute, whether that price is actually well-calibrated — and publish every result, including when our own models fail to beat it.</p>
+    <h1 class="serif-headline hero-headline">The Most Transparent Calibration Engine in Prediction Markets</h1>
+    <p class="subhead hero-subhead">We publish every backtest — including the ones where we lose. 1,316 settled markets audited. No hidden edge claimed, because we haven't found one.</p>
     <div class="cta-group">
-      <a href="/council"><button class="primary-btn" style="box-shadow: 0 0 24px rgba(201,162,39,0.35);">⚡ Launch Council Terminal →</button></a>
+      <a href="/council" class="hero-cta-gold"><button class="primary-btn" style="box-shadow: 0 0 24px rgba(201,162,39,0.35);">⚡ Launch Council Terminal →</button></a>
       <a href="/calibration"><button class="secondary-btn">See Calibration Proof</button></a>
       <button class="ghost-btn" onclick="document.getElementById('council').scrollIntoView({behavior:'smooth'})">Interrogate Officers ↓</button>
+    </div>
+
+    <!-- Three-stat strip -->
+    <div class="benchmark-stat-strip">
+      <div class="stat-tile">
+        <div class="stat-value">1,316</div>
+        <div class="stat-label">settled markets audited, every one published</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-value">0.2001</div>
+        <div class="stat-label">market-mid Brier score — our own calibration baseline</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-value">$0.00</div>
+        <div class="stat-label">live capital deployed — standby until the numbers earn it</div>
+      </div>
     </div>
     <div class="seal-container">
       <div class="seal">
@@ -2070,15 +2131,15 @@ ${miniCircles}
     <!-- Live Council Coordination HUD Strip -->
     <div class="council-live-hud-banner" id="council-live-hud-banner">
       <div class="hud-banner-left">
-        <span class="hud-pulse-dot"></span>
-        <span class="hud-banner-title">COUNCIL INTELLIGENCE PIPELINE ACTIVE</span>
+        <span class="hud-pulse-dot pulse-dot"></span>
+        <span class="hud-tagline hud-banner-title">8 specialists, one standard: cite the record or say nothing.</span>
         <span class="hud-banner-verdict" id="home-lion-verdict">LION VERDICT: CALIBRATED · STANDBY</span>
       </div>
       <div class="hud-banner-right">
-        <span class="hud-tag">CYCLE: <strong id="home-cycle-num">#--</strong></span>
-        <span class="hud-tag">CAPITAL: <strong style="color: #42D392;">$0.00</strong></span>
-        <span class="hud-tag">EXECUTION: <strong style="color: var(--accent);">RULE B5 LOCKED</strong></span>
-        <a href="/council" class="hud-banner-link">Open Live Terminal HUD &rarr;</a>
+        <span class="hud-stat hud-tag">LIVE CAPITAL: <strong style="color: #42D392;">$0.00</strong></span>
+        <span class="hud-stat hud-tag">EXECUTION: <strong style="color: var(--accent);">RULE B5 LOCKED</strong></span>
+        <span class="hud-stat hud-tag">CYCLE <strong id="home-cycle-num">#--</strong></span>
+        <a href="/council" class="hud-launch-link hud-banner-link">Launch Live Terminal HUD &rarr;</a>
       </div>
     </div>
 
@@ -2093,6 +2154,7 @@ ${miniCircles}
            data-agent-id="${agent.id}"
            id="agent-card-${agent.id}">
         <div>
+          <span class="card-eyebrow">AUDITED · NO UNPROVEN EDGE CLAIMED</span>
           <div class="icon">${agent.iconSvg}</div>
           <div class="role">${agent.role}</div>
           <div class="name">${agent.name}</div>
