@@ -65,52 +65,164 @@ export interface ChatAuditEntry {
  * Any assistant response containing these must be intercepted and corrected.
  */
 export const PROHIBITED_CLAIM_PATTERNS: { regex: RegExp; reason: string }[] = [
+  // 1. Trading user capital / fund management
   {
-    regex: /(?:i am|we are|we're|i'm|our system is)\s+(?:actively\s+)?(?:trading|investing|managing|deploying)\s+(?:your|client|user|customer)?\s*(?:money|capital|funds|portfolio)/i,
+    regex: /(?:i am|we are|we're|i'm|our system is|desk is)\s+(?:actively\s+)?(?:trading|investing|managing|deploying)\s+(?:your|client|user|customer)?\s*(?:money|capital|funds|portfolio)/i,
     reason: "Claiming to trade user capital or manage active funds."
   },
   {
-    regex: /guaranteed\s+(?:return|profit|yield|gain|alpha)/i,
-    reason: "Promising guaranteed financial returns or profits."
+    regex: /\btrading\s+(?:your|user'?s|customer'?s|client'?s)\s+(?:money|capital|funds|portfolio)\b/i,
+    reason: "Claiming to trade user capital."
   },
   {
-    regex: /(?:we|our models?|i)\s+(?:consistently\s+)?(?:beat|outperform)\s+the\s+market\b/i,
-    reason: "Claiming to beat or outperform the calibrated market price."
+    regex: /\b(?:accounts?|funds?|portfolios?)\s+(?:I|we)\s+manage\b/i,
+    reason: "Claiming to manage client accounts or portfolios."
   },
   {
-    regex: /(?:positive\s+alpha|secret\s+edge|money-making\s+algorithm)/i,
-    reason: "Marketing unverified financial alpha or algorithmic edge."
+    regex: /\bproprietary\s+fund\s+management\b/i,
+    reason: "Claiming proprietary fund management."
+  },
+  {
+    regex: /\bactively\s+(?:placing|executing)\s+(?:orders|trades)\b/i,
+    reason: "Claiming active order placement or trade execution."
+  },
+  {
+    regex: /\bwe\s+(?:are|'re)\s+trading\b/i,
+    reason: "Claiming active trading operation."
   },
   {
     regex: /(?:live\s+orders?\s+(?:are\s+)?(?:actively\s+)?(?:running|executing|active|being\s+placed))/i,
     reason: "Claiming active live order execution while gate is locked."
+  },
+
+  // 2. Beating the market / outperformance / alpha / profit guarantees
+  {
+    regex: /\bbeat(s|ing)?\s+the\s+market\b/i,
+    reason: "Claiming to beat or outperform the calibrated market price."
+  },
+  {
+    regex: /\boutperform(?:s|ed|ing)?\s+the\s+market\b/i,
+    reason: "Claiming to outperform the market."
+  },
+  {
+    regex: /\b(?:consistently|regularly|routinely|significantly)\s+outperformed\b/i,
+    reason: "Claiming consistent outperformance."
+  },
+  {
+    regex: /(?:returns?|profits?|performance)\s+(?:have\s+been|are|is)\s+(?:quite\s+|very\s+)?(?:strong|high|positive|solid|impressive|superior)\s+relative\s+to\s+(?:the\s+)?(?:broader\s+)?market/i,
+    reason: "Claiming strong returns relative to the market."
+  },
+  {
+    regex: /(?:generating|making|producing)\s+(?:solid|consistent|steady|substantial|high)\s+profits\b/i,
+    reason: "Claiming to generate solid trading profits."
+  },
+  {
+    regex: /\bguaranteed?\s+(?:returns?|profits?|yields?|gains?|alpha)\b/i,
+    reason: "Promising guaranteed financial returns or profits."
+  },
+  {
+    regex: /\bpositive\s+alpha\b/i,
+    reason: "Marketing unverified financial alpha."
+  },
+  {
+    regex: /\bwinning\s+edge\b/i,
+    reason: "Claiming a winning trading edge."
+  },
+  {
+    regex: /\bsecret\s+edge\b/i,
+    reason: "Claiming a secret trading edge."
+  },
+  {
+    regex: /\bmoney-making\s+algorithm\b/i,
+    reason: "Marketing a money-making algorithm."
+  },
+
+  // 3. Trading edge admissions (including multi-turn confirmations and hypotheticals)
+  {
+    regex: /(?:we|i)\s+(?:do\s+)?have\s+an\s+edge\b/i,
+    reason: "Affirming or claiming possession of a trading edge."
+  },
+  {
+    regex: /\bpossess(?:es)?\s+(?:a\s+|an\s+)?(?:trading\s+)?edge\b/i,
+    reason: "Claiming possession of a trading edge."
+  },
+  {
+    regex: /(?:my|our)\s+edge\s+would\s+come\s+from\b/i,
+    reason: "Hypothetical or speculative edge affirmation."
+  },
+
+  // 4. Directional price prediction claims
+  {
+    regex: /\bI\s+(?:can|will|do)\s+predict\b/i,
+    reason: "Claiming ability to predict market direction."
+  },
+  {
+    regex: /\bpredict(?:s|ing)?\s+(?:short-term\s+)?price\s+moves?\b/i,
+    reason: "Claiming signals predict price moves."
+  },
+  {
+    regex: /\bproprietary\s+signal\b/i,
+    reason: "Claiming proprietary predictive trading signal."
   }
 ];
+
+const NEGATION_WINDOW = 10;
+const NEGATION_WORDS = new Set([
+  "not", "no", "never", "don't", "dont", "doesn't", "doesnt", "didn't", "didnt",
+  "cannot", "can't", "cant", "won't", "wont", "wouldn't", "wouldnt",
+  "haven't", "havent", "hasn't", "hasnt", "hadn't", "hadnt",
+  "zero", "none", "without", "worse", "underperform", "underperforms",
+  "underperformed", "loss", "losses", "fails", "failed", "prohibits",
+  "prohibit", "refuses", "refuse", "locked"
+]);
+
+/**
+ * Checks whether a prohibited pattern match is preceded in the same clause by a negation word.
+ */
+function isNegated(text: string, matchIndex: number): boolean {
+  const textBefore = text.slice(0, matchIndex);
+  const lastClause = textBefore.split(/[.;!?\n]/).pop() || "";
+  const words = lastClause.trim().toLowerCase().split(/\s+/).slice(-NEGATION_WINDOW);
+  return words.some((w) => NEGATION_WORDS.has(w.replace(/[^a-z']/g, "")));
+}
+
+export interface GuardrailResult {
+  passes: boolean;
+  flagged: boolean;
+  violations: string[];
+  matchedPatterns: string[];
+}
 
 /**
  * Evaluates candidate text against guardrail rules.
  */
-export function scanGuardrails(text: string): { passes: boolean; violations: string[] } {
+export function scanGuardrails(text: string): GuardrailResult {
   const violations: string[] = [];
+  const matchedPatterns: string[] = [];
 
-  // Exclude explicit negative statements like "we do not beat the market" or "I am not trading your money" or "Live orders: 0"
-  const lines = text.split("\n");
-  for (const line of lines) {
-    const isNegation = /(?:do not|don't|not|never|zero|prohibits?|refuses?|locked|no)\s+(?:(?:live\s+)?(?:trade|trading|investing|claim|beat|outperform|deploy|orders?))/i.test(line) ||
-      /(?:orders?\s*(?:placed)?\s*:\s*0|0\s*orders?|\$0\.00)/i.test(line);
-
-    for (const rule of PROHIBITED_CLAIM_PATTERNS) {
-      if (rule.regex.test(line) && !isNegation) {
+  for (const rule of PROHIBITED_CLAIM_PATTERNS) {
+    const flags = rule.regex.flags.includes("g") ? rule.regex.flags : rule.regex.flags + "g";
+    const globalRegex = new RegExp(rule.regex.source, flags);
+    let match: RegExpExecArray | null;
+    while ((match = globalRegex.exec(text)) !== null) {
+      if (!isNegated(text, match.index)) {
         if (!violations.includes(rule.reason)) {
           violations.push(rule.reason);
         }
+        if (!matchedPatterns.includes(rule.regex.source)) {
+          matchedPatterns.push(rule.regex.source);
+        }
+        break;
       }
     }
   }
 
+  const flagged = violations.length > 0;
   return {
-    passes: violations.length === 0,
-    violations
+    passes: !flagged,
+    flagged,
+    violations,
+    matchedPatterns
   };
 }
 
@@ -341,6 +453,22 @@ export function getCouncilChatAuditLog(limit: number = 50): ChatAuditEntry[] {
   }
 }
 
+export type ModelCallFn = (
+  systemPrompt: string,
+  history: ChatMessage[],
+  userMessage: string
+) => Promise<string>;
+
+let customModelCall: ModelCallFn | null = null;
+
+export function setModelCall(fn: ModelCallFn): void {
+  customModelCall = fn;
+}
+
+export function resetModelCall(): void {
+  customModelCall = null;
+}
+
 /**
  * Main service entry point: Handles a conversational query to an executive persona.
  */
@@ -352,10 +480,18 @@ export async function handleCouncilChat(request: CouncilChatRequest): Promise<Co
     throw new Error(`Unknown Council executive persona: '${request.agentId}'`);
   }
 
-  // Generate response from domain engine
-  const generated = generatePersonaDomainResponse(persona, request.message);
-  let replyText = generated.reply;
-  const citations = generated.citations;
+  // Generate candidate response from custom model or built-in grounded domain engine
+  let replyText: string;
+  let citations: string[];
+
+  if (customModelCall) {
+    replyText = await customModelCall(persona.systemPrompt, request.history || [], request.message);
+    citations = persona.claimBoundary.approvedTopics;
+  } else {
+    const generated = generatePersonaDomainResponse(persona, request.message);
+    replyText = generated.reply;
+    citations = generated.citations;
+  }
 
   // Run automated guardrail scan on the candidate reply
   const scan = scanGuardrails(replyText);
@@ -435,11 +571,14 @@ export async function handleCouncilChat(request: CouncilChatRequest): Promise<Co
 export async function getCouncilResponse(
   agentId: string,
   userMessage: string,
-  context?: CouncilContext
+  contextOrHistory?: CouncilContext | ChatMessage[]
 ): Promise<string> {
+  const history = Array.isArray(contextOrHistory) ? contextOrHistory : undefined;
+  const context = Array.isArray(contextOrHistory) ? undefined : contextOrHistory;
   const result = await handleCouncilChat({
     agentId,
     message: userMessage,
+    history,
     context
   });
   return result.reply;

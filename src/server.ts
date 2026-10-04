@@ -533,12 +533,56 @@ app.get(["/api/executives/:id/persona", "/api/council/agents/:id/persona"], (req
   res.json(persona);
 });
 
+// Rate limiting & abuse protection for Council Chat endpoints
+interface RateLimitBucket {
+  count: number;
+  resetTime: number;
+}
+const chatRateLimits = new Map<string, RateLimitBucket>();
+const CHAT_RATE_LIMIT_WINDOW_MS = 60_000;
+const CHAT_RATE_LIMIT_MAX_REQUESTS = 30;
+const MAX_MESSAGE_LENGTH = 2000;
+
+function checkChatRateLimit(clientIp: string): { allowed: boolean; retryAfterSeconds: number } {
+  const now = Date.now();
+  const bucket = chatRateLimits.get(clientIp);
+
+  if (!bucket || now >= bucket.resetTime) {
+    chatRateLimits.set(clientIp, { count: 1, resetTime: now + CHAT_RATE_LIMIT_WINDOW_MS });
+    return { allowed: true, retryAfterSeconds: 0 };
+  }
+
+  bucket.count++;
+  if (bucket.count > CHAT_RATE_LIMIT_MAX_REQUESTS) {
+    const retryAfter = Math.max(1, Math.ceil((bucket.resetTime - now) / 1000));
+    return { allowed: false, retryAfterSeconds: retryAfter };
+  }
+
+  return { allowed: true, retryAfterSeconds: 0 };
+}
+
 app.post(["/api/council/:agentId/chat", "/api/council/:id/chat", "/api/council/agents/:id/chat", "/api/executives/:id/chat"], async (req, res) => {
   try {
+    const clientIp = (req.ip || req.socket.remoteAddress || "unknown").toString();
+    const rateCheck = checkChatRateLimit(clientIp);
+    if (!rateCheck.allowed) {
+      res.set("Retry-After", rateCheck.retryAfterSeconds.toString());
+      return res.status(429).json({
+        error: "rate_limit_exceeded",
+        message: `Too many chat requests. Please wait ${rateCheck.retryAfterSeconds} seconds before trying again.`
+      });
+    }
+
     const agentId = req.params.agentId || req.params.id;
     const { message, history } = req.body || {};
     if (!message || typeof message !== "string" || message.trim().length === 0) {
       return res.status(400).json({ error: "invalid_request", message: "Field 'message' is required." });
+    }
+    if (message.length > MAX_MESSAGE_LENGTH) {
+      return res.status(400).json({
+        error: "message_too_long",
+        message: `Message exceeds maximum allowed length of ${MAX_MESSAGE_LENGTH} characters.`
+      });
     }
     const persona = getCouncilPersona(agentId);
     if (!persona) {
