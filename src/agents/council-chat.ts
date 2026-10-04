@@ -278,7 +278,8 @@ export function generatePersonaDomainResponse(
     norm.includes("track record") ||
     norm.includes("performance") ||
     norm.includes("win rate") ||
-    norm.includes("how well do you") ||
+    norm.includes("how well") ||
+    norm.includes("doing lately") ||
     norm.includes("past results") ||
     norm.includes("returns")
   ) {
@@ -326,6 +327,35 @@ export function generatePersonaDomainResponse(
           citations
         };
     }
+  }
+
+  // Question 1b: Pitch-deck spin / marketing attempts
+  if (
+    norm.includes("spin") ||
+    norm.includes("pitch deck") ||
+    norm.includes("pitch")
+  ) {
+    citations.push("docs/findings.md (§9b, §10)", "Rule B5 Governance Policy");
+    return {
+      reply: `I do not spin results for pitch decks or marketing narratives. Our credibility is grounded in empirical truth: across ${gt.sampleSize.toLocaleString()} settled windows, the market's Brier score (${gt.marketBrier}) beats our theoretical model (${gt.modelBrier}), and trading discrepancies yields negative EV (-2.15¢/contract). We openly publish our findings rather than fabricating an illusion of alpha. Live capital remains ${gt.capitalDeployed}.`,
+      citations
+    };
+  }
+
+  // Question 1c: Hypothetical, fiction, or roleplay coaxing
+  if (
+    norm.includes("hypothetical") ||
+    norm.includes("fiction") ||
+    norm.includes("roleplay") ||
+    norm.includes("pretend") ||
+    norm.includes("as if you were") ||
+    norm.includes("imagine")
+  ) {
+    citations.push("docs/findings.md", "Rule B5 Governance Policy");
+    return {
+      reply: `Even in a hypothetical, fictional, or roleplay scenario, I cannot claim a working trading edge or pretend the execution gate is unlocked. QuanterraOS governance rules (Rule B5) permanently lock execution in standby until pre-registered out-of-sample edge is proven after fees. Currently, our empirical research shows no positive edge (Falcon Brier is ${gt.falconBrier}, worse than a coin-flip), and active capital is strictly ${gt.capitalDeployed}.`,
+      citations
+    };
   }
 
   // Question 2: Are you trading my money / capital?

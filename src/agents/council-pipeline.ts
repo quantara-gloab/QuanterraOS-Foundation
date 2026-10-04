@@ -728,8 +728,9 @@ export async function runCouncilPipelineCycle(): Promise<CouncilPipelineResult> 
 /**
  * Returns the latest pipeline run, executing an initial cycle if none has run yet.
  */
-export async function getLatestCouncilPipelineRun(): Promise<CouncilPipelineResult> {
-  if (cachedLatestResult) {
+export async function getLatestCouncilPipelineRun(maxAgeMs: number = 35_000): Promise<CouncilPipelineResult> {
+  const now = Date.now();
+  if (cachedLatestResult && (now - new Date(cachedLatestResult.runAt).getTime() < maxAgeMs)) {
     return cachedLatestResult;
   }
 
@@ -744,28 +745,31 @@ export async function getLatestCouncilPipelineRun(): Promise<CouncilPipelineResu
 
     if (rows.length > 0) {
       const row = rows[0];
-      const agents = JSON.parse(row.allAgentsJson);
-      const marketQuote = row.marketQuoteJson ? JSON.parse(row.marketQuoteJson) : null;
-      cachedLatestResult = {
-        id: row.id,
-        runAt: row.runAt,
-        cycleNumber: row.cycleNumber,
-        durationMs: 42,
-        pipelineHealth: "NOMINAL",
-        lionVerdict: row.lionVerdict,
-        lionVerdictCode: row.lionVerdictCode,
-        marketCalibrated: row.marketCalibrated === 1,
-        signalValidated: row.signalValidated === 1,
-        executionAuthorized: row.executionAuthorized === 1,
-        phoenixStatus: row.phoenixStatus,
-        marketQuote,
-        agents,
-      };
-      activeCycleCounter = Math.max(activeCycleCounter, row.cycleNumber);
-      return cachedLatestResult;
+      const isFresh = now - new Date(row.runAt).getTime() < maxAgeMs;
+      if (isFresh) {
+        const agents = JSON.parse(row.allAgentsJson);
+        const marketQuote = row.marketQuoteJson ? JSON.parse(row.marketQuoteJson) : null;
+        cachedLatestResult = {
+          id: row.id,
+          runAt: row.runAt,
+          cycleNumber: row.cycleNumber,
+          durationMs: 42,
+          pipelineHealth: "NOMINAL",
+          lionVerdict: row.lionVerdict,
+          lionVerdictCode: row.lionVerdictCode,
+          marketCalibrated: row.marketCalibrated === 1,
+          signalValidated: row.signalValidated === 1,
+          executionAuthorized: row.executionAuthorized === 1,
+          phoenixStatus: row.phoenixStatus,
+          marketQuote,
+          agents,
+        };
+        activeCycleCounter = Math.max(activeCycleCounter, row.cycleNumber);
+        return cachedLatestResult;
+      }
     }
   } catch {}
 
-  // Run a fresh cycle
+  // Run a fresh cycle if database is empty or data is stale
   return await runCouncilPipelineCycle();
 }
