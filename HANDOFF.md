@@ -249,3 +249,29 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 2. Accumulate monthly Falcon order-book snapshots past n=31 before re-testing imbalance.
 3. Wire Jev strictly for data-quality classification (Draco/Wolf), maintaining zero live execution orders.
 
+---
+
+### Session: 2026-10-04 — Composite Index, Prediction Ledger, Billing Gating & Complete Information Architecture
+
+**Completed Work:**
+- **Composite Index v0.1 Engine (`src/composite-index.ts`)**: Volume-weighted median calculation across eligible spot venues, strict Draco tick filtering (stale tick > 5s, price deviation > 0.5% from median), requiring ≥ 3 passing venues or suppressing composite. Fully tested in `src/__tests__/composite-index.test.ts`. Documented in `docs/venues.md` and `docs/settlement.md`.
+- **Immutable Prediction Ledger & Autopilot Engine (`src/prediction-ledger.ts`, `src/autopilot-engine.ts`)**:
+  - Migration `0013_prediction_ledger.sql` for append-only pre-settlement forecast records.
+  - Automatic settlement scoring against resolved market outcomes computing Brier loss contributions.
+  - Autopilot paper trading engine enforcing Rule B5 ($0.00 capital, zero live execution paths, strictly `PAPER` simulation). Tested in `src/__tests__/prediction-ledger.test.ts`.
+- **User Accounts, Authentication & Billing (`src/billing.ts`, `src/auth.ts`, `src/plan.ts`)**:
+  - Migration `0014_user_accounts_and_billing.sql` for users, sessions, api_keys, and billing events.
+  - Tier enforcement (`free`, `pro`, `institutional`) with paywall gating (e.g., 20-minute ledger delay for free tier, real-time + full history for pro, API key access for institutional). Tested in `src/__tests__/paywall-gating-billing.test.ts` and `src/__tests__/plan.test.ts`.
+  - Pages: `/account`, `/pricing`, `/subscribe`.
+- **Full Public Information Architecture & Telemetry**:
+  - Shipped routes: `/index` (`src/index-page.ts`), `/methodology` (`src/methodology-page.ts`), `/research` (`src/research-page.ts`), `/status` (`src/status-page.ts`), `/changelog` (`src/changelog-page.ts`), `/legal` (`src/legal-page.ts`), `/blog` (`src/blog-page.ts`), `/predictions` (`src/predictions-page.ts`), `/autopilot` (`src/autopilot-page.ts`).
+  - Observability & Telemetry: Global edge latency telemetry (`src/__tests__/global-edge-nodes.test.ts`), healthz endpoints (`src/__tests__/healthz.test.ts`), and Council specialist chat client wiring (`src/__tests__/council-chat-client-wiring.test.ts`).
+- **Static Copy Guardrail Enforcement (`src/__tests__/static-copy-guardrails.test.ts`)**:
+  - Strict automated audit guaranteeing zero Rule B4 banned phrases across all public templates, zero unvalidated marketing superlatives, explicit Rule B5 displays, and Council specialist copy alignment.
+
+**Verification:**
+- `npx tsc --noEmit` — 0 errors (clean exit 0).
+- `npm test` — 229/229 passing across 47 suites, 0 failures (duration 57.08s).
+- Canonical backtests: `btc15m-predictor-backtest.ts` (1,316 markets) and `falcon-backtest.ts` (31 markets) verified matching committed figures.
+
+
