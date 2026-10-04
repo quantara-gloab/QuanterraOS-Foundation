@@ -35,9 +35,12 @@ function mockBtcTicks() {
 }
 
 describe("runBtcPaperTradingCycle", () => {
+  let markets: KalshiLiveMarket[];
+
   beforeEach(() => {
     mock.method(Date, "now", () => Date.parse("2026-09-30T15:00:00Z"));
-    mock.method(globalThis, "fetch", async () => Response.json({ markets: [synthMarket()] }));
+    markets = [synthMarket()];
+    mock.method(globalThis, "fetch", async () => Response.json({ markets }));
   });
 
   afterEach(() => mock.restoreAll());
@@ -136,9 +139,7 @@ describe("runBtcPaperTradingCycle", () => {
   test("does not log closed contracts", async (t) => {
     const db = makeDb();
     t.after(() => db.close());
-    mock.method(globalThis, "fetch", async () => Response.json({
-      markets: [synthMarket({ close_time: new Date(Date.now() - 1).toISOString() })],
-    }));
+    markets = [synthMarket({ close_time: new Date(Date.now() - 1).toISOString() })];
 
     const results = await runBtcPaperTradingCycle(
       { db, fetchBtcTicks: () => mockBtcTicks() },
