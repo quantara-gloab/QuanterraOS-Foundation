@@ -522,5 +522,5 @@ export function loadPaperTrades(
             outcome, brier_score AS brierScore, pnl, created_at AS createdAt
      FROM paper_trades WHERE owner = ? ORDER BY created_at`,
     )
-    .all(owner) as PaperTradeRow[];
+    .all(owner) as unknown as PaperTradeRow[];
 }

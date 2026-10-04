@@ -27,7 +27,7 @@ export function loadRecentBtcTicks(
   nowMs: number,
   windowMinutes = 60,
 ): BtcTick[] {
-  const db = new DatabaseSync(dbPath, { readonly: true });
+  const db = new DatabaseSync(dbPath, { readOnly: true });
   try {
     const rows = db
       .prepare(
@@ -38,7 +38,7 @@ export function loadRecentBtcTicks(
            AND received_at >= ?
          ORDER BY received_at ASC`,
       )
-      .all(nowMs - windowMinutes * 60_000) as BtcTick[];
+      .all(nowMs - windowMinutes * 60_000) as unknown as BtcTick[];
     return rows.filter((r) => Number.isFinite(r.value));
   } finally {
     db.close();
@@ -51,7 +51,7 @@ export function loadRecentBtcTicks(
 export function getLatestBtcPrice(
   dbPath: string = "quanterraos.db",
 ): number | null {
-  const db = new DatabaseSync(dbPath, { readonly: true });
+  const db = new DatabaseSync(dbPath, { readOnly: true });
   try {
     const row = db
       .prepare(
