@@ -34,6 +34,8 @@ import { desc, eq, and, gte, asc } from "drizzle-orm";
 import { buildPrediction, type LiveMarket } from "../btc15m-predictor.ts";
 import { computeFalconRecommendation, type OrderbookEvidence } from "./falcon.ts";
 import { getSwingEventsSummary } from "../swing-event-logger.ts";
+import { recordPrediction } from "../prediction-ledger.ts";
+import { executeAutopilotPaperStep } from "../autopilot-engine.ts";
 
 export type HealthStatus = "nominal" | "active" | "standby" | "stale" | "failed";
 
@@ -719,6 +721,38 @@ export async function runCouncilPipelineCycle(): Promise<CouncilPipelineResult> 
       .run();
   } catch (err) {
     console.error("Failed to persist council pipeline run:", err);
+  }
+
+  // Phase 1: Immutable Prediction Ledger logging (pre-settlement)
+  try {
+    const falconProb = falcon.telemetry?.recommendation?.probability ?? marketQuote.midPrice;
+    recordPrediction({
+      marketId: marketQuote.ticker,
+      predictedProb: falconProb,
+      modelVersion: "falcon-highlow-v0.1",
+      notes: "Council autonomous pipeline evaluation",
+    });
+  } catch {
+    // Already logged or immutable constraint enforced
+  }
+
+  // Phase 2: Autopilot paper-trading evaluation (Rule B5 enforced, $0.00 capital)
+  try {
+    const falconProb = falcon.telemetry?.recommendation?.probability ?? marketQuote.midPrice;
+    executeAutopilotPaperStep({
+      contract: marketQuote.ticker,
+      modelProbability: falconProb,
+      marketQuote: {
+        yesAsk: marketQuote.yesAsk,
+        yesBid: marketQuote.yesBid,
+        noAsk: marketQuote.noAsk,
+        noBid: marketQuote.noBid,
+      },
+      modelSource: "quant",
+      barrierType: "high",
+    });
+  } catch {
+    // Graceful handling
   }
 
   cachedLatestResult = result;

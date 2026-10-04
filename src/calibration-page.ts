@@ -91,9 +91,9 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
   // Point circles & tooltips
   const pointElements = points.map((p) => `
     <g class="chart-point-group" tabindex="0" role="img" aria-label="Bucket ${p.bucket}: actual rate ${(p.actualRate * 100).toFixed(1)}%, sample size ${p.count}">
-      <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="6" fill="#00e5ff" stroke="#090a0f" stroke-width="2" class="point-circle" />
+      <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="5" fill="#4FD1C5" stroke="#0A0E14" stroke-width="2" class="point-circle" />
       <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="14" fill="transparent" class="point-hover-target" />
-      <text x="${p.x.toFixed(1)}" y="${(p.y - 12).toFixed(1)}" fill="#ffffff" font-size="11" text-anchor="middle" font-weight="600" class="point-label" font-family="ui-monospace, monospace">${(p.actualRate * 100).toFixed(1)}%</text>
+      <text x="${p.x.toFixed(1)}" y="${(p.y - 10).toFixed(1)}" fill="#E8EAED" font-size="10" text-anchor="middle" font-weight="500" class="point-label" font-family="var(--font-mono)">${(p.actualRate * 100).toFixed(1)}%</text>
     </g>
   `).join("");
 
@@ -125,107 +125,158 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
 <meta name="description" content="Empirical calibration proof for Kalshi's 15-minute BTC prediction market. Verified against 1,316 canonical settled windows with zero cherry-picking.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #090a0f;
-    --card-bg: #0e111a;
-    --card-hover: #121622;
-    --border: rgba(255, 255, 255, 0.08);
-    --border-bright: rgba(0, 229, 255, 0.3);
-    --text: #f0f2f8;
-    --text-dim: #9aa0b4;
-    --muted: #5e6478;
-    --cyan: #00e5ff;
-    --gold: #d4af37;
-    --green: #00e676;
-    --amber: #ffb300;
-    --red: #ff3d71;
-    --mono: 'JetBrains Mono', ui-monospace, monospace;
-    --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --bg: #06080E;
+    --panel: rgba(14, 20, 29, 0.72);
+    --panel-border: rgba(255, 255, 255, 0.08);
+    --panel-border-subtle: rgba(255, 255, 255, 0.04);
+    --panel-border-highlight: rgba(79, 209, 197, 0.35);
+    --text: #F1F3F5;
+    --muted: #8E96A4;
+    --accent: #4FD1C5;
+    --accent-glow: rgba(79, 209, 197, 0.15);
+    --gold: #F5A623;
+    --gold-glow: rgba(245, 166, 35, 0.12);
+    --warning: #C65D4A;
+    --green: #4FD1C5;
+    --amber: #E2A03F;
+    --red: #C65D4A;
+    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     background-color: var(--bg);
+    background-image: 
+      radial-gradient(ellipse 90% 50% at 50% -20%, rgba(79, 209, 197, 0.08), transparent 70%),
+      radial-gradient(ellipse 60% 40% at 85% 10%, rgba(198, 93, 74, 0.04), transparent 60%),
+      linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 48px 48px, 48px 48px;
     color: var(--text);
-    font-family: var(--sans);
+    font-family: var(--font-sans);
     line-height: 1.6;
     padding-bottom: 80px;
     -webkit-font-smoothing: antialiased;
   }
+
+  /* Institutional Ticker Strip */
+  .live-ticker-strip {
+    background: rgba(8, 12, 18, 0.85);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 7px 24px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    backdrop-filter: blur(12px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    overflow-x: auto;
+  }
+  .ticker-content { display: flex; align-items: center; gap: 14px; white-space: nowrap; }
+  .ticker-item { display: inline-flex; align-items: center; gap: 7px; color: var(--text); }
+  .ticker-pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulseDot 2s infinite; }
+  .ticker-sep { color: rgba(255, 255, 255, 0.15); font-weight: 300; }
+  @keyframes pulseDot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.85); } }
 
   /* Navigation Bar */
   .top-nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 18px 36px;
-    border-bottom: 1px solid var(--border);
-    background: rgba(9, 10, 15, 0.85);
-    backdrop-filter: blur(12px);
+    padding: 18px 48px;
+    border-bottom: 1px solid var(--panel-border);
+    background: rgba(6, 8, 14, 0.82);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     position: sticky;
     top: 0;
     z-index: 100;
   }
-  .nav-brand {
+  .nav-left {
+    display: flex;
+    align-items: center;
+    gap: 36px;
+  }
+  .nav-brand-container {
     display: flex;
     align-items: center;
     gap: 12px;
     text-decoration: none;
-    color: var(--text);
   }
-  .brand-logo {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, rgba(0, 229, 255, 0.2), rgba(212, 175, 55, 0.2));
-    border: 1px solid var(--border-bright);
+  .nav-brand-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, rgba(79, 209, 197, 0.2), rgba(6, 8, 14, 0.9));
+    border: 1px solid rgba(79, 209, 197, 0.4);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--cyan);
   }
-  .brand-title {
-    font-family: 'Cinzel', serif;
-    font-size: 1rem;
-    letter-spacing: 0.12em;
+  .nav-brand-icon svg { width: 14px; height: 14px; stroke: var(--accent); }
+  .nav-brand-text { display: flex; flex-direction: column; }
+  .nav-brand-title {
+    font-size: 0.96rem;
     font-weight: 700;
+    letter-spacing: 0.02em;
+    color: #FFFFFF;
+    font-family: var(--font-mono);
+  }
+  .nav-brand-sub {
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-family: var(--font-mono);
   }
   .nav-links {
     display: flex;
-    gap: 24px;
+    gap: 22px;
     align-items: center;
   }
   .nav-links a {
-    color: var(--text-dim);
+    color: var(--muted);
     text-decoration: none;
     font-size: 0.85rem;
     font-weight: 500;
-    transition: color 0.15s;
+    transition: color 0.15s, border-color 0.15s;
+    letter-spacing: -0.01em;
   }
-  .nav-links a:hover, .nav-links a.active { color: var(--cyan); }
+  .nav-links a:hover, .nav-links a.active { color: #FFFFFF; }
+  .nav-links a.active { border-bottom: 2px solid var(--accent); padding-bottom: 3px; }
+
   .btn-outline {
-    border: 1px solid var(--border-bright);
-    color: var(--cyan);
-    padding: 6px 14px;
-    border-radius: 6px;
+    border: 1px solid rgba(79, 209, 197, 0.4);
+    color: #FFFFFF;
+    padding: 8px 18px;
+    border-radius: 4px;
     font-size: 0.82rem;
+    font-family: var(--font-mono);
     text-decoration: none;
-    font-weight: 600;
-    background: transparent;
+    background: rgba(79, 209, 197, 0.08);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 0 15px rgba(79, 209, 197, 0.1);
   }
-  .btn-outline:hover { background: rgba(0, 229, 255, 0.1); }
+  .btn-outline:hover {
+    border-color: var(--accent);
+    background: rgba(79, 209, 197, 0.18);
+    box-shadow: 0 0 25px rgba(79, 209, 197, 0.25);
+    color: #FFFFFF;
+    text-decoration: none;
+    transform: translateY(-1px);
+  }
 
   /* Main Container */
   .container {
-    max-width: 1060px;
+    max-width: 1140px;
     margin: 0 auto;
-    padding: 40px 24px 0;
+    padding: 56px 48px 0;
   }
 
   /* Eyebrow & Page Header */
@@ -233,154 +284,179 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    font-family: var(--mono);
-    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
     text-transform: uppercase;
-    letter-spacing: 0.15em;
-    color: var(--cyan);
-    background: rgba(0, 229, 255, 0.08);
-    border: 1px solid rgba(0, 229, 255, 0.25);
-    padding: 4px 10px;
-    border-radius: 4px;
-    margin-bottom: 16px;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    background: rgba(79, 209, 197, 0.08);
+    border: 1px solid rgba(79, 209, 197, 0.25);
+    padding: 5px 12px;
+    border-radius: 3px;
+    margin-bottom: 18px;
+    box-shadow: 0 0 12px rgba(79, 209, 197, 0.08);
   }
   .pulse-dot {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: var(--green);
-    box-shadow: 0 0 8px var(--green);
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
   }
   .page-title {
     font-size: 2.4rem;
     font-weight: 700;
-    letter-spacing: -0.02em;
-    color: #ffffff;
+    letter-spacing: -0.03em;
+    color: #FFFFFF;
     margin-bottom: 12px;
-    line-height: 1.2;
+    line-height: 1.15;
   }
   .page-subtitle {
-    font-size: 1.05rem;
-    color: var(--text-dim);
+    font-size: 1.02rem;
+    color: var(--muted);
     max-width: 820px;
     margin-bottom: 36px;
+    line-height: 1.6;
   }
 
-  /* Live Debate Context Banner */
+  /* Research Context Banner */
   .debate-banner {
-    background: rgba(14, 17, 26, 0.95);
-    border: 1px solid rgba(212, 175, 55, 0.3);
-    border-left: 4px solid var(--gold);
-    border-radius: 8px;
-    padding: 24px;
-    margin-bottom: 32px;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 26px 28px;
+    margin-bottom: 36px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
   }
   .debate-tag {
-    font-family: var(--mono);
+    font-family: var(--font-mono);
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    color: var(--gold);
-    margin-bottom: 8px;
+    color: var(--accent);
+    margin-bottom: 10px;
+    font-weight: 600;
   }
   .debate-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #ffffff;
-    margin-bottom: 10px;
-    letter-spacing: -0.01em;
+    font-size: 1.22rem;
+    font-weight: 600;
+    color: #FFFFFF;
+    margin-bottom: 12px;
+    letter-spacing: -0.015em;
   }
   .debate-text {
     font-size: 0.92rem;
-    color: var(--text-dim);
-    line-height: 1.6;
-    margin-bottom: 14px;
+    color: var(--muted);
+    line-height: 1.65;
+    margin-bottom: 16px;
   }
   .debate-text em {
-    color: var(--cyan);
-    font-style: italic;
+    color: #FFFFFF;
+    font-style: normal;
+    text-decoration: underline;
   }
   .debate-link {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    color: var(--cyan);
+    gap: 8px;
+    color: var(--accent);
     font-size: 0.88rem;
+    font-family: var(--font-mono);
     font-weight: 600;
     text-decoration: none;
-    transition: color 0.15s;
+    transition: all 0.15s;
   }
   .debate-link:hover {
-    text-decoration: underline;
-    color: #ffffff;
+    color: #FFFFFF;
+    text-shadow: 0 0 8px rgba(79, 209, 197, 0.5);
   }
 
   /* Section 1: Headline Stat Cards */
   .headline-grid {
     display: grid;
     grid-template-columns: 1.2fr 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 36px;
+    gap: 20px;
+    margin-bottom: 40px;
   }
   .stat-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 24px;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    padding: 26px;
     position: relative;
     overflow: hidden;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+  .stat-card:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
   }
   .stat-card.featured {
-    border-color: var(--border-bright);
-    background: linear-gradient(180deg, rgba(0, 229, 255, 0.05) 0%, var(--card-bg) 100%);
+    border-color: rgba(79, 209, 197, 0.35);
+    box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.6), 0 0 20px rgba(79, 209, 197, 0.05);
   }
   .stat-card-label {
-    font-family: var(--mono);
+    font-family: var(--font-mono);
     font-size: 0.72rem;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--text-dim);
-    margin-bottom: 8px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    margin-bottom: 10px;
   }
   .stat-card-value {
-    font-family: var(--mono);
-    font-size: 2.2rem;
+    font-family: var(--font-mono);
+    font-size: 2.5rem;
     font-weight: 700;
-    color: #ffffff;
+    color: #FFFFFF;
     letter-spacing: -0.03em;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
+    line-height: 1;
   }
-  .stat-card.featured .stat-card-value { color: var(--cyan); }
+  .stat-card.featured .stat-card-value {
+    color: var(--accent);
+    text-shadow: 0 0 15px rgba(79, 209, 197, 0.3);
+  }
   .stat-card-sub {
-    font-size: 0.82rem;
-    color: var(--text-dim);
+    font-size: 0.84rem;
+    color: var(--muted);
+    line-height: 1.5;
   }
 
   /* Section 2: Calibration Visual & Table */
   .proof-section {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 32px;
-    margin-bottom: 36px;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    padding: 34px;
+    margin-bottom: 40px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.6);
   }
   .section-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 24px;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 16px;
+    margin-bottom: 26px;
+    border-bottom: 1px solid var(--panel-border);
+    padding-bottom: 18px;
   }
   .section-title {
     font-size: 1.25rem;
-    font-weight: 700;
-    color: #ffffff;
-    margin-bottom: 4px;
+    font-weight: 600;
+    color: #FFFFFF;
+    margin-bottom: 5px;
+    letter-spacing: -0.015em;
   }
   .section-meta {
-    font-family: var(--mono);
-    font-size: 0.78rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
     color: var(--muted);
   }
 
@@ -388,8 +464,12 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 20px 0 32px;
+    margin: 24px 0 34px;
     position: relative;
+    background: rgba(4, 6, 10, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    padding: 24px;
   }
   .calibration-svg {
     max-width: 100%;
@@ -399,15 +479,16 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
   .chart-legend {
     display: flex;
     justify-content: center;
-    gap: 24px;
-    font-size: 0.8rem;
-    color: var(--text-dim);
-    margin-bottom: 24px;
+    gap: 28px;
+    font-size: 0.82rem;
+    font-family: var(--font-mono);
+    color: var(--muted);
+    margin-bottom: 26px;
   }
-  .legend-item { display: flex; align-items: center; gap: 8px; }
-  .legend-line { width: 18px; height: 2px; }
-  .legend-line.ideal { background: #5e6478; border-top: 1px dashed #9aa0b4; }
-  .legend-line.actual { background: var(--cyan); }
+  .legend-item { display: flex; align-items: center; gap: 9px; }
+  .legend-line { width: 20px; height: 2px; }
+  .legend-line.ideal { background: #5e6478; border-top: 1px dashed #8F95A0; }
+  .legend-line.actual { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
 
   /* 10-Bin Table */
   .table-wrapper {
@@ -416,142 +497,183 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
   .proof-table {
     width: 100%;
     border-collapse: collapse;
-    font-family: var(--mono);
-    font-size: 0.84rem;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
     text-align: right;
   }
   .proof-table th {
-    padding: 12px 14px;
-    color: var(--text-dim);
+    padding: 13px 16px;
+    color: var(--muted);
     font-weight: 600;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--panel-border);
     text-transform: uppercase;
     font-size: 0.72rem;
     letter-spacing: 0.08em;
+    background: rgba(255, 255, 255, 0.02);
   }
   .proof-table td {
-    padding: 12px 14px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-    color: #e2e8f0;
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--panel-border-subtle);
+    color: #FFFFFF;
   }
-  .proof-table tr:hover { background: var(--card-hover); }
+  .proof-table tr:hover { background: rgba(79, 209, 197, 0.03); }
   .proof-table th.bucket-col, .proof-table td.bucket-col { text-align: left; }
   .rate-badge {
-    background: rgba(0, 229, 255, 0.1);
-    color: var(--cyan);
+    background: rgba(79, 209, 197, 0.12);
+    color: var(--accent);
     padding: 3px 8px;
-    border-radius: 4px;
+    border-radius: 3px;
     font-weight: 600;
+    border: 1px solid rgba(79, 209, 197, 0.3);
   }
 
   /* Section 3: Plain-Language Methodology */
   .methodology-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-bottom: 36px;
+    gap: 24px;
+    margin-bottom: 40px;
   }
   .method-box {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 24px;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    padding: 26px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
   }
   .method-box h3 {
     font-size: 1rem;
     font-weight: 600;
-    color: #ffffff;
-    margin-bottom: 12px;
+    color: #FFFFFF;
+    margin-bottom: 14px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 9px;
   }
   .method-box p {
-    font-size: 0.88rem;
-    color: var(--text-dim);
-    margin-bottom: 12px;
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin-bottom: 14px;
+    line-height: 1.6;
   }
   .method-box ul {
     list-style: none;
-    font-size: 0.84rem;
-    color: var(--text-dim);
+    font-size: 0.86rem;
+    color: var(--muted);
+    line-height: 1.6;
   }
   .method-box li {
-    margin-bottom: 8px;
-    padding-left: 16px;
+    margin-bottom: 9px;
+    padding-left: 18px;
     position: relative;
   }
   .method-box li::before {
-    content: "•";
+    content: "—";
     position: absolute;
     left: 0;
-    color: var(--cyan);
+    color: var(--accent);
   }
 
-  /* Section 4 & 5: Framing Footer */
+  /* Section 4 & 5: Framing Banner */
   .framing-banner {
-    background: linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(0, 229, 255, 0.05) 100%);
-    border: 1px solid rgba(212, 175, 55, 0.25);
-    border-radius: 10px;
-    padding: 28px;
-    text-align: center;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    padding: 34px;
     margin-bottom: 40px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.6);
   }
   .framing-headline {
-    font-family: 'Cinzel', serif;
     font-size: 1.35rem;
-    color: var(--gold);
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    margin-bottom: 8px;
+    color: #FFFFFF;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    margin-bottom: 10px;
   }
   .framing-sub {
-    font-size: 0.92rem;
-    color: var(--text-dim);
-    max-width: 720px;
-    margin: 0 auto 18px;
+    font-size: 0.94rem;
+    color: var(--muted);
+    max-width: 820px;
+    margin-bottom: 24px;
+    line-height: 1.6;
   }
   .links-row {
     display: flex;
-    justify-content: center;
-    gap: 20px;
+    gap: 16px;
   }
 
   /* Site Footer */
   .audit-footer {
-    border-top: 1px solid var(--border);
-    padding-top: 24px;
+    border-top: 1px solid var(--panel-border);
+    padding-top: 28px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-size: 0.78rem;
     color: var(--muted);
-    font-family: var(--mono);
+    font-family: var(--font-mono);
   }
 
   @media (max-width: 820px) {
     .headline-grid { grid-template-columns: 1fr; }
     .methodology-grid { grid-template-columns: 1fr; }
-    .top-nav { padding: 14px 20px; }
-    .page-title { font-size: 1.8rem; }
+    .top-nav { padding: 16px 20px; flex-direction: column; align-items: flex-start; gap: 14px; }
+    .page-title { font-size: 1.85rem; }
     .proof-section { padding: 20px; }
+    .links-row { flex-direction: column; }
+    .container { padding: 32px 20px 0; }
   }
 </style>
 </head>
 <body>
 
+  <!-- Top Live Telemetry Ticker -->
+  <div class="live-ticker-strip">
+    <div class="ticker-content">
+      <span class="ticker-item"><span class="ticker-pulse"></span>LIVE REPRODUCIBILITY TELEMETRY</span>
+      <span class="ticker-sep">//</span>
+      <span class="ticker-item">BTC 15M CANONICAL CORPUS: ${n.toLocaleString()} SETTLED WINDOWS</span>
+      <span class="ticker-sep">//</span>
+      <span class="ticker-item">BRIER BENCHMARK: ${brier} (BEATS 0.2500 BASELINE)</span>
+      <span class="ticker-sep">//</span>
+      <span class="ticker-item">CIRCUIT BREAKER: RULE B5 LOCKED ($0.00 CAPITAL)</span>
+      <span class="ticker-sep">//</span>
+      <span class="ticker-item">RULE B4 GUARDRAIL: ACTIVE</span>
+    </div>
+  </div>
+
   <!-- Navigation -->
   <nav class="top-nav">
-    <a href="/" class="nav-brand">
-      <div class="brand-logo">QG</div>
-      <span class="brand-title">QUANTERRAOS</span>
-    </a>
-    <div class="nav-links">
-      <a href="/calibration" class="active">Calibration Proof</a>
-      <a href="/dashboard">Council Terminal</a>
-      <a href="/#council">Specialists</a>
-      <a href="/#how">Methodology</a>
-      <a href="/fair-value/btc15m">Model Telemetry</a>
+    <div class="nav-left">
+      <a href="/" class="nav-brand-container">
+        <div class="nav-brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
+          </svg>
+        </div>
+        <div class="nav-brand-text">
+          <span class="nav-brand-title">QUANTERRA // OS</span>
+          <span class="nav-brand-sub">INSTITUTIONAL QUANTITATIVE CORE</span>
+        </div>
+      </a>
+      <div class="nav-links">
+        <a href="/calibration" class="active">Calibration Proof</a>
+        <a href="/council">Council Terminal</a>
+        <a href="/index">Composite Index</a>
+        <a href="/spread">Spread Monitor</a>
+        <a href="/status">System Status</a>
+        <a href="/methodology">Methodology</a>
+        <a href="/research">Research</a>
+      </div>
+    </div>
+    <div class="nav-right">
+      <a href="/council" class="btn-outline">Launch Terminal →</a>
     </div>
   </nav>
 
@@ -601,7 +723,7 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
 
       <div class="stat-card">
         <div class="stat-card-label">// Model vs. Market Verdict</div>
-        <div class="stat-card-value" style="color:var(--gold); font-size:1.6rem; padding-top:6px;">MARKET WINS</div>
+        <div class="stat-card-value" style="color:var(--accent); font-size:1.6rem; padding-top:6px;">MARKET WINS</div>
         <div class="stat-card-sub">
           Internal lognormal fair-value model achieved 0.2063 Brier (lost to market at every checkpoint; findings.md §10).
         </div>
@@ -615,7 +737,7 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
           <h2 class="section-title">The Calibration Curve: Quoted Price vs. Actual Outcome</h2>
           <div class="section-meta">Empirical settlement frequency across 10 probability deciles (Minute-4 Entry Mid-Price)</div>
         </div>
-        <div class="section-meta" style="color:var(--cyan);">
+        <div class="section-meta" style="color:var(--accent);">
           n = ${n.toLocaleString()} SETTLED WINDOWS
         </div>
       </div>
@@ -642,7 +764,7 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
           <line x1="${diagX1}" y1="${diagY1}" x2="${diagX2}" y2="${diagY2}" stroke="#717686" stroke-width="2" stroke-dasharray="5 5" />
 
           <!-- Actual Curve Polyline -->
-          <polyline points="${polylinePoints}" fill="none" stroke="#00e5ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+          <polyline points="${polylinePoints}" fill="none" stroke="#4FD1C5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
 
           <!-- Data Points & Labels -->
           ${pointElements}
@@ -694,7 +816,7 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
         <ul>
           <li><strong>Minute-4 Target:</strong> Uses only the entry candle at minute 4 of each 15-minute window.</li>
           <li><strong>Strict Provenance:</strong> Evaluates exactly 1,316 settled markets from <code>kalshi-btc15m-candles.csv</code>.</li>
-          <li><strong>Documented Failures:</strong> All 12 tested hypotheses — including rules that lost money after spread and fees — are preserved in our research findings: <a href="https://github.com/quanterra/quanterraos/blob/main/docs/findings.md" target="_blank" rel="noopener noreferrer" style="color:var(--cyan); text-decoration:underline;">Read findings.md methodology</a>.</li>
+          <li><strong>Documented Failures:</strong> All 12 tested hypotheses — including rules that lost money after spread and fees — are preserved in our research findings: <a href="https://github.com/quanterra/quanterraos/blob/main/docs/findings.md" target="_blank" rel="noopener noreferrer" style="color:var(--accent); text-decoration:underline;">Read findings.md methodology</a>.</li>
         </ul>
       </div>
     </section>
@@ -706,20 +828,25 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
         While competitors sell black-box prediction bots and unverified alpha signals, QuanterraOS builds the institutional truth layer: independent calibration measurement, real-time basis tracking against CME BRTI, and mathematical transparency.
       </p>
       <div class="links-row">
-        <a href="/dashboard" class="btn-outline">Launch Council Terminal →</a>
-        <a href="/fair-value/btc15m" class="btn-outline" style="border-color:var(--border);">Examine Fair Value Model →</a>
+        <a href="/council" class="btn-outline">Launch Council Terminal →</a>
+        <a href="/fair-value/btc15m" class="btn-outline" style="border-color:var(--panel-border);">Examine Fair Value Model →</a>
       </div>
     </section>
 
     <!-- Footer -->
-    <footer class="audit-footer">
-      <div>
-        <span>DATA PIPELINE: kalshi-btc15m-candles.csv</span> · 
-        <span>SETTLEMENT: CME BRTI (KXBTC15M)</span> · 
-        <span>LAST COMPUTED: ${computedAtIso}</span>
+    <footer class="audit-footer" style="flex-direction: column; align-items: flex-start; gap: 14px;">
+      <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <span>DATA PIPELINE: kalshi-btc15m-candles.csv</span> · 
+          <span>SETTLEMENT: CME BRTI (KXBTC15M)</span> · 
+          <span>LAST COMPUTED: ${computedAtIso}</span>
+        </div>
+        <div>
+          QUANTERRAOS FOUNDATION · REPRODUCIBLE RESEARCH STANDARD
+        </div>
       </div>
-      <div>
-        QUANTERRAOS FOUNDATION · REPRODUCIBLE RESEARCH STANDARD
+      <div style="font-size: 0.72rem; color: var(--muted); line-height: 1.5; border-top: 1px solid var(--panel-border-subtle); padding-top: 10px; width: 100%;">
+        <strong>Legal &amp; Non-Affiliation Notice (Rule B10):</strong> Kalshi, CME Group, and CF Benchmarks are trademarks of their respective owners. QuanterraOS is an independent measurement system operated by Quantara Global LLC and is not affiliated with, endorsed by, or sponsored by any exchange or market operator. Rule B5 locked: zero live capital deployed ($0.00). Not investment advice. <a href="/legal" style="color: var(--accent); text-decoration: underline;">Full Legal Disclaimers &rarr;</a>
       </div>
     </footer>
 

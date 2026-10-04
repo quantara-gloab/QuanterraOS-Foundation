@@ -21,17 +21,17 @@ export function renderResponsePostPage(): string {
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0b0d12;
-    --card-bg: #131722;
-    --border: rgba(255, 255, 255, 0.08);
-    --text: #e8ecf4;
-    --text-dim: #9aa1b4;
-    --muted: #656c80;
-    --accent: #C9A227;
-    --cyan: #00e5ff;
+    --bg: #0A0E14;
+    --card-bg: #0E131A;
+    --border: rgba(232, 234, 237, 0.08);
+    --text: #E8EAED;
+    --text-dim: #8F95A0;
+    --muted: #8F95A0;
+    --accent: #4FD1C5;
+    --cyan: #4FD1C5;
     --serif: 'Fraunces', Georgia, serif;
     --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    --mono: 'JetBrains Mono', ui-monospace, monospace;
+    --mono: 'IBM Plex Mono', ui-monospace, monospace;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -258,7 +258,7 @@ export function renderResponsePostPage(): string {
     </a>
     <div class="nav-right">
       <a href="/calibration">Calibration Proof</a>
-      <a href="/dashboard">Council Terminal</a>
+      <a href="/council">Council Terminal</a>
       <a href="/calibration" class="btn-proof">View Live Proof →</a>
     </div>
   </nav>
