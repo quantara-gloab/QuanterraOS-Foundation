@@ -1,18 +1,16 @@
 /**
  * Live Terminal Dashboard View (/dashboard & /council)
  *
- * Celestial Alien Spaceship Bridge Console — Tactical Trading & Calibration Horizon
- * Implements a clean, organized, hyper-advanced extraterrestrial flagship interface
- * designed specifically for institutional quants, macro investors, and sovereign funds.
+ * Multi-Agent Sensory Telemetry & Calibration Bridge Console
+ * Provides a focused, organized high-contrast interface designed specifically
+ * for empirical monitoring of short-duration prediction market calibration,
+ * multi-venue spot dispersion, and 8-specialist consensus.
  *
- * "The Tesla of Intelligence":
- * - Full Self-Calibration (FSC) Multi-Agent Sensor Fusion Architecture
- * - 3D Perspective Space-Warp Starfield with mouse parallax & warp acceleration
+ * - Multi-Agent Sensor Fusion Architecture
+ * - 3D Perspective Space-Warp Starfield with mouse parallax
  * - 360° Interactive Tactical Radar Sweeper with orbiting specialist blips
- * - Zero-dependency Web Audio API sound synthesis engine (warp, comms, clicks, radar, alerts, triumphs)
- * - Institutional Keyboard Flight Controls (Space/R cycle, M mute, 1-8 hail, H hotkeys, D drill, C Tesla matrix, Esc close)
- * - The Alpha Citadel Combat Readiness Drill minigame (testing empirical calibration against findings.md)
- * - The Tesla Competitive Intelligence Matrix (Head-to-head contrast vs Bloomberg $32k, Kalshi, Polymarket, Kaiko)
+ * - Web Audio API telemetry sound synthesizer (toggles on/off)
+ * - Ergonomic Keyboard Navigation (Space/R cycle, M mute, 1-8 hail specialist, H hotkeys, Esc close)
  */
 
 export function renderCouncilDashboardPage(clerkScripts: string = "", clerkConfigured: boolean = false): string {
@@ -21,7 +19,7 @@ export function renderCouncilDashboardPage(clerkScripts: string = "", clerkConfi
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>QuanterraOS — Celestial Council Bridge // The Tesla of Intelligence</title>
+<title>QuanterraOS — Celestial Council Bridge</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,500;1,9..144,600&family=IBM+Plex+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -1146,244 +1144,6 @@ ${clerkScripts}
   }
 
   /* ==========================================================================
-     THE ALPHA CITADEL: COMBAT READINESS DRILL MODAL
-     ========================================================================== */
-  .drill-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(1, 4, 10, 0.9);
-    backdrop-filter: blur(18px);
-    z-index: 1100;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s ease;
-  }
-  .drill-overlay.open {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .drill-card {
-    background: #040a1a;
-    border: 1px solid var(--panel-border-gold);
-    border-radius: var(--radius-lg);
-    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.95), 0 0 50px rgba(255, 215, 0, 0.25);
-    width: 100%;
-    max-width: 740px;
-    max-height: 90vh;
-    overflow-y: auto;
-    padding: 28px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .drill-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid rgba(255, 215, 0, 0.2);
-    padding-bottom: 14px;
-  }
-
-  .drill-title {
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: var(--gold-pulsar);
-    font-family: "Space Grotesk", sans-serif;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .drill-scoreboard {
-    display: flex;
-    gap: 16px;
-    background: rgba(255, 215, 0, 0.08);
-    border: 1px solid rgba(255, 215, 0, 0.25);
-    border-radius: var(--radius-sm);
-    padding: 10px 16px;
-    font-family: "Space Mono", monospace;
-    font-size: 0.74rem;
-  }
-
-  .drill-scenario-box {
-    background: rgba(6, 14, 30, 0.8);
-    border: 1px solid rgba(0, 240, 255, 0.2);
-    border-radius: var(--radius-sm);
-    padding: 16px;
-  }
-
-  .drill-scenario-title {
-    color: var(--cyan-core);
-    font-family: "Space Mono", monospace;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 8px;
-  }
-
-  .drill-scenario-body {
-    font-size: 0.85rem;
-    line-height: 1.55;
-    color: #f0f9ff;
-  }
-
-  .drill-options-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 14px;
-  }
-
-  .drill-choice-btn {
-    background: rgba(8, 18, 38, 0.75);
-    border: 1px solid rgba(0, 240, 255, 0.25);
-    border-radius: var(--radius-sm);
-    padding: 12px 16px;
-    color: var(--text-primary);
-    font-family: "Space Grotesk", sans-serif;
-    font-size: 0.82rem;
-    cursor: pointer;
-    text-align: left;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .drill-choice-btn:hover {
-    border-color: var(--cyan-core);
-    background: rgba(0, 240, 255, 0.14);
-    transform: translateX(4px);
-  }
-
-  .drill-result-box {
-    padding: 14px;
-    border-radius: var(--radius-sm);
-    font-size: 0.8rem;
-    line-height: 1.5;
-    font-family: "Space Mono", monospace;
-    display: none;
-    animation: fadeInHolo 0.25s ease;
-  }
-  .drill-result-box.pass {
-    display: block;
-    background: rgba(0, 255, 136, 0.12);
-    border: 1px solid var(--green-warp);
-    color: #afffd5;
-  }
-  .drill-result-box.fail {
-    display: block;
-    background: rgba(255, 51, 102, 0.12);
-    border: 1px solid var(--alert-crimson);
-    color: #ffb3c6;
-  }
-
-  /* ==========================================================================
-     THE TESLA OF INTELLIGENCE: COMPETITIVE ARCHITECTURE & BENCHMARK MODAL
-     ========================================================================== */
-  .tesla-matrix-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(1, 4, 10, 0.92);
-    backdrop-filter: blur(20px);
-    z-index: 1150;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s ease;
-  }
-  .tesla-matrix-overlay.open {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .tesla-matrix-card {
-    background: #030713;
-    border: 1px solid var(--panel-border-glow);
-    border-radius: var(--radius-lg);
-    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.95), 0 0 60px rgba(0, 240, 255, 0.25);
-    width: 100%;
-    max-width: 980px;
-    max-height: 90vh;
-    overflow-y: auto;
-    padding: 28px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    position: relative;
-  }
-
-  .tesla-tabs-bar {
-    display: flex;
-    gap: 8px;
-    border-bottom: 1px solid rgba(0, 240, 255, 0.15);
-    padding-bottom: 12px;
-  }
-
-  .tesla-tab-btn {
-    background: rgba(8, 16, 32, 0.6);
-    border: 1px solid rgba(0, 240, 255, 0.15);
-    color: var(--text-dim);
-    font-family: "Space Mono", monospace;
-    font-size: 0.72rem;
-    padding: 8px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .tesla-tab-btn.active {
-    background: rgba(0, 240, 255, 0.18);
-    border-color: var(--cyan-core);
-    color: var(--cyan-core);
-    font-weight: 700;
-    box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
-  }
-
-  .tesla-matrix-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: "Space Grotesk", sans-serif;
-    font-size: 0.78rem;
-    margin-top: 10px;
-  }
-  .tesla-matrix-table th {
-    text-align: left;
-    padding: 10px 12px;
-    font-family: "Space Mono", monospace;
-    font-size: 0.7rem;
-    color: var(--cyan-core);
-    border-bottom: 1px solid rgba(0, 240, 255, 0.25);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-  .tesla-matrix-table td {
-    padding: 10px 12px;
-    border-bottom: 1px solid rgba(0, 240, 255, 0.08);
-    color: var(--text-stellar);
-    vertical-align: top;
-    line-height: 1.45;
-  }
-  .tesla-matrix-table tr:hover td {
-    background: rgba(0, 240, 255, 0.04);
-  }
-  .tesla-highlight-cell {
-    color: var(--gold-pulsar) !important;
-    font-weight: 700;
-  }
-
-  /* ==========================================================================
      HUD TOAST NOTIFICATIONS
      ========================================================================== */
   .hud-toast-wrap {
@@ -1442,7 +1202,6 @@ ${clerkScripts}
       <span class="beacon-dot"></span>
       <span class="hud-ship-tag">
         <span>QUANTERRAOS</span>
-        <span class="hud-badge-gold">THE TESLA OF INTEL</span>
       </span>
       <span>•</span>
       <span style="color:var(--text-primary); font-weight:600;">BTC/USD 15M TACTICAL DECK</span>
@@ -1456,12 +1215,6 @@ ${clerkScripts}
 
     <div class="hud-right">
       <span class="hud-clock" id="utc-clock">00:00:00 UTC</span>
-      <button type="button" class="hud-action-btn gold-btn" onclick="openTeslaMatrix()" title="The Tesla of Intelligence: Competitive Architecture [C]">
-        <span>⚡</span><span>TESLA MATRIX [C]</span>
-      </button>
-      <button type="button" class="hud-action-btn gold-btn" onclick="openCombatDrill()" title="Launch Combat Readiness Drill [D]">
-        <span>⚔️</span><span>COMBAT DRILL [D]</span>
-      </button>
       <button type="button" class="hud-action-btn" onclick="toggleHotkeysHelp()" title="Flight Controls & Hotkeys [H]">
         <span>⌨️</span><span>HOTKEYS [H]</span>
       </button>
@@ -1824,14 +1577,6 @@ ${clerkScripts}
           <span class="hotkey-desc">Toggle Web Audio Sound Engine</span>
         </div>
         <div class="hotkey-row">
-          <span class="kbd-key">C</span>
-          <span class="hotkey-desc">Open Tesla Competitive Matrix</span>
-        </div>
-        <div class="hotkey-row">
-          <span class="kbd-key">D</span>
-          <span class="hotkey-desc">Launch Combat Readiness Drill</span>
-        </div>
-        <div class="hotkey-row">
           <span class="kbd-key">H / ?</span>
           <span class="hotkey-desc">Toggle Flight Manual Overlay</span>
         </div>
@@ -1874,186 +1619,6 @@ ${clerkScripts}
       </div>
       <div style="font-size:0.68rem; color:var(--text-muted); font-family:'Space Mono', monospace; text-align:center;">
         Designed for institutional desk ergonomics. All keys trigger physical sound feedback and tactical state shifts.
-      </div>
-    </div>
-  </div>
-
-  <!-- The Alpha Citadel: Combat Readiness Drill Modal -->
-  <div class="drill-overlay" id="combat-drill-modal" role="presentation" aria-hidden="true">
-    <div class="drill-card" role="dialog" aria-modal="true">
-      <div class="drill-header">
-        <div class="drill-title">
-          <span>⚔️</span>
-          <span>THE ALPHA CITADEL // COMBAT READINESS DRILL</span>
-        </div>
-        <button type="button" class="subspace-close-btn" onclick="closeCombatDrill()">&times;</button>
-      </div>
-
-      <div class="drill-scoreboard">
-        <div>SCORE: <strong id="drill-score" style="color:var(--gold-pulsar);">0 XP</strong></div>
-        <div>CALIBRATION RATING: <strong id="drill-rank" style="color:var(--green-warp);">CADET ALLOCATOR</strong></div>
-        <div>DRILLS COMPLETED: <strong id="drill-counter">0 / 3</strong></div>
-      </div>
-
-      <div class="drill-scenario-box">
-        <div class="drill-scenario-title" id="drill-scenario-heading">SCENARIO 1: THE SUDDEN PRICE-SWING MOMENTUM TRAP</div>
-        <div class="drill-scenario-body" id="drill-scenario-text">
-          BTC swings +6.2¢ in 30 seconds on Kalshi. In-sample momentum win rate looks like 75.6%. Falcon is firing BUY YES. But out-of-sample walk-forward Brier is 0.1863 vs market 0.1838 (Held-out profit CI spans -$0.067 to +$0.147). What is your tactical order?
-        </div>
-        <div class="drill-options-list" id="drill-options-box">
-          <!-- Dynamic options -->
-        </div>
-      </div>
-
-      <div class="drill-result-box" id="drill-feedback-box">
-        <!-- Results and explanation citing findings.md -->
-      </div>
-    </div>
-  </div>
-
-  <!-- The Tesla of Intelligence: Competitive Architecture & Benchmark Modal -->
-  <div class="tesla-matrix-overlay" id="tesla-matrix-modal" role="presentation" aria-hidden="true">
-    <div class="tesla-matrix-card" role="dialog" aria-modal="true">
-      <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid rgba(0,240,255,0.25); padding-bottom:14px;">
-        <div>
-          <div style="font-family:'Space Mono', monospace; font-size:0.68rem; color:var(--gold-pulsar); letter-spacing:0.14em; text-transform:uppercase; margin-bottom:4px;">
-            ⚡ ARCHITECTURAL PARADIGM SHIFT // THE TESLA OF INTEL
-          </div>
-          <div style="font-family:'Space Grotesk', sans-serif; font-size:1.25rem; font-weight:700; color:var(--text-primary);">
-            Competitive Intelligence & Autonomous Benchmark
-          </div>
-        </div>
-        <button type="button" class="subspace-close-btn" onclick="closeTeslaMatrix()">&times;</button>
-      </div>
-
-      <!-- Tab Switcher -->
-      <div class="tesla-tabs-bar">
-        <button type="button" class="tesla-tab-btn active" id="tesla-tab-btn-bench" onclick="switchTeslaTab('bench')">Head-to-Head Matrix</button>
-        <button type="button" class="tesla-tab-btn" id="tesla-tab-btn-fsc" onclick="switchTeslaTab('fsc')">FSC Sensor Fusion</button>
-        <button type="button" class="tesla-tab-btn" id="tesla-tab-btn-brake" onclick="switchTeslaTab('brake')">Autonomous Circuit-Breaker</button>
-      </div>
-
-      <!-- Pane 1: Head to Head Table -->
-      <div id="tesla-pane-bench">
-        <div style="font-size:0.75rem; color:var(--text-dim); margin-bottom:12px; font-family:'Space Mono', monospace;">
-          Why QuanterraOS replaces $31,980/yr legacy terminals and naked retail prediction market order books:
-        </div>
-        <table class="tesla-matrix-table">
-          <thead>
-            <tr>
-              <th>Dimension</th>
-              <th style="color:var(--gold-pulsar);">QuanterraOS (Tesla of Intel)</th>
-              <th>Bloomberg ($31,980/yr)</th>
-              <th>Kalshi Native</th>
-              <th>Polymarket</th>
-              <th>Kaiko / Metrics</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Primary Architecture</strong></td>
-              <td class="tesla-highlight-cell">Neural Council Multi-Agent Sensor Fusion</td>
-              <td>1982 Monolithic Mainframe Menus</td>
-              <td>Single-Exchange CLOB</td>
-              <td>Web3 Polygon / UMA Oracle</td>
-              <td>Raw JSON Data Feeds</td>
-            </tr>
-            <tr>
-              <td><strong>Calibration Rigor</strong></td>
-              <td class="tesla-highlight-cell">Murphy Brier Decomposition (10 Bins, Wilson CIs)</td>
-              <td>None for short-duration contracts</td>
-              <td>None (Last traded price only)</td>
-              <td>None (Volatile token price)</td>
-              <td>None (Raw unweighted L2 book)</td>
-            </tr>
-            <tr>
-              <td><strong>Autonomous Risk Brake</strong></td>
-              <td class="tesla-highlight-cell">Phoenix Gate (AEB: Locks execution when no edge)</td>
-              <td>None (Manual order entry)</td>
-              <td>None (Retail liquidity taker trap)</td>
-              <td>None (Variable pool slippage)</td>
-              <td>None (Data-only vendor)</td>
-            </tr>
-            <tr>
-              <td><strong>Sensor Fusion</strong></td>
-              <td class="tesla-highlight-cell">Draco Synthetic BRTI (<0.5% Outlier Rejection)</td>
-              <td>Unconnected multi-window tabs</td>
-              <td>Single Kalshi order-book</td>
-              <td>Single Polymarket pool</td>
-              <td>Raw tables without synthesis</td>
-            </tr>
-            <tr>
-              <td><strong>Auditable Truth</strong></td>
-              <td class="tesla-highlight-cell">100% Open CI/CD Statistical Provenance</td>
-              <td>Proprietary black-box calculation</td>
-              <td>Proprietary exchange logs</td>
-              <td>On-chain token votes</td>
-              <td>Enterprise private database</td>
-            </tr>
-            <tr>
-              <td><strong>Ergonomics & Ergonomics</strong></td>
-              <td class="tesla-highlight-cell">Tactile Web Audio, 3D Warp HUD, 360° Radar</td>
-              <td>Keyboard codes (<GO>, DES, HP)</td>
-              <td>Basic web candlestick chart</td>
-              <td>Standard Web3 crypto interface</td>
-              <td>Grafana / API code endpoints</td>
-            </tr>
-            <tr>
-              <td><strong>Annual Cost</strong></td>
-              <td class="tesla-highlight-cell">$0 Open Research / Pro Tier</td>
-              <td>$31,980 / seat / year</td>
-              <td>Taker fees up to 1.75¢ / trade</td>
-              <td>Gas & pool fees</td>
-              <td>$15,000–$50,000+ / yr</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Pane 2: FSC Sensor Fusion -->
-      <div id="tesla-pane-fsc" style="display:none;">
-        <div style="font-size:0.8rem; color:var(--text-stellar); line-height:1.55; margin-bottom:14px;">
-          Like Tesla’s Full Self-Driving vision network that converts 8 cameras into a 3D vector occupancy space, QuanterraOS’s <strong>Full Self-Calibration (FSC)</strong> converts multi-venue liquidity into an actionable, auditable single source of truth.
-        </div>
-        <div style="background:rgba(4,10,24,0.85); border:1px solid rgba(0,240,255,0.2); border-radius:var(--radius-sm); padding:16px; font-family:'Space Mono', monospace; font-size:0.72rem; line-height:1.7;">
-          <div style="color:var(--cyan-core); font-weight:700; margin-bottom:8px;">[STAGE 1: MULTI-SPECTRAL SENSOR INGESTION]</div>
-          <div>&bull; Coinbase Exchange Live Ticker (Fixed stale-endpoint bug via live ticker WS/REST)</div>
-          <div>&bull; Kraken Live Spot & Orderbook Imbalance Feed</div>
-          <div>&bull; Bitstamp & Gemini Spot Liquidity Anchors</div>
-          <div>&bull; CME CF Bitcoin Real-Time Index (BRTI 60s Moving Benchmark)</div>
-          <div style="color:var(--gold-pulsar); font-weight:700; margin:10px 0 6px;">[STAGE 2: 8-AGENT NEURAL COUNCIL FILTERING]</div>
-          <div>&bull; <strong>Draco:</strong> Filters outliers (>0.5% deviation) and builds volume-weighted composite index</div>
-          <div>&bull; <strong>Wolf:</strong> Real-time volatility surface (per-second realized σ)</div>
-          <div>&bull; <strong>Falcon:</strong> Microstructure order-book depth imbalance calculation</div>
-          <div>&bull; <strong>Quantum Fox:</strong> 5-fold walk-forward held-out Brier validation safety check</div>
-          <div>&bull; <strong>Sentinel:</strong> Continuous platform surveillance & swing-event capture</div>
-          <div>&bull; <strong>Kraken:</strong> Rule B5 live capital boundary enforcement ($0.00 live exposure)</div>
-          <div>&bull; <strong>Lion:</strong> Consensus synthesis & Murphy calibration decomposition</div>
-          <div>&bull; <strong>Phoenix:</strong> Autonomous execution circuit-breaker & gate actuator</div>
-        </div>
-      </div>
-
-      <!-- Pane 3: Autonomous Risk Brake -->
-      <div id="tesla-pane-brake" style="display:none;">
-        <div style="font-size:0.8rem; color:var(--text-stellar); line-height:1.55; margin-bottom:14px;">
-          In automotive safety, Tesla’s Automatic Emergency Braking (AEB) engages when human perception fails to avoid a crash. In institutional finance, QuanterraOS’s <strong>Phoenix Gate</strong> performs the identical role for capital preservation.
-        </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
-          <div style="background:rgba(255,51,102,0.08); border:1px solid rgba(255,51,102,0.3); border-radius:var(--radius-sm); padding:14px; font-family:'Space Mono', monospace; font-size:0.7rem; line-height:1.5;">
-            <div style="color:var(--alert-crimson); font-weight:700; margin-bottom:6px;">✖ THE RETAIL TRAP (COMPETITION)</div>
-            <p>On Kalshi & Polymarket, when BTC swings 6¢ in 30 seconds, retail traders rush to chase the momentum or fade it. In-sample backtests show 75.6% win rates, but traders get crushed by bid-ask spreads and taker fees (<code>0.07 * p * (1-p)</code>), losing money out-of-sample.</p>
-          </div>
-          <div style="background:rgba(0,255,136,0.08); border:1px solid rgba(0,255,136,0.3); border-radius:var(--radius-sm); padding:14px; font-family:'Space Mono', monospace; font-size:0.7rem; line-height:1.5;">
-            <div style="color:var(--green-warp); font-weight:700; margin-bottom:6px;">✔ THE QUANTERRAOS AUTONOMOUS BRAKE</div>
-            <p>QuanterraOS proves in <strong>findings.md §12</strong> that out-of-sample walk-forward Brier (0.1863) loses to the calibrated market mid-price (0.1838). Phoenix automatically locks the execution gate. Capital preserved: <strong>$0.00 lost</strong>.</p>
-          </div>
-        </div>
-      </div>
-
-      <div style="display:flex; justify-content:flex-end; border-top:1px solid rgba(0,240,255,0.15); padding-top:14px;">
-        <button type="button" class="warp-cycle-btn" style="padding:6px 16px; font-size:0.72rem;" onclick="closeTeslaMatrix()">
-          <span>Return to Flight Deck</span>
-        </button>
       </div>
     </div>
   </div>
@@ -2411,155 +1976,7 @@ if (radarCanvas) {
 }
 
 // ============================================================================
-// 4. THE ALPHA CITADEL: COMBAT READINESS DRILL MINIGAME
-// ============================================================================
-let drillXP = 0;
-let drillIndex = 0;
-
-const DRILL_SCENARIOS = [
-  {
-    title: "SCENARIO 1: SUDDEN PRICE-SWING MOMENTUM TRAP (§12)",
-    text: "BTC 15-minute contract suddenly swings +6.2¢ in 30 seconds. Historical in-sample data shows a 75.6% win rate chasing the swing. Falcon fires BUY YES at 82.5¢. However, walk-forward out-of-sample testing yields Brier 0.1863 vs market 0.1838, and net held-out profit CI spans -$0.067 to +$0.147. What is your command?",
-    options: [
-      { text: "A) Follow the Momentum: Buy YES immediately to catch continuation", correct: false, note: "FAILED: In-sample win-rate illusion. Out-of-sample walk-forward Brier loses to market, and profit CI spans zero after Kalshi taker fees per findings.md §12." },
-      { text: "B) Fade the Swing: Buy NO anticipating sharp mean-reversion", correct: false, note: "FAILED: Fading the swing loses on 0 of 5 walk-forward folds with average loss of over 15¢ per contract. The market absorbs information rapidly." },
-      { text: "C) Stand Down & Gate Locked: Honor calibrated mid-price baseline", correct: true, note: "VICTORY (+100 XP): Calibrated sovereign discipline. Neither chasing nor fading beats the calibrated market price. Zero capital exposed." }
-    ]
-  },
-  {
-    title: "SCENARIO 2: THE MINUTE-13 DRIFT MIRAGE (§1)",
-    text: "At minute 13 of a 15-minute contract, Draco composite index indicates a +$85 upward drift. Direction accuracy historically measures 62.4%. Phoenix execution gate is waiting for your manual override. Do you execute?",
-    options: [
-      { text: "A) Force Order Execution: 62.4% direction accuracy guarantees profit", correct: false, note: "FAILED: Direction accuracy alone is insufficient. By minute 13, executable market spreads and Kalshi fees swallow all apparent edge. BSS is non-positive." },
-      { text: "B) Reject Execution: Stand by per single-source findings.md", correct: true, note: "VICTORY (+100 XP): Realized execution pricing incorporates drift. Standing by preserves capital from negative EV." }
-    ]
-  },
-  {
-    title: "SCENARIO 3: QUANTUM FOX HELD-OUT BRIER VALIDATION (§11)",
-    text: "An analyst proposes an order-book imbalance rule with a backtested Sharpe of 2.1. Quantum Fox runs 5-fold walk-forward validation and reports Brier Difference CI [+0.0041, +0.0139] and net held-out EV -2.15¢. How do you instruct Lion?",
-    options: [
-      { text: "A) Ratify NOMINAL_CALIBRATED_STANDBY: Signal fails out-of-sample", correct: true, note: "VICTORY (+100 XP): Lion consensus rule requires model to beat market Brier on all folds. Model fails; standby ratified." },
-      { text: "B) Authorize Live Trial: Overrule Quantum Fox based on Sharpe ratio", correct: false, note: "FAILED: In-sample Sharpe ratio without walk-forward calibration is how hedge funds blow up. Rule B5 forbids unvalidated live capital." }
-    ]
-  }
-];
-
-function openCombatDrill() {
-  playUiSound('comms');
-  const modal = document.getElementById('combat-drill-modal');
-  if (modal) {
-    modal.classList.add('open');
-    modal.setAttribute('aria-hidden', 'false');
-    renderDrillScenario();
-  }
-}
-
-function closeCombatDrill() {
-  playUiSound('click');
-  const modal = document.getElementById('combat-drill-modal');
-  if (modal) {
-    modal.classList.remove('open');
-    modal.setAttribute('aria-hidden', 'true');
-  }
-}
-
-function renderDrillScenario() {
-  const sc = DRILL_SCENARIOS[drillIndex % DRILL_SCENARIOS.length];
-  const headEl = document.getElementById('drill-scenario-heading');
-  const bodyEl = document.getElementById('drill-scenario-text');
-  const optBox = document.getElementById('drill-options-box');
-  const fbBox = document.getElementById('drill-feedback-box');
-  if (fbBox) fbBox.style.display = 'none';
-
-  if (headEl) headEl.textContent = sc.title;
-  if (bodyEl) bodyEl.textContent = sc.text;
-
-  if (optBox) {
-    optBox.innerHTML = sc.options.map((opt, idx) => \`
-      <button type="button" class="drill-choice-btn" onclick="submitDrillChoice(\${idx})">
-        <span>\${escapeTerminalText(opt.text)}</span>
-        <span style="font-family:'Space Mono', monospace; font-size:0.7rem; color:var(--cyan-core);">&rarr;</span>
-      </button>
-    \`).join('');
-  }
-}
-
-function submitDrillChoice(optIdx) {
-  const sc = DRILL_SCENARIOS[drillIndex % DRILL_SCENARIOS.length];
-  const opt = sc.options[optIdx];
-  const fbBox = document.getElementById('drill-feedback-box');
-  if (!fbBox || !opt) return;
-
-  if (opt.correct) {
-    playUiSound('success');
-    drillXP += 100;
-    fbBox.className = 'drill-result-box pass';
-    fbBox.innerHTML = '<strong>' + escapeTerminalText(opt.note) + '</strong><div style="margin-top:8px;"><button class="warp-cycle-btn" style="padding:4px 12px; font-size:0.7rem;" onclick="advanceDrill()">Next Tactical Scenario &rarr;</button></div>';
-  } else {
-    playUiSound('fail');
-    drillXP = Math.max(0, drillXP - 30);
-    fbBox.className = 'drill-result-box fail';
-    fbBox.innerHTML = '<strong>' + escapeTerminalText(opt.note) + '</strong><div style="margin-top:8px;"><button class="tactical-prompt-btn" onclick="renderDrillScenario()">Retry Scenario &rarr;</button></div>';
-  }
-  updateDrillScoreboard();
-}
-
-function advanceDrill() {
-  drillIndex++;
-  renderDrillScenario();
-  updateDrillScoreboard();
-}
-
-function updateDrillScoreboard() {
-  const scoreEl = document.getElementById('drill-score');
-  const rankEl = document.getElementById('drill-rank');
-  const countEl = document.getElementById('drill-counter');
-
-  if (scoreEl) scoreEl.textContent = drillXP + ' XP';
-  if (countEl) countEl.textContent = drillIndex + ' / ' + DRILL_SCENARIOS.length;
-
-  if (rankEl) {
-    if (drillXP >= 300) rankEl.textContent = 'SOVEREIGN RISK MARSHAL';
-    else if (drillXP >= 200) rankEl.textContent = 'CALIBRATED ALPHA COMMANDER';
-    else if (drillXP >= 100) rankEl.textContent = 'TACTICAL QUANT STRATEGIST';
-    else rankEl.textContent = 'CADET ALLOCATOR';
-  }
-}
-
-// ============================================================================
-// 5. THE TESLA OF INTELLIGENCE: COMPETITIVE MATRIX CONTROLLER
-// ============================================================================
-function openTeslaMatrix() {
-  playUiSound('comms');
-  showHudToast('ENGAGING TESLA COMPETITIVE ARCHITECTURE MATRIX');
-  const modal = document.getElementById('tesla-matrix-modal');
-  if (modal) {
-    modal.classList.add('open');
-    modal.setAttribute('aria-hidden', 'false');
-  }
-}
-
-function closeTeslaMatrix() {
-  playUiSound('click');
-  const modal = document.getElementById('tesla-matrix-modal');
-  if (modal) {
-    modal.classList.remove('open');
-    modal.setAttribute('aria-hidden', 'true');
-  }
-}
-
-function switchTeslaTab(tabId) {
-  playUiSound('click');
-  ['bench', 'fsc', 'brake'].forEach(t => {
-    const btn = document.getElementById('tesla-tab-btn-' + t);
-    const pane = document.getElementById('tesla-pane-' + t);
-    if (btn) btn.classList.toggle('active', t === tabId);
-    if (pane) pane.style.display = t === tabId ? 'block' : 'none';
-  });
-}
-
-// ============================================================================
-// 6. TACTICAL FLIGHT CONTROLS & KEYBOARD HOTKEYS
+// 4. TACTICAL FLIGHT CONTROLS & KEYBOARD HOTKEYS
 // ============================================================================
 function toggleHotkeysHelp() {
   playUiSound('click');
@@ -2600,8 +2017,6 @@ document.addEventListener('keydown', (e) => {
 
   if (e.key === 'Escape') {
     closeTerminalAgentChat();
-    closeCombatDrill();
-    closeTeslaMatrix();
     const hk = document.getElementById('hotkeys-modal');
     if (hk) hk.classList.remove('open');
     playUiSound('click');
@@ -2611,12 +2026,8 @@ document.addEventListener('keydown', (e) => {
     triggerCycle();
   } else if (e.key === 'm' || e.key === 'M') {
     toggleSfx();
-  } else if (e.key === 'c' || e.key === 'C') {
-    openTeslaMatrix();
   } else if (e.key === 'h' || e.key === 'H' || e.key === '?') {
     toggleHotkeysHelp();
-  } else if (e.key === 'd' || e.key === 'D') {
-    openCombatDrill();
   } else if (e.key >= '1' && e.key <= '8') {
     const agentMap = {
       '1': 'draco', '2': 'wolf', '3': 'falcon', '4': 'quantumFox',
