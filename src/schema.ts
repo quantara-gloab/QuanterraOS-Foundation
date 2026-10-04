@@ -357,4 +357,100 @@ export const councilChatLogs = sqliteTable(
   }),
 );
 
+/**
+ * Immutable Prediction Ledger.
+ * Written before the market settles; immutable once written.
+ * Only the settlement scorer writes outcome and brier_score upon market resolution.
+ */
+export const predictions = sqliteTable(
+  "predictions",
+  {
+    id: text("id").primaryKey(),
+    marketId: text("market_id").notNull(),
+    timestamp: text("timestamp").notNull(),
+    predictedProb: real("predicted_prob").notNull(),
+    modelVersion: text("model_version").notNull(),
+    status: text("status").notNull().default("PENDING"), // 'PENDING' | 'SETTLED'
+    outcome: text("outcome"), // 'YES' | 'NO' | 'VOID'
+    brierScore: real("brier_score"),
+    settledAt: text("settled_at"),
+    isReplay: integer("is_replay").notNull().default(0),
+    notes: text("notes"),
+  },
+  (table) => ({
+    marketIdx: index("predictions_market_id_idx").on(table.marketId),
+    statusIdx: index("predictions_status_idx").on(table.status),
+    isReplayIdx: index("predictions_is_replay_idx").on(table.isReplay),
+    timestampIdx: index("predictions_timestamp_idx").on(table.timestamp),
+  }),
+);
+
+export const users = sqliteTable(
+  "users",
+  {
+    id: text("id").primaryKey(),
+    email: text("email").notNull().unique(),
+    passwordHash: text("password_hash").notNull(),
+    tier: text("tier").notNull().default("free"), // 'free' | 'pro' | 'institutional'
+    stripeCustomerId: text("stripe_customer_id"),
+    stripeSubscriptionId: text("stripe_subscription_id"),
+    createdAt: text("created_at").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (table) => ({
+    emailIdx: index("users_email_idx").on(table.email),
+    tierIdx: index("users_tier_idx").on(table.tier),
+    stripeCustIdx: index("users_stripe_cust_idx").on(table.stripeCustomerId),
+  }),
+);
+
+export const sessions = sqliteTable(
+  "sessions",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id").notNull(),
+    createdAt: text("created_at").notNull(),
+    expiresAt: text("expires_at").notNull(),
+  },
+  (table) => ({
+    userIdIdx: index("sessions_user_id_idx").on(table.userId),
+    expiresAtIdx: index("sessions_expires_at_idx").on(table.expiresAt),
+  }),
+);
+
+export const apiKeys = sqliteTable(
+  "api_keys",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id").notNull(),
+    keyPrefix: text("key_prefix").notNull(),
+    keyHash: text("key_hash").notNull(),
+    tier: text("tier").notNull().default("institutional"),
+    createdAt: text("created_at").notNull(),
+    revokedAt: text("revoked_at"),
+  },
+  (table) => ({
+    userIdIdx: index("api_keys_user_id_idx").on(table.userId),
+    keyHashIdx: index("api_keys_key_hash_idx").on(table.keyHash),
+  }),
+);
+
+export const billingEvents = sqliteTable(
+  "billing_events",
+  {
+    id: text("id").primaryKey(),
+    stripeEventId: text("stripe_event_id"),
+    eventType: text("event_type").notNull(),
+    userId: text("user_id"),
+    payloadJson: text("payload_json"),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => ({
+    userIdIdx: index("billing_events_user_id_idx").on(table.userId),
+    typeIdx: index("billing_events_type_idx").on(table.eventType),
+  }),
+);
+
+
+
 
