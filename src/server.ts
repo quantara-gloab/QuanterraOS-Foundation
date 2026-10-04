@@ -22,6 +22,7 @@ import { computeMarketPriceCalibration, type MarketPriceCalibrationReport } from
 import { currentPlan, hasFeature } from "./plan.ts";
 import { computeCalibrationCurve, computeStreak, scoreObservation, summarizePerformance } from "./scoring.ts";
 import type { ObservationRow, ResolutionRow } from "./scoring.ts";
+import { getCouncilAgentsData } from "./agents/council-data.ts";
 
 runMigrations();
 
@@ -508,6 +509,10 @@ app.get("/api/calibration/market-price", async (req, res) => {
   }
 });
 
+app.get("/api/council/agents", (_req, res) => {
+  res.json(getCouncilAgentsData());
+});
+
 const marketPriceCalibrationPage = `<!doctype html>
 <html lang="en">
 <head>
@@ -836,7 +841,9 @@ window.addEventListener("load", async function () {
 </body>
 </html>`;
 
-const landingPage = `<!doctype html>
+function renderLandingPage(): string {
+  const councilAgents = getCouncilAgentsData();
+  return `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -1081,13 +1088,25 @@ ${clerkScripts}
     border-radius: 12px;
     padding: 24px;
     text-align: center;
-    transition: all 0.2s;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    outline: none;
+    position: relative;
+    user-select: none;
   }
   .agent-card:hover {
     border-color: var(--accent);
-    box-shadow: 0 8px 24px rgba(201,162,39,0.08);
-    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(201,162,39,0.12);
+    transform: translateY(-3px);
+  }
+  .agent-card:focus-visible {
+    border-color: var(--accent);
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+    box-shadow: 0 0 20px rgba(201,162,39,0.25);
   }
   .agent-card .icon {
     width: 44px;
@@ -1114,6 +1133,243 @@ ${clerkScripts}
   .agent-card .desc {
     color: var(--muted);
     font-size: 0.8rem;
+    line-height: 1.5;
+  }
+  .agent-card .card-footer-action {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(243,241,234,0.05);
+  }
+  .view-telemetry-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.72rem;
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    opacity: 0.85;
+    transition: opacity 0.15s;
+  }
+  .agent-card:hover .view-telemetry-pill {
+    opacity: 1;
+    text-decoration: underline;
+  }
+
+  /* Council Specialist Detail Modal */
+  .council-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(11, 13, 16, 0.78);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s;
+  }
+  .council-modal-backdrop.open {
+    opacity: 1;
+    visibility: visible;
+  }
+  .council-modal {
+    background: #14171C;
+    border: 1px solid rgba(201,162,39,0.25);
+    border-radius: 16px;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.6), 0 0 0 1px rgba(243,241,234,0.06);
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 28px;
+    transform: scale(0.96) translateY(12px);
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .council-modal-backdrop.open .council-modal {
+    transform: scale(1) translateY(0);
+  }
+  .council-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+  .council-modal-identity {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .council-modal-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: rgba(201,162,39,0.12);
+    border: 1px solid rgba(201,162,39,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .council-modal-icon svg {
+    width: 24px;
+    height: 24px;
+    fill: var(--accent);
+  }
+  .council-modal-role {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+  }
+  .council-modal-name {
+    font-family: "Fraunces", serif;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 2px 0 0;
+  }
+  .council-modal-close {
+    background: transparent;
+    border: 1px solid var(--panel-line);
+    color: var(--muted);
+    font-size: 1.4rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition: all 0.15s;
+    outline: none;
+  }
+  .council-modal-close:hover, .council-modal-close:focus-visible {
+    color: var(--text);
+    border-color: var(--accent);
+    background: rgba(201,162,39,0.1);
+  }
+  .council-modal-status-wrapper {
+    margin: 8px 0 16px;
+  }
+  .agent-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 4px 10px;
+    border-radius: 6px;
+  }
+  .status-research {
+    background: rgba(201,162,39,0.15);
+    color: #ffd768;
+    border: 1px solid rgba(201,162,39,0.35);
+  }
+  .status-verified {
+    background: rgba(46,125,50,0.15);
+    color: #a5d6a7;
+    border: 1px solid rgba(129,199,132,0.3);
+  }
+  .status-active {
+    background: rgba(33,150,243,0.15);
+    color: #90caf9;
+    border: 1px solid rgba(100,181,246,0.3);
+  }
+  .status-standby {
+    background: rgba(169,167,156,0.12);
+    color: #d0cebe;
+    border: 1px solid rgba(169,167,156,0.25);
+  }
+  .status-monitoring {
+    background: rgba(79,224,255,0.12);
+    color: #80deea;
+    border: 1px solid rgba(79,224,255,0.28);
+  }
+  .council-modal-desc {
+    color: var(--text);
+    font-size: 0.92rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  .council-modal-telemetry {
+    background: rgba(11,13,16,0.7);
+    border: 1px solid var(--panel-line);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+  .telemetry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(243,241,234,0.06);
+  }
+  .telemetry-title {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .telemetry-badge {
+    font-size: 0.65rem;
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    background: rgba(201,162,39,0.1);
+    color: var(--accent);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .telemetry-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .telemetry-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.82rem;
+    gap: 12px;
+  }
+  .telemetry-label {
+    color: var(--muted);
+    font-size: 0.75rem;
+    flex-shrink: 0;
+  }
+  .telemetry-value {
+    color: var(--text);
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    text-align: right;
+    word-break: break-all;
+  }
+  .council-modal-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(243,241,234,0.06);
+  }
+  .council-modal-note {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-style: italic;
+  }
+  .council-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
   }
 
   /* How it works */
@@ -1247,6 +1503,10 @@ ${clerkScripts}
     .council-grid { grid-template-columns: repeat(2, 1fr); }
     .how-steps { gap: 16px; }
   }
+  @media (max-width: 540px) {
+    .council-grid { grid-template-columns: 1fr; }
+    .council-modal { padding: 20px; }
+  }
 </style>
 </head>
 <body>
@@ -1292,56 +1552,66 @@ ${clerkScripts}
     <div class="section-header">
       <div class="eyebrow">The Council</div>
       <h2>Eight specialists. One objective: Pricing Truth.</h2>
-      <p class="section-subhead">Each agent executes an independent verification discipline — data integrity, market microstructure, latency profiling, and settlement calibration.</p>
+      <p class="section-subhead">Each agent verifies, monitors, or stress-tests a different layer of the market — built for transparency first, execution only once a signal is proven.</p>
     </div>
     <div class="council-grid">
-      <div class="agent-card">
-        <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg></div>
-        <div class="role">Order-Book Depth Monitoring (research)</div>
-        <div class="name">Falcon</div>
-        <div class="desc">Collects order-book depth snapshots and tracks bid/ask imbalance; accumulating sample size before conclusions</div>
-      </div>
-      <div class="agent-card">
-        <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V5l-9-4z"/><path d="M9.5 12.5l2 2 2.5-3"/></svg></div>
-        <div class="role">CALIBRATION SURVEILLANCE</div>
-        <div class="name">Sentinel</div>
-        <div class="desc">Continuous drift monitoring and real-time Brier score tracking across venues</div>
-      </div>
-      <div class="agent-card">
-        <div class="icon"><svg viewBox="0 0 24 24"><path d="M21 16.5c0-.27-.02-.55-.07-.82A4.5 4.5 0 0 0 19 11.5a4.4 4.4 0 0 0-.33-1.7l1.17-1.17a.5.5 0 0 0-.3-.87l-2.17-.44a4.5 4.5 0 0 0-.9 1.83 4.6 4.6 0 0 0-2.15-1.44L10.5 7v2.5l5.83 1.17A4.5 4.5 0 0 1 19 12c0 .23-.02.46-.07.68l1.17.67a.5.5 0 0 1 0 .8z"/></svg></div>
-        <div class="role">QUANTITATIVE MODELING</div>
-        <div class="name">Quantum Fox</div>
-        <div class="desc">Rigorous baseline modeling, volatility analytics, and convexity validation</div>
-      </div>
-      <div class="agent-card">
-        <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 8v4l2 2m-2-6a9 9 0 1 1 0 18 9 9 0 0 1 0-18z"/><path d="M5 12h14"/></svg></div>
-        <div class="role">TELEMETRY PIPELINE</div>
-        <div class="name">Phoenix</div>
-        <div class="desc">High-throughput ingestion pipeline and low-latency market-data dispatch</div>
-      </div>
-      <div class="agent-card">
-        <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7v10c0 5 6 9 10 9s10-4 10-9V7l-10-5z"/>m-2 8l2 2 4-4-1-1-3 3-1 1z"/></svg></div>
-        <div class="role">DATA INTEGRITY</div>
-        <div class="name">Draco</div>
-        <div class="desc">Data verification, staleness detection, and pipeline anomaly mitigation</div>
-      </div>
-      <div class="agent-card">
-        <div class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 10v6m8.66-9H17m-5 0H5.34"/></svg></div>
-        <div class="role">MARKET MICROSTRUCTURE</div>
-        <div class="name">Wolf</div>
-        <div class="desc">Order-book skew dynamics, spread attribution, and liquidity structure analysis</div>
-      </div>
-      <div class="agent-card">
-        <div class="icon"><svg viewBox="0 0 24 24"><path d="M3 12c0 4.97 4.03 9 9 9s9-4.03 9-9-4.03-9-9-9-9 4.03-9 9zm9 4a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm0-3a1 1 0 0 1 1-1h1a1 1 0 0 1 0 2h-1a1 1 0 0 1-1 0zm2-3a1 1 0 0 1 1 1v1h1a1 1 0 0 1 0 2h-1v1a1 1 0 0 1-2 0v-1a1 1 0 0 1 1-1h1v-1a1 1 0 0 1 1-1z"/></svg></div>
-        <div class="role">RISK OVERSIGHT</div>
-        <div class="name">Kraken</div>
-        <div class="desc">Cross-venue divergence stress-testing and tail-risk calibration checks</div>
-      </div>
-      <div class="agent-card">
-        <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 7V3l8 9-8 9v-4a4 4 0 0 1-4-4v-1zm0 0V7z"/><circle cx="12" cy="12" r="5"/></svg></div>
-        <div class="role">CALIBRATION SYNTHESIS</div>
-        <div class="name">Lion</div>
-        <div class="desc">Cross-agent consensus audit, empirical calibration grading, and reproducible measurement</div>
+      ${councilAgents.map((agent) => `
+      <div class="agent-card"
+           role="button"
+           tabindex="0"
+           aria-haspopup="dialog"
+           aria-expanded="false"
+           aria-controls="council-modal"
+           data-agent-id="${agent.id}"
+           id="agent-card-${agent.id}">
+        <div>
+          <div class="icon">${agent.iconSvg}</div>
+          <div class="role">${agent.role}</div>
+          <div class="name">${agent.name}</div>
+          <div class="desc">${agent.shortDesc}</div>
+        </div>
+        <div class="card-footer-action">
+          <span class="view-telemetry-pill">Audit Telemetry &rarr;</span>
+        </div>
+      </div>`).join("")}
+    </div>
+
+    <!-- Council Specialist Detail Modal -->
+    <div class="council-modal-backdrop" id="council-modal-backdrop" role="presentation" aria-hidden="true">
+      <div class="council-modal"
+           id="council-modal"
+           role="dialog"
+           aria-modal="true"
+           aria-labelledby="council-modal-name"
+           aria-describedby="council-modal-desc">
+        <div class="council-modal-header">
+          <div class="council-modal-identity">
+            <div class="council-modal-icon" id="council-modal-icon"></div>
+            <div>
+              <div class="council-modal-role" id="council-modal-role"></div>
+              <h3 class="council-modal-name" id="council-modal-name"></h3>
+            </div>
+          </div>
+          <button type="button" class="council-modal-close" id="council-modal-close-btn" aria-label="Close specialist details">&times;</button>
+        </div>
+        <div class="council-modal-status-wrapper">
+          <span class="agent-status-badge" id="council-modal-status"></span>
+        </div>
+        <p class="council-modal-desc" id="council-modal-desc"></p>
+        <div class="council-modal-telemetry" id="council-modal-telemetry">
+          <div class="telemetry-header">
+            <span class="telemetry-title">Empirical Telemetry &amp; Provenance</span>
+            <span class="telemetry-badge" id="council-modal-telemetry-badge">AUDITED RECORD</span>
+          </div>
+          <div class="telemetry-grid" id="council-modal-stats"></div>
+        </div>
+        <div class="council-modal-footer">
+          <div class="council-modal-note">Independent truth layer &bull; Metrics computed from stored records. No simulated edge.</div>
+          <div class="council-modal-actions">
+            <a id="council-modal-link" href="#" class="primary-btn" style="display: none; padding: 8px 16px; font-size: 0.82rem;"></a>
+            <button type="button" class="ghost-btn" id="council-modal-dismiss-btn" style="padding: 8px 16px; font-size: 0.82rem;">Close Details</button>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -1439,10 +1709,139 @@ document.addEventListener('DOMContentLoaded', async function() {
   } catch (e) {
     console.error('Failed to load homepage calibration telemetry', e);
   }
+
+  // Council Specialist Modal Controller
+  (function initCouncilModal() {
+    const councilAgents = ${JSON.stringify(councilAgents)};
+    const backdrop = document.getElementById('council-modal-backdrop');
+    const closeBtn = document.getElementById('council-modal-close-btn');
+    const dismissBtn = document.getElementById('council-modal-dismiss-btn');
+    const modalIcon = document.getElementById('council-modal-icon');
+    const modalRole = document.getElementById('council-modal-role');
+    const modalName = document.getElementById('council-modal-name');
+    const modalStatus = document.getElementById('council-modal-status');
+    const modalDesc = document.getElementById('council-modal-desc');
+    const modalStats = document.getElementById('council-modal-stats');
+    const modalLink = document.getElementById('council-modal-link');
+    let activeCard = null;
+
+    function openModal(agentId) {
+      const agent = councilAgents.find(a => a.id === agentId);
+      if (!agent || !backdrop) return;
+
+      if (modalIcon) modalIcon.innerHTML = agent.iconSvg;
+      if (modalRole) modalRole.textContent = agent.role;
+      if (modalName) modalName.textContent = agent.name;
+      if (modalDesc) modalDesc.textContent = agent.expandedDesc;
+
+      if (modalStatus) {
+        modalStatus.textContent = agent.status;
+        modalStatus.className = 'agent-status-badge status-' + (agent.statusType || 'monitoring');
+      }
+
+      if (modalStats) {
+        modalStats.innerHTML = '';
+        agent.stats.forEach(stat => {
+          const row = document.createElement('div');
+          row.className = 'telemetry-row';
+          const label = document.createElement('span');
+          label.className = 'telemetry-label';
+          label.textContent = stat.label;
+          const val = document.createElement('span');
+          val.className = 'telemetry-value';
+          val.textContent = stat.value;
+          row.appendChild(label);
+          row.appendChild(val);
+          modalStats.appendChild(row);
+        });
+      }
+
+      if (modalLink) {
+        if (agent.learnMoreUrl) {
+          modalLink.href = agent.learnMoreUrl;
+          modalLink.textContent = agent.learnMoreText || 'View Related Telemetry →';
+          modalLink.style.display = 'inline-flex';
+        } else {
+          modalLink.style.display = 'none';
+        }
+      }
+
+      backdrop.classList.add('open');
+      backdrop.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+
+      activeCard = document.getElementById('agent-card-' + agentId);
+      if (activeCard) {
+        activeCard.setAttribute('aria-expanded', 'true');
+      }
+
+      setTimeout(() => {
+        if (closeBtn) closeBtn.focus();
+      }, 50);
+    }
+
+    function closeModal() {
+      if (!backdrop) return;
+      backdrop.classList.remove('open');
+      backdrop.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+
+      if (activeCard) {
+        activeCard.setAttribute('aria-expanded', 'false');
+        activeCard.focus();
+        activeCard = null;
+      }
+    }
+
+    document.querySelectorAll('.agent-card[data-agent-id]').forEach(card => {
+      const agentId = card.getAttribute('data-agent-id');
+      card.addEventListener('click', () => openModal(agentId));
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openModal(agentId);
+        }
+      });
+    });
+
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (dismissBtn) dismissBtn.addEventListener('click', closeModal);
+    if (backdrop) {
+      backdrop.addEventListener('click', (e) => {
+        if (e.target === backdrop) closeModal();
+      });
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && backdrop && backdrop.classList.contains('open')) {
+        closeModal();
+      }
+    });
+
+    if (backdrop) {
+      backdrop.addEventListener('keydown', (e) => {
+        if (e.key !== 'Tab' || !backdrop.classList.contains('open')) return;
+        const focusable = backdrop.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex="-1"])');
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      });
+    }
+  })();
 });
 </script>
 </body>
 </html>`;
+}
+
+const landingPage = renderLandingPage();
 
 const accessTerminalPage = `<!doctype html>
 <html lang="en">
@@ -1931,7 +2330,7 @@ document.getElementById('init-session').addEventListener('click', async function
 </html>`;
 
 app.get("/", (_req, res) => {
-  res.type("html").send(landingPage);
+  res.type("html").send(renderLandingPage());
 });
 
 app.get("/signup", (_req, res) => {
