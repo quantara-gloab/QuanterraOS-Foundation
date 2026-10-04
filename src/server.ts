@@ -1296,7 +1296,11 @@ ${clerkScripts}
   .agent-card .card-footer-action {
     margin-top: 16px;
     padding-top: 12px;
-    border-top: 1px solid rgba(243,241,234,0.05);
+    border-top: 1px solid rgba(243,241,234,0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
   }
   .view-telemetry-pill {
     display: inline-flex;
@@ -1309,10 +1313,105 @@ ${clerkScripts}
     color: var(--accent);
     opacity: 0.85;
     transition: opacity 0.15s;
+    cursor: pointer;
   }
   .agent-card:hover .view-telemetry-pill {
     opacity: 1;
     text-decoration: underline;
+  }
+  .chat-agent-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.7rem;
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: rgba(201,162,39,0.12);
+    color: var(--accent);
+    border: 1px solid rgba(201,162,39,0.3);
+    padding: 3px 8px;
+    border-radius: 6px;
+    transition: all 0.15s;
+    cursor: pointer;
+  }
+  .chat-agent-pill:hover {
+    background: var(--accent);
+    color: var(--ink);
+    box-shadow: 0 0 10px rgba(201,162,39,0.3);
+  }
+
+  /* Live Council HUD Banner on Homepage */
+  .council-live-hud-banner {
+    background: rgba(13,20,31,0.92);
+    border: 1px solid rgba(201,162,39,0.25);
+    border-radius: 10px;
+    padding: 14px 20px;
+    margin-bottom: 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+  .hud-banner-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .hud-pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #42D392;
+    box-shadow: 0 0 8px #42D392;
+    animation: pulse 2s infinite ease-in-out;
+  }
+  .hud-banner-title {
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    color: var(--text);
+    font-weight: 600;
+  }
+  .hud-banner-verdict {
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    font-size: 0.7rem;
+    background: rgba(201,162,39,0.15);
+    color: #ffd768;
+    border: 1px solid rgba(201,162,39,0.3);
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.06em;
+  }
+  .hud-banner-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    font-size: 0.72rem;
+  }
+  .hud-tag {
+    color: var(--muted);
+  }
+  .hud-tag strong {
+    color: var(--text);
+  }
+  .hud-banner-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.15s;
+  }
+  .hud-banner-link:hover {
+    text-decoration: underline;
+    transform: translateX(2px);
   }
 
   /* Council Specialist Detail Modal */
@@ -1884,7 +1983,7 @@ ${clerkScripts}
     </div>
     <div class="links">
       <a href="/calibration">Calibration Proof</a>
-      <a href="/dashboard">Council Terminal</a>
+      <a href="/council" style="color: var(--text); display: inline-flex; align-items: center; gap: 7px; font-weight: 500;"><span class="hud-pulse-dot" style="display:inline-block; width:7px; height:7px;"></span>Council Terminal</a>
       <a href="/#council">The Council</a>
       <a href="/#how">How it Works</a>
     </div>
@@ -1899,10 +1998,9 @@ ${clerkScripts}
     <h1 class="serif-headline">We don't predict the market.<br>We prove it's trustworthy.</h1>
     <p class="subhead">Kalshi's 15-minute BTC markets settle against the CME BRTI. We independently verify, minute by minute, whether that price is actually well-calibrated — and publish every result, including when our own models fail to beat it.</p>
     <div class="cta-group">
-      <a href="/calibration"><button class="primary-btn">See the Calibration Proof →</button></a>
-      <button class="secondary-btn" onclick="window.location.href='${clerkConfigured ? '/signup' : '/account'}'">Request Access</button>
-      <a href="/dashboard"><button class="secondary-btn" style="border-color: var(--accent); color: var(--accent);">Live Console Dashboard →</button></a>
-      <button class="ghost-btn" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">How it works</button>
+      <a href="/council"><button class="primary-btn" style="box-shadow: 0 0 24px rgba(201,162,39,0.35);">⚡ Launch Council Terminal →</button></a>
+      <a href="/calibration"><button class="secondary-btn">See Calibration Proof</button></a>
+      <button class="ghost-btn" onclick="document.getElementById('council').scrollIntoView({behavior:'smooth'})">Interrogate Officers ↓</button>
     </div>
     <div class="seal-container">
       <div class="seal">
@@ -1968,6 +2066,22 @@ ${miniCircles}
       <h2>Eight specialists. One objective: Pricing Truth.</h2>
       <p class="section-subhead">Each agent verifies, monitors, or stress-tests a different layer of the market — built for transparency first, execution only once a signal is proven.</p>
     </div>
+
+    <!-- Live Council Coordination HUD Strip -->
+    <div class="council-live-hud-banner" id="council-live-hud-banner">
+      <div class="hud-banner-left">
+        <span class="hud-pulse-dot"></span>
+        <span class="hud-banner-title">COUNCIL INTELLIGENCE PIPELINE ACTIVE</span>
+        <span class="hud-banner-verdict" id="home-lion-verdict">LION VERDICT: CALIBRATED · STANDBY</span>
+      </div>
+      <div class="hud-banner-right">
+        <span class="hud-tag">CYCLE: <strong id="home-cycle-num">#--</strong></span>
+        <span class="hud-tag">CAPITAL: <strong style="color: #42D392;">$0.00</strong></span>
+        <span class="hud-tag">EXECUTION: <strong style="color: var(--accent);">RULE B5 LOCKED</strong></span>
+        <a href="/council" class="hud-banner-link">Open Live Terminal HUD &rarr;</a>
+      </div>
+    </div>
+
     <div class="council-grid">
       ${councilAgents.map((agent) => `
       <div class="agent-card"
@@ -1985,7 +2099,8 @@ ${miniCircles}
           <div class="desc">${agent.shortDesc}</div>
         </div>
         <div class="card-footer-action">
-          <span class="view-telemetry-pill">Audit Telemetry &rarr;</span>
+          <span class="view-telemetry-pill" onclick="event.stopPropagation(); window.openCouncilModal('${agent.id}', 'telemetry')">Audit Telemetry &rarr;</span>
+          <span class="chat-agent-pill" onclick="event.stopPropagation(); window.openCouncilModal('${agent.id}', 'chat')">💬 Interrogate AI</span>
         </div>
       </div>`).join("")}
     </div>
@@ -2350,11 +2465,11 @@ document.addEventListener('DOMContentLoaded', async function() {
         .replace(/'/g, '&#039;');
     }
 
-    function openModal(agentId) {
+    function openModal(agentId, defaultTab = 'telemetry') {
       const agent = councilAgents.find(a => a.id === agentId);
       if (!agent || !backdrop) return;
 
-      switchTab('telemetry');
+      switchTab(defaultTab);
       initChatForAgent(agentId);
 
       if (modalIcon) modalIcon.innerHTML = agent.iconSvg;
@@ -2404,9 +2519,15 @@ document.addEventListener('DOMContentLoaded', async function() {
       }
 
       setTimeout(() => {
-        if (closeBtn) closeBtn.focus();
-      }, 50);
+        if (defaultTab === 'chat' && chatInput) {
+          chatInput.focus();
+        } else if (closeBtn) {
+          closeBtn.focus();
+        }
+      }, 60);
     }
+
+    window.openCouncilModal = openModal;
 
     function closeModal() {
       if (!backdrop) return;
@@ -2423,11 +2544,16 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     document.querySelectorAll('.agent-card[data-agent-id]').forEach(card => {
       const agentId = card.getAttribute('data-agent-id');
-      card.addEventListener('click', () => openModal(agentId));
+      card.addEventListener('click', (e) => {
+        if (e.target && (e.target.classList.contains('chat-agent-pill') || e.target.closest('.chat-agent-pill'))) {
+          return; // Handled by inline onclick
+        }
+        openModal(agentId, 'telemetry');
+      });
       card.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          openModal(agentId);
+          openModal(agentId, 'telemetry');
         }
       });
     });
@@ -2463,6 +2589,28 @@ document.addEventListener('DOMContentLoaded', async function() {
       });
     }
   })();
+
+  // Live Council Pipeline HUD polling
+  async function refreshPipelineHud() {
+    try {
+      const res = await fetch('/api/council/pipeline/latest');
+      if (!res.ok) return;
+      const run = await res.json();
+      const verdictEl = document.getElementById('home-lion-verdict');
+      const cycleEl = document.getElementById('home-cycle-num');
+      if (verdictEl && run.lionVerdict) {
+        const shortVerdict = run.lionVerdict.replace(/^Verdict:\s*/i, '');
+        verdictEl.textContent = 'LION: ' + shortVerdict.slice(0, 52);
+      }
+      if (cycleEl && run.cycleNumber) {
+        cycleEl.textContent = '#' + run.cycleNumber;
+      }
+    } catch (_e) {
+      // quiet fallback
+    }
+  }
+  refreshPipelineHud();
+  setInterval(refreshPipelineHud, 15000);
 });
 </script>
 </body>
