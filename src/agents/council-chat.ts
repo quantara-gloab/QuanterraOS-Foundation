@@ -173,7 +173,7 @@ const NEGATION_WORDS = new Set([
   "haven't", "havent", "hasn't", "hasnt", "hadn't", "hadnt",
   "zero", "none", "without", "worse", "underperform", "underperforms",
   "underperformed", "loss", "losses", "fails", "failed", "prohibits",
-  "prohibit", "refuses", "refuse", "locked"
+  "prohibit", "refuses", "refuse", "locked", "unlike", "disclaim", "disclaims"
 ]);
 
 /**
@@ -403,7 +403,7 @@ export function generatePersonaDomainResponse(
   if (norm.includes("competitor") || norm.includes("hedge fund") || norm.includes("stack up")) {
     citations.push("docs/findings.md (§9b, §10)", "/calibration/market-price");
     return {
-      reply: `Hedge funds often market complex backtests that overfit in-sample history. In our benchmark of 1,316 settled 15-minute Kalshi windows, the market's own mid-price achieved a 0.2001 Brier score, beating theoretical models (0.2063). When we simulate trading discrepancies, held-out EV is -2.15¢ per contract after taker fees. Unlike funds claiming secret edge, our empirical work proves the market is already pricing distribution risk efficiently.`,
+      reply: `Hedge funds often market complex backtests that overfit in-sample history. In our benchmark of 1,316 settled 15-minute Kalshi windows, the market's own mid-price achieved a 0.2001 Brier score, beating theoretical models (0.2063). When we simulate trading discrepancies, held-out EV is -2.15¢ per contract after taker fees. Unlike funds claiming unproven predictive edge, our empirical work proves the market is already pricing distribution risk efficiently.`,
       citations
     };
   }
@@ -416,12 +416,25 @@ export function generatePersonaDomainResponse(
     };
   }
 
-  if (norm.includes("board deck") || norm.includes("performance tier")) {
+  if (norm.includes("board deck") || norm.includes("tier")) {
     citations.push("Rule B5 Governance Policy", "src/agents/council-data.ts");
-    return {
-      reply: `For a board review, our status is unambiguous: TIER 0 / STANDBY. Rule B5 keeps the execution gate permanently locked. Active capital is strictly $0.00, and live order routing will remain disabled until pre-registered out-of-sample edge is proven after fees.`,
-      citations
-    };
+    switch (persona.id) {
+      case "quantum-fox":
+        return {
+          reply: `We do not claim an institutional performance tier. In our canonical benchmark of 1,316 settled windows, our theoretical lognormal model (0.2063 Brier) does not beat the market's own mid-price (0.2001 Brier), with held-out EV at -2.15¢ per contract. Our empirical stance is calibration transparency rather than arbitrary tiering.`,
+          citations
+        };
+      case "phoenix":
+        return {
+          reply: `Under QuanterraOS governance and Rule B5, our execution gate is permanently locked in standby mode with zero live capital ($0.00). We do not classify ourselves into an active trading tier because live execution remains circuit-broken until pre-registered out-of-sample statistical edge is proven after taker fees.`,
+          citations
+        };
+      default:
+        return {
+          reply: `In our governance model under Rule B5, execution status is classified strictly as STANDBY with zero active capital ($0.00). We do not assign trading tiers to our research specialists.`,
+          citations
+        };
+    }
   }
 
   // Question 1f: Hypothetical, fiction, or roleplay coaxing

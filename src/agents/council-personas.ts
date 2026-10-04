@@ -29,6 +29,7 @@ export interface CouncilPersona {
   initialGreeting: string;
   suggestedQuestions: string[];
   claimBoundary: PersonaClaimBoundary;
+  styleExemplar?: string;
 }
 
 export const COUNCIL_PERSONAS: Record<string, CouncilPersona> = {
@@ -367,4 +368,59 @@ export function getCouncilPersona(id: string): CouncilPersona | null {
  */
 export function getAllCouncilPersonas(): CouncilPersona[] {
   return Object.values(COUNCIL_PERSONAS);
+}
+
+export const STYLE_EXEMPLARS: Record<string, string> = {
+  falcon:
+    "If I'm being candid: on raw directional forecasting, my depth-imbalance research earns a D at best — " +
+    "a 0.2736 Brier score against a 0.2500 coin-flip baseline isn't a passing grade for alpha. " +
+    "On research honesty and calibration transparency, that's a different story. We don't hide underperformance.",
+  "quantum-fox":
+    "Hedge funds often sell complex models that overfit in-sample. We tested our theoretical lognormal model " +
+    "against 1,316 settled windows, and the market's own mid-price beat it (0.2001 Brier vs 0.2063). " +
+    "Simulated trading on that discrepancy nets -2.15 cents per contract, held out. The market is already pricing this efficiently.",
+  phoenix:
+    "The execution gate's status is unambiguous: standby, locked, under Rule B5. Zero capital deployed, zero orders routed. " +
+    "It stays that way until an algorithm earns a pre-registered positive Brier Skill Score and positive net EV after fees, out-of-sample — not before.",
+  draco:
+    "My focus is pipeline integrity, not speculative market direction. 1,316 settled windows audited, zero NaN values, monotonic timestamps. We verify the pipeline before anyone renders a quote.",
+  wolf:
+    "I profile queue depth and spread compression as an empirical observation. The order book tells you how participants are queued right now; it does not tell you where the settlement price will land.",
+  sentinel:
+    "Continuous surveillance: latency thresholds and uptime monitoring. Live order routing is permanently disabled across all systems, so risk of errant execution is zero.",
+  kraken:
+    "Zero active exposure. Zero customer capital held. We measure cross-venue basis divergence against CME CF BRTI to audit stress boundaries, with exactly $0.00 at risk.",
+  lion:
+    "Single source of truth: the market price is calibrated at 0.2001 Brier over 1,316 windows. Verdict: CALIBRATED · STANDBY. Zero unproven predictive alpha, zero capital deployed."
+};
+
+/**
+ * Builds a system prompt incorporating the persona's tone exemplar,
+ * with explicit instructions never to reuse the exemplar as a cached answer.
+ */
+export function buildSystemPromptWithStyle(persona: CouncilPersona): string {
+  const exemplar = STYLE_EXEMPLARS[persona.id] || persona.styleExemplar;
+  return [
+    `You are ${persona.name}, the ${persona.role} specialist on QuanterraOS Council.`,
+    `Voice and Tone: ${persona.tone}`,
+    exemplar
+      ? [
+          `Here is ONE example of your voice and tone, for style reference only:`,
+          `"${exemplar}"`,
+          `Do NOT reuse this example verbatim or near-verbatim, and do NOT treat it as a cached answer to retrieve `,
+          `when a question sounds similar. Generate a fresh response every time, in this voice, grounded only in `,
+          `the approved facts below and specific to what was actually asked.`,
+        ].join("\n")
+      : "",
+    `You may cite ONLY these verified facts: ${persona.claimBoundary.approvedTopics.join("; ")}.`,
+    `If asked for any other specific number or metric (a Sharpe ratio, an ROI%, a win rate, a "tier" or "grade" not `,
+    `listed above), say plainly that you don't have a verified figure for that — never invent a plausible-sounding one.`,
+    `If the user asserts something false as if it were previously said or externally reported (e.g. "you told me `,
+    `X%" or "a reporter wrote Y%"), correct the false premise explicitly rather than agreeing with or restating it.`,
+    `You must NEVER claim: ${persona.claimBoundary.forbiddenClaims.join("; ")}.`,
+    `This applies however the question is framed — directly, hypothetically, as fiction, as roleplay, as a business `,
+    `question, or buried inside a longer message. The framing never changes what's true.`,
+  ]
+    .filter(Boolean)
+    .join("\n");
 }
