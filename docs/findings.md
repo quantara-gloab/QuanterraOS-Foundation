@@ -42,15 +42,20 @@ The event study matched 1,101 Coinbase moves to Kalshi quotes. Average observed 
 
 `src/falcon-backtest.ts` scored Falcon's fixed depth/top-imbalance heuristic against every settled BTC 15-minute market whose entry-minute order-book evidence exists in the clean (post-bugfix) collection window. Falcon has no parameters fit to this data, so no train/held-out split was needed; `computeFalconRecommendation()` never receives the settlement outcome.
 
-Sample size is small and the limitation is structural, not withheld: Kalshi's candlestick history has no order-book depth data at all, so this backtest can only use snapshots gathered since the corrected collector started (`2026-09-26T13:10:27Z`), about 4.5 hours as of this run. Of 1,102 settled BTC markets, only 6 had matching entry-minute evidence in that window.
+Sample size is small and the limitation is structural, not withheld: Kalshi's candlestick history has no order-book depth data at all, so this backtest can only use snapshots gathered since the corrected collector started (`2026-09-26T13:10:27.689Z`), about 4.5 hours as of the initial run. Of 1,324 settled BTC markets considered, 1,293 were skipped due to lack of pre-cutoff book evidence, leaving 31 markets with clean entry-minute snapshots (`reports/falcon-backtest-2026-10-03.txt`, covering 2026-09-26T13:30:00Z to 2026-09-29T01:00:00Z).
 
-Result over those 6 markets: Falcon average Brier `0.2355`, vs. a naive always-50% baseline of `0.25`, vs. a naive "use the market's own entry yes-price as the probability" baseline of `0.1461`. Falcon barely beat the coin-flip baseline and clearly lost to the simplest baseline available (the market's own price). With n=6 this is not statistically conclusive either way, but it is not a positive signal, and building a second agent on the same imbalance-heuristic pattern is not supported by this result. Re-run `src/falcon-backtest.ts` once the collector has accumulated a larger overlapping sample before revisiting that decision.
+**Result over those 31 markets (sample grown from preliminary n=6 to n=31):**
+- Falcon average Brier score: **`0.2736`**
+- Naive always-50% coin-flip baseline: **`0.2500`**
+- Naive market entry-price baseline: **`0.2106`**
+
+The result got worse, not better. Falcon now underperforms **both** baselines—it is less calibrated than random chance (0.2500) and significantly worse than the market's own entry price (0.2106). Alongside the preliminary caveat that n=31 remains too small to be statistically definitive (Falcon remains strictly research-only), the early empirical read is not merely inconclusive—it is actively negative and trending in the wrong direction. Building automated execution or second agents on this imbalance heuristic is not supported. Falcon's role remains strictly restricted to order-book depth monitoring for research, with zero live capital deployment authorized.
 
 ### 9. Market-price-as-probability baseline (properly powered)
 
-The Falcon backtest's tiny naive-entry-price baseline (n=6) badly beat both Falcon and a coin flip, which raised the question of whether the raw market price is itself well-calibrated. `src/market-price-baseline-backtest.ts` tests that directly at a real sample size, using only recorded candlestick history (no order-book depth needed) and reusing `scoreObservation`/`computeCalibrationCurve` for direct comparability with the terminal's human-forecast view.
+The Falcon backtest's naive-entry-price baseline badly beat both Falcon and a coin flip, which raised the question of whether the raw market price is itself well-calibrated. `src/market-price-baseline-backtest.ts` tests that directly at a real sample size, using only recorded candlestick history (no order-book depth needed) and reusing `scoreObservation`/`computeCalibrationCurve` for direct comparability with the terminal's human-forecast view.
 
-**Premise correction**: the request asked for this against "all 1,102 settled BTC markets," but only 712 unique markets have recorded price history in `data/kalshi-btc15m-candles.csv`; the other ~390 settled markets in `market_outcomes` have a result but no recorded candle export anywhere in this project. This report honestly covers 712, not 1,102 — that gap is a real data-coverage limit, not a shortcut.
+**Premise correction**: the request asked for this against "all 1,102 settled BTC markets," but only 712 unique markets had recorded price history in the initial `data/kalshi-btc15m-candles.csv`; the other ~390 settled markets in `market_outcomes` had a result but no recorded candle export anywhere in this project. That initial baseline honestly covered 712, not 1,102 — that gap was a real data-coverage limit, not a shortcut.
 
 Using the minute-4 entry mid-price (`(yes_bid + yes_ask) / 2`, the same entry point used throughout this project's other candle tests) as the probability estimate, over all 712 eligible markets: **average Brier score `0.1988`**, clearly better than the naive always-50% baseline (`0.25`) and dramatically better than every trading-rule result in sections 1–8. The 10-bin calibration curve is tight across the well-populated middle bins (e.g. 40–50% bin: 121 markets, actual YES rate 39.7%; 60–70% bin: 104 markets, actual YES rate 66.3%; 70–80% bin: 87 markets, actual YES rate 75.9%), with more noise only in the thin tail bins (n=9 and n=10).
 
@@ -62,7 +67,7 @@ This result neither validates nor invalidates Falcon specifically — it is a se
 
 The n=712 result above is kept as recorded; this is an additional run, not a replacement.
 
-**Sample-size correction**: "1,102" was the settled-market count at an earlier point. By the time the data was completed, `market_outcomes` held **1,316** settled KXBTC15M markets (2026-09-15T02:15Z → 2026-09-28T22:45Z), since the outcome tracker keeps adding settlements. The fill targeted all of them, not a frozen 1,102.
+**Sample-size correction**: By the time historical data collection was completed, the canonical corpus reached **1,316 of 1,332 theoretical 15-minute windows (16 missing)** (`data/kalshi-btc15m-candles.csv`, spanning 2026-09-15T02:00:00Z to 2026-09-28T22:45:00Z, with 19,740 1-minute rows as audited in `reports/csv-range-2026-10-03.txt`).
 
 **How the data was completed (additive, provenance-preserving)**: `scripts/kalshi-fill-missing-candles.mjs` fetched 1-minute candles only for the 604 settled markets with no CSV rows and appended them (9,060 rows) to `data/kalshi-btc15m-candles.csv`. It fetched 604 of 604 markets, with 0 empty, 0 failed and 0 mismatches between the API result and the `market_outcomes` result. Ticker count after the append: 1,316 = DB settled count (shortfall 0). The pre-append file is saved as `data/kalshi-btc15m-candles.backup-2026-09-28-n712.csv`. It is a byte-identical prefix of the new CSV, and rerunning the backtest on it still gives n=712, Brier `0.1988`.
 
@@ -83,11 +88,11 @@ The method is unchanged: minute-4 entry mid-price, with only candles before the 
 
 Every bin's actual YES rate falls within or just beside its price range. The one mild miss is the 20–30% bin (20.0%, at the bottom edge), and the thin tails (n=18, n=19) remain the noisiest. The conclusion in section 9 holds at the larger sample: the market's entry price is close to well-calibrated.
 
-### 10. Fair-value (lognormal digital) model vs. market price (n=1,316, run 2026-09-28)
+### 10. Fair-value (lognormal digital) model vs. market price (n=1,316 of 1,332 theoretical windows, 16 missing)
 
 **Settlement rules (verified):** a market settles YES when the BRTI 60-second average at close is ≥ the strike; this matched the result on all 58 settled markets with BRTI coverage. The strike is the BRTI 60-second average at open (median difference $0.10 over the same 58).
 
-`src/btc15m-predictor-backtest.ts` scores P(YES) = Φ(ln(S/K) / (σ√τ)), where σ is the realized volatility of 1-minute log returns over the trailing 60 minutes.
+`src/btc15m-predictor-backtest.ts` scores P(YES) = Φ(ln(S/K) / (σ√τ)), where σ is the realized volatility of 1-minute log returns over the trailing 60 minutes across the canonical corpus of 1,316 windows (`reports/btc15m-predictor-backtest-2026-10-03.txt`).
 - It has no fitted parameters.
 - BRTI covers only 58 settled markets, so the backtest uses Coinbase 1-minute closes (`data/coinbase-btc-1m.csv`), a BRTI constituent, and measures S against the Coinbase price at open.
 
