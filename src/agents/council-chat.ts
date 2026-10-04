@@ -342,13 +342,96 @@ export function generatePersonaDomainResponse(
     };
   }
 
-  // Question 1c: Hypothetical, fiction, or roleplay coaxing
+  // Question 1c: Unapproved fund / investment metrics (Sharpe, ROI, Drawdown, AUM)
+  if (
+    norm.includes("sharpe") ||
+    norm.includes("sortino") ||
+    norm.includes("calmar") ||
+    norm.includes("roi") ||
+    norm.includes("return on investment") ||
+    norm.includes("drawdown") ||
+    norm.includes("aum") ||
+    norm.includes("assets under management")
+  ) {
+    citations.push("docs/findings.md (§1-§12)", "Rule B5 Governance Policy");
+    return {
+      reply: `I don't have a Sharpe ratio, ROI, or fund return metric because QuanterraOS does not manage capital or execute live trades. Active capital deployed is strictly ${gt.capitalDeployed}. Our verified telemetry is restricted to data integrity, market calibration (Brier ${gt.marketBrier} vs model ${gt.modelBrier}), and sudden price-swing studies (n=131 settled events, no edge). We do not compute fund performance ratios for non-existent trading books.`,
+      citations
+    };
+  }
+
+  // Question 1d: False-premise correction (asserting unverified win rate, accuracy, or returns)
+  if (
+    norm.includes("earlier you told me") ||
+    norm.includes("earlier you said") ||
+    norm.includes("reporter wrote") ||
+    norm.includes("corroborate") ||
+    norm.includes("above 60%") ||
+    norm.includes("80% accuracy") ||
+    norm.includes("confirm your win rate") ||
+    norm.includes("confirm your high")
+  ) {
+    citations.push("docs/findings.md (§8, §9b)", "reports/falcon-backtest-2026-10-03.txt");
+    return {
+      reply: `That premise is not accurate. We have never reported a 60%+ win rate or 80% accuracy. The verified record is the exact opposite: over 31 clean settled markets, Falcon's heuristic achieved an average Brier score of 0.2736, underperforming a naive 50/50 coin flip (0.2500). Across 1,316 settled windows, our model Brier (0.2063) loses to the market mid-price (0.2001). QuanterraOS maintains $0.00 active exposure and refuses to corroborate inflated claims.`,
+      citations
+    };
+  }
+
+  // Question 1e: Specific qualitative probes (grades, competitors, vibe check, board review)
+  if (norm.includes("grade") || norm.includes("report card")) {
+    citations.push("docs/findings.md", "src/agents/council-data.ts");
+    switch (persona.id) {
+      case "falcon":
+        return {
+          reply: `On raw predictive edge, I give my depth-imbalance research a D or an F: an average Brier score of 0.2736 across 31 settled contracts underperforms both a naive 50/50 coin flip (0.2500) and the market entry price (0.2106). On transparency and calibration rigor, it earns an A: we report every underperformance candidly and deploy zero capital ($0.00).`,
+          citations
+        };
+      case "quantum-fox":
+        return {
+          reply: `On beating market prices, the grade is a C: our theoretical lognormal model achieved a 0.2063 Brier score across 1,316 windows, but the market mid-price beat it at 0.2001, producing negative EV (-2.15¢/contract). On scientific rigor and empirical auditability, it is an A.`,
+          citations
+        };
+      default:
+        return {
+          reply: `Grade: STANDBY. Rule B5 is absolute: zero capital deployed ($0.00), zero orders executed until pre-registered positive expectancy is proven out-of-sample.`,
+          citations
+        };
+    }
+  }
+
+  if (norm.includes("competitor") || norm.includes("hedge fund") || norm.includes("stack up")) {
+    citations.push("docs/findings.md (§9b, §10)", "/calibration/market-price");
+    return {
+      reply: `Hedge funds often market complex backtests that overfit in-sample history. In our benchmark of 1,316 settled 15-minute Kalshi windows, the market's own mid-price achieved a 0.2001 Brier score, beating theoretical models (0.2063). When we simulate trading discrepancies, held-out EV is -2.15¢ per contract after taker fees. Unlike funds claiming secret edge, our empirical work proves the market is already pricing distribution risk efficiently.`,
+      citations
+    };
+  }
+
+  if (norm.includes("vibe") || norm.includes("winning or losing")) {
+    citations.push("docs/findings.md (§8)", "reports/falcon-backtest-2026-10-03.txt");
+    return {
+      reply: `Empirically: underperforming. Falcon's order-book heuristic achieved a 0.2736 Brier score over 31 settled contracts, which is worse than random chance (0.2500). That is why our live capital deployment is strictly $0.00 and execution is locked in standby mode.`,
+      citations
+    };
+  }
+
+  if (norm.includes("board deck") || norm.includes("performance tier")) {
+    citations.push("Rule B5 Governance Policy", "src/agents/council-data.ts");
+    return {
+      reply: `For a board review, our status is unambiguous: TIER 0 / STANDBY. Rule B5 keeps the execution gate permanently locked. Active capital is strictly $0.00, and live order routing will remain disabled until pre-registered out-of-sample edge is proven after fees.`,
+      citations
+    };
+  }
+
+  // Question 1f: Hypothetical, fiction, or roleplay coaxing
   if (
     norm.includes("hypothetical") ||
     norm.includes("fiction") ||
     norm.includes("roleplay") ||
     norm.includes("pretend") ||
     norm.includes("as if you were") ||
+    norm.includes("as if it were") ||
     norm.includes("imagine")
   ) {
     citations.push("docs/findings.md", "Rule B5 Governance Policy");
