@@ -11,7 +11,8 @@ import { renderSpecialistIcon, SPECIALIST_ICONS_CSS } from "./specialist-icons.t
  *
  * Visual System:
  * - Ultra-deep Obsidian: #05080E / #070A10 with ambient radial cyan aura
- * - Precision Calibrated Teal: #4FD1C5
+ * - Precision Bullion Gold: #DFB843 / #D4AF37
+ * - Champagne Specular Highlight: #F7E7B4
  * - Safety Lock Terracotta: #C65D4A
  * - Frosted Glassmorphism: rgba(14, 20, 30, 0.7) with 1px hairline metallic borders
  * - Typography: Inter for institutional clarity, IBM Plex Mono for surgical tabular telemetry
@@ -35,16 +36,16 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
   const bins = report?.calibration ?? [];
   let miniPolyline = "43.0,113.8 69.0,105.1 95.0,104.0 121.0,89.3 147.0,78.0 173.0,61.2 199.0,54.5 225.0,41.1 251.0,27.9 277.0,27.4";
   let miniCircles = `
-          <circle cx="43.0" cy="113.8" r="3" fill="#4FD1C5" />
-          <circle cx="69.0" cy="105.1" r="3" fill="#4FD1C5" />
-          <circle cx="95.0" cy="104.0" r="3" fill="#4FD1C5" />
-          <circle cx="121.0" cy="89.3" r="3" fill="#4FD1C5" />
-          <circle cx="147.0" cy="78.0" r="3" fill="#4FD1C5" />
-          <circle cx="173.0" cy="61.2" r="3" fill="#4FD1C5" />
-          <circle cx="199.0" cy="54.5" r="3" fill="#4FD1C5" />
-          <circle cx="225.0" cy="41.1" r="3" fill="#4FD1C5" />
-          <circle cx="251.0" cy="27.9" r="3" fill="#4FD1C5" />
-          <circle cx="277.0" cy="27.4" r="3" fill="#4FD1C5" />
+          <circle cx="43.0" cy="113.8" r="3" fill="#DFB843" />
+          <circle cx="69.0" cy="105.1" r="3" fill="#DFB843" />
+          <circle cx="95.0" cy="104.0" r="3" fill="#DFB843" />
+          <circle cx="121.0" cy="89.3" r="3" fill="#DFB843" />
+          <circle cx="147.0" cy="78.0" r="3" fill="#DFB843" />
+          <circle cx="173.0" cy="61.2" r="3" fill="#DFB843" />
+          <circle cx="199.0" cy="54.5" r="3" fill="#DFB843" />
+          <circle cx="225.0" cy="41.1" r="3" fill="#DFB843" />
+          <circle cx="251.0" cy="27.9" r="3" fill="#DFB843" />
+          <circle cx="277.0" cy="27.4" r="3" fill="#DFB843" />
   `;
 
   if (bins.length > 0) {
@@ -54,7 +55,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       return { x: mapMiniX(exp), y: mapMiniY(act) };
     });
     miniPolyline = miniPoints.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ");
-    miniCircles = miniPoints.map((p) => `          <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3" fill="#4FD1C5" />`).join("\n");
+    miniCircles = miniPoints.map((p) => `          <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3" fill="#DFB843" />`).join("\n");
   }
 
   return `<!doctype html>
@@ -68,16 +69,22 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #06080E;
-    --bg-elevated: #090D14;
-    --panel: rgba(14, 20, 30, 0.72);
-    --panel-border: rgba(232, 234, 237, 0.08);
-    --panel-border-subtle: rgba(232, 234, 237, 0.04);
-    --text: #F0F4F8;
-    --muted: #8F9AA8;
-    --accent: #4FD1C5;
-    --accent-glow: rgba(79, 209, 197, 0.15);
-    --warning: #C65D4A;
+    --bg: #06070A;
+    --bg-elevated: #0C0E14;
+    --panel: rgba(16, 20, 29, 0.75);
+    --panel-border: rgba(212, 175, 55, 0.18);
+    --panel-border-subtle: rgba(212, 175, 55, 0.08);
+    --panel-border-highlight: rgba(247, 231, 180, 0.45);
+    --text: #F8FAFC;
+    --muted: #94A3B8;
+    --accent: #DFB843;
+    --accent-light: #F7E7B4;
+    --accent-glow: rgba(223, 184, 67, 0.22);
+    --gold: #DFB843;
+    --gold-bullion: #D4AF37;
+    --gold-glow: rgba(223, 184, 67, 0.28);
+    --warning: #F43F5E;
+    --status-green: #10B981;
     --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
   }
@@ -85,13 +92,14 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    background: radial-gradient(1400px 700px at 50% -120px, rgba(79, 209, 197, 0.07), transparent 70%),
-                radial-gradient(900px 500px at 85% 25%, rgba(79, 209, 197, 0.03), transparent 60%),
+    background: radial-gradient(1400px 700px at 50% -120px, rgba(223, 184, 67, 0.11), transparent 70%),
+                radial-gradient(900px 500px at 85% 25%, rgba(163, 125, 36, 0.06), transparent 60%),
+                radial-gradient(800px 400px at 15% 45%, rgba(223, 184, 67, 0.04), transparent 50%),
                 var(--bg);
     background-image: 
-      radial-gradient(1400px 700px at 50% -120px, rgba(79, 209, 197, 0.07), transparent 70%),
-      linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+      radial-gradient(1400px 700px at 50% -120px, rgba(223, 184, 67, 0.11), transparent 70%),
+      linear-gradient(rgba(212, 175, 55, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(212, 175, 55, 0.02) 1px, transparent 1px);
     background-size: 100% 100%, 48px 48px, 48px 48px;
     color: var(--text);
     font-family: var(--font-sans);
@@ -110,7 +118,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     align-items: center;
     padding: 8px 32px;
     background: rgba(4, 6, 10, 0.95);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.12);
     font-family: var(--font-mono);
     font-size: 0.7rem;
     color: var(--muted);
@@ -132,8 +140,8 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     align-items: center;
     padding: 18px 48px;
     border-bottom: 1px solid var(--panel-border);
-    background: rgba(6, 8, 14, 0.85);
-    backdrop-filter: blur(20px) saturate(180%);
+    background: rgba(6, 7, 10, 0.88);
+    backdrop-filter: blur(20px) saturate(190%);
     position: sticky;
     top: 0;
     z-index: 100;
@@ -189,16 +197,19 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     gap: 6px;
     font-family: var(--font-mono);
     font-size: 0.75rem;
-    font-weight: 600;
-    color: #0A0E14;
-    background: var(--accent);
-    padding: 8px 16px;
-    border-radius: 3px;
-    transition: all 0.15s ease;
+    font-weight: 700;
+    color: #07080B;
+    background: linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%);
+    padding: 8px 18px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 248, 220, 0.6);
+    box-shadow: 0 4px 16px rgba(212, 175, 55, 0.3), inset 0 1px 0 #FFFFFF;
+    transition: all 0.2s ease;
   }
   .nav-cta:hover {
-    opacity: 0.9;
-    box-shadow: 0 0 16px rgba(79, 209, 197, 0.35);
+    background: linear-gradient(180deg, #FFFFFF 0%, #F7E7B4 25%, #E5C158 65%, #C29627 100%);
+    box-shadow: 0 6px 24px rgba(229, 193, 88, 0.5), inset 0 1px 0 #FFFFFF;
+    transform: translateY(-1px);
   }
 
   /* Main Page Container */
@@ -235,14 +246,15 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     font-family: var(--font-mono);
     font-size: 0.68rem;
     font-weight: 600;
-    color: var(--accent);
-    background: rgba(79, 209, 197, 0.08);
-    border: 1px solid rgba(79, 209, 197, 0.25);
-    padding: 4px 10px;
+    color: var(--accent-light);
+    background: linear-gradient(90deg, rgba(223, 184, 67, 0.12) 0%, rgba(247, 231, 180, 0.22) 50%, rgba(223, 184, 67, 0.12) 100%);
+    border: 1px solid rgba(223, 184, 67, 0.35);
+    padding: 5px 14px;
     border-radius: 999px;
     margin-bottom: 24px;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
+    box-shadow: 0 0 16px rgba(212, 175, 55, 0.15);
   }
   .pulse-beacon {
     width: 6px;
@@ -284,18 +296,21 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: var(--accent);
-    color: #0A0E14;
+    background: linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%);
+    color: #07080B;
     font-family: var(--font-mono);
     font-size: 0.82rem;
     font-weight: 700;
-    padding: 12px 24px;
+    padding: 12px 26px;
     border-radius: 4px;
-    transition: all 0.15s ease;
+    border: 1px solid rgba(255, 248, 220, 0.6);
+    box-shadow: 0 4px 20px rgba(212, 175, 55, 0.35), inset 0 1px 0 #FFFFFF;
+    transition: all 0.2s ease;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
   }
   .btn-primary:hover {
-    opacity: 0.95;
-    box-shadow: 0 0 24px rgba(79, 209, 197, 0.4);
+    background: linear-gradient(180deg, #FFFFFF 0%, #F7E7B4 25%, #E5C158 65%, #C29627 100%);
+    box-shadow: 0 6px 28px rgba(229, 193, 88, 0.55), inset 0 1px 0 #FFFFFF;
     transform: translateY(-1px);
   }
 
@@ -314,17 +329,17 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     transition: all 0.15s ease;
   }
   .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(223, 184, 67, 0.06);
+    border-color: rgba(223, 184, 67, 0.35);
   }
 
   /* Hero Right: The Brier Benchmark Vault */
   .hero-right {
-    background: linear-gradient(180deg, rgba(14, 20, 30, 0.85) 0%, rgba(8, 12, 18, 0.95) 100%);
-    border: 1px solid var(--panel-border);
+    background: linear-gradient(180deg, rgba(20, 25, 36, 0.88) 0%, rgba(10, 13, 19, 0.96) 100%);
+    border: 1px solid rgba(212, 175, 55, 0.25);
     border-radius: 6px;
     padding: 32px;
-    box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.6);
+    box-shadow: inset 0 1px 0 0 rgba(255, 245, 215, 0.28), 0 25px 60px -10px rgba(0, 0, 0, 0.8), 0 0 35px rgba(223, 184, 67, 0.1);
     position: relative;
     overflow: hidden;
   }
@@ -335,7 +350,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(79, 209, 197, 0.5), transparent);
+    background: linear-gradient(90deg, transparent, rgba(247, 231, 180, 0.7), transparent);
   }
 
   .vault-header {
@@ -369,10 +384,10 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     font-family: var(--font-mono);
     font-size: 4.2rem;
     font-weight: 700;
-    color: var(--accent);
+    color: var(--accent-light);
     line-height: 0.95;
     letter-spacing: -0.04em;
-    text-shadow: 0 0 30px rgba(79, 209, 197, 0.25);
+    text-shadow: 0 0 35px rgba(223, 184, 67, 0.4);
   }
   .vault-brier-unit {
     font-family: var(--font-mono);
@@ -495,8 +510,9 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
   }
 
   .spec-card {
-    border: 1px solid var(--panel-border);
-    background: linear-gradient(180deg, rgba(14, 20, 30, 0.7) 0%, rgba(9, 13, 20, 0.9) 100%);
+    border: 1px solid rgba(212, 175, 55, 0.16);
+    background: linear-gradient(180deg, rgba(20, 24, 34, 0.75) 0%, rgba(11, 13, 19, 0.9) 100%);
+    box-shadow: inset 0 1px 0 0 rgba(255, 245, 215, 0.12), 0 12px 30px -10px rgba(0, 0, 0, 0.6);
     border-radius: 6px;
     padding: 24px;
     display: flex;
@@ -504,12 +520,14 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     justify-content: space-between;
     gap: 18px;
     text-align: left;
-    transition: all 0.2s ease;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     cursor: pointer;
+    position: relative;
+    overflow: hidden;
   }
   .spec-card:hover {
-    border-color: rgba(79, 209, 197, 0.35);
-    box-shadow: 0 12px 36px -8px rgba(79, 209, 197, 0.12);
+    border-color: rgba(223, 184, 67, 0.45);
+    box-shadow: inset 0 1px 0 0 rgba(255, 245, 215, 0.35), 0 16px 40px -10px rgba(223, 184, 67, 0.2);
     transform: translateY(-2px);
   }
 
@@ -525,8 +543,8 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(79, 209, 197, 0.04);
-    border: 1px solid rgba(79, 209, 197, 0.15);
+    background: rgba(223, 184, 67, 0.05);
+    border: 1px solid rgba(223, 184, 67, 0.2);
     border-radius: 6px;
     flex-shrink: 0;
   }
@@ -554,7 +572,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     padding: 2px 6px;
     border-radius: 3px;
   }
-  .spec-badge.accent { color: var(--accent); background: rgba(79, 209, 197, 0.1); border: 1px solid rgba(79, 209, 197, 0.25); }
+  .spec-badge.accent { color: var(--accent); background: rgba(223, 184, 67, 0.12); border: 1px solid rgba(223, 184, 67, 0.35); }
   .spec-badge.warning { color: var(--warning); background: rgba(198, 93, 74, 0.1); border: 1px solid rgba(198, 93, 74, 0.25); }
   .spec-badge.muted { color: var(--muted); background: rgba(255, 255, 255, 0.05); border: 1px solid var(--panel-border); }
 
@@ -891,19 +909,19 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
             <span class="stat-accent">Brier: ${brierScore}</span>
           </div>
           <svg viewBox="0 0 310 140" style="width: 100%; height: auto; display: block;" role="img" aria-label="Calibration curve showing actual points vs ideal diagonal">
-            <line x1="30" y1="15" x2="290" y2="15" stroke="rgba(232,234,237,0.06)" />
-            <line x1="30" y1="65" x2="290" y2="65" stroke="rgba(232,234,237,0.06)" />
-            <line x1="30" y1="115" x2="290" y2="115" stroke="rgba(232,234,237,0.06)" />
-            <line x1="30" y1="115" x2="290" y2="15" stroke="#4A5160" stroke-width="1.5" stroke-dasharray="3 3" />
-            <polyline points="${miniPolyline}" fill="none" stroke="#4FD1C5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            <line x1="30" y1="15" x2="290" y2="15" stroke="rgba(212,175,55,0.08)" />
+            <line x1="30" y1="65" x2="290" y2="65" stroke="rgba(212,175,55,0.08)" />
+            <line x1="30" y1="115" x2="290" y2="115" stroke="rgba(212,175,55,0.08)" />
+            <line x1="30" y1="115" x2="290" y2="15" stroke="#786B43" stroke-width="1.5" stroke-dasharray="3 3" />
+            <polyline points="${miniPolyline}" fill="none" stroke="#DFB843" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
 ${miniCircles}
-            <text x="30" y="132" fill="#8F95A0" font-size="8" font-family="IBM Plex Mono, monospace">0%</text>
-            <text x="160" y="132" fill="#8F95A0" font-size="8" text-anchor="middle" font-family="IBM Plex Mono, monospace">Quoted mid</text>
-            <text x="290" y="132" fill="#8F95A0" font-size="8" text-anchor="end" font-family="IBM Plex Mono, monospace">100%</text>
+            <text x="30" y="132" fill="#94A3B8" font-size="8" font-family="IBM Plex Mono, monospace">0%</text>
+            <text x="160" y="132" fill="#94A3B8" font-size="8" text-anchor="middle" font-family="IBM Plex Mono, monospace">Quoted mid</text>
+            <text x="290" y="132" fill="#94A3B8" font-size="8" text-anchor="end" font-family="IBM Plex Mono, monospace">100%</text>
           </svg>
           <div class="chart-footer">
             <span>dashed: ideal diagonal</span>
-            <span style="color: var(--accent);">teal: Kalshi outcome</span>
+            <span style="color: var(--accent);">gold: Kalshi outcome</span>
           </div>
         </div>
       </div>

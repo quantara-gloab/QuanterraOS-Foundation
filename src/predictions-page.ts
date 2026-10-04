@@ -60,22 +60,22 @@ export function renderPredictionsPage(options?: { isReplay?: boolean; tier?: str
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #06090E;
-    --card: #0D131C;
-    --card-header: #141B26;
-    --border: #1C2636;
-    --accent: #4FD1C5;
-    --accent-subtle: rgba(79, 209, 197, 0.12);
-    --warning: #C65D4A;
+    --bg: #06070A;
+    --card: #0C0F17;
+    --card-header: #111624;
+    --border: rgba(212, 175, 55, 0.16);
+    --accent: #DFB843;
+    --accent-subtle: rgba(223, 184, 67, 0.14);
+    --warning: #F43F5E;
     --amber: #D97706;
-    --text: #E8EAED;
-    --muted: #8892B0;
+    --text: #F8FAFC;
+    --muted: #94A3B8;
     --mono: "IBM Plex Mono", monospace;
     --sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    background: var(--bg);
+    background: radial-gradient(ellipse 90% 50% at 50% -10%, rgba(223, 184, 67, 0.09), transparent 70%), var(--bg);
     color: var(--text);
     font-family: var(--sans);
     min-height: 100vh;
@@ -392,12 +392,12 @@ export function renderPredictionsPage(options?: { isReplay?: boolean; tier?: str
         </div>
       </div>
     ` : (tier === "free" ? `
-      <div class="tier-indicator-banner" style="margin-bottom: 20px; padding: 12px 18px; background: rgba(79, 209, 197, 0.05); border: 1px solid rgba(79, 209, 197, 0.25); border-radius: 6px; font-family: var(--mono); font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center;">
+      <div class="tier-indicator-banner" style="margin-bottom: 20px; padding: 12px 18px; background: rgba(223, 184, 67, 0.08); border: 1px solid rgba(223, 184, 67, 0.3); border-radius: 6px; font-family: var(--mono); font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center; box-shadow: inset 0 1px 0 rgba(247, 231, 180, 0.15);">
         <span><strong>FREE EXPLORER:</strong> Live feed delayed 20 min · 1,316-market replay is 100% full access</span>
         <a href="/pricing" style="color: var(--accent); font-weight: 600; text-decoration: none;">Upgrade to Pro for Real-Time &amp; CSV Export →</a>
       </div>
     ` : `
-      <div class="tier-indicator-banner pro" style="margin-bottom: 20px; padding: 12px 18px; background: rgba(79, 209, 197, 0.1); border: 1px solid var(--accent); border-radius: 6px; font-family: var(--mono); font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center;">
+      <div class="tier-indicator-banner pro" style="margin-bottom: 20px; padding: 12px 18px; background: rgba(223, 184, 67, 0.14); border: 1px solid var(--accent); border-radius: 6px; font-family: var(--mono); font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center; box-shadow: inset 0 1px 0 rgba(247, 231, 180, 0.25);">
         <span><span style="color:var(--accent); font-weight:700;">● REAL-TIME FEED ACTIVE</span> (${tier.toUpperCase()}) · Sub-second live updates</span>
         <a href="/api/export/predictions.csv" style="color: var(--accent); font-weight: 600; text-decoration: underline;">Download CSV Export ↓</a>
       </div>

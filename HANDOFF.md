@@ -274,4 +274,40 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 - `npm test` — 229/229 passing across 47 suites, 0 failures (duration 57.08s).
 - Canonical backtests: `btc15m-predictor-backtest.ts` (1,316 markets) and `falcon-backtest.ts` (31 markets) verified matching committed figures.
 
+---
+
+### Session: 2026-10-04 — Gold Standard Design System & Institutional Presentation Overhaul
+
+**Design System Transformation:**
+- Executed a comprehensive institutional brand and aesthetic migration from earlier cyan/teal accents to an elite, high-durability **"Gold Standard"** presentation architecture across all client-facing pages and terminal interfaces.
+- **Color Palette & Material Tokens:**
+  - Obsidian/Basalt Substrates: `--bg: #06070A`, `--panel: rgba(14, 18, 27, 0.85)`, `--panel-border: rgba(212, 175, 55, 0.16)`.
+  - Triple-Stop Bullion Gold Accent Hierarchy: Imperial Gold (`#DFB843`, `#D4AF37`), Specular Champagne Highlight (`#F7E7B4`), Deep Burnished Gold (`#A37D24`).
+  - Specular Gloss & Bevel Styling: 24K bullion primary CTA buttons featuring top-edge white-gold specular hairline reflections (`box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6)`), glassmorphism card bevels (`box-shadow: inset 0 1px 0 0 rgba(247, 231, 180, 0.25)`), and ambient gold radial back-glows.
+  - Risk & Circuit Breaker: Precision Carmine Rose (`#F43F5E`).
+  - Typography: Crisp Alabaster & Platinum (`#F8FAFC`, `#E2E8F0`, `#94A3B8`) adhering strictly to WCAG AA/AAA contrast ratios.
+- **Components & Pages Migrated (18 files):**
+  - `src/landing-page.ts`: Ambient gold glow, 24K bullion execution CTAs, gold calibration preview polyline/circles, specialist card halos.
+  - `src/pricing-page.ts`: Featured Pro tier card with gold specular bevel and halo, bullion `.btn-pro` gloss action button, honest callout with champagne hairline, gold comparison table highlights.
+  - `src/dashboard-terminal.ts`: Console tokens updated (`--accent: #DFB843`), command bar prompt, execution bullion button (`.cmd-exec-btn`), active workspace tabs, pipeline stepper nodes, and live task inspector.
+  - `src/status-page.ts`: Tokens, live ticker, brand icon, bullion `.btn-outline`, status banner with specular highlight, gold telemetry values, active status badges.
+  - `src/predictions-page.ts`: Root tokens, radial gold backdrop, free/pro tier indicator banners with gold specular boxes.
+  - `src/autopilot-page.ts`: Root tokens, radial gold backdrop, primary P&L card gold gradient + specular bevel, paper trade badges, free/pro tier banners.
+  - `src/account-page.ts`: Root tokens, auth card shadow/bevel, primary bullion button, tier badges (`badge-pro`, `badge-institutional`).
+  - `src/assistant-widget.ts`: Bubble hover gold glow, avatar icon, avatar pulse dot, voice active mode, quick chip hover, input submit button metallic gloss.
+  - `src/legal-page.ts`, `src/changelog-page.ts`, `src/blog-page.ts`, `src/response-post-page.ts`: Full Gold Standard typography, nav brand, blueprint eyebrow, and bullion outline buttons.
+  - `src/calibration-page.ts`: SVG calibration curve (`#DFB843`, stroke-width 3.5), nav brand, and bullion `.btn-outline`.
+  - `src/index-page.ts`: Nav brand, button outline, featured cards, table row hovers, method link glow, and badge styles for both `renderIndexPageHtml` and `renderSpreadPageHtml`.
+  - `src/research-page.ts`: Nav brand icon, `.btn-outline`, `.blueprint-eyebrow`, `.paper-card:hover`, and `.tag-calibration`.
+  - `src/methodology-page.ts`: Architectural blueprint grid lines with subtle gold tint, specular buttons, and callout boxes.
+  - `src/server.ts`: All embedded server HTML templates updated to Gold Standard tokens and ambient backgrounds, plus AI tags and tier badge styles.
+  - `src/specialist-icons.ts`: Specialist icon SVG definitions consuming `var(--accent)`.
+
+**Verification:**
+- `npx tsc --noEmit` — 0 errors (clean exit 0).
+- `npm test` — 230/230 passing across 47 suites, 0 failures (duration 63.4s).
+- Strict adherence to `HANDOFF.md` Rules B4 (no marketing superlatives, 0 unbacked claims) and B5 (zero live capital, circuit lock intact).
+- Verified 0 remaining references to `#4FD1C5` or `rgba(79, 209, 197)`.
+
+
 

@@ -5,8 +5,8 @@
  * prediction market calibration, multi-venue spot dispersion, and 8-specialist consensus.
  *
  * Adheres strictly to the QuanterraOS "High-Tech, Competitive" Visual Design Plan:
- * - 4-color restrained palette: #0A0E14 (oscilloscope dark), #E8EAED (primary text),
- *   #4FD1C5 (calibrated teal), #C65D4A (underperformance/locked terracotta).
+ * - Gold Standard restrained palette: #06070A (obsidian basalt), #F8FAFC (primary text),
+ *   #DFB843 (imperial bullion gold), #F43F5E (circuit breaker lock).
  * - Typography: Inter / geometric sans for UI and headlines; IBM Plex Mono for tabular data.
  * - Restraint over spectacle: no starfield canvas, no audio synthesizer, no radar sweeper.
  * - Sentence case throughout: no ALL-CAPS tracked labels, no middle-dot joins, no arrow-suffixed buttons.
@@ -28,14 +28,18 @@ export function renderCouncilDashboardPage(clerkScripts: string = "", clerkConfi
 ${clerkScripts}
 <style>
   :root {
-    --bg: #0A0E14;
-    --panel: #0E131A;
-    --panel-border: rgba(232, 234, 237, 0.08);
-    --panel-border-subtle: rgba(232, 234, 237, 0.04);
-    --text: #E8EAED;
+    --bg: #06070A;
+    --panel: #0C0F17;
+    --panel-border: rgba(212, 175, 55, 0.16);
+    --panel-border-subtle: rgba(212, 175, 55, 0.08);
+    --text: #F8FAFC;
     --muted: #8F95A0;
-    --accent: #4FD1C5;
-    --warning: #C65D4A;
+    --accent: #DFB843;
+    --accent-light: #F7E7B4;
+    --accent-glow: rgba(223, 184, 67, 0.22);
+    --gold: #DFB843;
+    --gold-bullion: #D4AF37;
+    --warning: #F43F5E;
     --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
   }
@@ -204,9 +208,9 @@ ${clerkScripts}
 
   .cmd-context-tag {
     font-size: 0.7rem;
-    color: var(--muted);
-    background: rgba(79, 209, 197, 0.08);
-    border: 1px solid rgba(79, 209, 197, 0.2);
+    color: var(--accent-light);
+    background: rgba(223, 184, 67, 0.1);
+    border: 1px solid rgba(223, 184, 67, 0.28);
     padding: 2px 6px;
     border-radius: 2px;
   }
@@ -232,18 +236,19 @@ ${clerkScripts}
   }
 
   .cmd-exec-btn {
-    background: var(--accent);
-    color: #0A0E14;
+    background: linear-gradient(180deg, #FBF3D5 0%, #DFB843 35%, #B88E28 100%);
+    color: #07080B;
     font-family: var(--font-mono);
     font-weight: 700;
     font-size: 0.72rem;
-    border: none;
+    border: 1px solid #DFB843;
     padding: 6px 12px;
     border-radius: 3px;
     cursor: pointer;
-    transition: opacity 0.15s;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 2px 6px rgba(0, 0, 0, 0.35);
+    transition: opacity 0.15s, transform 0.15s;
   }
-  .cmd-exec-btn:hover { opacity: 0.9; }
+  .cmd-exec-btn:hover { opacity: 0.95; transform: translateY(-1px); }
 
   .cmd-quick-btn {
     background: transparent;
@@ -416,7 +421,8 @@ ${clerkScripts}
   }
   .workspace-tab.active {
     color: var(--text);
-    background: rgba(79, 209, 197, 0.1);
+    background: rgba(223, 184, 67, 0.12);
+    border-bottom: 2px solid var(--accent);
     font-weight: 600;
   }
   .workspace-tab.active .tab-index {
@@ -490,7 +496,7 @@ ${clerkScripts}
     transition: all 0.15s;
   }
   .cycle-btn:hover {
-    background: rgba(79, 209, 197, 0.1);
+    background: rgba(223, 184, 67, 0.12);
   }
 
   .action-toggle-btn {
@@ -530,11 +536,11 @@ ${clerkScripts}
     position: relative;
   }
   .pipeline-node:hover {
-    border-color: rgba(232, 234, 237, 0.2);
+    border-color: rgba(212, 175, 55, 0.3);
   }
   .pipeline-node.active-stage {
     border-color: var(--accent);
-    background: rgba(79, 209, 197, 0.05);
+    background: rgba(223, 184, 67, 0.08);
   }
 
   .node-step-tag {
@@ -575,7 +581,7 @@ ${clerkScripts}
     overflow: hidden;
   }
   .live-task-inspector.in-flight {
-    border-color: rgba(79, 209, 197, 0.35);
+    border-color: rgba(223, 184, 67, 0.4);
   }
 
   .inspector-header {
@@ -917,7 +923,7 @@ ${clerkScripts}
     transition: all 0.15s;
   }
   .chat-submit-btn:hover {
-    background: rgba(79, 209, 197, 0.1);
+    background: rgba(223, 184, 67, 0.15);
   }
 
   /* Log Panel */

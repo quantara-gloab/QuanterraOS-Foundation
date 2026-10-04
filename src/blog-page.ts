@@ -17,13 +17,16 @@ export function renderTwoStrategiesLostPageHtml(): string {
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #06080E;
-      --panel: rgba(14, 20, 29, 0.72);
-      --panel-border: rgba(255, 255, 255, 0.08);
-      --text: #F1F3F5;
-      --muted: #8E96A4;
-      --accent: #4FD1C5;
-      --warning: #C65D4A;
+      --bg: #06070A;
+      --panel: rgba(14, 18, 27, 0.85);
+      --panel-border: rgba(212, 175, 55, 0.16);
+      --text: #F8FAFC;
+      --muted: #94A3B8;
+      --accent: #DFB843;
+      --accent-light: #F7E7B4;
+      --accent-glow: rgba(223, 184, 67, 0.22);
+      --gold-bullion: #D4AF37;
+      --warning: #F43F5E;
       --amber: #f59e0b;
       --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --font-mono: "IBM Plex Mono", monospace;
@@ -32,9 +35,9 @@ export function renderTwoStrategiesLostPageHtml(): string {
     body {
       background-color: var(--bg);
       background-image: 
-        radial-gradient(ellipse 90% 50% at 50% -20%, rgba(79, 209, 197, 0.07), transparent 70%),
-        linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+        radial-gradient(ellipse 90% 50% at 50% -20%, rgba(223, 184, 67, 0.1), transparent 70%),
+        linear-gradient(rgba(212, 175, 55, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(212, 175, 55, 0.02) 1px, transparent 1px);
       background-size: 100% 100%, 48px 48px, 48px 48px;
       color: var(--text);
       font-family: var(--font-sans);
@@ -79,9 +82,10 @@ export function renderTwoStrategiesLostPageHtml(): string {
       font-weight: 500;
     }
     .btn-pricing {
-      background: rgba(79, 209, 197, 0.12);
-      border: 1px solid rgba(79, 209, 197, 0.35);
-      color: var(--accent);
+      background: linear-gradient(180deg, rgba(223, 184, 67, 0.15) 0%, rgba(163, 125, 36, 0.05) 100%);
+      border: 1px solid rgba(223, 184, 67, 0.4);
+      color: var(--accent-light);
+      box-shadow: inset 0 1px 0 rgba(247, 231, 180, 0.2);
     }
 
     .article-container {
@@ -162,11 +166,12 @@ export function renderTwoStrategiesLostPageHtml(): string {
     .quote-callout {
       margin: 32px 0;
       padding: 20px 24px;
-      background: rgba(79, 209, 197, 0.04);
+      background: linear-gradient(180deg, rgba(223, 184, 67, 0.06) 0%, rgba(14, 18, 27, 0.8) 100%);
       border-left: 3px solid var(--accent);
       border-radius: 0 8px 8px 0;
       font-style: italic;
       color: #E2E8F0;
+      box-shadow: inset 0 1px 0 rgba(247, 231, 180, 0.15);
     }
 
     .cftc-card {

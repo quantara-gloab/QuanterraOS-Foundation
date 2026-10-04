@@ -21,14 +21,16 @@ export function renderResponsePostPage(): string {
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0A0E14;
-    --card-bg: #0E131A;
-    --border: rgba(232, 234, 237, 0.08);
-    --text: #E8EAED;
-    --text-dim: #8F95A0;
-    --muted: #8F95A0;
-    --accent: #4FD1C5;
-    --cyan: #4FD1C5;
+    --bg: #06070A;
+    --card-bg: #0C0F17;
+    --border: rgba(212, 175, 55, 0.16);
+    --text: #F8FAFC;
+    --text-dim: #94A3B8;
+    --muted: #94A3B8;
+    --accent: #DFB843;
+    --cyan: #DFB843;
+    --accent-light: #F7E7B4;
+    --gold-bullion: #D4AF37;
     --serif: 'Fraunces', Georgia, serif;
     --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     --mono: 'IBM Plex Mono', ui-monospace, monospace;
@@ -36,7 +38,7 @@ export function renderResponsePostPage(): string {
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    background-color: var(--bg);
+    background: radial-gradient(ellipse 90% 50% at 50% -20%, rgba(223, 184, 67, 0.1), transparent 70%), var(--bg);
     color: var(--text);
     font-family: var(--sans);
     line-height: 1.75;

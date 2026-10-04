@@ -402,17 +402,20 @@ const workspacePage = `<!doctype html>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0A0E14;
-    --card: #0E131A;
-    --border: #1E2633;
-    --accent: #4FD1C5;
-    --warning: #C65D4A;
-    --text: #E8EAED;
-    --muted: #8892B0;
+    --bg: #06070A;
+    --card: #0C0F17;
+    --border: rgba(212, 175, 55, 0.16);
+    --accent: #DFB843;
+    --accent-light: #F7E7B4;
+    --accent-glow: rgba(223, 184, 67, 0.22);
+    --gold-bullion: #D4AF37;
+    --warning: #F43F5E;
+    --text: #F8FAFC;
+    --muted: #94A3B8;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    background: var(--bg);
+    background: radial-gradient(ellipse 90% 50% at 50% -10%, rgba(223, 184, 67, 0.09), transparent 70%), var(--bg);
     color: var(--text);
     font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     min-height: 100vh;
@@ -506,9 +509,9 @@ const workspacePage = `<!doctype html>
   button.reject { border-color: var(--warning); color: #F08C7D; }
   .ai-tag {
     display: inline-block;
-    background: rgba(79, 209, 197, 0.12);
-    color: var(--accent);
-    border: 1px solid rgba(79, 209, 197, 0.3);
+    background: rgba(223, 184, 67, 0.14);
+    color: var(--accent-light);
+    border: 1px solid rgba(223, 184, 67, 0.35);
     font-family: "IBM Plex Mono", monospace;
     font-size: 0.68rem;
     letter-spacing: 0.04em;
@@ -1040,17 +1043,20 @@ const clerkAccountPage = `<!doctype html>
 ${clerkScripts}
 <style>
   :root {
-    --bg: #0A0E14;
-    --card: #0E131A;
-    --border: #1E2633;
-    --accent: #4FD1C5;
-    --warning: #C65D4A;
-    --text: #E8EAED;
-    --muted: #8892B0;
+    --bg: #06070A;
+    --card: #0C0F17;
+    --border: rgba(212, 175, 55, 0.16);
+    --accent: #DFB843;
+    --accent-light: #F7E7B4;
+    --accent-glow: rgba(223, 184, 67, 0.22);
+    --gold-bullion: #D4AF37;
+    --warning: #F43F5E;
+    --text: #F8FAFC;
+    --muted: #94A3B8;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    background: var(--bg);
+    background: radial-gradient(ellipse 90% 50% at 50% -10%, rgba(223, 184, 67, 0.09), transparent 70%), var(--bg);
     color: var(--text);
     font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     min-height: 100vh;
@@ -1268,17 +1274,20 @@ const clerkSubscribePage = `<!doctype html>
 ${clerkScripts}
 <style>
   :root {
-    --bg: #0A0E14;
-    --card: #0E131A;
-    --border: #1E2633;
-    --accent: #4FD1C5;
-    --warning: #C65D4A;
-    --text: #E8EAED;
-    --muted: #8892B0;
+    --bg: #06070A;
+    --card: #0C0F17;
+    --border: rgba(212, 175, 55, 0.16);
+    --accent: #DFB843;
+    --accent-light: #F7E7B4;
+    --accent-glow: rgba(223, 184, 67, 0.22);
+    --gold-bullion: #D4AF37;
+    --warning: #F43F5E;
+    --text: #F8FAFC;
+    --muted: #94A3B8;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    background: var(--bg);
+    background: radial-gradient(ellipse 90% 50% at 50% -10%, rgba(223, 184, 67, 0.09), transparent 70%), var(--bg);
     color: var(--text);
     font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     min-height: 100vh;
@@ -1353,7 +1362,8 @@ ${clerkScripts}
   }
   .tier-card.featured {
     border-color: var(--accent);
-    background: linear-gradient(180deg, rgba(79, 209, 197, 0.04) 0%, var(--card) 100%);
+    background: linear-gradient(180deg, rgba(223, 184, 67, 0.08) 0%, var(--card) 100%);
+    box-shadow: inset 0 1px 0 rgba(247, 231, 180, 0.25);
   }
   .tier-badge {
     position: absolute;
@@ -1361,9 +1371,9 @@ ${clerkScripts}
     right: 16px;
     font-family: "IBM Plex Mono", monospace;
     font-size: 0.65rem;
-    color: var(--accent);
-    background: rgba(79, 209, 197, 0.12);
-    border: 1px solid rgba(79, 209, 197, 0.3);
+    color: var(--accent-light);
+    background: rgba(223, 184, 67, 0.14);
+    border: 1px solid rgba(223, 184, 67, 0.35);
     padding: 2px 8px;
     border-radius: 999px;
   }
@@ -2490,17 +2500,20 @@ const btc15mFairValuePage = `<!doctype html>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0A0E14;
-    --card: #0E131A;
-    --border: #1E2633;
-    --accent: #4FD1C5;
-    --warning: #C65D4A;
-    --text: #E8EAED;
-    --muted: #8892B0;
+    --bg: #06070A;
+    --card: #0C0F17;
+    --border: rgba(212, 175, 55, 0.16);
+    --accent: #DFB843;
+    --accent-light: #F7E7B4;
+    --accent-glow: rgba(223, 184, 67, 0.22);
+    --gold-bullion: #D4AF37;
+    --warning: #F43F5E;
+    --text: #F8FAFC;
+    --muted: #94A3B8;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    background: var(--bg);
+    background: radial-gradient(ellipse 90% 50% at 50% -10%, rgba(223, 184, 67, 0.09), transparent 70%), var(--bg);
     color: var(--text);
     font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     min-height: 100vh;

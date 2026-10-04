@@ -3,7 +3,7 @@
  * 
  * Spec: HANDOFF.md Section I
  * Architectural blueprint aesthetic:
- * 4-color palette (#0A0E14, #0E131A, #4FD1C5, #C65D4A), Inter + IBM Plex Mono.
+ * Gold Standard palette (#06070A, #0C0F17, #DFB843, #F43F5E), Inter + IBM Plex Mono.
  */
 export function renderChangelogPageHtml(): string {
   return `<!DOCTYPE html>
@@ -18,16 +18,18 @@ export function renderChangelogPageHtml(): string {
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #06080E;
-      --panel: rgba(14, 20, 29, 0.72);
-      --panel-border: rgba(255, 255, 255, 0.08);
-      --panel-border-subtle: rgba(255, 255, 255, 0.04);
-      --panel-border-highlight: rgba(79, 209, 197, 0.35);
-      --text: #F1F3F5;
-      --muted: #8E96A4;
-      --accent: #4FD1C5;
-      --accent-glow: rgba(79, 209, 197, 0.15);
-      --warning: #C65D4A;
+      --bg: #06070A;
+      --panel: rgba(14, 18, 27, 0.85);
+      --panel-border: rgba(212, 175, 55, 0.16);
+      --panel-border-subtle: rgba(212, 175, 55, 0.08);
+      --panel-border-highlight: rgba(223, 184, 67, 0.45);
+      --text: #F8FAFC;
+      --muted: #94A3B8;
+      --accent: #DFB843;
+      --accent-light: #F7E7B4;
+      --accent-glow: rgba(223, 184, 67, 0.22);
+      --gold-bullion: #D4AF37;
+      --warning: #F43F5E;
       --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
     }
@@ -35,10 +37,10 @@ export function renderChangelogPageHtml(): string {
     body {
       background-color: var(--bg);
       background-image: 
-        radial-gradient(ellipse 90% 50% at 50% -20%, rgba(79, 209, 197, 0.08), transparent 70%),
-        radial-gradient(ellipse 60% 40% at 85% 10%, rgba(198, 93, 74, 0.04), transparent 60%),
-        linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+        radial-gradient(ellipse 90% 50% at 50% -20%, rgba(223, 184, 67, 0.1), transparent 70%),
+        radial-gradient(ellipse 60% 40% at 85% 10%, rgba(163, 125, 36, 0.05), transparent 60%),
+        linear-gradient(rgba(212, 175, 55, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(212, 175, 55, 0.02) 1px, transparent 1px);
       background-size: 100% 100%, 100% 100%, 48px 48px, 48px 48px;
       color: var(--text);
       font-family: var(--font-sans);
@@ -99,8 +101,8 @@ export function renderChangelogPageHtml(): string {
       width: 28px;
       height: 28px;
       border-radius: 6px;
-      background: linear-gradient(135deg, rgba(79, 209, 197, 0.2), rgba(6, 8, 14, 0.9));
-      border: 1px solid rgba(79, 209, 197, 0.4);
+      background: linear-gradient(135deg, rgba(223, 184, 67, 0.25), rgba(6, 8, 14, 0.9));
+      border: 1px solid rgba(223, 184, 67, 0.45);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -118,7 +120,7 @@ export function renderChangelogPageHtml(): string {
       font-size: 0.62rem;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: var(--accent);
+      color: var(--accent-light);
       font-family: var(--font-mono);
     }
     .nav-links {
@@ -136,22 +138,22 @@ export function renderChangelogPageHtml(): string {
     .nav-links a:hover, .nav-links a.active { color: #FFFFFF; }
     .nav-links a.active { border-bottom: 2px solid var(--accent); padding-bottom: 3px; }
     .btn-outline {
-      border: 1px solid rgba(79, 209, 197, 0.4);
+      border: 1px solid rgba(223, 184, 67, 0.4);
       color: #FFFFFF;
       padding: 8px 18px;
       border-radius: 6px;
       font-size: 0.82rem;
       font-family: var(--font-mono);
       text-decoration: none;
-      background: rgba(79, 209, 197, 0.08);
+      background: linear-gradient(180deg, rgba(223, 184, 67, 0.14) 0%, rgba(163, 125, 36, 0.05) 100%);
       cursor: pointer;
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      box-shadow: 0 0 15px rgba(79, 209, 197, 0.1);
+      box-shadow: inset 0 1px 0 rgba(247, 231, 180, 0.2), 0 0 15px rgba(223, 184, 67, 0.1);
     }
     .btn-outline:hover {
       border-color: var(--accent);
-      background: rgba(79, 209, 197, 0.18);
-      box-shadow: 0 0 25px rgba(79, 209, 197, 0.25);
+      background: linear-gradient(180deg, rgba(223, 184, 67, 0.25) 0%, rgba(163, 125, 36, 0.1) 100%);
+      box-shadow: inset 0 1px 0 rgba(247, 231, 180, 0.35), 0 0 25px rgba(223, 184, 67, 0.25);
       color: #FFFFFF;
       transform: translateY(-1px);
     }
@@ -167,12 +169,13 @@ export function renderChangelogPageHtml(): string {
       font-size: 0.75rem;
       text-transform: uppercase;
       letter-spacing: 0.12em;
-      color: var(--accent);
-      background: rgba(79, 209, 197, 0.08);
-      border: 1px solid rgba(79, 209, 197, 0.2);
-      padding: 4px 10px;
-      border-radius: 2px;
+      color: var(--accent-light);
+      background: linear-gradient(180deg, rgba(223, 184, 67, 0.15) 0%, rgba(163, 125, 36, 0.05) 100%);
+      border: 1px solid rgba(223, 184, 67, 0.35);
+      padding: 5px 12px;
+      border-radius: 3px;
       margin-bottom: 16px;
+      box-shadow: inset 0 1px 0 rgba(247, 231, 180, 0.25);
     }
     .pulse-dot {
       width: 6px;

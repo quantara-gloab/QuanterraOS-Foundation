@@ -21,13 +21,16 @@ export function renderAccountPageHtml(user: UserRecord | null, tier: UserTier, e
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #06080E;
-      --card: #0E131A;
-      --card-highlight: #121922;
-      --border: #1E2633;
-      --accent: #4FD1C5;
-      --warning: #C65D4A;
-      --text: #F1F3F5;
+      --bg: #06070A;
+      --card: #0C0F17;
+      --card-highlight: #111624;
+      --border: rgba(212, 175, 55, 0.16);
+      --accent: #DFB843;
+      --accent-light: #F7E7B4;
+      --accent-glow: rgba(223, 184, 67, 0.22);
+      --gold-bullion: #D4AF37;
+      --warning: #F43F5E;
+      --text: #F8FAFC;
       --text-dim: #94A3B8;
       --muted: #64748B;
       --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -37,9 +40,9 @@ export function renderAccountPageHtml(user: UserRecord | null, tier: UserTier, e
     body {
       background: var(--bg);
       background-image: 
-        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(79, 209, 197, 0.07), transparent 70%),
-        linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(223, 184, 67, 0.1), transparent 70%),
+        linear-gradient(rgba(212, 175, 55, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(212, 175, 55, 0.02) 1px, transparent 1px);
       background-size: 100% 100%, 48px 48px, 48px 48px;
       color: var(--text);
       font-family: var(--font-sans);
@@ -55,8 +58,8 @@ export function renderAccountPageHtml(user: UserRecord | null, tier: UserTier, e
       align-items: center;
       padding: 18px 48px;
       border-bottom: 1px solid var(--border);
-      background: rgba(6, 8, 14, 0.85);
-      backdrop-filter: blur(20px);
+      background: rgba(6, 7, 10, 0.88);
+      backdrop-filter: blur(20px) saturate(180%);
       position: sticky;
       top: 0;
       z-index: 100;
@@ -80,9 +83,9 @@ export function renderAccountPageHtml(user: UserRecord | null, tier: UserTier, e
       font-size: 0.8rem;
       font-family: var(--font-mono);
       text-decoration: none;
-      background: rgba(79, 209, 197, 0.12);
-      border: 1px solid rgba(79, 209, 197, 0.35);
-      color: var(--accent);
+      background: linear-gradient(180deg, rgba(223, 184, 67, 0.15) 0%, rgba(163, 125, 36, 0.05) 100%);
+      border: 1px solid rgba(223, 184, 67, 0.4);
+      color: var(--accent-light);
     }
 
     .container {
@@ -96,7 +99,7 @@ export function renderAccountPageHtml(user: UserRecord | null, tier: UserTier, e
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 36px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 12px 32px rgba(0, 0, 0, 0.45);
     }
 
     h1 {
@@ -104,6 +107,7 @@ export function renderAccountPageHtml(user: UserRecord | null, tier: UserTier, e
       font-weight: 700;
       margin-bottom: 8px;
       color: #FFFFFF;
+      letter-spacing: -0.01em;
     }
     .subtitle {
       font-size: 0.95rem;
@@ -119,14 +123,14 @@ export function renderAccountPageHtml(user: UserRecord | null, tier: UserTier, e
       font-family: var(--font-mono);
     }
     .alert-error {
-      background: rgba(198, 93, 74, 0.15);
+      background: rgba(244, 63, 94, 0.12);
       border: 1px solid var(--warning);
-      color: #FCA5A5;
+      color: #FDA4AF;
     }
     .alert-success {
-      background: rgba(79, 209, 197, 0.15);
+      background: rgba(223, 184, 67, 0.12);
       border: 1px solid var(--accent);
-      color: #6EE7B7;
+      color: var(--accent-light);
     }
 
     .status-badge {
@@ -140,8 +144,16 @@ export function renderAccountPageHtml(user: UserRecord | null, tier: UserTier, e
       letter-spacing: 0.05em;
     }
     .badge-free { background: rgba(255, 255, 255, 0.08); color: var(--text-dim); border: 1px solid var(--border); }
-    .badge-pro { background: rgba(79, 209, 197, 0.15); color: var(--accent); border: 1px solid var(--accent); }
-    .badge-institutional { background: rgba(168, 85, 247, 0.15); color: #C084FC; border: 1px solid #A855F7; }
+    .badge-pro {
+      background: linear-gradient(180deg, rgba(223, 184, 67, 0.2) 0%, rgba(163, 125, 36, 0.08) 100%);
+      color: var(--accent-light);
+      border: 1px solid var(--accent);
+    }
+    .badge-institutional {
+      background: linear-gradient(180deg, rgba(247, 231, 180, 0.2) 0%, rgba(212, 175, 55, 0.1) 100%);
+      color: #FFF0C2;
+      border: 1px solid rgba(247, 231, 180, 0.5);
+    }
 
     .grid-row {
       display: grid;
@@ -170,10 +182,18 @@ export function renderAccountPageHtml(user: UserRecord | null, tier: UserTier, e
       display: inline-flex;
       align-items: center;
       gap: 8px;
+      transition: transform 0.15s, opacity 0.15s;
     }
-    .btn-primary { background: var(--accent); color: #06080E; border: none; }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary {
+      background: linear-gradient(180deg, #FBF3D5 0%, #DFB843 35%, #B88E28 100%);
+      color: #07080B;
+      font-weight: 700;
+      border: 1px solid #DFB843;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 4px 18px rgba(223, 184, 67, 0.35), 0 1px 3px rgba(0, 0, 0, 0.5);
+    }
     .btn-secondary { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); color: var(--text); }
-    .btn-danger { background: rgba(198, 93, 74, 0.1); border: 1px solid var(--warning); color: #FCA5A5; }
+    .btn-danger { background: rgba(244, 63, 94, 0.1); border: 1px solid var(--warning); color: #FDA4AF; }
 
     /* Auth Form Tabs */
     .tabs-header {
@@ -191,7 +211,7 @@ export function renderAccountPageHtml(user: UserRecord | null, tier: UserTier, e
       cursor: pointer;
       border-bottom: 2px solid transparent;
     }
-    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
 
     .form-group { margin-bottom: 20px; }
     .form-group label {

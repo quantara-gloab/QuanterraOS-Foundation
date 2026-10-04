@@ -91,9 +91,9 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
   // Point circles & tooltips
   const pointElements = points.map((p) => `
     <g class="chart-point-group" tabindex="0" role="img" aria-label="Bucket ${p.bucket}: actual rate ${(p.actualRate * 100).toFixed(1)}%, sample size ${p.count}">
-      <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="5" fill="#4FD1C5" stroke="#0A0E14" stroke-width="2" class="point-circle" />
+      <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="5.5" fill="#DFB843" stroke="#07080B" stroke-width="2" class="point-circle" />
       <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="14" fill="transparent" class="point-hover-target" />
-      <text x="${p.x.toFixed(1)}" y="${(p.y - 10).toFixed(1)}" fill="#E8EAED" font-size="10" text-anchor="middle" font-weight="500" class="point-label" font-family="var(--font-mono)">${(p.actualRate * 100).toFixed(1)}%</text>
+      <text x="${p.x.toFixed(1)}" y="${(p.y - 10).toFixed(1)}" fill="#F8FAFC" font-size="10" text-anchor="middle" font-weight="600" class="point-label" font-family="var(--font-mono)">${(p.actualRate * 100).toFixed(1)}%</text>
     </g>
   `).join("");
 
@@ -128,21 +128,23 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #06080E;
-    --panel: rgba(14, 20, 29, 0.72);
-    --panel-border: rgba(255, 255, 255, 0.08);
-    --panel-border-subtle: rgba(255, 255, 255, 0.04);
-    --panel-border-highlight: rgba(79, 209, 197, 0.35);
-    --text: #F1F3F5;
-    --muted: #8E96A4;
-    --accent: #4FD1C5;
-    --accent-glow: rgba(79, 209, 197, 0.15);
-    --gold: #F5A623;
-    --gold-glow: rgba(245, 166, 35, 0.12);
-    --warning: #C65D4A;
-    --green: #4FD1C5;
-    --amber: #E2A03F;
-    --red: #C65D4A;
+    --bg: #06070A;
+    --bg-elevated: #0C0E14;
+    --panel: rgba(16, 20, 29, 0.75);
+    --panel-border: rgba(212, 175, 55, 0.18);
+    --panel-border-subtle: rgba(212, 175, 55, 0.08);
+    --panel-border-highlight: rgba(247, 231, 180, 0.45);
+    --text: #F8FAFC;
+    --muted: #94A3B8;
+    --accent: #DFB843;
+    --accent-light: #F7E7B4;
+    --accent-glow: rgba(223, 184, 67, 0.22);
+    --gold: #DFB843;
+    --gold-glow: rgba(223, 184, 67, 0.28);
+    --warning: #F43F5E;
+    --green: #10B981;
+    --amber: #F59E0B;
+    --red: #F43F5E;
     --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
   }
@@ -151,10 +153,10 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
   body {
     background-color: var(--bg);
     background-image: 
-      radial-gradient(ellipse 90% 50% at 50% -20%, rgba(79, 209, 197, 0.08), transparent 70%),
-      radial-gradient(ellipse 60% 40% at 85% 10%, rgba(198, 93, 74, 0.04), transparent 60%),
-      linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+      radial-gradient(ellipse 90% 50% at 50% -20%, rgba(223, 184, 67, 0.12), transparent 70%),
+      radial-gradient(ellipse 60% 40% at 85% 10%, rgba(163, 125, 36, 0.06), transparent 60%),
+      linear-gradient(rgba(212, 175, 55, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(212, 175, 55, 0.02) 1px, transparent 1px);
     background-size: 100% 100%, 100% 100%, 48px 48px, 48px 48px;
     color: var(--text);
     font-family: var(--font-sans);
@@ -165,8 +167,8 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
 
   /* Institutional Ticker Strip */
   .live-ticker-strip {
-    background: rgba(8, 12, 18, 0.85);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(6, 7, 10, 0.92);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.12);
     padding: 7px 24px;
     font-family: var(--font-mono);
     font-size: 0.72rem;
@@ -212,8 +214,8 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
     width: 28px;
     height: 28px;
     border-radius: 6px;
-    background: linear-gradient(135deg, rgba(79, 209, 197, 0.2), rgba(6, 8, 14, 0.9));
-    border: 1px solid rgba(79, 209, 197, 0.4);
+    background: linear-gradient(135deg, rgba(223, 184, 67, 0.25), rgba(6, 8, 14, 0.9));
+    border: 1px solid rgba(223, 184, 67, 0.45);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -231,7 +233,7 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
     font-size: 0.62rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--accent);
+    color: var(--accent-light);
     font-family: var(--font-mono);
   }
   .nav-links {
@@ -251,22 +253,22 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
   .nav-links a.active { border-bottom: 2px solid var(--accent); padding-bottom: 3px; }
 
   .btn-outline {
-    border: 1px solid rgba(79, 209, 197, 0.4);
+    border: 1px solid rgba(223, 184, 67, 0.4);
     color: #FFFFFF;
     padding: 8px 18px;
     border-radius: 4px;
     font-size: 0.82rem;
     font-family: var(--font-mono);
     text-decoration: none;
-    background: rgba(79, 209, 197, 0.08);
+    background: linear-gradient(180deg, rgba(223, 184, 67, 0.14) 0%, rgba(163, 125, 36, 0.05) 100%);
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 0 15px rgba(79, 209, 197, 0.1);
+    box-shadow: inset 0 1px 0 rgba(247, 231, 180, 0.2), 0 0 15px rgba(223, 184, 67, 0.1);
   }
   .btn-outline:hover {
     border-color: var(--accent);
-    background: rgba(79, 209, 197, 0.18);
-    box-shadow: 0 0 25px rgba(79, 209, 197, 0.25);
+    background: linear-gradient(180deg, rgba(223, 184, 67, 0.25) 0%, rgba(163, 125, 36, 0.1) 100%);
+    box-shadow: inset 0 1px 0 rgba(247, 231, 180, 0.35), 0 0 25px rgba(223, 184, 67, 0.25);
     color: #FFFFFF;
     text-decoration: none;
     transform: translateY(-1px);
@@ -288,13 +290,13 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    color: var(--accent);
-    background: rgba(79, 209, 197, 0.08);
-    border: 1px solid rgba(79, 209, 197, 0.25);
+    color: var(--accent-light);
+    background: linear-gradient(180deg, rgba(223, 184, 67, 0.15) 0%, rgba(163, 125, 36, 0.05) 100%);
+    border: 1px solid rgba(223, 184, 67, 0.35);
     padding: 5px 12px;
     border-radius: 3px;
     margin-bottom: 18px;
-    box-shadow: 0 0 12px rgba(79, 209, 197, 0.08);
+    box-shadow: inset 0 1px 0 rgba(247, 231, 180, 0.25);
   }
   .pulse-dot {
     width: 6px;
@@ -371,7 +373,7 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
   }
   .debate-link:hover {
     color: #FFFFFF;
-    text-shadow: 0 0 8px rgba(79, 209, 197, 0.5);
+    text-shadow: 0 0 8px rgba(223, 184, 67, 0.5);
   }
 
   /* Section 1: Headline Stat Cards */
@@ -398,8 +400,8 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
     transform: translateY(-2px);
   }
   .stat-card.featured {
-    border-color: rgba(79, 209, 197, 0.35);
-    box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.6), 0 0 20px rgba(79, 209, 197, 0.05);
+    border-color: rgba(223, 184, 67, 0.45);
+    box-shadow: inset 0 1px 0 0 rgba(255, 245, 215, 0.3), 0 20px 45px -10px rgba(0, 0, 0, 0.7), 0 0 25px rgba(223, 184, 67, 0.12);
   }
   .stat-card-label {
     font-family: var(--font-mono);
@@ -419,8 +421,8 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
     line-height: 1;
   }
   .stat-card.featured .stat-card-value {
-    color: var(--accent);
-    text-shadow: 0 0 15px rgba(79, 209, 197, 0.3);
+    color: var(--accent-light);
+    text-shadow: 0 0 20px rgba(223, 184, 67, 0.4);
   }
   .stat-card-sub {
     font-size: 0.84rem;
@@ -516,15 +518,15 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
     border-bottom: 1px solid var(--panel-border-subtle);
     color: #FFFFFF;
   }
-  .proof-table tr:hover { background: rgba(79, 209, 197, 0.03); }
+  .proof-table tr:hover { background: rgba(223, 184, 67, 0.04); }
   .proof-table th.bucket-col, .proof-table td.bucket-col { text-align: left; }
   .rate-badge {
-    background: rgba(79, 209, 197, 0.12);
-    color: var(--accent);
+    background: rgba(223, 184, 67, 0.14);
+    color: var(--accent-light);
     padding: 3px 8px;
     border-radius: 3px;
     font-weight: 600;
-    border: 1px solid rgba(79, 209, 197, 0.3);
+    border: 1px solid rgba(223, 184, 67, 0.35);
   }
 
   /* Section 3: Plain-Language Methodology */
@@ -764,7 +766,7 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
           <line x1="${diagX1}" y1="${diagY1}" x2="${diagX2}" y2="${diagY2}" stroke="#717686" stroke-width="2" stroke-dasharray="5 5" />
 
           <!-- Actual Curve Polyline -->
-          <polyline points="${polylinePoints}" fill="none" stroke="#4FD1C5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+          <polyline points="${polylinePoints}" fill="none" stroke="#DFB843" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
 
           <!-- Data Points & Labels -->
           ${pointElements}

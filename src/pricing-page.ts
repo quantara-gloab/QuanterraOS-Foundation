@@ -20,17 +20,20 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #06080E;
-      --card: #0E131A;
-      --card-highlight: #121922;
-      --border: #1E2633;
-      --border-accent: rgba(79, 209, 197, 0.4);
-      --accent: #4FD1C5;
-      --accent-glow: rgba(79, 209, 197, 0.15);
-      --text: #F1F3F5;
+      --bg: #06070A;
+      --card: #0C0F17;
+      --card-highlight: #111624;
+      --border: rgba(212, 175, 55, 0.16);
+      --border-accent: rgba(223, 184, 67, 0.5);
+      --accent: #DFB843;
+      --accent-light: #F7E7B4;
+      --accent-glow: rgba(223, 184, 67, 0.22);
+      --gold-bullion: #D4AF37;
+      --gold-glow: rgba(223, 184, 67, 0.35);
+      --text: #F8FAFC;
       --text-dim: #94A3B8;
       --muted: #64748B;
-      --warning: #C65D4A;
+      --warning: #F43F5E;
       --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --font-mono: "IBM Plex Mono", monospace;
     }
@@ -38,10 +41,11 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
     body {
       background: var(--bg);
       background-image: 
-        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(79, 209, 197, 0.08), transparent 70%),
-        linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
-      background-size: 100% 100%, 48px 48px, 48px 48px;
+        radial-gradient(ellipse 90% 60% at 50% -10%, rgba(223, 184, 67, 0.12), transparent 70%),
+        radial-gradient(700px 400px at 80% 30%, rgba(163, 125, 36, 0.05), transparent 60%),
+        linear-gradient(rgba(212, 175, 55, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(212, 175, 55, 0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 48px 48px, 48px 48px;
       color: var(--text);
       font-family: var(--font-sans);
       min-height: 100vh;
@@ -56,8 +60,8 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
       align-items: center;
       padding: 18px 48px;
       border-bottom: 1px solid var(--border);
-      background: rgba(6, 8, 14, 0.85);
-      backdrop-filter: blur(20px);
+      background: rgba(6, 7, 10, 0.88);
+      backdrop-filter: blur(20px) saturate(180%);
       position: sticky;
       top: 0;
       z-index: 100;
@@ -70,6 +74,7 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
       color: var(--text);
       font-weight: 700;
       font-size: 1rem;
+      letter-spacing: -0.01em;
     }
     .nav-brand span { color: var(--accent); font-family: var(--font-mono); font-size: 0.8rem; font-weight: 400; }
     .nav-links { display: flex; gap: 20px; align-items: center; }
@@ -81,9 +86,14 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
       font-size: 0.8rem;
       font-family: var(--font-mono);
       text-decoration: none;
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(212, 175, 55, 0.06);
       border: 1px solid var(--border);
       color: var(--text);
+      transition: border-color 0.15s, background-color 0.15s;
+    }
+    .btn-account:hover {
+      border-color: var(--border-accent);
+      background: rgba(212, 175, 55, 0.12);
     }
 
     .container {
@@ -99,20 +109,21 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
       display: inline-block;
       font-family: var(--font-mono);
       font-size: 0.75rem;
-      color: var(--accent);
-      background: rgba(79, 209, 197, 0.1);
-      border: 1px solid rgba(79, 209, 197, 0.3);
-      padding: 4px 12px;
+      color: var(--accent-light);
+      background: linear-gradient(180deg, rgba(223, 184, 67, 0.15) 0%, rgba(163, 125, 36, 0.05) 100%);
+      border: 1px solid rgba(223, 184, 67, 0.35);
+      box-shadow: inset 0 1px 0 rgba(247, 231, 180, 0.25);
+      padding: 5px 14px;
       border-radius: 20px;
-      margin-bottom: 16px;
+      margin-bottom: 18px;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.06em;
     }
     h1 {
-      font-size: 2.4rem;
+      font-size: 2.5rem;
       font-weight: 700;
       color: #FFFFFF;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       letter-spacing: -0.02em;
     }
     .hero-subtitle {
@@ -123,12 +134,13 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
       line-height: 1.6;
     }
     .honest-callout {
-      margin: 24px auto 0;
-      padding: 12px 20px;
-      background: rgba(79, 209, 197, 0.05);
-      border: 1px solid rgba(79, 209, 197, 0.2);
+      margin: 28px auto 0;
+      padding: 14px 24px;
+      background: linear-gradient(180deg, rgba(223, 184, 67, 0.08) 0%, rgba(12, 15, 23, 0.8) 100%);
+      border: 1px solid rgba(223, 184, 67, 0.25);
+      box-shadow: inset 0 1px 0 rgba(247, 231, 180, 0.15);
       border-radius: 8px;
-      max-width: 680px;
+      max-width: 700px;
       font-size: 0.9rem;
       color: #E2E8F0;
       text-align: center;
@@ -149,34 +161,41 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 32px 28px;
+      padding: 34px 28px;
       display: flex;
       flex-direction: column;
       position: relative;
-      transition: transform 0.2s, border-color 0.2s;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 12px 28px rgba(0, 0, 0, 0.4);
+    }
+    .pricing-card:hover {
+      border-color: rgba(212, 175, 55, 0.35);
+      transform: translateY(-2px);
     }
     .pricing-card.featured {
-      background: var(--card-highlight);
+      background: linear-gradient(180deg, rgba(20, 26, 40, 0.92) 0%, rgba(13, 17, 26, 0.96) 100%);
       border-color: var(--border-accent);
-      box-shadow: 0 0 30px rgba(79, 209, 197, 0.08);
+      box-shadow: inset 0 1px 0 0 rgba(247, 231, 180, 0.4), 0 0 35px rgba(223, 184, 67, 0.18), 0 16px 36px rgba(0, 0, 0, 0.5);
     }
     .featured-badge {
       position: absolute;
       top: -12px;
       left: 50%;
       transform: translateX(-50%);
-      background: var(--accent);
-      color: #06080E;
+      background: linear-gradient(180deg, #FBF3D5 0%, #DFB843 40%, #B88E28 100%);
+      color: #07080B;
       font-family: var(--font-mono);
       font-size: 0.7rem;
       font-weight: 700;
-      padding: 3px 12px;
+      padding: 4px 14px;
       border-radius: 12px;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.06em;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4);
+      white-space: nowrap;
     }
     .tier-name {
-      font-size: 1.2rem;
+      font-size: 1.25rem;
       font-weight: 700;
       color: #FFFFFF;
       margin-bottom: 6px;
@@ -193,7 +212,7 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
       border-bottom: 1px solid var(--border);
     }
     .price-amount {
-      font-size: 2.2rem;
+      font-size: 2.3rem;
       font-weight: 700;
       font-family: var(--font-mono);
       color: #FFFFFF;
@@ -220,7 +239,7 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
       color: var(--accent);
       font-family: var(--font-mono);
       font-weight: 700;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       line-height: 1.2;
     }
     .dash-icon {
@@ -232,7 +251,7 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
 
     .action-btn {
       width: 100%;
-      padding: 12px;
+      padding: 13px;
       border-radius: 8px;
       font-size: 0.9rem;
       font-family: var(--font-mono);
@@ -241,23 +260,44 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
       text-decoration: none;
       cursor: pointer;
       border: none;
-      transition: opacity 0.15s, background-color 0.15s;
+      transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
+      display: block;
+    }
+    .action-btn:hover {
+      transform: translateY(-1px);
     }
     .btn-free {
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.04);
       border: 1px solid var(--border);
       color: var(--text);
     }
+    .btn-free:hover {
+      background: rgba(212, 175, 55, 0.08);
+      border-color: rgba(212, 175, 55, 0.3);
+    }
+    /* Gold Bullion Gloss Action Button */
     .btn-pro {
-      background: var(--accent);
-      color: #06080E;
+      background: linear-gradient(180deg, #FAF1D4 0%, #DFB843 35%, #B88E28 100%);
+      color: #07080B;
+      font-weight: 700;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 4px 20px rgba(223, 184, 67, 0.35), 0 1px 3px rgba(0, 0, 0, 0.5);
+      border: 1px solid #DFB843;
+    }
+    .btn-pro:hover {
+      background: linear-gradient(180deg, #FFFFFF 0%, #E8C353 35%, #C2962C 100%);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 6px 24px rgba(223, 184, 67, 0.45);
     }
     .btn-inst {
-      background: rgba(79, 209, 197, 0.12);
-      border: 1px solid var(--accent);
-      color: var(--accent);
+      background: linear-gradient(180deg, rgba(223, 184, 67, 0.12) 0%, rgba(163, 125, 36, 0.05) 100%);
+      border: 1px solid rgba(223, 184, 67, 0.5);
+      color: var(--accent-light);
+      box-shadow: inset 0 1px 0 rgba(247, 231, 180, 0.2);
     }
-    .action-btn:hover { opacity: 0.9; }
+    .btn-inst:hover {
+      background: linear-gradient(180deg, rgba(223, 184, 67, 0.2) 0%, rgba(163, 125, 36, 0.1) 100%);
+      border-color: var(--accent);
+      color: #FFFFFF;
+    }
 
     /* Comparison Table */
     .comparison-section {
@@ -267,6 +307,7 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
       font-size: 1.4rem;
       margin-bottom: 20px;
       color: #FFFFFF;
+      letter-spacing: -0.01em;
     }
     .comp-table {
       width: 100%;
@@ -277,6 +318,7 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
       border: 1px solid var(--border);
       border-radius: 8px;
       overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
     }
     .comp-table th, .comp-table td {
       padding: 14px 16px;
@@ -284,11 +326,11 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
       border-bottom: 1px solid var(--border);
     }
     .comp-table th {
-      background: rgba(255, 255, 255, 0.03);
-      color: var(--text-dim);
+      background: rgba(212, 175, 55, 0.04);
+      color: var(--accent-light);
       font-size: 0.75rem;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.05em;
     }
     .comp-table tr:last-child td { border-bottom: none; }
 
@@ -303,7 +345,8 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
       font-size: 0.8rem;
       font-family: var(--font-mono);
     }
-    footer a { color: var(--accent); text-decoration: none; }
+    footer a { color: var(--accent); text-decoration: none; transition: color 0.15s; }
+    footer a:hover { color: var(--accent-light); text-decoration: underline; }
   </style>
 </head>
 <body>

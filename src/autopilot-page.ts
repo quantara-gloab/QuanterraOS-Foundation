@@ -66,22 +66,24 @@ export function renderAutopilotPage(options?: { tier?: string }): string {
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #06090E;
-    --card: #0D131C;
-    --card-header: #141B26;
-    --border: #1C2636;
-    --accent: #4FD1C5;
-    --accent-subtle: rgba(79, 209, 197, 0.12);
-    --warning: #C65D4A;
+    --bg: #06070A;
+    --card: #0C0F17;
+    --card-header: #111624;
+    --border: rgba(212, 175, 55, 0.16);
+    --accent: #DFB843;
+    --accent-light: #F7E7B4;
+    --accent-subtle: rgba(223, 184, 67, 0.14);
+    --gold-bullion: #D4AF37;
+    --warning: #F43F5E;
     --amber: #D97706;
-    --text: #E8EAED;
-    --muted: #8892B0;
+    --text: #F8FAFC;
+    --muted: #94A3B8;
     --mono: "IBM Plex Mono", monospace;
     --sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    background: var(--bg);
+    background: radial-gradient(ellipse 90% 50% at 50% -10%, rgba(223, 184, 67, 0.09), transparent 70%), var(--bg);
     color: var(--text);
     font-family: var(--sans);
     min-height: 100vh;
@@ -159,14 +161,14 @@ export function renderAutopilotPage(options?: { tier?: string }): string {
     text-transform: uppercase;
   }
   .pill-paper {
-    background: rgba(79, 209, 197, 0.1);
-    color: var(--accent);
-    border: 1px solid rgba(79, 209, 197, 0.3);
+    background: rgba(223, 184, 67, 0.14);
+    color: var(--accent-light);
+    border: 1px solid rgba(223, 184, 67, 0.35);
   }
   .pill-lock {
-    background: rgba(198, 93, 74, 0.12);
+    background: rgba(244, 63, 94, 0.12);
     color: var(--warning);
-    border: 1px solid rgba(198, 93, 74, 0.35);
+    border: 1px solid rgba(244, 63, 94, 0.35);
   }
 
   .pnl-comparison-strip {
@@ -181,10 +183,12 @@ export function renderAutopilotPage(options?: { tier?: string }): string {
     border-radius: 6px;
     padding: 20px;
     position: relative;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 8px 24px rgba(0, 0, 0, 0.4);
   }
   .pnl-card.primary {
-    border-color: rgba(79, 209, 197, 0.4);
-    background: linear-gradient(180deg, rgba(79, 209, 197, 0.03) 0%, var(--card) 100%);
+    border-color: rgba(223, 184, 67, 0.45);
+    background: linear-gradient(180deg, rgba(223, 184, 67, 0.08) 0%, var(--card) 100%);
+    box-shadow: inset 0 1px 0 rgba(247, 231, 180, 0.25), 0 8px 24px rgba(0, 0, 0, 0.45);
   }
   .card-label {
     font-family: var(--mono);
@@ -264,9 +268,9 @@ export function renderAutopilotPage(options?: { tier?: string }): string {
   .paper-badge {
     font-family: var(--mono);
     font-size: 0.68rem;
-    color: var(--accent);
+    color: var(--accent-light);
     background: var(--accent-subtle);
-    border: 1px solid rgba(79, 209, 197, 0.25);
+    border: 1px solid rgba(223, 184, 67, 0.3);
     padding: 2px 6px;
     border-radius: 4px;
   }
@@ -383,12 +387,12 @@ export function renderAutopilotPage(options?: { tier?: string }): string {
     </div>
 
     ${tier === "free" ? `
-      <div class="tier-indicator-banner" style="margin-bottom: 20px; padding: 12px 18px; background: rgba(79, 209, 197, 0.05); border: 1px solid rgba(79, 209, 197, 0.25); border-radius: 6px; font-family: var(--mono); font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center;">
+      <div class="tier-indicator-banner" style="margin-bottom: 20px; padding: 12px 18px; background: rgba(223, 184, 67, 0.08); border: 1px solid rgba(223, 184, 67, 0.3); border-radius: 6px; font-family: var(--mono); font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center; box-shadow: inset 0 1px 0 rgba(247, 231, 180, 0.15);">
         <span><strong>FREE EXPLORER:</strong> Showing daily paper P&amp;L snapshot</span>
         <a href="/pricing" style="color: var(--accent); font-weight: 600; text-decoration: none;">Upgrade to Pro for Continuous Live Autopilot Telemetry →</a>
       </div>
     ` : `
-      <div class="tier-indicator-banner pro" style="margin-bottom: 20px; padding: 12px 18px; background: rgba(79, 209, 197, 0.1); border: 1px solid var(--accent); border-radius: 6px; font-family: var(--mono); font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center;">
+      <div class="tier-indicator-banner pro" style="margin-bottom: 20px; padding: 12px 18px; background: rgba(223, 184, 67, 0.14); border: 1px solid var(--accent); border-radius: 6px; font-family: var(--mono); font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center; box-shadow: inset 0 1px 0 rgba(247, 231, 180, 0.25);">
         <span><span style="color:var(--accent); font-weight:700;">● LIVE TELEMETRY STREAM</span> (${tier.toUpperCase()}) · Continuous paper trade updates</span>
         <a href="/api/export/autopilot.csv" style="color: var(--accent); font-weight: 600; text-decoration: underline;">Download Autopilot CSV ↓</a>
       </div>

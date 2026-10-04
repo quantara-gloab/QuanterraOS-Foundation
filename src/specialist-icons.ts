@@ -3,7 +3,7 @@
  *
  * Adheres strictly to the QuanterraOS "High-Tech, Competitive" Visual Design Plan:
  * - Line-art only (1.5px stroke, no fill except accent dots)
- * - 3 tokens only: --text (#E8EAED), --accent (#4FD1C5), --warning (#C65D4A)
+ * - 3 tokens only: --text (#F8FAFC), --accent (#DFB843 Bullion Gold), --warning (#F43F5E)
  * - Self-contained inline SVGs (48x48)
  * - One restrained animation per icon encoding the persona's functional role
  * - Strict prefers-reduced-motion media query guard

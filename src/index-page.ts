@@ -29,16 +29,18 @@ export function renderIndexPageHtml(): string {
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #06080E;
-      --panel: rgba(14, 20, 29, 0.72);
-      --panel-border: rgba(255, 255, 255, 0.08);
-      --panel-border-subtle: rgba(255, 255, 255, 0.04);
-      --panel-border-highlight: rgba(79, 209, 197, 0.35);
-      --text: #F1F3F5;
-      --muted: #8E96A4;
-      --accent: #4FD1C5;
-      --accent-glow: rgba(79, 209, 197, 0.15);
-      --warning: #C65D4A;
+      --bg: #06070A;
+      --panel: rgba(14, 18, 27, 0.85);
+      --panel-border: rgba(212, 175, 55, 0.16);
+      --panel-border-subtle: rgba(212, 175, 55, 0.08);
+      --panel-border-highlight: rgba(223, 184, 67, 0.45);
+      --text: #F8FAFC;
+      --muted: #94A3B8;
+      --accent: #DFB843;
+      --accent-light: #F7E7B4;
+      --accent-glow: rgba(223, 184, 67, 0.22);
+      --gold-bullion: #D4AF37;
+      --warning: #F43F5E;
       --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
     }
@@ -46,10 +48,10 @@ export function renderIndexPageHtml(): string {
     body {
       background-color: var(--bg);
       background-image: 
-        radial-gradient(ellipse 90% 50% at 50% -20%, rgba(79, 209, 197, 0.08), transparent 70%),
-        radial-gradient(ellipse 60% 40% at 85% 10%, rgba(198, 93, 74, 0.04), transparent 60%),
-        linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+        radial-gradient(ellipse 90% 50% at 50% -20%, rgba(223, 184, 67, 0.1), transparent 70%),
+        radial-gradient(ellipse 60% 40% at 85% 10%, rgba(163, 125, 36, 0.05), transparent 60%),
+        linear-gradient(rgba(212, 175, 55, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(212, 175, 55, 0.02) 1px, transparent 1px);
       background-size: 100% 100%, 100% 100%, 48px 48px, 48px 48px;
       color: var(--text);
       font-family: var(--font-sans);
@@ -110,8 +112,8 @@ export function renderIndexPageHtml(): string {
       width: 28px;
       height: 28px;
       border-radius: 6px;
-      background: linear-gradient(135deg, rgba(79, 209, 197, 0.2), rgba(6, 8, 14, 0.9));
-      border: 1px solid rgba(79, 209, 197, 0.4);
+      background: linear-gradient(135deg, rgba(223, 184, 67, 0.25), rgba(6, 8, 14, 0.9));
+      border: 1px solid rgba(223, 184, 67, 0.45);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -129,7 +131,7 @@ export function renderIndexPageHtml(): string {
       font-size: 0.62rem;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: var(--accent);
+      color: var(--accent-light);
       font-family: var(--font-mono);
     }
     .nav-links {
@@ -147,22 +149,22 @@ export function renderIndexPageHtml(): string {
     .nav-links a:hover, .nav-links a.active { color: #FFFFFF; }
     .nav-links a.active { border-bottom: 2px solid var(--accent); padding-bottom: 3px; }
     .btn-outline {
-      border: 1px solid rgba(79, 209, 197, 0.4);
+      border: 1px solid rgba(223, 184, 67, 0.4);
       color: #FFFFFF;
       padding: 8px 18px;
       border-radius: 4px;
       font-size: 0.82rem;
       font-family: var(--font-mono);
       text-decoration: none;
-      background: rgba(79, 209, 197, 0.08);
+      background: linear-gradient(180deg, rgba(223, 184, 67, 0.14) 0%, rgba(163, 125, 36, 0.05) 100%);
       cursor: pointer;
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      box-shadow: 0 0 15px rgba(79, 209, 197, 0.1);
+      box-shadow: inset 0 1px 0 rgba(247, 231, 180, 0.2), 0 0 15px rgba(223, 184, 67, 0.1);
     }
     .btn-outline:hover {
       border-color: var(--accent);
-      background: rgba(79, 209, 197, 0.18);
-      box-shadow: 0 0 25px rgba(79, 209, 197, 0.25);
+      background: linear-gradient(180deg, rgba(223, 184, 67, 0.25) 0%, rgba(163, 125, 36, 0.1) 100%);
+      box-shadow: inset 0 1px 0 rgba(247, 231, 180, 0.35), 0 0 25px rgba(223, 184, 67, 0.25);
       color: #FFFFFF;
       transform: translateY(-1px);
     }
@@ -178,13 +180,13 @@ export function renderIndexPageHtml(): string {
       font-size: 0.72rem;
       text-transform: uppercase;
       letter-spacing: 0.12em;
-      color: var(--accent);
-      background: rgba(79, 209, 197, 0.08);
-      border: 1px solid rgba(79, 209, 197, 0.25);
+      color: var(--accent-light);
+      background: linear-gradient(180deg, rgba(223, 184, 67, 0.15) 0%, rgba(163, 125, 36, 0.05) 100%);
+      border: 1px solid rgba(223, 184, 67, 0.35);
       padding: 5px 12px;
       border-radius: 3px;
       margin-bottom: 18px;
-      box-shadow: 0 0 12px rgba(79, 209, 197, 0.08);
+      box-shadow: inset 0 1px 0 rgba(247, 231, 180, 0.25);
     }
     .pulse-dot {
       width: 6px;
@@ -231,8 +233,8 @@ export function renderIndexPageHtml(): string {
       transform: translateY(-2px);
     }
     .card.featured {
-      border-color: rgba(79, 209, 197, 0.35);
-      box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.6), 0 0 20px rgba(79, 209, 197, 0.05);
+      border-color: rgba(223, 184, 67, 0.45);
+      box-shadow: inset 0 1px 0 rgba(247, 231, 180, 0.25), 0 20px 45px -10px rgba(0, 0, 0, 0.6), 0 0 20px rgba(223, 184, 67, 0.1);
     }
     .card-label {
       font-family: var(--font-mono);
@@ -252,7 +254,7 @@ export function renderIndexPageHtml(): string {
     }
     .card.featured .card-val {
       color: var(--accent);
-      text-shadow: 0 0 15px rgba(79, 209, 197, 0.3);
+      text-shadow: 0 0 15px rgba(223, 184, 67, 0.3);
     }
     .card-meta {
       font-size: 0.82rem;
@@ -270,21 +272,21 @@ export function renderIndexPageHtml(): string {
       letter-spacing: 0.05em;
     }
     .badge-active {
-      background: rgba(79, 209, 197, 0.12);
-      color: var(--accent);
-      border: 1px solid rgba(79, 209, 197, 0.35);
-      box-shadow: 0 0 10px rgba(79, 209, 197, 0.15);
+      background: rgba(223, 184, 67, 0.14);
+      color: var(--accent-light);
+      border: 1px solid rgba(223, 184, 67, 0.4);
+      box-shadow: 0 0 10px rgba(223, 184, 67, 0.18);
     }
     .badge-warning {
-      background: rgba(198, 93, 74, 0.12);
+      background: rgba(244, 63, 94, 0.12);
       color: var(--warning);
-      border: 1px solid rgba(198, 93, 74, 0.35);
-      box-shadow: 0 0 10px rgba(198, 93, 74, 0.15);
+      border: 1px solid rgba(244, 63, 94, 0.35);
+      box-shadow: 0 0 10px rgba(244, 63, 94, 0.15);
     }
     .badge-benchmark {
-      background: rgba(79, 209, 197, 0.12);
-      color: var(--accent);
-      border: 1px solid rgba(79, 209, 197, 0.35);
+      background: rgba(223, 184, 67, 0.14);
+      color: var(--accent-light);
+      border: 1px solid rgba(223, 184, 67, 0.4);
     }
     .badge-normal {
       background: rgba(255, 255, 255, 0.06);
@@ -344,7 +346,7 @@ export function renderIndexPageHtml(): string {
       color: #FFFFFF;
     }
     tr:last-child td { border-bottom: none; }
-    tr:hover { background: rgba(79, 209, 197, 0.03); }
+    tr:hover { background: rgba(223, 184, 67, 0.04); }
 
     /* Methodology Blueprint Box */
     .methodology-box {
@@ -383,7 +385,7 @@ export function renderIndexPageHtml(): string {
     }
     .method-link:hover {
       color: #FFFFFF;
-      text-shadow: 0 0 8px rgba(79, 209, 197, 0.5);
+      text-shadow: 0 0 8px rgba(223, 184, 67, 0.5);
     }
 
     /* Footer */
@@ -578,16 +580,18 @@ export function renderSpreadPageHtml(): string {
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #06080E;
-      --panel: rgba(14, 20, 29, 0.72);
-      --panel-border: rgba(255, 255, 255, 0.08);
-      --panel-border-subtle: rgba(255, 255, 255, 0.04);
-      --panel-border-highlight: rgba(79, 209, 197, 0.35);
-      --text: #F1F3F5;
-      --muted: #8E96A4;
-      --accent: #4FD1C5;
-      --accent-glow: rgba(79, 209, 197, 0.15);
-      --warning: #C65D4A;
+      --bg: #06070A;
+      --panel: rgba(14, 18, 27, 0.85);
+      --panel-border: rgba(212, 175, 55, 0.16);
+      --panel-border-subtle: rgba(212, 175, 55, 0.08);
+      --panel-border-highlight: rgba(223, 184, 67, 0.45);
+      --text: #F8FAFC;
+      --muted: #94A3B8;
+      --accent: #DFB843;
+      --accent-light: #F7E7B4;
+      --accent-glow: rgba(223, 184, 67, 0.22);
+      --gold-bullion: #D4AF37;
+      --warning: #F43F5E;
       --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
     }
@@ -595,10 +599,10 @@ export function renderSpreadPageHtml(): string {
     body {
       background-color: var(--bg);
       background-image: 
-        radial-gradient(ellipse 90% 50% at 50% -20%, rgba(79, 209, 197, 0.08), transparent 70%),
-        radial-gradient(ellipse 60% 40% at 85% 10%, rgba(198, 93, 74, 0.04), transparent 60%),
-        linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+        radial-gradient(ellipse 90% 50% at 50% -20%, rgba(223, 184, 67, 0.1), transparent 70%),
+        radial-gradient(ellipse 60% 40% at 85% 10%, rgba(163, 125, 36, 0.05), transparent 60%),
+        linear-gradient(rgba(212, 175, 55, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(212, 175, 55, 0.02) 1px, transparent 1px);
       background-size: 100% 100%, 100% 100%, 48px 48px, 48px 48px;
       color: var(--text);
       font-family: var(--font-sans);
@@ -659,8 +663,8 @@ export function renderSpreadPageHtml(): string {
       width: 28px;
       height: 28px;
       border-radius: 6px;
-      background: linear-gradient(135deg, rgba(79, 209, 197, 0.2), rgba(6, 8, 14, 0.9));
-      border: 1px solid rgba(79, 209, 197, 0.4);
+      background: linear-gradient(135deg, rgba(223, 184, 67, 0.25), rgba(6, 8, 14, 0.9));
+      border: 1px solid rgba(223, 184, 67, 0.45);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -678,7 +682,7 @@ export function renderSpreadPageHtml(): string {
       font-size: 0.62rem;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: var(--accent);
+      color: var(--accent-light);
       font-family: var(--font-mono);
     }
     .nav-links {
@@ -696,22 +700,22 @@ export function renderSpreadPageHtml(): string {
     .nav-links a:hover, .nav-links a.active { color: #FFFFFF; }
     .nav-links a.active { border-bottom: 2px solid var(--accent); padding-bottom: 3px; }
     .btn-outline {
-      border: 1px solid rgba(79, 209, 197, 0.4);
+      border: 1px solid rgba(223, 184, 67, 0.4);
       color: #FFFFFF;
       padding: 8px 18px;
       border-radius: 4px;
       font-size: 0.82rem;
       font-family: var(--font-mono);
       text-decoration: none;
-      background: rgba(79, 209, 197, 0.08);
+      background: linear-gradient(180deg, rgba(223, 184, 67, 0.14) 0%, rgba(163, 125, 36, 0.05) 100%);
       cursor: pointer;
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      box-shadow: 0 0 15px rgba(79, 209, 197, 0.1);
+      box-shadow: inset 0 1px 0 rgba(247, 231, 180, 0.2), 0 0 15px rgba(223, 184, 67, 0.1);
     }
     .btn-outline:hover {
       border-color: var(--accent);
-      background: rgba(79, 209, 197, 0.18);
-      box-shadow: 0 0 25px rgba(79, 209, 197, 0.25);
+      background: linear-gradient(180deg, rgba(223, 184, 67, 0.25) 0%, rgba(163, 125, 36, 0.1) 100%);
+      box-shadow: inset 0 1px 0 rgba(247, 231, 180, 0.35), 0 0 25px rgba(223, 184, 67, 0.25);
       color: #FFFFFF;
       transform: translateY(-1px);
     }
@@ -727,13 +731,13 @@ export function renderSpreadPageHtml(): string {
       font-size: 0.72rem;
       text-transform: uppercase;
       letter-spacing: 0.12em;
-      color: var(--accent);
-      background: rgba(79, 209, 197, 0.08);
-      border: 1px solid rgba(79, 209, 197, 0.25);
+      color: var(--accent-light);
+      background: linear-gradient(180deg, rgba(223, 184, 67, 0.15) 0%, rgba(163, 125, 36, 0.05) 100%);
+      border: 1px solid rgba(223, 184, 67, 0.35);
       padding: 5px 12px;
       border-radius: 3px;
       margin-bottom: 18px;
-      box-shadow: 0 0 12px rgba(79, 209, 197, 0.08);
+      box-shadow: inset 0 1px 0 rgba(247, 231, 180, 0.25);
     }
     .pulse-dot {
       width: 6px;
@@ -769,10 +773,10 @@ export function renderSpreadPageHtml(): string {
       letter-spacing: 0.05em;
     }
     .badge-benchmark {
-      background: rgba(79, 209, 197, 0.12);
-      color: var(--accent);
-      border: 1px solid rgba(79, 209, 197, 0.35);
-      box-shadow: 0 0 10px rgba(79, 209, 197, 0.15);
+      background: rgba(223, 184, 67, 0.14);
+      color: var(--accent-light);
+      border: 1px solid rgba(223, 184, 67, 0.4);
+      box-shadow: 0 0 10px rgba(223, 184, 67, 0.18);
     }
     .badge-normal {
       background: rgba(255, 255, 255, 0.06);
@@ -833,7 +837,7 @@ export function renderSpreadPageHtml(): string {
       color: #FFFFFF;
     }
     tr:last-child td { border-bottom: none; }
-    tr:hover { background: rgba(79, 209, 197, 0.03); }
+    tr:hover { background: rgba(223, 184, 67, 0.04); }
 
     /* Footer */
     footer {
