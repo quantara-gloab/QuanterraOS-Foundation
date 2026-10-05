@@ -1,0 +1,111 @@
+{
+  "markets": 1316,
+  "volWindowMinutes": 60,
+  "spotSource": "Coinbase BTC-USD 1m closes",
+  "report": {
+    "minute4": {
+      "scored": 1316,
+      "skipped": 0,
+      "brier": {
+        "model": 0.2063,
+        "market": 0.2001,
+        "blend50_50": 0.202
+      },
+      "brierByHalf": {
+        "older": {
+          "n": 658,
+          "model": 0.2044,
+          "market": 0.2015
+        },
+        "newer": {
+          "n": 658,
+          "model": 0.2082,
+          "market": 0.1987
+        }
+      },
+      "tradeWhenModelEvPositive": {
+        "trades": 1023,
+        "winRate": 0.4829,
+        "avgProfitPerContract": -0.0222
+      }
+    },
+    "minute7": {
+      "scored": 1316,
+      "skipped": 0,
+      "brier": {
+        "model": 0.1755,
+        "market": 0.1685,
+        "blend50_50": 0.1707
+      },
+      "brierByHalf": {
+        "older": {
+          "n": 658,
+          "model": 0.1769,
+          "market": 0.1726
+        },
+        "newer": {
+          "n": 658,
+          "model": 0.1741,
+          "market": 0.1644
+        }
+      },
+      "tradeWhenModelEvPositive": {
+        "trades": 1057,
+        "winRate": 0.4759,
+        "avgProfitPerContract": -0.0188
+      }
+    },
+    "minute10": {
+      "scored": 1316,
+      "skipped": 0,
+      "brier": {
+        "model": 0.1333,
+        "market": 0.1248,
+        "blend50_50": 0.1273
+      },
+      "brierByHalf": {
+        "older": {
+          "n": 658,
+          "model": 0.1355,
+          "market": 0.1302
+        },
+        "newer": {
+          "n": 658,
+          "model": 0.1311,
+          "market": 0.1194
+        }
+      },
+      "tradeWhenModelEvPositive": {
+        "trades": 1173,
+        "winRate": 0.4433,
+        "avgProfitPerContract": -0.0099
+      }
+    },
+    "minute13": {
+      "scored": 1316,
+      "skipped": 0,
+      "brier": {
+        "model": 0.0835,
+        "market": 0.0731,
+        "blend50_50": 0.0754
+      },
+      "brierByHalf": {
+        "older": {
+          "n": 658,
+          "model": 0.0849,
+          "market": 0.0795
+        },
+        "newer": {
+          "n": 658,
+          "model": 0.0822,
+          "market": 0.0668
+        }
+      },
+      "tradeWhenModelEvPositive": {
+        "trades": 1126,
+        "winRate": 0.4014,
+        "avgProfitPerContract": 0.0043
+      }
+    }
+  }
+}
