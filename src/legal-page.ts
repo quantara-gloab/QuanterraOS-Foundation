@@ -5,13 +5,19 @@
  * Architectural blueprint aesthetic:
  * Gold Standard palette (#06070A, #0C0F17, #DFB843, #F43F5E), Inter + IBM Plex Mono.
  */
+import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
+
 export function renderLegalPageHtml(): string {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Legal Notice, Terms & Disclaimers — QuanterraOS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#06070A">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="QuanterraOS">
+  <title>Legal Notice, Terms &amp; Disclaimers — QuanterraOS</title>
   <meta name="description" content="Legal disclaimers, trademark attributions, not-investment-advice statement, and non-affiliation notice for QuanterraOS.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -375,6 +381,7 @@ export function renderLegalPageHtml(): string {
       </p>
     </footer>
   </main>
+${ASSISTANT_WIDGET_HTML}
 </body>
 </html>`;
 }

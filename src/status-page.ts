@@ -6,6 +6,7 @@
  * Gold Standard palette (#06070A, #F8FAFC, #DFB843, #F43F5E), Inter + IBM Plex Mono.
  */
 import Database from "better-sqlite3";
+import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
 
 export interface SystemStatusData {
   status: "OPERATIONAL" | "DEGRADED";
@@ -204,7 +205,11 @@ export function renderStatusPageHtml(): string {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#06070A">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="QuanterraOS">
   <title>System &amp; Ingestion Status — QuanterraOS</title>
   <meta name="description" content="Live operational status of QuanterraOS worldwide ingestion services, Draco data-quality gates, database health, and systemd units.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -628,6 +633,7 @@ export function renderStatusPageHtml(): string {
       QuanterraOS Ingestion Status · Auditable empirical benchmarks · Rule B5 locked · Zero live capital deployed ($0.00).
     </footer>
   </div>
+${ASSISTANT_WIDGET_HTML}
 </body>
 </html>`;
 }

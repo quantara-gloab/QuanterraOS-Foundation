@@ -6,6 +6,7 @@
  * Deep Obsidian, Ambient Radial Lighting, Inter + IBM Plex Mono, Frosted Glass.
  */
 import { getLatestCompositeIndex, COMPOSITE_METHODOLOGY_VERSION } from "./composite-index.ts";
+import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
 
 export function renderIndexPageHtml(): string {
   const result = getLatestCompositeIndex("BTC");
@@ -21,7 +22,11 @@ export function renderIndexPageHtml(): string {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#06070A">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="QuanterraOS">
   <title>Quanterra BTC Composite Index — Independent Spot Benchmark</title>
   <meta name="description" content="Volume-weighted spot composite index across Tier 1 venues with Draco outlier filtering. Independent measurement for BTC prediction markets.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -558,6 +563,7 @@ export function renderIndexPageHtml(): string {
       </p>
     </footer>
   </main>
+${ASSISTANT_WIDGET_HTML}
 </body>
 </html>`;
 }
@@ -572,7 +578,11 @@ export function renderSpreadPageHtml(): string {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#06070A">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="QuanterraOS">
   <title>Cross-Venue Spread & Basis Monitor — QuanterraOS</title>
   <meta name="description" content="Real-time basis and spread monitor between spot exchanges, composite index, and prediction market settlement reference.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -978,6 +988,7 @@ export function renderSpreadPageHtml(): string {
       </p>
     </footer>
   </main>
+${ASSISTANT_WIDGET_HTML}
 </body>
 </html>`;
 }

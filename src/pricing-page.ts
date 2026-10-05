@@ -14,7 +14,11 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#06070A">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="QuanterraOS">
   <title>Pricing & Subscriptions — QuanterraOS</title>
   <meta name="description" content="Transparent pricing for QuanterraOS short-duration prediction market telemetry, real-time prediction ledgers, and institutional APIs.">
   <link rel="preconnect" href="https://fonts.googleapis.com">

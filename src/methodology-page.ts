@@ -6,6 +6,7 @@
  * Gold Standard palette (#06070A, #0C0F17, #DFB843, #F43F5E), Inter + IBM Plex Mono.
  */
 import { COMPOSITE_METHODOLOGY_VERSION } from "./composite-index.ts";
+import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
 
 export function renderMethodologyPageHtml(subtopic?: "index"): string {
   const isIndexSubtopic = subtopic === "index";
@@ -14,7 +15,11 @@ export function renderMethodologyPageHtml(subtopic?: "index"): string {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#06070A">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="QuanterraOS">
   <title>${isIndexSubtopic ? "Composite Index Methodology v0.1" : "Methodology & Mathematical Formulas"} — QuanterraOS</title>
   <meta name="description" content="Open, reproducible methodology and mathematical formulas for QuanterraOS calibration scoring, Brier decomposition, and spot composite index v0.1.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -503,6 +508,7 @@ export function renderMethodologyPageHtml(subtopic?: "index"): string {
       </p>
     </footer>
   </main>
+${ASSISTANT_WIDGET_HTML}
 </body>
 </html>`;
 }

@@ -63,7 +63,11 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#06070A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="QuanterraOS">
 <title>QuanterraOS — Autonomous Prediction Market Calibration Council</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -232,6 +236,17 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
   }
   @media (max-width: 960px) {
     .hero-section { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 860px) {
+    .live-ticker-strip { padding: 6px 16px; font-size: 0.65rem; }
+    .top-nav { padding: 12px 16px; flex-wrap: wrap; gap: 12px; }
+    .nav-left { width: 100%; justify-content: space-between; gap: 12px; }
+    .nav-links { overflow-x: auto; white-space: nowrap; gap: 16px; width: 100%; padding: 4px 0 6px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .nav-links::-webkit-scrollbar { display: none; }
+    .page-wrap { padding: 32px 16px 64px; gap: 48px; }
+    .hero-heading { font-size: 2.1rem; line-height: 1.15; }
+    .hero-actions { flex-direction: column; width: 100%; gap: 10px; }
+    .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
   }
 
   .hero-left {

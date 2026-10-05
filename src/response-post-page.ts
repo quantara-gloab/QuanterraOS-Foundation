@@ -8,12 +8,18 @@
  * and clear, transparent citations linking directly to the live /calibration proof.
  */
 
+import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
+
 export function renderResponsePostPage(): string {
   return `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#06070A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="QuanterraOS">
 <title>Is Kalshi's BTC Market Actually Calibrated? We Checked. — QuanterraOS Research</title>
 <meta name="description" content="An independent calibration check of Kalshi's 15-minute BTC markets, using 1,316 settled contracts and full disclosed methodology.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -329,7 +335,7 @@ export function renderResponsePostPage(): string {
       </p>
 
       <p style="font-size: 1.05rem; margin-top: 28px;">
-        <strong>Full methodology and calibration curve:</strong> <a href="/calibration" style="color:var(--cyan); font-weight:600; text-decoration: underline;">/calibration</a>
+        <strong>Full methodology and calibration curve:</strong> <a href="/calibration" style="color:var(--accent); font-weight:600; text-decoration: underline;">/calibration</a>
       </p>
 
       <!-- CTA Box -->
@@ -342,6 +348,7 @@ export function renderResponsePostPage(): string {
 
   </main>
 
+${ASSISTANT_WIDGET_HTML}
 </body>
 </html>`;
 }

@@ -6,12 +6,18 @@
  * Architectural blueprint aesthetic:
  * Gold Standard palette (#06070A, #0C0F17, #DFB843, #F43F5E), Inter + IBM Plex Mono.
  */
+import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
+
 export function renderResearchPageHtml(): string {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#06070A">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="QuanterraOS">
   <title>Research & Empirical Findings — QuanterraOS</title>
   <meta name="description" content="Published research papers, backtest results, and negative findings on short-duration BTC prediction markets.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -422,6 +428,7 @@ export function renderResearchPageHtml(): string {
       </p>
     </footer>
   </main>
+${ASSISTANT_WIDGET_HTML}
 </body>
 </html>`;
 }

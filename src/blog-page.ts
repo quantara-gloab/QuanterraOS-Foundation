@@ -4,12 +4,18 @@
  * Published Oct 4, 2026 · QuanterraOS Research
  */
 
+import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
+
 export function renderTwoStrategiesLostPageHtml(): string {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#06070A">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="QuanterraOS">
   <title>We tested two trading strategies against the market. Both lost. — QuanterraOS Research</title>
   <meta name="description" content="Empirical backtest findings on 131 short-duration Bitcoin prediction market swing events: why momentum and fade heuristics failed to beat the market baseline.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -327,6 +333,7 @@ export function renderTwoStrategiesLostPageHtml(): string {
     <div><a href="/research">← All Research Papers</a></div>
   </footer>
 
+${ASSISTANT_WIDGET_HTML}
 </body>
 </html>`;
 }

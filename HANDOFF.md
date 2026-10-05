@@ -336,3 +336,21 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 1. Deploy changes to production (`deploy/deploy.sh` per J2).
 2. Monitor incoming live events and cohort matrix on `/admin/metrics`.
 3. Accumulate monthly Falcon order-book snapshots past n=31 before re-testing imbalance.
+
+---
+
+### Session: 2026-10-04 — Universal Mobile App Optimization & Full-Site Widget Architecture
+
+**Delivered Improvements:**
+- **Universal Mobile Web App (PWA) Foundation**:
+  - Implemented `<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">`, `theme-color: #06070A`, and Apple standalone web app meta tags (`apple-mobile-web-app-capable: yes`, `apple-mobile-web-app-status-bar-style: black-translucent`) across all 16 client pages.
+  - Resolved mobile navigation wrapping issues with smooth horizontal scrolling chip navs (`-webkit-overflow-scrolling: touch`) and full-width touch-friendly CTAs.
+- **Universal Assistant Widget Injection**:
+  - Expanded `ASSISTANT_WIDGET_HTML` injection across 100% of public and terminal routes: `/index`, `/spread`, `/status`, `/research`, `/methodology`, `/legal`, `/changelog`, and `/blog`.
+  - Enforced verified email-only channels (`support@quanterraos.com`, `compliance@quanterraos.com`) with zero placeholder numbers.
+  - Verified full-screen mobile drawer mode (`inset: 0`, `100dvh`), iOS zoom prevention (16px input font), and sanitized rendering (bold and line breaks only).
+
+**Verification:**
+- `npx tsc --noEmit` — 0 errors (clean exit 0).
+- `npm test` — 236/236 passing across 47 suites, 0 failures (duration 38.3s).
+
