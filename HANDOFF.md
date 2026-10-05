@@ -325,7 +325,7 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
   - Password-protected `/admin/metrics` command dashboard and `/api/admin/metrics` authenticated endpoint.
 - **Unified Assistant Widget & Council Desk Integration (`src/assistant-widget.ts`, `src/agents/council-chat.ts`)**:
   - Integrated `ASSISTANT_WIDGET_HTML` across all public and terminal interfaces (`/`, `/account`, `/autopilot`, `/calibration`, `/predictions`, `/pricing`, `/dashboard`).
-  - Added Escape key dismiss, event propagation protection, and domain answers for Chicago operations desk contact details (+1 312 555-0198, support@quanterraos.com), 20-minute Free tier ledger delay, and subscription tiers.
+  - Added Escape key dismiss, event propagation protection, and domain answers for verified contact channels (support@quanterraos.com, compliance@quanterraos.com), 20-minute Free tier ledger delay, and subscription tiers.
 
 **Verification:**
 - `npx tsc --noEmit` — 0 errors (clean exit 0).

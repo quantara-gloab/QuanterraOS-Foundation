@@ -514,7 +514,7 @@ export function generatePersonaDomainResponse(
     };
   }
 
-  // Question 6: Contact details / customer service phone & email
+  // Question 6: Contact details / customer service email
   if (
     norm.includes("contact") ||
     norm.includes("phone") ||
@@ -523,9 +523,9 @@ export function generatePersonaDomainResponse(
     norm.includes("support") ||
     norm.includes("desk direct")
   ) {
-    citations.push("QuanterraOS Institutional Desk Contacts", "support@quanterraos.com");
+    citations.push("QuanterraOS Contact Channels", "support@quanterraos.com");
     return {
-      reply: `Our Chicago operations desk can be reached directly at +1 (312) 555-0198 (Mon–Fri 08:00–18:00 CT). For 24/7 technical and customer support, email support@quanterraos.com. For compliance, legal, and regulatory inquiries, email compliance@quanterraos.com.`,
+      reply: `For technical, operator, and customer support, email support@quanterraos.com. For compliance, legal, and regulatory inquiries, email compliance@quanterraos.com. Our virtual desk operates 24/7 with human support provided directly by email.`,
       citations
     };
   }
