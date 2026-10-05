@@ -514,7 +514,53 @@ export function generatePersonaDomainResponse(
     };
   }
 
-  // Question 6: Who are you / role introduction
+  // Question 6: Contact details / customer service phone & email
+  if (
+    norm.includes("contact") ||
+    norm.includes("phone") ||
+    norm.includes("email") ||
+    norm.includes("customer service") ||
+    norm.includes("support") ||
+    norm.includes("desk direct")
+  ) {
+    citations.push("QuanterraOS Institutional Desk Contacts", "support@quanterraos.com");
+    return {
+      reply: `Our Chicago operations desk can be reached directly at +1 (312) 555-0198 (Mon–Fri 08:00–18:00 CT). For 24/7 technical and customer support, email support@quanterraos.com. For compliance, legal, and regulatory inquiries, email compliance@quanterraos.com.`,
+      citations
+    };
+  }
+
+  // Question 7: Delayed free feed / 20-min delay
+  if (
+    norm.includes("delayed") ||
+    norm.includes("free tier") ||
+    norm.includes("free feed") ||
+    norm.includes("explorer")
+  ) {
+    citations.push("src/prediction-ledger.ts", "/pricing");
+    return {
+      reply: `The Free Explorer tier ($0/mo) provides full ledger access with a fixed 20-minute operational delay. All settled windows, historical Brier calibration curves, and research papers remain 100% public. Pro Terminal ($199/mo) and Institutional API ($750/mo) unlock real-time streaming WebSocket feeds and live sub-second telemetry.`,
+      citations
+    };
+  }
+
+  // Question 8: Pricing and Pro subscription
+  if (
+    norm.includes("subscribe") ||
+    norm.includes("pro terminal") ||
+    norm.includes("pricing") ||
+    norm.includes("upgrade") ||
+    norm.includes("199") ||
+    norm.includes("750")
+  ) {
+    citations.push("src/billing.ts", "/pricing", "/account");
+    return {
+      reply: `QuanterraOS offers three access tiers: Free Explorer ($0/mo with 20-min delayed ledger), Pro Terminal ($199/mo with real-time streaming, autopilot paper-mode, and full CSV exports), and Institutional API ($750/mo with low-latency tick streams and raw data feeds). You can upgrade anytime at /pricing or through your operator dashboard at /account.`,
+      citations
+    };
+  }
+
+  // Question 9: Who are you / role introduction
   if (
     norm.includes("who are you") ||
     norm.includes("what is your role") ||

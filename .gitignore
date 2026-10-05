@@ -30,6 +30,7 @@ coverage/
 *.sqlite3
 
 # Scratch / debug files
+scratch/
 tmp-check.mjs
 tmp-*.mjs
 

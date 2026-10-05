@@ -9,6 +9,7 @@
  * - Zero live execution path; hardcoded to PAPER mode under Rule B5.
  */
 import { getAutopilotLedger, type AutopilotSummary } from "./autopilot-engine.ts";
+import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
 
 export function renderAutopilotPage(options?: { tier?: string }): string {
   const tier = options?.tier ?? "free";
@@ -478,6 +479,7 @@ export function renderAutopilotPage(options?: { tier?: string }): string {
     </div>
   </footer>
 
+${ASSISTANT_WIDGET_HTML}
 </body>
 </html>`;
 }

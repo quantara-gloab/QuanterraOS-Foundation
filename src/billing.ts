@@ -13,6 +13,7 @@ import { eq } from "drizzle-orm";
 import { db } from "./db.ts";
 import { users, billingEvents } from "./schema.ts";
 import { updateUserTier, getUserById, type UserTier } from "./auth.ts";
+import { logEvent } from "./metrics.ts";
 
 export interface CheckoutConfig {
   proPriceId: string;
@@ -207,6 +208,9 @@ export function processBillingEvent(event: StripeEventPayload): { handled: boole
           affectedUserId = u.id;
           actionTaken = `upgraded_to_${tier}_by_email`;
         }
+      }
+      if (affectedUserId) {
+        logEvent("checkout_completed", affectedUserId, { tier, customerId, subscriptionId });
       }
       break;
     }

@@ -5,6 +5,7 @@
  * CSV download links, API key management (for Institutional), and Stripe billing portal link.
  */
 import type { UserRecord, UserTier } from "./auth.ts";
+import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
 
 export function renderAccountPageHtml(user: UserRecord | null, tier: UserTier, error?: string, success?: string): string {
   const isAuth = user !== null;
@@ -426,6 +427,7 @@ export function renderAccountPageHtml(user: UserRecord | null, tier: UserTier, e
     <div><a href="/pricing">Pricing</a> · <a href="/legal">Legal</a></div>
   </footer>
 
+${ASSISTANT_WIDGET_HTML}
 </body>
 </html>`;
 }

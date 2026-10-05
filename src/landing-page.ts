@@ -1,6 +1,7 @@
 import type { MarketPriceCalibrationReport } from "./market-price-calibration.ts";
 import { getCouncilAgentsData } from "./agents/council-data.ts";
 import { renderSpecialistIcon, SPECIALIST_ICONS_CSS } from "./specialist-icons.ts";
+import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
 
 /**
  * QuanterraOS Flagship — Elite Institutional Grade
@@ -1414,6 +1415,7 @@ function escapeHtml(str) {
     .replace(/'/g, '&#039;');
 }
 </script>
+${ASSISTANT_WIDGET_HTML}
 </body>
 </html>`;
 }

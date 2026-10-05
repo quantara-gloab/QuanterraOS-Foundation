@@ -9,6 +9,7 @@
  */
 
 import { computeMarketPriceCalibration, type MarketPriceCalibrationReport } from "./market-price-calibration.ts";
+import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
 
 let cachedReport: MarketPriceCalibrationReport | null = null;
 let lastComputedTime: number = 0;
@@ -854,6 +855,7 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
 
   </main>
 
+${ASSISTANT_WIDGET_HTML}
 </body>
 </html>`;
 }

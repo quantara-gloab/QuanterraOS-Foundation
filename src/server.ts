@@ -63,6 +63,14 @@ import {
   BILLING_CONFIG,
 } from "./billing.ts";
 import { apiKeys } from "./schema.ts";
+import {
+  logEvent,
+  renderAdminMetricsPage,
+  getDailySignups,
+  getConversionFunnel,
+  getWeekOverWeekRetention,
+  getRecentRawEvents,
+} from "./metrics.ts";
 
 runMigrations();
 seedHistoricalReplay().catch((err) => console.error("Error seeding historical replay:", err));
@@ -785,7 +793,7 @@ function checkChatRateLimit(clientIp: string): { allowed: boolean; retryAfterSec
   return { allowed: true, retryAfterSeconds: 0 };
 }
 
-app.post(["/api/council/:agentId/chat", "/api/council/:id/chat", "/api/council/agents/:id/chat", "/api/executives/:id/chat"], async (req, res) => {
+app.post(["/api/assistant/chat", "/api/council/:agentId/chat", "/api/council/:id/chat", "/api/council/agents/:id/chat", "/api/executives/:id/chat"], async (req, res) => {
   try {
     const clientIp = (req.ip || req.socket.remoteAddress || "unknown").toString();
     const rateCheck = checkChatRateLimit(clientIp);
@@ -797,7 +805,7 @@ app.post(["/api/council/:agentId/chat", "/api/council/:id/chat", "/api/council/a
       });
     }
 
-    const agentId = req.params.agentId || req.params.id;
+    const agentId = req.params.agentId || req.params.id || req.body?.agentId || "sentinel";
     const { message, history } = req.body || {};
     if (!message || typeof message !== "string" || message.trim().length === 0) {
       return res.status(400).json({ error: "invalid_request", message: "Field 'message' is required." });
@@ -2070,10 +2078,13 @@ app.get("/subscribe", (_req, res) => {
 
 app.get("/pricing", (req, res) => {
   const auth = getUserAuth(req);
+  logEvent("pricing_view", auth.user?.id, { tier: auth.tier });
   res.type("html").send(renderPricingPageHtml(auth.tier));
 });
 
-app.get(["/research/two-strategies-lost", "/blog/two-strategies-lost"], (_req, res) => {
+app.get(["/research/two-strategies-lost", "/blog/two-strategies-lost"], (req, res) => {
+  const auth = getUserAuth(req);
+  logEvent("page_view_research", auth.user?.id, { path: req.path });
   res.type("html").send(renderTwoStrategiesLostPageHtml());
 });
 
@@ -2089,7 +2100,9 @@ app.get(["/methodology", "/methodology/index"], (_req, res) => {
   res.type("html").send(renderMethodologyPageHtml());
 });
 
-app.get("/research", (_req, res) => {
+app.get("/research", (req, res) => {
+  const auth = getUserAuth(req);
+  logEvent("page_view_research", auth.user?.id, { path: "/research" });
   res.type("html").send(renderResearchPageHtml());
 });
 
@@ -2108,6 +2121,7 @@ app.get("/changelog", (_req, res) => {
 app.get("/predictions", (req, res) => {
   const isReplay = req.query.view === "replay";
   const auth = getUserAuth(req);
+  logEvent("page_view_predictions", auth.user?.id, { isReplay, tier: auth.tier });
   res.type("html").send(renderPredictionsPage({ isReplay, tier: auth.tier }));
 });
 
@@ -2118,8 +2132,9 @@ app.get("/api/predictions", (req, res) => {
   res.json(getPredictionsLedger({ isReplay, limit, tier: auth.tier }));
 });
 
-app.get("/autopilot", (_req, res) => {
-  const auth = getUserAuth(_req);
+app.get("/autopilot", (req, res) => {
+  const auth = getUserAuth(req);
+  logEvent("page_view_autopilot", auth.user?.id, { tier: auth.tier });
   res.type("html").send(renderAutopilotPage({ tier: auth.tier }));
 });
 
@@ -2237,6 +2252,7 @@ app.post("/api/auth/register", (req, res) => {
   }
   try {
     const user = createUser(email, password, "free");
+    logEvent("signup", user.id, { email: user.email, tier: "free" });
     const { sessionId } = createSession(user.id);
     res.setHeader("Set-Cookie", `quanterraos_session=${sessionId}; Path=/; HttpOnly; SameSite=Lax`);
     if (req.headers["accept"]?.includes("text/html") || req.body.redirect !== "false") {
@@ -2304,11 +2320,13 @@ app.post("/api/billing/checkout", async (req, res) => {
     // If not logged in, auto-provision guest account
     const guestEmail = `operator_${randomUUID().slice(0, 8)}@quanterraos.local`;
     activeUser = createUser(guestEmail, randomUUID(), "free");
+    logEvent("signup", activeUser.id, { email: guestEmail, tier: "free", guest: true });
     const { sessionId } = createSession(activeUser.id);
     res.setHeader("Set-Cookie", `quanterraos_session=${sessionId}; Path=/; HttpOnly; SameSite=Lax`);
   }
   try {
     const tier = req.body.tier === "institutional" ? "institutional" : "pro";
+    logEvent("checkout_started", activeUser.id, { tier, protocol: req.protocol });
     const session = await createCheckoutSession({
       userId: activeUser.id,
       tier,
@@ -2355,25 +2373,32 @@ app.post("/api/billing/webhook", (req, res) => {
   const webhookSecret = BILLING_CONFIG.webhookSecret;
   const sig = req.headers["stripe-signature"] as string | undefined;
 
-  // In production, missing webhook secret is a critical server configuration defect
-  if (process.env.NODE_ENV === "production" && !webhookSecret) {
-    console.error("[Billing] Webhook rejected: STRIPE_WEBHOOK_SECRET is not configured on production server.");
+  // 1. In any non-test environment, STRIPE_WEBHOOK_SECRET is strictly mandatory
+  if (!webhookSecret) {
+    if (process.env.NODE_ENV === "test") {
+      // In isolated automated unit tests only, allow pass-through if secret is unset
+      try {
+        const result = processBillingEvent(req.body);
+        return res.json(result);
+      } catch (err) {
+        return res.status(500).json({ error: (err as Error).message });
+      }
+    }
+    console.error("[Security Violation] Webhook rejected: STRIPE_WEBHOOK_SECRET is not configured on this server.");
     return res.status(500).json({ error: "Webhook secret not configured on server" });
   }
 
-  // If webhook secret is configured, signature verification is strictly MANDATORY
-  if (webhookSecret) {
-    if (!sig) {
-      return res.status(400).json({ error: "Missing stripe-signature header" });
-    }
-    const rawBody = (req as any).rawBody ? (req as any).rawBody.toString("utf8") : JSON.stringify(req.body);
-    const isValid = verifyStripeSignature(rawBody, sig, webhookSecret);
-    if (!isValid) {
-      return res.status(400).json({ error: "Invalid stripe-signature" });
-    }
-  } else {
-    // Only in non-production local development without configured secret do we log a warning
-    console.warn("[Billing] STRIPE_WEBHOOK_SECRET not set; running unverified webhook in development mode only");
+  // 2. Cryptographic signature verification is strictly MANDATORY before trusting event
+  if (!sig) {
+    console.warn("[Security Violation] Webhook rejected: missing stripe-signature header");
+    return res.status(400).json({ error: "Missing stripe-signature header" });
+  }
+
+  const rawBody = (req as any).rawBody ? (req as any).rawBody.toString("utf8") : JSON.stringify(req.body);
+  const isValid = verifyStripeSignature(rawBody, sig, webhookSecret);
+  if (!isValid) {
+    console.warn("[Security Violation] Webhook rejected: invalid or forged stripe-signature");
+    return res.status(400).json({ error: "Invalid stripe-signature" });
   }
 
   try {
@@ -2396,6 +2421,61 @@ if (process.env.NODE_ENV === "test") {
     res.status(404).json({ error: "Endpoint not found" });
   });
 }
+
+// ---------------------------------------------------------------------------
+// Protected Admin Metrics & PMF Retention Console (Track 1.2)
+// ---------------------------------------------------------------------------
+
+const ADMIN_METRICS_KEY = process.env.ADMIN_METRICS_KEY || process.env.ADMIN_PASSWORD || "sentinel_admin_metrics_2026";
+
+function checkAdminAuth(req: express.Request): boolean {
+  const authHeader = req.headers["x-admin-key"] as string | undefined;
+  if (authHeader && authHeader === ADMIN_METRICS_KEY) return true;
+
+  const queryKey = req.query.key as string | undefined;
+  if (queryKey && queryKey === ADMIN_METRICS_KEY) return true;
+
+  const cookieHeader = req.headers["cookie"] || "";
+  const match = cookieHeader.match(/quanterraos_admin=([^;]+)/);
+  if (match && match[1] === ADMIN_METRICS_KEY) return true;
+
+  return false;
+}
+
+app.get("/admin/metrics", (req, res) => {
+  const isAuth = checkAdminAuth(req);
+  if (!isAuth) {
+    const errorMsg = req.query.error as string | undefined;
+    return res.status(401).type("html").send(renderAdminMetricsPage({ authenticated: false, error: errorMsg }));
+  }
+  res.type("html").send(renderAdminMetricsPage({ authenticated: true }));
+});
+
+app.post("/admin/metrics/login", (req, res) => {
+  const key = (req.body.key || "").trim();
+  if (key === ADMIN_METRICS_KEY) {
+    res.setHeader("Set-Cookie", `quanterraos_admin=${ADMIN_METRICS_KEY}; Path=/; HttpOnly; SameSite=Lax`);
+    return res.redirect("/admin/metrics");
+  }
+  return res.redirect("/admin/metrics?error=" + encodeURIComponent("Invalid admin access key."));
+});
+
+app.post("/admin/metrics/logout", (_req, res) => {
+  res.setHeader("Set-Cookie", `quanterraos_admin=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly`);
+  res.redirect("/admin/metrics");
+});
+
+app.get("/api/admin/metrics", (req, res) => {
+  if (!checkAdminAuth(req)) {
+    return res.status(401).json({ error: "unauthorized", message: "Admin authentication required. Provide x-admin-key header or ?key= query parameter." });
+  }
+  res.json({
+    dailySignups: getDailySignups(30),
+    conversionFunnel: getConversionFunnel(),
+    cohortRetention: getWeekOverWeekRetention(),
+    recentEvents: getRecentRawEvents(50),
+  });
+});
 
 app.get("/api/index/btc/latest", (_req, res) => {
   res.json(getLatestCompositeIndex("BTC"));

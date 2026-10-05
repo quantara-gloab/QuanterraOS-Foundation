@@ -10,6 +10,7 @@
  * - Strictly pulls from the immutable ledger — no narrative, pure data.
  */
 import { getPredictionsLedger, type PredictionRecord } from "./prediction-ledger.ts";
+import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
 
 export function renderPredictionsPage(options?: { isReplay?: boolean; tier?: string }): string {
   const isReplay = Boolean(options?.isReplay);
@@ -482,6 +483,7 @@ export function renderPredictionsPage(options?: { isReplay?: boolean; tier?: str
     </div>
   </footer>
 
+${ASSISTANT_WIDGET_HTML}
 </body>
 </html>`;
 }

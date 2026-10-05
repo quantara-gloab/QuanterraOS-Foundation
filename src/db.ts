@@ -40,6 +40,7 @@ export function runMigrations(): void {
     "0012_council_chat_log.sql",
     "0013_prediction_ledger.sql",
     "0014_user_accounts_and_billing.sql",
+    "0015_events_and_metrics.sql",
   ]) {
     const migrationPath = path.join(migrationsDir, migration);
     if (migration === "0006_multi_asset.sql") {

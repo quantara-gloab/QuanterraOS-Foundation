@@ -412,8 +412,23 @@ export const ASSISTANT_WIDGET_HTML = `
     }
   }
 
-  bubble.addEventListener('click', toggleDrawer);
-  closeBtn.addEventListener('click', toggleDrawer);
+  bubble.addEventListener('click', function(e) {
+    e.stopPropagation();
+    toggleDrawer();
+  });
+
+  closeBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    drawer.classList.add('qos-drawer-hidden');
+    isOpen = false;
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && isOpen) {
+      drawer.classList.add('qos-drawer-hidden');
+      isOpen = false;
+    }
+  });
 
   // Voice Speech Synthesis
   function speakText(text) {

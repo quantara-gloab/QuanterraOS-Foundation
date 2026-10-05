@@ -7,6 +7,8 @@
  * - Zero artificial urgency, zero fake countdowns, strictly compliant with static-copy guardrails.
  */
 
+import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
+
 export function renderPricingPageHtml(userTier: string = "free"): string {
   return `<!DOCTYPE html>
 <html lang="en">
@@ -524,6 +526,7 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
     <div><a href="/legal">Legal & Compliance</a> · <a href="/status">System Status</a></div>
   </footer>
 
+${ASSISTANT_WIDGET_HTML}
 </body>
 </html>`;
 }

@@ -451,6 +451,22 @@ export const billingEvents = sqliteTable(
   }),
 );
 
+export const events = sqliteTable(
+  "events",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id"),
+    eventName: text("event_name").notNull(),
+    timestamp: text("timestamp").notNull(),
+    metadata: text("metadata"),
+  },
+  (table) => ({
+    userIdIdx: index("events_user_id_idx").on(table.userId),
+    nameIdx: index("events_name_idx").on(table.eventName),
+    timestampIdx: index("events_timestamp_idx").on(table.timestamp),
+  }),
+);
+
 
 
 

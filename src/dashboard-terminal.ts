@@ -14,6 +14,7 @@
  */
 
 import { renderSpecialistIcon, SPECIALIST_ICONS_CSS, SPECIALIST_ICONS_MAP } from "./specialist-icons.ts";
+import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
 
 export function renderCouncilDashboardPage(clerkScripts: string = "", clerkConfigured: boolean = false): string {
   return `<!doctype html>
@@ -2109,6 +2110,7 @@ window.addEventListener('load', function() {
   }, 30000);
 });
 </script>
+${ASSISTANT_WIDGET_HTML}
 </body>
 </html>`;
 }

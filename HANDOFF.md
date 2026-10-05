@@ -309,5 +309,30 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 - Strict adherence to `HANDOFF.md` Rules B4 (no marketing superlatives, 0 unbacked claims) and B5 (zero live capital, circuit lock intact).
 - Verified 0 remaining references to `#4FD1C5` or `rgba(79, 209, 197)`.
 
+---
 
+### Session: 2026-10-04 — Billing Security, Telemetry Funnel & PMF Retention Console (Track 1.0 & 1.2)
 
+**Delivered Capabilities:**
+- **Track 1.0 Billing Webhook Security Hardening (`src/billing.ts`, `src/server.ts`)**:
+  - Strict cryptographic HMAC-SHA256 signature verification (`t=...,v1=...`) enforcing replay defense window (<= 300s).
+  - Mandatory webhook secret configuration in non-test environments; `/api/billing/simulate-webhook` strictly test-gated.
+- **Track 1.2 Telemetry Instrumentation & PMF Cohort Retention Engine (`src/metrics.ts`, `migrations/0015_events_and_metrics.sql`)**:
+  - Schema: `events` table with indexes on `user_id`, `event_name`, and `timestamp`.
+  - Non-blocking `logEvent()` logging across critical operational touchpoints: `signup`, `pricing_view`, `page_view_predictions`, `page_view_autopilot`, `page_view_research`, `checkout_started`, and `checkout_completed`.
+  - Conversion Funnel computation: pricing view -> checkout started -> subscription activated.
+  - Week-over-week cohort retention matrix evaluating week-4 flattening (PMF indicator) vs decay.
+  - Password-protected `/admin/metrics` command dashboard and `/api/admin/metrics` authenticated endpoint.
+- **Unified Assistant Widget & Council Desk Integration (`src/assistant-widget.ts`, `src/agents/council-chat.ts`)**:
+  - Integrated `ASSISTANT_WIDGET_HTML` across all public and terminal interfaces (`/`, `/account`, `/autopilot`, `/calibration`, `/predictions`, `/pricing`, `/dashboard`).
+  - Added Escape key dismiss, event propagation protection, and domain answers for Chicago operations desk contact details (+1 312 555-0198, support@quanterraos.com), 20-minute Free tier ledger delay, and subscription tiers.
+
+**Verification:**
+- `npx tsc --noEmit` — 0 errors (clean exit 0).
+- `npm test` — 236/236 passing across 47 suites, 0 failures (duration 44.8s).
+- Dedicated test suite: `src/__tests__/metrics-retention-security.test.ts` (6/6 passing).
+
+**Next Tasks:**
+1. Deploy changes to production (`deploy/deploy.sh` per J2).
+2. Monitor incoming live events and cohort matrix on `/admin/metrics`.
+3. Accumulate monthly Falcon order-book snapshots past n=31 before re-testing imbalance.
