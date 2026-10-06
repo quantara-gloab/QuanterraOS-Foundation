@@ -50,7 +50,7 @@ import { renderAccountPageHtml } from "./account-page.ts";
 import { renderWalletPageHtml } from "./wallet-page.ts";
 import { renderCalculatorPageHtml } from "./calculator-page.ts";
 import { renderCalibrationSurfacePageHtml } from "./calibration-surface-page.ts";
-import { renderMcpPageHtml, MCP_SERVER_MANIFEST } from "./mcp-server.ts";
+import { renderMcpPageHtml, MCP_SERVER_MANIFEST, executeMcpTool } from "./mcp-server.ts";
 import { renderSmsOptInPageHtml } from "./sms-optin-page.ts";
 import {
   SMS_MARKETING_DISCLOSURE,
@@ -2192,6 +2192,45 @@ app.get("/mcp", (_req, res) => {
 
 app.get(["/api/mcp", "/api/mcp/manifest"], (_req, res) => {
   res.json(MCP_SERVER_MANIFEST);
+});
+
+app.post(["/api/mcp", "/api/mcp/call"], async (req, res) => {
+  try {
+    const body = req.body || {};
+    // Handle JSON-RPC 2.0 (standard for Claude Desktop / Cursor MCP clients)
+    if (body.jsonrpc === "2.0") {
+      const toolName = body.params?.name || body.method;
+      const toolArgs = body.params?.arguments || body.params || {};
+      const result = await executeMcpTool(toolName, toolArgs);
+      return res.json({
+        jsonrpc: "2.0",
+        id: body.id ?? null,
+        result: {
+          content: [
+            {
+              type: "text",
+              text: typeof result === "string" ? result : JSON.stringify(result, null, 2),
+            },
+          ],
+        },
+      });
+    }
+
+    // Handle standard REST invocation: { tool: "simulate_order_friction", parameters: { ... } }
+    const toolName = body.tool || body.name;
+    if (!toolName) {
+      return res.status(400).json({ error: "Missing tool or method name in request body" });
+    }
+    const params = body.parameters || body.arguments || body.params || {};
+    const result = await executeMcpTool(toolName, params);
+    return res.json({ success: true, tool: toolName, result });
+  } catch (error: any) {
+    return res.status(500).json({
+      error: error?.message || "Failed to execute MCP tool",
+      jsonrpc: req.body?.jsonrpc ? "2.0" : undefined,
+      id: req.body?.id ?? null,
+    });
+  }
 });
 
 app.get("/api/quotes", async (req, res) => {

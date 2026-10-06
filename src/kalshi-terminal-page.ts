@@ -249,6 +249,104 @@ export function renderKalshiTerminalHtml(userEmail?: string, userTier: string = 
     gap: 14px;
     margin-bottom: 20px;
   }
+
+  /* TWAP Settlement Projector Card */
+  .twap-card {
+    background: rgba(14, 19, 28, 0.95);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .twap-card.active-window {
+    border-color: var(--accent);
+    box-shadow: 0 0 16px rgba(223, 184, 67, 0.2);
+  }
+  .twap-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+  }
+  .twap-badge {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .twap-badge.waiting {
+    background: rgba(148, 163, 184, 0.12);
+    color: var(--muted);
+    border: 1px solid rgba(148, 163, 184, 0.25);
+  }
+  .twap-badge.running {
+    background: rgba(223, 184, 67, 0.15);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    animation: blink 1s infinite alternate;
+  }
+  .twap-stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    font-family: var(--font-mono);
+  }
+  .twap-stat-label {
+    font-size: 0.70rem;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .twap-stat-value {
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin-top: 2px;
+  }
+  .twap-progress-bar-bg {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
+    margin-top: 10px;
+    overflow: hidden;
+  }
+  .twap-progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--gold-bullion), #FFFFFF);
+    transition: width 0.3s ease;
+  }
+
+  /* Order slip taker/maker toggle */
+  .order-type-toggle {
+    display: flex;
+    gap: 6px;
+    background: rgba(6, 8, 14, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 3px;
+    border-radius: 6px;
+  }
+  .order-type-btn {
+    flex: 1;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    padding: 6px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.15s;
+  }
+  .order-type-btn.active {
+    background: rgba(223, 184, 67, 0.15);
+    color: var(--accent-light);
+    border: 1px solid rgba(223, 184, 67, 0.3);
+  }
   .depth-side {
     background: rgba(14, 19, 28, 0.8);
     border: 1px solid var(--border);
@@ -537,6 +635,35 @@ export function renderKalshiTerminalHtml(userEmail?: string, userTier: string = 
           </div>
         </div>
 
+        <!-- 60-Second Settlement TWAP Projector & Countdown Visualizer -->
+        <div id="twap-card" class="twap-card">
+          <div class="twap-header">
+            <span style="font-weight:600; letter-spacing:0.04em; color:var(--accent-light);">FINAL 60s SETTLEMENT TWAP WINDOW (CME BRTI ACCUMULATOR)</span>
+            <span id="twap-status-badge" class="twap-badge waiting">PRE-TWAP (STARTS T-60s)</span>
+          </div>
+          <div class="twap-stats-row">
+            <div>
+              <div class="twap-stat-label">Projected Settlement TWAP</div>
+              <div class="twap-stat-value" id="twap-projected-val">$—</div>
+            </div>
+            <div>
+              <div class="twap-stat-label">TWAP vs Strike Gap</div>
+              <div class="twap-stat-value" id="twap-gap-val">—</div>
+            </div>
+            <div>
+              <div class="twap-stat-label">Projected Settlement</div>
+              <div class="twap-stat-value" id="twap-verdict-val" style="color:var(--muted);">PENDING T-60s</div>
+            </div>
+          </div>
+          <div class="twap-progress-bar-bg">
+            <div id="twap-progress-bar" class="twap-progress-bar-fill"></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:0.70rem; color:var(--muted); font-family:var(--font-mono); margin-top:6px;">
+            <span id="twap-samples-label">0 / 60 1-sec ticks recorded</span>
+            <span>Kalshi settles on 60-sec arithmetic mean</span>
+          </div>
+        </div>
+
         <div class="orderbook-box">
           <div class="depth-side yes">
             <div class="side-tag yes">BUY YES (Settles ≥ Strike)</div>
@@ -631,19 +758,42 @@ export function renderKalshiTerminalHtml(userEmail?: string, userTier: string = 
             </div>
           </div>
 
+          <!-- Order Type (Taker vs Maker Fee Rate) -->
+          <div class="form-group">
+            <div class="form-label">
+              <span>EXECUTION ROUTE</span>
+              <span id="fee-rate-label" style="color:var(--accent);">Taker Fee: ~7% peak</span>
+            </div>
+            <div class="order-type-toggle">
+              <button type="button" id="btn-type-taker" class="order-type-btn active" onclick="setOrderType('taker')">TAKER (Immediate Fill)</button>
+              <button type="button" id="btn-type-maker" class="order-type-btn" onclick="setOrderType('maker')">MAKER (Resting Order)</button>
+            </div>
+          </div>
+
           <!-- Order Summary Box -->
           <div class="order-summary-box">
             <div class="summary-line">
-              <span style="color:var(--muted);">Total Cost:</span>
+              <span style="color:var(--muted);">Gross Contract Cost:</span>
               <span id="summary-cost" style="color:#FFFFFF;">$5.00</span>
             </div>
             <div class="summary-line">
-              <span style="color:var(--muted);">Payout at Settle:</span>
+              <span style="color:var(--muted);" id="summary-fee-label">Kalshi Fee (Taker 7% max):</span>
+              <span id="summary-fee" style="color:#FB7185;">+$0.18</span>
+            </div>
+            <div class="summary-line">
+              <span style="color:var(--muted);">Breakeven Win Rate:</span>
+              <span id="summary-breakeven" style="color:var(--accent-light);">51.8% hurdle</span>
+            </div>
+            <div class="summary-line">
+              <span style="color:var(--muted);">Gross Payout at Settle:</span>
               <span id="summary-payout" style="color:#FFFFFF;">$10.00 ($1.00/contract)</span>
             </div>
             <div class="summary-line">
-              <span style="color:var(--muted);">Potential Return:</span>
-              <span id="summary-return" style="color:var(--green);">+$5.00 (+100%)</span>
+              <span style="color:var(--text); font-weight:700;">Net EV Return:</span>
+              <span id="summary-net-return" style="color:var(--green); font-weight:700;">+$4.82 (+96.4% Net ROI)</span>
+            </div>
+            <div id="maker-savings-hint" style="font-size:0.72rem; color:var(--accent); margin-top:6px; display:block;">
+              💡 Tip: Resting as Maker saves up to 75% on Kalshi exchange fees.
             </div>
           </div>
 
@@ -705,9 +855,12 @@ export function renderKalshiTerminalHtml(userEmail?: string, userTier: string = 
 <script>
 let currentMode = 'sandbox';
 let currentSide = 'yes';
+let currentOrderType = 'taker';
 let activeMarket = null;
 let userBalance = { sandbox: 10000, live: 100.29 };
 let closeTimeMs = 0;
+let twapTickSamples = [];
+let lastSampleSec = -1;
 
 // Audio Chime (Web Audio API)
 function playChime() {
@@ -786,19 +939,63 @@ function setCount(count) {
   updateCalculations();
 }
 
+function setOrderType(type) {
+  currentOrderType = type;
+  document.getElementById('btn-type-taker').className = 'order-type-btn ' + (type === 'taker' ? 'active' : '');
+  document.getElementById('btn-type-maker').className = 'order-type-btn ' + (type === 'maker' ? 'active' : '');
+  document.getElementById('fee-rate-label').textContent = type === 'taker' ? 'Taker Fee: ~7% peak' : 'Maker Fee: ~1.75% peak';
+  updateCalculations();
+}
+
 function updateCalculations() {
   const price = Math.max(1, Math.min(99, Number(document.getElementById('input-price').value || 50))) / 100;
   const count = Math.max(1, Number(document.getElementById('input-count').value || 1));
-  const cost = price * count;
-  const payout = 1.00 * count;
-  const profit = payout - cost;
-  const roi = Math.round((profit / cost) * 100);
+  const grossCost = price * count;
+  const grossPayout = 1.00 * count;
+
+  // Kalshi Fee formula: ceil(rate * count * P * (1-P) * 100) in cents
+  const feeRate = currentOrderType === 'maker' ? 0.0175 : 0.07;
+  const feeCents = Math.ceil(feeRate * count * price * (1 - price) * 100);
+  const feeDollars = feeCents / 100;
+
+  const makerFeeCents = Math.ceil(0.0175 * count * price * (1 - price) * 100);
+  const makerFeeDollars = makerFeeCents / 100;
+  const takerFeeCents = Math.ceil(0.07 * count * price * (1 - price) * 100);
+  const takerFeeDollars = takerFeeCents / 100;
+  const makerSavings = takerFeeDollars - makerFeeDollars;
+
+  const totalCost = grossCost + feeDollars;
+  const netProfit = grossPayout - grossCost - feeDollars;
+  const netRoi = grossCost > 0 ? ((netProfit / grossCost) * 100).toFixed(1) : '0.0';
+  const breakevenHurdle = count > 0 ? (((grossCost + feeDollars) / grossPayout) * 100).toFixed(1) : '50.0';
 
   document.getElementById('price-cents-label').textContent = Math.round(price * 100) + '¢ ($' + price.toFixed(2) + ')';
   document.getElementById('contracts-label').textContent = count + ' contracts';
-  document.getElementById('summary-cost').textContent = '$' + cost.toFixed(2);
-  document.getElementById('summary-payout').textContent = '$' + payout.toFixed(2) + ' ($1.00/contract)';
-  document.getElementById('summary-return').textContent = '+$' + profit.toFixed(2) + ' (+' + roi + '%)';
+  document.getElementById('summary-cost').textContent = '$' + grossCost.toFixed(2);
+  document.getElementById('summary-fee-label').textContent = currentOrderType === 'taker' ? 'Kalshi Taker Fee (7% max):' : 'Kalshi Maker Fee (1.75% max):';
+  document.getElementById('summary-fee').textContent = '+$' + feeDollars.toFixed(2);
+  document.getElementById('summary-breakeven').textContent = breakevenHurdle + '% win rate hurdle';
+  document.getElementById('summary-payout').textContent = '$' + grossPayout.toFixed(2) + ' ($1.00/contract)';
+  
+  const returnEl = document.getElementById('summary-net-return');
+  if (netProfit >= 0) {
+    returnEl.textContent = '+$' + netProfit.toFixed(2) + ' (+' + netRoi + '% Net ROI)';
+    returnEl.style.color = 'var(--green)';
+  } else {
+    returnEl.textContent = '-$' + Math.abs(netProfit).toFixed(2) + ' (' + netRoi + '% Net ROI)';
+    returnEl.style.color = 'var(--rose)';
+  }
+
+  const hintEl = document.getElementById('maker-savings-hint');
+  if (currentOrderType === 'taker' && makerSavings > 0) {
+    hintEl.textContent = '💡 Tip: Save $' + makerSavings.toFixed(2) + ' in fee drag by resting as Maker.';
+    hintEl.style.display = 'block';
+  } else if (currentOrderType === 'maker') {
+    hintEl.textContent = '✨ Maker advantage: 75% fee discount applied (earns spread if filled).';
+    hintEl.style.display = 'block';
+  } else {
+    hintEl.style.display = 'none';
+  }
 }
 
 function updateBalanceDisplay() {
@@ -865,7 +1062,7 @@ async function fetchMarket() {
   }
 }
 
-// Countdown timer
+// TWAP Projector & Countdown timer
 function tickTimer() {
   if (!closeTimeMs) return;
   const now = Date.now();
@@ -874,9 +1071,75 @@ function tickTimer() {
   const secs = left % 60;
   document.getElementById('countdown-timer').textContent = 
     String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0') + ' left';
+
+  // Update 60s Settlement TWAP Projector
+  updateTwapProjector(left);
+
   if (left === 0) {
+    twapTickSamples = [];
     fetchMarket();
     loadUserBids();
+  }
+}
+
+function updateTwapProjector(secondsLeft) {
+  const card = document.getElementById('twap-card');
+  const badge = document.getElementById('twap-status-badge');
+  const projectedVal = document.getElementById('twap-projected-val');
+  const gapVal = document.getElementById('twap-gap-val');
+  const verdictVal = document.getElementById('twap-verdict-val');
+  const bar = document.getElementById('twap-progress-bar');
+  const label = document.getElementById('twap-samples-label');
+
+  if (!activeMarket || !activeMarket.floor_strike) return;
+  const strike = activeMarket.floor_strike;
+  const spot = activeMarket.spot;
+
+  if (secondsLeft > 60) {
+    card.classList.remove('active-window');
+    badge.className = 'twap-badge waiting';
+    badge.textContent = 'PRE-TWAP (STARTS AT T-60s)';
+    projectedVal.textContent = spot ? '$' + Number(spot).toLocaleString() + ' (Spot)' : '$—';
+    gapVal.textContent = spot ? ((spot - strike >= 0 ? '+' : '') + '$' + (spot - strike).toFixed(2)) : '—';
+    verdictVal.textContent = 'STANDBY (T-' + (secondsLeft - 60) + 's)';
+    verdictVal.style.color = 'var(--muted)';
+    bar.style.width = '0%';
+    label.textContent = 'Accumulation opens in minute 14 (final 60s)';
+    twapTickSamples = [];
+  } else if (secondsLeft > 0) {
+    card.classList.add('active-window');
+    badge.className = 'twap-badge running';
+    badge.textContent = '● ACTIVE TWAP SAMPLING (' + secondsLeft + 's REMAINING)';
+
+    if (spot && lastSampleSec !== secondsLeft) {
+      twapTickSamples.push(spot);
+      lastSampleSec = secondsLeft;
+    }
+
+    const n = twapTickSamples.length;
+    const sum = twapTickSamples.reduce((a, b) => a + b, 0);
+    const twap = n > 0 ? (sum / n) : (spot || strike);
+    const gap = twap - strike;
+
+    projectedVal.textContent = '$' + Number(twap.toFixed(2)).toLocaleString();
+    gapVal.textContent = (gap >= 0 ? '+' : '') + '$' + gap.toFixed(2);
+    gapVal.style.color = gap >= 0 ? 'var(--green)' : 'var(--rose)';
+
+    if (gap >= 0) {
+      verdictVal.textContent = 'YES (Projected ≥ Strike)';
+      verdictVal.style.color = 'var(--green)';
+    } else {
+      verdictVal.textContent = 'NO (Projected < Strike)';
+      verdictVal.style.color = 'var(--rose)';
+    }
+
+    const progressPct = Math.min(100, Math.round((n / 60) * 100));
+    bar.style.width = progressPct + '%';
+    label.textContent = n + ' / 60 1-sec ticks recorded (' + progressPct + '%)';
+  } else {
+    badge.className = 'twap-badge waiting';
+    badge.textContent = 'SETTLED';
+    verdictVal.textContent = 'FINALIZED';
   }
 }
 setInterval(tickTimer, 1000);

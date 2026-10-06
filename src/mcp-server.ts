@@ -1,4 +1,5 @@
 import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
+import { getLiveQuotes } from "./live-quotes.ts";
 
 /**
  * Model Context Protocol (MCP) Manifest & Agent Integration Layer
@@ -54,6 +55,20 @@ export const MCP_SERVER_MANIFEST = {
         type: "object",
         properties: {
           asset: { type: "string", default: "BTC" }
+        }
+      }
+    },
+    {
+      name: "simulate_order_friction",
+      description: "Pre-trade risk coprocessor: computes exact Kalshi taker ($0.07*C*P*(1-P)) and maker ($0.0175*C*P*(1-P)) fee drag, required breakeven win rate hurdle, fee drag in basis points, and net expected value (EV) for short-duration binary event contracts.",
+      parameters: {
+        type: "object",
+        required: ["price"],
+        properties: {
+          price: { type: "number", description: "Contract price between 0.01 and 0.99 (dollars)" },
+          size: { type: "number", default: 100, description: "Contract quantity" },
+          assessedProbability: { type: "number", description: "Assessed win probability between 0.01 and 0.99" },
+          orderType: { type: "string", enum: ["taker", "maker"], default: "taker", description: "Taker (immediate execution) or Maker (resting limit order)" }
         }
       }
     }
@@ -284,6 +299,10 @@ export function renderMcpPageHtml(): string {
           <div class="tool-name">get_spot_basis</div>
           <div class="tool-desc">Surveils basis divergence across spot crypto venues against the composite settlement proxy.</div>
         </div>
+        <div class="tool-item">
+          <div class="tool-name">simulate_order_friction</div>
+          <div class="tool-desc">Pre-trade risk coprocessor: evaluates Kalshi non-linear taker/maker fees, required breakeven win rate, and net EV.</div>
+        </div>
       </div>
     </div>
   </main>
@@ -291,4 +310,179 @@ export function renderMcpPageHtml(): string {
   ${ASSISTANT_WIDGET_HTML}
 </body>
 </html>`;
+}
+
+export function calculateTrueCost(params: {
+  price: number;
+  assessedProbability: number;
+  spread?: number;
+  count?: number;
+}) {
+  const price = Math.max(0.01, Math.min(0.99, Number(params.price)));
+  const assessed = Math.max(0.01, Math.min(0.99, Number(params.assessedProbability)));
+  const count = Math.max(1, Number(params.count ?? 100));
+  const spread = Math.max(0, Number(params.spread ?? 0.02));
+
+  // Taker fee: ceil(0.07 * count * price * (1-price) * 100) in cents
+  const feeCents = Math.ceil(0.07 * count * price * (1 - price) * 100);
+  const fee = feeCents / 100;
+  const spreadCost = (spread / 2) * count;
+  const totalFriction = fee + spreadCost;
+
+  const cost = price * count;
+  const expectedPayout = assessed * count;
+  const grossProfit = expectedPayout - cost;
+  const netProfit = grossProfit - totalFriction;
+
+  const breakevenWinRate = (cost + totalFriction) / count;
+
+  return {
+    price,
+    assessedProbability: assessed,
+    count,
+    cost: Number(cost.toFixed(2)),
+    fee: Number(fee.toFixed(2)),
+    spreadCost: Number(spreadCost.toFixed(2)),
+    totalFriction: Number(totalFriction.toFixed(2)),
+    grossProfit: Number(grossProfit.toFixed(2)),
+    netProfit: Number(netProfit.toFixed(2)),
+    breakevenWinRate: Number(breakevenWinRate.toFixed(4)),
+    netEvPercent: cost > 0 ? Number(((netProfit / cost) * 100).toFixed(2)) : 0,
+    isPositiveEv: netProfit > 0,
+  };
+}
+
+export function simulateOrderFriction(params: {
+  price: number;
+  size?: number;
+  assessedProbability?: number;
+  orderType?: "taker" | "maker";
+}) {
+  const price = Math.max(0.01, Math.min(0.99, Number(params.price)));
+  const size = Math.max(1, Math.floor(Number(params.size ?? 100)));
+  const prob = params.assessedProbability !== undefined
+    ? Math.max(0.01, Math.min(0.99, Number(params.assessedProbability)))
+    : price;
+  const orderType = params.orderType === "maker" ? "maker" : "taker";
+
+  const notional = Number((size * price).toFixed(2));
+  const maxPayout = size * 1.0;
+
+  // Kalshi formula: ceil(rate * C * P * (1-P)) in cents with floating-point epsilon guard
+  const takerRawCents = Math.round(0.07 * size * price * (1 - price) * 100 * 1e4) / 1e4;
+  const takerFeeCents = Math.ceil(takerRawCents);
+  const takerFeeDollars = Number((takerFeeCents / 100).toFixed(2));
+
+  const makerRawCents = Math.round(0.0175 * size * price * (1 - price) * 100 * 1e4) / 1e4;
+  const makerFeeCents = Math.ceil(makerRawCents);
+  const makerFeeDollars = Number((makerFeeCents / 100).toFixed(2));
+
+  const effectiveFee = orderType === "maker" ? makerFeeDollars : takerFeeDollars;
+  const feePerContract = effectiveFee / size;
+
+  const breakevenWinRate = Number((price + feePerContract).toFixed(4));
+  const feePercentOfCost = notional > 0 ? Number(((effectiveFee / notional) * 100).toFixed(2)) : 0;
+  const feeDragBps = notional > 0 ? Math.round((effectiveFee / notional) * 10000) : 0;
+
+  const expectedGrossProfit = Number((size * (prob - price)).toFixed(2));
+  const expectedNetProfit = Number((expectedGrossProfit - effectiveFee).toFixed(2));
+  const netEvRoiPercent = notional > 0 ? Number(((expectedNetProfit / notional) * 100).toFixed(2)) : 0;
+  const isPositiveEv = expectedNetProfit > 0;
+
+  let verdict: string;
+  if (isPositiveEv) {
+    verdict = `POSITIVE EV: Model assessed edge (${(prob * 100).toFixed(1)}%) clears breakeven hurdle (${(breakevenWinRate * 100).toFixed(1)}%) after $${effectiveFee.toFixed(2)} in transaction friction.`;
+  } else if (prob > price) {
+    verdict = `NEGATIVE EV (FEE DRAG): Gross directional edge exists (${(prob * 100).toFixed(1)}% vs ${(price * 100).toFixed(1)}%), but $${effectiveFee.toFixed(2)} (${feePercentOfCost}%) fee drag consumes all alpha. Win rate must exceed ${(breakevenWinRate * 100).toFixed(1)}% to break even.`;
+  } else {
+    verdict = `NEGATIVE EV: Assessed probability (${(prob * 100).toFixed(1)}%) is at or below market quote (${(price * 100).toFixed(1)}%). Zero edge.`;
+  }
+
+  return {
+    price,
+    size,
+    totalNotional: notional,
+    maxPayout,
+    orderType,
+    takerFeeDollars,
+    makerFeeDollars,
+    effectiveFeeDollars: effectiveFee,
+    feeSavingsIfMaker: Number((takerFeeDollars - makerFeeDollars).toFixed(2)),
+    feePercentOfCost,
+    breakevenWinRate,
+    feeDragBps,
+    assessedProbability: prob,
+    expectedGrossPayout: Number((size * prob).toFixed(2)),
+    expectedGrossProfit,
+    expectedNetPayout: Number((size * prob - effectiveFee).toFixed(2)),
+    expectedNetProfit,
+    netEvDollars: expectedNetProfit,
+    netEvRoiPercent,
+    isPositiveEv,
+    verdict,
+  };
+}
+
+export async function executeMcpTool(name: string, params: Record<string, any> = {}): Promise<any> {
+  switch (name) {
+    case "get_composite_price": {
+      const asset = String(params.asset || "BTC").toUpperCase();
+      const quotes = await getLiveQuotes(asset);
+      return {
+        asset: quotes.asset,
+        compositePrice: quotes.compositePrice,
+        quorumMet: quotes.quorumMet,
+        activeVenuesCount: quotes.activeVenuesCount,
+        timestamp: new Date(quotes.timestamp).toISOString(),
+        venues: quotes.venues.map((v) => ({
+          venue: v.venue,
+          price: v.price,
+          spreadBps: v.spreadBps,
+          status: v.status,
+        })),
+      };
+    }
+    case "get_spot_basis": {
+      const asset = String(params.asset || "BTC").toUpperCase();
+      const quotes = await getLiveQuotes(asset);
+      return {
+        referenceIndex: "Quanterra BTC Spot Composite (BRTI Empirical Proxy)",
+        referencePrice: quotes.compositePrice,
+        disclaimer: "QuanterraOS does not represent its composite index as the official CME CF BRTI benchmark, which requires an institutional license.",
+        venues: quotes.venues,
+      };
+    }
+    case "calculate_true_cost": {
+      return calculateTrueCost({
+        price: Number(params.price ?? 0.5),
+        assessedProbability: Number(params.assessedProbability ?? 0.55),
+        spread: Number(params.spread ?? 0.02),
+        count: Number(params.count ?? 100),
+      });
+    }
+    case "simulate_order_friction": {
+      return simulateOrderFriction({
+        price: Number(params.price ?? 0.5),
+        size: Number(params.size ?? 100),
+        assessedProbability: params.assessedProbability !== undefined ? Number(params.assessedProbability) : undefined,
+        orderType: params.orderType,
+      });
+    }
+    case "get_calibration_metrics": {
+      return {
+        canonicalCorpusMarkets: 1316,
+        dataset: "KXBTC15M (Kalshi 15-Minute Bitcoin)",
+        checkpointsEvaluated: "Minutes 1 to 14",
+        minute4Summary: {
+          brierScore: 0.244,
+          sampleCount: 1316,
+          wilson95Ci: [0.231, 0.257],
+          brierSkillScoreVsMid: -0.012,
+          empiricalFinding: "The market is well calibrated; fees ($0.07*P*(1-P)) create high hurdle for gross predictive edge.",
+        },
+      };
+    }
+    default:
+      throw new Error(`Unknown MCP tool: ${name}`);
+  }
 }
