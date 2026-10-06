@@ -971,125 +971,7 @@ ${clerkScripts}
     margin-top: 6px;
   }
 
-  /* Formula 1 Race Telemetry HUD & AI Engine Grid */
-  .f1-telemetry-hud {
-    border: 1px solid rgba(223, 184, 67, 0.28);
-    background: linear-gradient(180deg, rgba(20, 24, 33, 0.95) 0%, rgba(12, 15, 23, 0.95) 100%);
-    padding: 16px 20px;
-    margin-bottom: 24px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-    position: relative;
-    overflow: hidden;
-  }
-  .f1-telemetry-hud::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, #DFB843, #F43F5E, #38BDF8, #DFB843);
-  }
-  .f1-hud-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 14px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--panel-border-subtle);
-  }
-  .f1-hud-title {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .f1-flag { font-size: 1.15rem; }
-  .f1-title-text {
-    font-weight: 600;
-    font-size: 0.92rem;
-    letter-spacing: 0.02em;
-    color: var(--text);
-  }
-  .f1-hud-badge {
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    background: rgba(223, 184, 67, 0.15);
-    color: var(--accent);
-    padding: 2px 8px;
-    border: 1px solid rgba(223, 184, 67, 0.3);
-    border-radius: 4px;
-  }
-  .f1-hud-telemetry {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    flex-wrap: wrap;
-  }
-  .f1-stat {
-    color: var(--muted);
-  }
-  .f1-stat strong {
-    color: var(--accent-light);
-    margin-left: 4px;
-  }
-  .f1-engine-grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 10px;
-  }
-  @media (max-width: 1024px) {
-    .f1-engine-grid { grid-template-columns: repeat(3, 1fr); }
-  }
-  @media (max-width: 640px) {
-    .f1-engine-grid { grid-template-columns: repeat(2, 1fr); }
-  }
-  .f1-engine-card {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    padding: 10px 12px;
-    border-radius: 4px;
-    transition: all 0.2s ease;
-  }
-  .f1-engine-card:hover {
-    border-color: rgba(223, 184, 67, 0.4);
-    background: rgba(223, 184, 67, 0.04);
-  }
-  .f1-engine-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: 600;
-    font-size: 0.78rem;
-    color: var(--text);
-    margin-bottom: 4px;
-  }
-  .f1-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    display: inline-block;
-  }
-  .f1-dot.online {
-    background: #10B981;
-    box-shadow: 0 0 6px #10B981;
-  }
-  .f1-engine-latency {
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--accent);
-    margin-bottom: 2px;
-  }
-  .f1-engine-desc {
-    font-size: 0.68rem;
-    color: var(--muted);
-    line-height: 1.3;
-  }
-
+  /* Specialist Call Sign Badges */
   .f1-callsign-tag {
     font-family: var(--font-mono);
     font-size: 0.65rem;
@@ -1149,66 +1031,17 @@ ${clerkScripts}
 
   <main class="console-container">
 
-    <!-- Formula One Race Telemetry & AI Engine Cluster -->
-    <section class="f1-telemetry-hud" id="f1-hud-cluster">
-      <div class="f1-hud-header">
-        <div class="f1-hud-title">
-          <span class="f1-flag">🏎️</span>
-          <span class="f1-title-text">Formula One Race Telemetry &amp; AI Engine Cluster</span>
-          <span class="f1-hud-badge">Q3 Hot Lap · Active Grid</span>
-        </div>
-        <div class="f1-hud-telemetry">
-          <span class="f1-stat"><span>LAP CALIBRATION:</span> <strong>0.2001 Brier</strong></span>
-          <span class="f1-stat"><span>RPM:</span> <strong id="hud-rpm">18,500</strong></span>
-          <span class="f1-stat"><span>DISPATCH:</span> <strong>&lt;1.2ms</strong></span>
-          <span class="f1-stat"><span>CIRCUIT:</span> <strong style="color:var(--warning)">Rule B5 Locked ($0.00)</strong></span>
-        </div>
-      </div>
-      <div class="f1-engine-grid" id="f1-engine-grid">
-        <div class="f1-engine-card active" title="Anthropic Model Context Protocol">
-          <div class="f1-engine-top"><span>MCP v1.2</span><span class="f1-dot online"></span></div>
-          <div class="f1-engine-latency">0.42ms</div>
-          <div class="f1-engine-desc">JSON-RPC 2.0 streaming tools &amp; context</div>
-        </div>
-        <div class="f1-engine-card active" title="DeepSeek-R1 / V3 Reasoning Loop">
-          <div class="f1-engine-top"><span>DeepSeek-R1</span><span class="f1-dot online"></span></div>
-          <div class="f1-engine-latency">1.12ms</div>
-          <div class="f1-engine-desc">93.3% MLA compression · 160 MoE experts</div>
-        </div>
-        <div class="f1-engine-card active" title="Berkeley vLLM Continuous Batching">
-          <div class="f1-engine-top"><span>vLLM PagedAttention</span><span class="f1-dot online"></span></div>
-          <div class="f1-engine-latency">0.85ms</div>
-          <div class="f1-engine-desc">Virtual memory KV-blocks · 0% fragmentation</div>
-        </div>
-        <div class="f1-engine-card active" title="Meta Llama 3.3 Open Agent Spec">
-          <div class="f1-engine-top"><span>Llama 3.3 MoE</span><span class="f1-dot online"></span></div>
-          <div class="f1-engine-latency">0.91ms</div>
-          <div class="f1-engine-desc">Structured JSON grammar &amp; tool calling</div>
-        </div>
-        <div class="f1-engine-card active" title="OpenAI Swarm Multi-Agent Orchestrator">
-          <div class="f1-engine-top"><span>Swarm Mesh</span><span class="f1-dot online"></span></div>
-          <div class="f1-engine-latency">0.53ms</div>
-          <div class="f1-engine-desc">Pit wall handoffs &amp; consensus debate</div>
-        </div>
-        <div class="f1-engine-card active" title="Stanford DSPy Prompt Optimizer">
-          <div class="f1-engine-top"><span>DSPy Optimizer</span><span class="f1-dot online"></span></div>
-          <div class="f1-engine-latency">1.04ms</div>
-          <div class="f1-engine-desc">Declarative few-shot Brier loss tuning</div>
-        </div>
-      </div>
-    </section>
-
     <!-- Four Metric Tiles -->
     <section class="metric-bar">
       <div class="metric-tile">
         <div class="metric-tile-label">market-mid Brier score</div>
         <div class="metric-tile-val accent" id="metric-market-brier">0.2001</div>
-        <div class="metric-tile-sub">minute-4 baseline across 1,316 settled markets</div>
+        <div class="metric-tile-sub">vs 0.2500 uncalibrated baseline (calibrated edge)</div>
       </div>
       <div class="metric-tile">
         <div class="metric-tile-label">Falcon Brier score</div>
         <div class="metric-tile-val warning" id="metric-falcon-brier">0.2736</div>
-        <div class="metric-tile-sub">underperforms 50/50 baseline (0.2500) over n=31</div>
+        <div class="metric-tile-sub">vs 0.2500 coin-flip baseline (underperforming by +0.0236)</div>
       </div>
       <div class="metric-tile">
         <div class="metric-tile-label">audited markets</div>
@@ -2166,10 +1999,7 @@ async function submitQuery() {
     if (data.telemetryCluster) {
       telemetryHtml = '<div class="f1-chat-telemetry-cluster">' +
         '<span>🏁 ' + escapeHtml(data.telemetryCluster.callSign) + '</span>' +
-        '<span>⚡ ' + escapeHtml(data.telemetryCluster.engine) + '</span>' +
-        '<span>⏱️ ' + data.telemetryCluster.latencyMs + 'ms</span>' +
-        '<span>🔄 ' + escapeHtml(data.telemetryCluster.rpm) + '</span>' +
-        '<span>DRS: ' + escapeHtml(data.telemetryCluster.drsStatus) + '</span>' +
+        '<span>🔒 ' + escapeHtml(data.telemetryCluster.circuitStatus) + '</span>' +
         '</div>';
     }
     specMsg.innerHTML = telemetryHtml + '<div class="chat-msg-header"><span>' + escapeHtml(data.agentName || currentAgentId) + '</span><span>' + new Date().toLocaleTimeString() + '</span></div><div>' + escapeHtml(data.reply || '') + '</div>' + citationsHtml;

@@ -469,12 +469,13 @@ export async function sendMarketingSms(options: SendMarketingSmsOptions): Promis
     throw new Error(errorMsg);
   }
 
-  // GATE 4: Dispatch via Twilio or simulate in test/dev
+  // GATE 4: Hard SMS_LIVE gate. Refuses to dispatch to real carrier unless SMS_LIVE=true is explicitly set.
+  const isSmsLive = process.env.SMS_LIVE === "true";
   const accountSid = process.env.TWILIO_ACCOUNT_SID;
   const authToken = process.env.TWILIO_AUTH_TOKEN;
   const fromNumber = process.env.TWILIO_FROM_NUMBER;
 
-  if (options.dryRun || !accountSid || !authToken || !fromNumber) {
+  if (!isSmsLive || options.dryRun || !accountSid || !authToken || !fromNumber) {
     const mockSid = `SM_dryrun_${randomUUID().slice(0, 16)}`;
     logSmsSend(normPhone, options.message, "dry_run", options.campaignId, mockSid);
     return {

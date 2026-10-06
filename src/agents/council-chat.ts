@@ -38,10 +38,7 @@ export interface CouncilChatRequest {
 
 export interface CouncilTelemetryCluster {
   callSign: string;
-  engine: string;
-  latencyMs: number;
-  rpm: string;
-  drsStatus: "ACTIVE" | "STANDBY";
+  executionDurationMs?: number;
   circuitStatus: string;
 }
 
@@ -893,10 +890,7 @@ export async function handleCouncilChat(request: CouncilChatRequest): Promise<Co
     timestamp: new Date().toISOString(),
     telemetryCluster: {
       callSign: persona.callSign || `F1-${persona.id.toUpperCase()}`,
-      engine: persona.engineBadge || "DeepSeek-R1 CoT + MCP v1.2",
-      latencyMs: durationMs,
-      rpm: persona.telemetryRpm || "18,500 RPM",
-      drsStatus: (persona.id === "wolf" || persona.id === "falcon") ? "ACTIVE" : "STANDBY",
+      executionDurationMs: durationMs,
       circuitStatus: "RULE_B5_LOCKED ($0.00)",
     }
   };

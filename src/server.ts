@@ -28,7 +28,6 @@ import { getCouncilAgentsData } from "./agents/council-data.ts";
 import { getLatestCouncilPipelineRun, runCouncilPipelineCycle } from "./agents/council-pipeline.ts";
 import { getCouncilPersona, getAllCouncilPersonas } from "./agents/council-personas.ts";
 import { handleCouncilChat, getCouncilChatAuditLog } from "./agents/council-chat.ts";
-import { benchmarkAllEngines } from "./ai-engines/index.ts";
 import { renderCouncilDashboardPage } from "./dashboard-terminal.ts";
 import { renderMobilePageHtml } from "./mobile-page.ts";
 import { getSwingEventsSummary, readSwingEventsCsv, checkLiveSwingEvents } from "./swing-event-logger.ts";
@@ -925,15 +924,6 @@ app.get("/api/calibration/market-price", async (req, res) => {
 
 app.get("/api/council/agents", (_req, res) => {
   res.json(getCouncilAgentsData());
-});
-
-app.get(["/api/engines", "/api/council/engines", "/api/ai-engines"], (_req, res) => {
-  res.json({
-    engines: benchmarkAllEngines(),
-    timestamp: new Date().toISOString(),
-    standard: "F1-Telemetry-Sub-Millisecond-Dispatch",
-    circuitStatus: "RULE_B5_LOCKED ($0.00)",
-  });
 });
 
 // Conversational AI Executive Persona Endpoints

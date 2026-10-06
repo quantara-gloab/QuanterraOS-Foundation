@@ -801,7 +801,7 @@ export function renderMobilePageHtml(): string {
     </div>
     <h1 class="hero-title">Empirical Quantitative Edge.<br>In the Palm of Your Hand.</h1>
     <p class="hero-subtitle">
-      Install QuanterraOS on your Apple iPhone and Samsung Galaxy device. Experience sub-millisecond market monitoring, 8-specialist consensus, and Aria Executive Voice with zero app store delays.
+      Install QuanterraOS on your Apple iPhone and Samsung Galaxy device. Experience empirical market monitoring, 8-specialist consensus, and Aria Executive Voice directly on your mobile device.
     </p>
 
     <!-- Client-side OS Detection -->
@@ -925,7 +925,7 @@ export function renderMobilePageHtml(): string {
   <section class="showcase-section">
     <div class="showcase-header">
       <h2 class="showcase-title">Built for the World's Leading Mobile Platforms</h2>
-      <p class="showcase-subtitle">Sub-millisecond pit wall telemetry formatted natively for iPhone 16 Pro and Samsung Galaxy S25</p>
+      <p class="showcase-subtitle">Empirical calibration and market telemetry formatted natively for iPhone 16 Pro and Samsung Galaxy S25</p>
     </div>
 
     <div class="devices-wrapper">
@@ -945,20 +945,20 @@ export function renderMobilePageHtml(): string {
 
             <div class="screen-telemetry-hud">
               <div class="telemetry-row">
-                <span style="color:var(--text-muted)">PIT CALLSIGN:</span>
+                <span style="color:var(--text-muted)">CALLSIGN:</span>
                 <span style="color:var(--cyan); font-weight:700">F1-CHIEF-01</span>
               </div>
               <div class="telemetry-row">
-                <span style="color:var(--text-muted)">MLA ATTENTION:</span>
-                <span style="color:var(--gold)">93.3% KV CACHE</span>
+                <span style="color:var(--text-muted)">CALIBRATION:</span>
+                <span style="color:var(--gold)">0.2001 (vs 0.2500)</span>
               </div>
               <div class="telemetry-row">
-                <span style="color:var(--text-muted)">LATENCY LOOP:</span>
-                <span style="color:var(--emerald); font-weight:700">0.82 ms</span>
+                <span style="color:var(--text-muted)">DATASET:</span>
+                <span style="color:var(--emerald); font-weight:700">1,316 Settled Mkts</span>
               </div>
               <div class="telemetry-row">
-                <span style="color:var(--text-muted)">DRS STATUS:</span>
-                <span style="color:var(--cyan)">ACTIVE / ENGAGED</span>
+                <span style="color:var(--text-muted)">GATE STATUS:</span>
+                <span style="color:var(--cyan)">RULE B5 STANDBY</span>
               </div>
             </div>
 
@@ -968,7 +968,7 @@ export function renderMobilePageHtml(): string {
                 <span style="font-size:9px; background:rgba(223,184,67,0.2); padding:1px 4px; border-radius:3px">CONSENSUS</span>
               </div>
               <p style="font-size:11px; color:var(--text-muted); line-height:1.4">
-                "Short-duration Kalshi 15m distribution calibrated. Brier loss down to 0.084. Rule B5 locked."
+                "Short-duration Kalshi 15m distribution calibrated. Brier score 0.2001 vs 0.2500 baseline. Rule B5 locked."
               </p>
             </div>
 
@@ -1005,25 +1005,25 @@ export function renderMobilePageHtml(): string {
 
             <div class="screen-telemetry-hud">
               <div class="telemetry-row">
-                <span style="color:var(--text-muted)">AI RUNTIME:</span>
-                <span style="color:var(--cyan)">DeepSeek-R1 / vLLM</span>
+                <span style="color:var(--text-muted)">COIN-FLIP BASELINE:</span>
+                <span style="color:var(--cyan)">0.2500 (50/50 Chance)</span>
               </div>
               <div class="telemetry-row">
-                <span style="color:var(--text-muted)">ENGINE CLUSTER:</span>
-                <span style="color:var(--emerald)">6 ENGINES BENCHMARKED</span>
+                <span style="color:var(--text-muted)">MARKET MID BRIER:</span>
+                <span style="color:var(--emerald)">0.2001 (Calibrated)</span>
               </div>
               <div class="telemetry-row">
-                <span style="color:var(--text-muted)">TELEMETRY RPM:</span>
-                <span style="color:var(--gold); font-weight:700">18,500 RPM</span>
+                <span style="color:var(--text-muted)">FALCON BRIER:</span>
+                <span style="color:var(--crimson); font-weight:700">0.2736 (Underperforming)</span>
               </div>
             </div>
 
             <div class="screen-specialist-card" style="border-color: rgba(0,242,254,0.25)">
               <div class="specialist-header" style="color:var(--cyan)">
-                <span>🦅 FALCON HIGH-SPEED LEAD</span>
+                <span>🦅 FALCON HEURISTIC AUDIT</span>
               </div>
               <p style="font-size:11px; color:var(--text-muted); line-height:1.4">
-                "Orderbook imbalance at 63.4%. Edge score +3.4σ on BTC-15M Kalshi contract."
+                "Orderbook imbalance heuristic underperforms 0.2500 baseline over n=31 settled markets."
               </p>
             </div>
 
@@ -1166,7 +1166,7 @@ export function renderMobilePageHtml(): string {
   <section class="features-grid">
     <div class="feature-item">
       <div class="feature-icon">⚡</div>
-      <h4>Sub-Millisecond Cache</h4>
+      <h4>High-Speed Edge Cache</h4>
       <p>Offline Service Worker pre-caches core analytical models, UI components, and state trees so the app launches in under 12 milliseconds.</p>
     </div>
     <div class="feature-item">
