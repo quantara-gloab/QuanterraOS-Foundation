@@ -1,0 +1,57 @@
+{
+  "packageId": "com.quanterraos.app",
+  "host": "quanterraos.com",
+  "name": "QuanterraOS Mobile Terminal",
+  "launcherName": "QuanterraOS",
+  "display": "standalone",
+  "themeColor": "#06070A",
+  "themeColorDark": "#06070A",
+  "navigationColor": "#06070A",
+  "navigationColorDark": "#06070A",
+  "backgroundColor": "#06070A",
+  "enableNotifications": true,
+  "startUrl": "/dashboard",
+  "iconUrl": "https://quanterraos.com/assets/icon-512.svg",
+  "maskableIconUrl": "https://quanterraos.com/assets/icon.svg",
+  "shortcuts": [
+    {
+      "name": "Live Telemetry",
+      "shortName": "Cockpit",
+      "url": "/dashboard",
+      "chosenIcon": "public/assets/icon-192.svg"
+    },
+    {
+      "name": "Predictive Intelligence",
+      "shortName": "Markets",
+      "url": "/kalshi",
+      "chosenIcon": "public/assets/icon-192.svg"
+    },
+    {
+      "name": "Executive Council",
+      "shortName": "Council",
+      "url": "/council",
+      "chosenIcon": "public/assets/icon-192.svg"
+    }
+  ],
+  "webManifestUrl": "https://quanterraos.com/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {
+    "playBilling": {
+      "enabled": false
+    },
+    "locationDelegation": {
+      "enabled": false
+    }
+  },
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://quanterraos.com/",
+  "minSdkVersion": 21,
+  "targetSdkVersion": 35,
+  "appVersionCode": 1,
+  "appVersionName": "1.0.0"
+}

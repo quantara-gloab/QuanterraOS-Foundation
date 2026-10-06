@@ -30,6 +30,7 @@ import { getCouncilPersona, getAllCouncilPersonas } from "./agents/council-perso
 import { handleCouncilChat, getCouncilChatAuditLog } from "./agents/council-chat.ts";
 import { benchmarkAllEngines } from "./ai-engines/index.ts";
 import { renderCouncilDashboardPage } from "./dashboard-terminal.ts";
+import { renderMobilePageHtml } from "./mobile-page.ts";
 import { getSwingEventsSummary, readSwingEventsCsv, checkLiveSwingEvents } from "./swing-event-logger.ts";
 import { getOrComputeCalibrationReport, renderCalibrationHtml } from "./calibration-page.ts";
 import { renderResponsePostPage } from "./response-post-page.ts";
@@ -139,6 +140,48 @@ app.use(express.static(path.resolve("public")));
 app.use("/assets", express.static(path.resolve("public/assets")));
 app.get("/assets/assistant-avatar.jpg", (_req, res) => {
   res.sendFile(path.resolve("public/assets/assistant-avatar.jpg"));
+});
+
+// Progressive Web App Manifest & Service Worker
+app.get("/manifest.json", (_req, res) => {
+  res.type("application/manifest+json").sendFile(path.resolve("public/manifest.json"));
+});
+app.get("/service-worker.js", (_req, res) => {
+  res.setHeader("Service-Worker-Allowed", "/");
+  res.type("application/javascript").sendFile(path.resolve("public/service-worker.js"));
+});
+
+// Google Play Store & Samsung Android Digital Asset Links (Trusted Web Activity)
+app.get("/.well-known/assetlinks.json", (_req, res) => {
+  res.type("application/json").sendFile(path.resolve("public/.well-known/assetlinks.json"));
+});
+
+// Apple iPhone Universal Links & Web Credentials
+app.get(["/.well-known/apple-app-site-association", "/apple-app-site-association"], (_req, res) => {
+  res.type("application/json").sendFile(path.resolve("public/.well-known/apple-app-site-association"));
+});
+
+// Mobile App Download Portal (Apple iOS & Samsung Android)
+app.get(["/mobile", "/download", "/app", "/pwa"], (_req, res) => {
+  res.type("html").send(renderMobilePageHtml());
+});
+
+// Mobile Platform Configuration API
+app.get("/api/mobile/config", (_req, res) => {
+  res.json({
+    app_name: "QuanterraOS Mobile Terminal",
+    android_package: "com.quanterraos.app",
+    ios_bundle_id: "com.quanterraos.app",
+    apple_app_id: "6504938210",
+    google_play_url: "https://play.google.com/store/apps/details?id=com.quanterraos.app",
+    samsung_store_url: "https://galaxystore.samsung.com/detail/com.quanterraos.app",
+    apple_app_store_url: "https://apps.apple.com/app/quanterraos-terminal/id6504938210",
+    pwa_manifest: "/manifest.json",
+    service_worker: "/service-worker.js",
+    universal_links_enabled: true,
+    twa_assetlinks_verified: true,
+    rule_b5_status: "LOCKED_STANDBY",
+  });
 });
 
 // Production / Platform Health Check

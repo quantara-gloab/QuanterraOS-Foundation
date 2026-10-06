@@ -1,0 +1,43 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "TEAMID12345.com.quanterraos.app",
+        "paths": [
+          "/dashboard*",
+          "/kalshi*",
+          "/council*",
+          "/wallet*",
+          "/mobile*",
+          "/download*"
+        ],
+        "components": [
+          {
+            "/": "/dashboard*"
+          },
+          {
+            "/": "/kalshi*"
+          },
+          {
+            "/": "/council*"
+          },
+          {
+            "/": "/wallet*"
+          },
+          {
+            "/": "/mobile*"
+          },
+          {
+            "/": "/download*"
+          }
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      "TEAMID12345.com.quanterraos.app"
+    ]
+  }
+}

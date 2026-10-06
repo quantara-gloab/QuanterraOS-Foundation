@@ -1,0 +1,41 @@
+apply plugin: 'com.android.application'
+
+android {
+    namespace "com.quanterraos.app"
+    compileSdkVersion 35
+
+    defaultConfig {
+        applicationId "com.quanterraos.app"
+        minSdkVersion 21
+        targetSdkVersion 35
+        versionCode 1
+        versionName "1.0.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        // Samsung Galaxy Store and Google Play Store TWA parameters
+        manifestPlaceholders = [
+            hostName: "quanterraos.com",
+            defaultUrl: "https://quanterraos.com/dashboard",
+            assetStatements: '[{"relation": ["delegate_permission/common.handle_all_urls"], "target": {"namespace": "android_app", "package_name": "com.quanterraos.app", "sha256_cert_fingerprints": ["14:6D:E9:75:5F:CD:A7:28:90:7E:6D:7F:19:0B:45:C9:87:65:43:21:FE:DC:BA:98:76:54:32:10:FE:DC:BA:98"]}}]'
+        ]
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.5.0'
+    implementation 'androidx.browser:browser:1.8.0'
+}
