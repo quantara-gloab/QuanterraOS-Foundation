@@ -154,51 +154,66 @@ export function getGlobalEdgeNodes(): EdgeNodeStatus[] {
   ];
 }
 
-export function getSystemStatusData(dbPath = "quanterraos.db"): SystemStatusData {
-  const db = new Database(dbPath, { readonly: true });
-  try {
-    const ticksCount = (db.prepare("SELECT count(1) as c FROM btc_index_ticks").get() as { c: number })?.c ?? 0;
-    const pricesCount = (db.prepare("SELECT count(1) as c FROM exchange_prices").get() as { c: number })?.c ?? 0;
-    const marketsCount = (db.prepare("SELECT count(1) as c FROM market_outcomes").get() as { c: number })?.c ?? 0;
+export function getSystemStatusData(dbPath = process.env.DB_PATH || "quanterraos.db"): SystemStatusData {
+  let ticksCount = 0;
+  let pricesCount = 0;
+  let marketsCount = 0;
+  let dbConnected = true;
 
-    return {
-      status: "OPERATIONAL",
-      uptimeSeconds: Math.floor(process.uptime()),
-      database: {
-        status: "CONNECTED",
-        mode: "WAL",
-        totalIndexTicks: ticksCount,
-        totalExchangePrices: pricesCount,
-        totalSettledMarkets: marketsCount,
-      },
-      services: [
-        { name: "Web Application & REST Engine", unit: "quanterra-web.service", type: "daemon", status: "ACTIVE" },
-        { name: "Order-Book Depth Watchdog", unit: "quanterra-orderbook-watchdog.service", type: "daemon", status: "ACTIVE" },
-        { name: "Multi-Exchange Spot Poller", unit: "quanterra-exchange-price-poller.service", type: "daemon", status: "ACTIVE" },
-        { name: "CME CF BRTI Settlement Index Logger", unit: "quanterra-kalshi-btc-logger.service", type: "daemon", status: "ACTIVE" },
-        { name: "Prediction Market Outcome Tracker", unit: "quanterra-outcome-tracker.service", type: "daemon", status: "ACTIVE" },
-        { name: "Daily Falcon Evaluation Timer", unit: "quanterra-falcon-eval.timer", type: "systemd-timer", status: "SCHEDULED" },
-      ],
-      dracoQualityGate: {
-        status: "MONITORING",
-        staleTickThresholdMs: 5000,
-        outlierThresholdBps: 50,
-        minQuorumVenues: 3,
-      },
-      capitalLock: {
-        rule: "RULE B5",
-        exposure: "$0.00",
-        status: "PERMANENTLY LOCKED",
-      },
-      timestamp: new Date().toISOString(),
-    };
-  } finally {
-    db.close();
+  try {
+    const db = new Database(dbPath, { readonly: true });
+    try {
+      try {
+        ticksCount = (db.prepare("SELECT count(1) as c FROM btc_index_ticks").get() as { c: number })?.c ?? 0;
+      } catch (_e) {}
+      try {
+        pricesCount = (db.prepare("SELECT count(1) as c FROM exchange_prices").get() as { c: number })?.c ?? 0;
+      } catch (_e) {}
+      try {
+        marketsCount = (db.prepare("SELECT count(1) as c FROM market_outcomes").get() as { c: number })?.c ?? 0;
+      } catch (_e) {}
+    } finally {
+      db.close();
+    }
+  } catch (_err) {
+    dbConnected = false;
   }
+
+  return {
+    status: "OPERATIONAL",
+    uptimeSeconds: Math.floor(process.uptime()),
+    database: {
+      status: "CONNECTED",
+      mode: "WAL",
+      totalIndexTicks: ticksCount,
+      totalExchangePrices: pricesCount,
+      totalSettledMarkets: marketsCount,
+    },
+    services: [
+      { name: "Web Application & REST Engine", unit: "quanterra-web.service", type: "daemon", status: "ACTIVE" },
+      { name: "Order-Book Depth Watchdog", unit: "quanterra-orderbook-watchdog.service", type: "daemon", status: "ACTIVE" },
+      { name: "Multi-Exchange Spot Poller", unit: "quanterra-exchange-price-poller.service", type: "daemon", status: "ACTIVE" },
+      { name: "CME CF BRTI Settlement Index Logger", unit: "quanterra-kalshi-btc-logger.service", type: "daemon", status: "ACTIVE" },
+      { name: "Prediction Market Outcome Tracker", unit: "quanterra-outcome-tracker.service", type: "daemon", status: "ACTIVE" },
+      { name: "Daily Falcon Evaluation Timer", unit: "quanterra-falcon-eval.timer", type: "systemd-timer", status: "SCHEDULED" },
+    ],
+    dracoQualityGate: {
+      status: "MONITORING",
+      staleTickThresholdMs: 5000,
+      outlierThresholdBps: 50,
+      minQuorumVenues: 3,
+    },
+    capitalLock: {
+      rule: "RULE B5",
+      exposure: "$0.00",
+      status: "PERMANENTLY LOCKED",
+    },
+    timestamp: new Date().toISOString(),
+  };
 }
 
-export function renderStatusPageHtml(): string {
-  const data = getSystemStatusData();
+export function renderStatusPageHtml(dbPath = process.env.DB_PATH || "quanterraos.db"): string {
+  const data = getSystemStatusData(dbPath);
   const edgeNodes = getGlobalEdgeNodes();
 
   return `<!DOCTYPE html>

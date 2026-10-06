@@ -2243,7 +2243,12 @@ app.get("/research", (req, res) => {
 });
 
 app.get("/status", (_req, res) => {
-  res.type("html").send(renderStatusPageHtml());
+  try {
+    res.type("html").send(renderStatusPageHtml());
+  } catch (err) {
+    console.error("Status page error:", err);
+    res.status(500).send("System status currently unavailable");
+  }
 });
 
 app.get("/legal", (_req, res) => {
