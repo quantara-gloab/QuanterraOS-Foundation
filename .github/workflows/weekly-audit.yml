@@ -1,0 +1,53 @@
+name: Weekly Quantitative Audit & Backtest Execution
+
+on:
+  schedule:
+    # Run every Monday at 00:00 UTC (weekly quantitative audit schedule)
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
+    # Allows manual trigger by operators from GitHub Actions tab
+
+permissions:
+  contents: read
+
+jobs:
+  weekly-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck TypeScript
+        run: npm run typecheck
+
+      - name: Run test suite
+        run: npm test
+
+      - name: Run Canonical Predictor Backtest (1,316 Markets)
+        run: |
+          mkdir -p reports
+          node --experimental-strip-types src/btc15m-predictor-backtest.ts > reports/btc15m-predictor-backtest-weekly.txt
+          cat reports/btc15m-predictor-backtest-weekly.txt
+
+      - name: Initialize database for Falcon backtest
+        run: npm run db:init
+
+      - name: Run Falcon Order-Book Backtest
+        run: |
+          node --experimental-strip-types src/falcon-backtest.ts > reports/falcon-backtest-weekly.txt
+          cat reports/falcon-backtest-weekly.txt
+
+      - name: Upload Audited Weekly Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly-quantitative-reports
+          path: reports/*.txt

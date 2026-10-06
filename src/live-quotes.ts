@@ -89,20 +89,33 @@ async function fetchBitstampPrice(): Promise<number | null> {
   }
 }
 
+async function fetchGeminiPrice(): Promise<number | null> {
+  try {
+    const res = await fetchWithTimeout("https://api.gemini.com/v1/pubticker/btcusd");
+    if (!res.ok) return null;
+    const json = (await res.json()) as { last?: string };
+    const p = parseFloat(json.last ?? "");
+    return Number.isFinite(p) && p > 0 ? p : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function getLiveQuotes(asset: string = "BTC"): Promise<LiveQuotesReport> {
   const now = Date.now();
   if (quoteCache && quoteCache.expiresAt > now) {
     return quoteCache.data;
   }
 
-  // Fetch all 3 constituent venues in parallel
-  const [cbPrice, krPrice, bsPrice] = await Promise.all([
+  // Fetch all 4 CME CF BRTI constituent venues in parallel
+  const [cbPrice, krPrice, bsPrice, gemPrice] = await Promise.all([
     fetchCoinbasePrice(),
     fetchKrakenPrice(),
     fetchBitstampPrice(),
+    fetchGeminiPrice(),
   ]);
 
-  const activePrices = [cbPrice, krPrice, bsPrice].filter((p): p is number => p !== null);
+  const activePrices = [cbPrice, krPrice, bsPrice, gemPrice].filter((p): p is number => p !== null);
   const activeCount = activePrices.length;
 
   // Compute live median of valid active prices
@@ -129,6 +142,7 @@ export async function getLiveQuotes(asset: string = "BTC"): Promise<LiveQuotesRe
   const cbMetrics = computeSpread(cbPrice);
   const krMetrics = computeSpread(krPrice);
   const bsMetrics = computeSpread(bsPrice);
+  const gemMetrics = computeSpread(gemPrice);
 
   const venues: VenueQuote[] = [
     {
@@ -139,7 +153,7 @@ export async function getLiveQuotes(asset: string = "BTC"): Promise<LiveQuotesRe
       spreadBps: liveMedian !== null ? 0.0 : null,
       status: "BENCHMARK",
       lastUpdated: now,
-      note: `Median of ${activeCount}/3 active public exchanges`,
+      note: `Median of ${activeCount}/4 active public exchanges`,
     },
     {
       venue: "Coinbase (BTC-USD)",
@@ -167,6 +181,15 @@ export async function getLiveQuotes(asset: string = "BTC"): Promise<LiveQuotesRe
       spreadBps: bsMetrics.spreadBps,
       status: bsPrice !== null ? bsMetrics.status : "OFFLINE",
       lastUpdated: bsPrice !== null ? now : null,
+    },
+    {
+      venue: "Gemini (BTC/USD)",
+      type: "Constituent Spot",
+      price: gemPrice,
+      spread: gemMetrics.spread,
+      spreadBps: gemMetrics.spreadBps,
+      status: gemPrice !== null ? gemMetrics.status : "OFFLINE",
+      lastUpdated: gemPrice !== null ? now : null,
     },
     {
       venue: "CME CF BRTI Reference",

@@ -574,6 +574,7 @@ export function renderSpreadPageHtml(initialQuotes?: LiveQuotesReport): string {
   const cbVenue = initialQuotes?.venues.find(v => v.venue.includes("Coinbase"));
   const krVenue = initialQuotes?.venues.find(v => v.venue.includes("Kraken"));
   const bsVenue = initialQuotes?.venues.find(v => v.venue.includes("Bitstamp"));
+  const gemVenue = initialQuotes?.venues.find(v => v.venue.includes("Gemini"));
 
   const spotNum = initialQuotes?.compositePrice ?? 85000.00;
   const priceDisplay = initialQuotes?.compositePrice !== null && initialQuotes?.compositePrice !== undefined
@@ -583,6 +584,7 @@ export function renderSpreadPageHtml(initialQuotes?: LiveQuotesReport): string {
   const coinbasePrice = cbVenue?.price ?? null;
   const krakenPrice = krVenue?.price ?? null;
   const bitstampPrice = bsVenue?.price ?? null;
+  const geminiPrice = gemVenue?.price ?? null;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -987,6 +989,14 @@ export function renderSpreadPageHtml(initialQuotes?: LiveQuotesReport): string {
             <td><span class="badge badge-normal" id="bs-badge">${bsVenue?.status ?? 'ONLINE'}</span></td>
           </tr>
           <tr>
+            <td class="mono" style="font-weight:500;">Gemini (BTC/USD)</td>
+            <td>Constituent Spot</td>
+            <td class="mono" id="gem-price">${geminiPrice !== null ? '$' + geminiPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—'}</td>
+            <td class="mono" id="gem-spread">${gemVenue?.spread !== null && gemVenue?.spread !== undefined ? (gemVenue.spread >= 0 ? '+$' : '-$') + Math.abs(gemVenue.spread).toFixed(2) : '—'}</td>
+            <td class="mono" id="gem-bps">${gemVenue?.spreadBps !== null && gemVenue?.spreadBps !== undefined ? (gemVenue.spreadBps >= 0 ? '+' : '') + gemVenue.spreadBps.toFixed(1) + ' bps' : '—'}</td>
+            <td><span class="badge badge-normal" id="gem-badge">${gemVenue?.status ?? 'ONLINE'}</span></td>
+          </tr>
+          <tr>
             <td class="mono" style="font-weight:500;">CME CF BRTI Reference</td>
             <td>Kalshi Settlement Target</td>
             <td class="mono" id="brti-price" style="color:var(--muted);">—</td>
@@ -1000,7 +1010,7 @@ export function renderSpreadPageHtml(initialQuotes?: LiveQuotesReport): string {
 
     <footer>
       <p>
-        <strong>Live Data Verification:</strong> Spot prices for Coinbase, Kraken, and Bitstamp are fetched directly in real-time from their public exchange REST APIs. The Quanterra Composite Benchmark represents the calculated median of active spot venues. The CME CF Bitcoin Real-Time Index (BRTI) is the proprietary settlement benchmark published by CF Benchmarks Ltd / CME Group and requires an institutional feed license. QuanterraOS does not synthesize or fabricate price quotes.
+        <strong>Live Data Verification:</strong> Spot prices for Coinbase, Kraken, Bitstamp, and Gemini are fetched directly in real-time from their public exchange REST APIs. The Quanterra Composite Benchmark represents the calculated median of active spot venues. The CME CF Bitcoin Real-Time Index (BRTI) is the proprietary settlement benchmark published by CF Benchmarks Ltd / CME Group and requires an institutional feed license. QuanterraOS does not synthesize or fabricate price quotes.
       </p>
       <p>
         Kalshi, CME Group, CF Benchmarks, Coinbase, Kraken, Bitstamp, and Gemini are trademarks of their respective owners. QuanterraOS is an independent measurement system. Rule B5 locked: zero live capital deployed.
@@ -1045,6 +1055,7 @@ export function renderSpreadPageHtml(initialQuotes?: LiveQuotesReport): string {
         updateVenue('cb', 'Coinbase');
         updateVenue('kr', 'Kraken');
         updateVenue('bs', 'Bitstamp');
+        updateVenue('gem', 'Gemini');
         updateVenue('brti', 'BRTI');
       } catch (_e) {}
     }

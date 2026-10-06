@@ -354,6 +354,21 @@ export function renderChangelogPageHtml(): string {
     <div class="timeline">
       <div class="release-item">
         <div class="release-dot"></div>
+        <div class="release-date">// 6 October 2026</div>
+        <div class="release-version">v0.5.0 — Production Cloud Deployment, 10DLC SMS Engine &amp; 4-Venue Spot Surveillance</div>
+        <div class="release-notes">
+          <ul>
+            <li><strong>Production Cloud Deployment:</strong> Live on Fly.io with encrypted persistent storage, automated SQLite migrations, Let's Encrypt TLS, and custom domain routing at <code>quanterraos.com</code>.</li>
+            <li><strong>Compliant 10DLC SMS Engine:</strong> Engineered strictly opt-in SMS notification engine with immutable consent ledger, application-layer gating, and automated carrier keyword handling (<code>STOP</code>, <code>HELP</code>, <code>START</code>).</li>
+            <li><strong>4-Venue Constituent Surveillance:</strong> Connected real unauthenticated REST feeds across all four CME CF BRTI constituent exchanges (Coinbase, Kraken, Bitstamp, Gemini) with zero synthetic quotes.</li>
+            <li><strong>Gating &amp; Integrity Verification:</strong> Enforced 20-minute delayed snapshot gating for free tiers, validated statutory CFTC Rule 4.41 disclosures, and purged synthetic testing fixtures.</li>
+            <li><strong>Automated Backtest Audits:</strong> Published audited backtest reproduction reports for canonical 1,316-market corpus and Falcon out-of-sample depth monitoring.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="release-item">
+        <div class="release-dot"></div>
         <div class="release-date">// 4 October 2026</div>
         <div class="release-version">v0.4.0 — Composite Index v0.1 &amp; Observability Infrastructure</div>
         <div class="release-notes">
