@@ -17,10 +17,18 @@ import { db } from "./db.ts";
 import { paperTrades, walletTransactions, subscriberWallets } from "./schema.ts";
 import { getOrCreateSubscriberWallet } from "./wallet-engine.ts";
 import { eq, desc } from "drizzle-orm";
+import {
+  KalshiTimeframe,
+  selectAtmHourlyMarket,
+  buildStrikeLadder,
+  KalshiStrikeLadderEntry,
+} from "./kalshi-contracts.ts";
 
 export interface KalshiMarket {
   ticker: string;
   title: string;
+  subtitle?: string;
+  timeframe?: KalshiTimeframe;
   floor_strike: number;
   yes_bid: number; // in dollars (e.g. 0.51)
   yes_ask: number; // in dollars (e.g. 0.52)
@@ -94,11 +102,16 @@ function signKalshiRequest(keyId: string, privateKey: Buffer, method: string, pa
 }
 
 /**
- * Fetches the active 15-minute Kalshi KXBTC15M market.
+ * Fetches the active Kalshi contract for the specified timeframe (15m or 1h).
  */
-export async function getActiveKalshi15mMarket(): Promise<KalshiMarket | null> {
+export async function getActiveKalshiMarket(
+  timeframe: KalshiTimeframe = "15m",
+  spotPrice?: number
+): Promise<KalshiMarket | null> {
   const creds = getKalshiCredentials();
-  const url = "https://api.elections.kalshi.com/trade-api/v2/markets?series_ticker=KXBTC15M&status=open&limit=5";
+  const seriesTicker = timeframe === "15m" ? "KXBTC15M" : "KXBTCD";
+  const limit = timeframe === "15m" ? 5 : 50;
+  const url = `https://api.elections.kalshi.com/trade-api/v2/markets?series_ticker=${seriesTicker}&status=open&limit=${limit}`;
   const pathWithoutQuery = "/trade-api/v2/markets";
 
   try {
@@ -109,36 +122,79 @@ export async function getActiveKalshi15mMarket(): Promise<KalshiMarket | null> {
     const res = await fetch(url, { headers, signal: AbortSignal.timeout(5000) });
     if (!res.ok) {
       // Fallback to public external API
-      const fallbackRes = await fetch("https://external-api.kalshi.com/trade-api/v2/markets?series_ticker=KXBTC15M&status=open&limit=5");
+      const fallbackUrl = `https://external-api.kalshi.com/trade-api/v2/markets?series_ticker=${seriesTicker}&status=open&limit=${limit}`;
+      const fallbackRes = await fetch(fallbackUrl, { signal: AbortSignal.timeout(5000) });
       if (fallbackRes.ok) {
         const d = await fallbackRes.json();
-        return parseMarketsResponse(d);
+        return parseMarketsResponse(d, timeframe, spotPrice);
       }
       return null;
     }
     const data = await res.json();
-    return parseMarketsResponse(data);
+    return parseMarketsResponse(data, timeframe, spotPrice);
   } catch (err) {
-    console.warn("Failed to fetch Kalshi 15m market:", err);
+    console.warn(`Failed to fetch Kalshi ${timeframe} market:`, err);
     return null;
   }
 }
 
-function parseMarketsResponse(data: any): KalshiMarket | null {
-  const now = Date.now();
-  const markets = ((data?.markets ?? []) as any[])
-    .filter((m) => Date.parse(m.close_time) > now)
-    .sort((a, b) => Date.parse(a.close_time) - Date.parse(b.close_time));
+/**
+ * Fetches the active 15-minute Kalshi KXBTC15M market.
+ */
+export async function getActiveKalshi15mMarket(): Promise<KalshiMarket | null> {
+  return getActiveKalshiMarket("15m");
+}
 
-  if (markets.length === 0) return null;
-  const m = markets[0];
+/**
+ * Fetches the active 1-hour Kalshi KXBTCD market (ATM strike relative to spot).
+ */
+export async function getActiveKalshi1hMarket(spotPrice?: number): Promise<KalshiMarket | null> {
+  return getActiveKalshiMarket("1h", spotPrice);
+}
+
+/**
+ * Fetches the full strike ladder for Kalshi 1-hour KXBTCD contracts.
+ */
+export async function getKalshi1hStrikeLadder(spotPrice: number = 85000): Promise<KalshiStrikeLadderEntry[]> {
+  try {
+    const url = "https://external-api.kalshi.com/trade-api/v2/markets?series_ticker=KXBTCD&status=open&limit=100";
+    const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return buildStrikeLadder(data.markets ?? [], spotPrice);
+  } catch (err) {
+    console.warn("Failed to fetch Kalshi 1h strike ladder:", err);
+    return [];
+  }
+}
+
+function parseMarketsResponse(data: any, timeframe: KalshiTimeframe = "15m", spotPrice?: number): KalshiMarket | null {
+  const now = Date.now();
+  const allMarkets = ((data?.markets ?? []) as any[])
+    .filter((m) => Date.parse(m.close_time) > now);
+
+  if (allMarkets.length === 0) return null;
+
+  let m: any = null;
+  if (timeframe === "1h" && spotPrice && spotPrice > 0) {
+    m = selectAtmHourlyMarket(allMarkets, spotPrice);
+  }
+
+  if (!m) {
+    const sorted = [...allMarkets].sort((a, b) => Date.parse(a.close_time) - Date.parse(b.close_time));
+    m = sorted[0];
+  }
+
   const closeMs = Date.parse(m.close_time);
-  const minutesLeft = Math.max(0, (closeMs - now) / 60000);
+  const minutesLeft = Math.max(0, Math.round(((closeMs - now) / 60000) * 10) / 10);
+  const strike = Number(m.floor_strike || m.cap_strike || 0);
 
   return {
     ticker: m.ticker,
-    title: m.title || `BTC > $${Number(m.floor_strike).toLocaleString()} at 15m close?`,
-    floor_strike: Number(m.floor_strike || 0),
+    title: m.title || `BTC > $${strike.toLocaleString()} at close?`,
+    subtitle: m.subtitle || (strike > 0 ? `$${strike.toLocaleString()} or above` : undefined),
+    timeframe,
+    floor_strike: strike,
     yes_bid: Number(m.yes_bid_dollars || m.yes_bid || 0.50),
     yes_ask: Number(m.yes_ask_dollars || m.yes_ask || 0.51),
     no_bid: Number(m.no_bid_dollars || m.no_bid || 0.49),

@@ -90,11 +90,20 @@ import {
   updateUserTier,
 } from "./auth.ts";
 import {
+  getActiveKalshiMarket,
   getActiveKalshi15mMarket,
+  getActiveKalshi1hMarket,
+  getKalshi1hStrikeLadder,
   getKalshiPortfolioBalance,
   placeKalshi15mBid,
   getUserKalshiBids,
 } from "./kalshi-api.ts";
+import {
+  KALSHI_CONTRACT_SPECS,
+  calculateKalshiTakerFee,
+  calculateBreakevenProbability,
+  KalshiTimeframe,
+} from "./kalshi-contracts.ts";
 import { renderKalshiTerminalHtml } from "./kalshi-terminal-page.ts";
 import {
   createCheckoutSession,
@@ -3189,9 +3198,13 @@ app.get(["/kalshi", "/fair-value/btc15m"], (req, res) => {
   res.type("html").send(renderKalshiTerminalHtml(auth.user?.email, auth.tier));
 });
 
-app.get("/api/kalshi/15m/active", async (_req, res) => {
+app.get("/api/kalshi/specs", (_req, res) => {
+  res.json(KALSHI_CONTRACT_SPECS);
+});
+
+app.get(["/api/kalshi/active", "/api/kalshi/15m/active"], async (req, res) => {
   try {
-    const market = await getActiveKalshi15mMarket();
+    const timeframe = (req.query.timeframe === "1h" ? "1h" : "15m") as KalshiTimeframe;
     const now = Date.now();
     const latestTick = db.select({ at: btcIndexTicks.receivedAt, raw: btcIndexTicks.rawValue })
       .from(btcIndexTicks)
@@ -3200,23 +3213,59 @@ app.get("/api/kalshi/15m/active", async (_req, res) => {
       .limit(1)
       .get();
 
-    const spot = latestTick ? Number(latestTick.raw) : (market?.floor_strike ? market.floor_strike + 4.5 : 85520);
-    const modelProb = market ? Math.max(0.05, Math.min(0.95, 0.50 + ((spot - market.floor_strike) / 100))) : 0.50;
+    const spot = latestTick ? Number(latestTick.raw) : 85520;
+    const market = await getActiveKalshiMarket(timeframe, spot);
+
+    const floorStrike = market?.floor_strike ? market.floor_strike : (timeframe === "15m" ? 85519 : 85600);
+    const modelProb = market ? Math.max(0.05, Math.min(0.95, 0.50 + ((spot - floorStrike) / 100))) : 0.50;
+    const yesAsk = market?.yes_ask ?? 0.51;
+    const noAsk = market?.no_ask ?? 0.51;
 
     res.json({
       ...(market || {
-        ticker: `KXBTC15M-${new Date(now).toISOString().slice(2, 10).replace(/-/g, "")}-ACTIVE`,
-        floor_strike: 85519,
+        ticker: `KXBTC${timeframe === "15m" ? "15M" : "D"}-${new Date(now).toISOString().slice(2, 10).replace(/-/g, "")}-ACTIVE`,
+        floor_strike: floorStrike,
+        subtitle: timeframe === "1h" ? `$${floorStrike.toLocaleString()} or above` : "Above or Below",
+        timeframe,
         yes_bid: 0.41,
         yes_ask: 0.43,
         no_bid: 0.57,
         no_ask: 0.59,
-        close_time: new Date(now + 10 * 60000).toISOString(),
-        minutes_left: 10,
+        close_time: new Date(now + (timeframe === "15m" ? 10 : 45) * 60000).toISOString(),
+        minutes_left: timeframe === "15m" ? 10 : 45,
         status: "active",
       }),
+      timeframe,
       spot,
-      model_prob: modelProb,
+      model_prob: Math.round(modelProb * 100) / 100,
+      taker_fee_yes: calculateKalshiTakerFee(yesAsk),
+      taker_fee_no: calculateKalshiTakerFee(noAsk),
+      breakeven_yes: calculateBreakevenProbability(yesAsk, true),
+      breakeven_no: calculateBreakevenProbability(noAsk, false),
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
+app.get("/api/kalshi/1h/ladder", async (req, res) => {
+  try {
+    const now = Date.now();
+    const latestTick = db.select({ at: btcIndexTicks.receivedAt, raw: btcIndexTicks.rawValue })
+      .from(btcIndexTicks)
+      .where(and(eq(btcIndexTicks.asset, "BTC"), gte(btcIndexTicks.receivedAt, now - 300_000)))
+      .orderBy(desc(btcIndexTicks.receivedAt))
+      .limit(1)
+      .get();
+
+    const spot = latestTick ? Number(latestTick.raw) : 85520;
+    const ladder = await getKalshi1hStrikeLadder(spot);
+    res.json({
+      spot,
+      series: "KXBTCD",
+      count: ladder.length,
+      ladder,
       timestamp: new Date().toISOString(),
     });
   } catch (err) {

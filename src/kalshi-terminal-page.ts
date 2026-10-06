@@ -500,8 +500,14 @@ export function renderKalshiTerminalHtml(userEmail?: string, userTier: string = 
     <div class="grid-layout">
       <!-- Left Column: Market HUD -->
       <div class="panel">
-        <div class="panel-title">
-          <span>LIVE 15M CONTRACT TELEMETRY</span>
+        <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span id="panel-series-title">KALSHI CONTRACT TELEMETRY</span>
+            <div style="display:inline-flex; gap:4px; margin-left:6px;">
+              <button type="button" id="btn-tf-15m" class="chip active" style="padding:2px 8px; font-size:0.72rem; cursor:pointer;" onclick="switchTimeframe('15m')">15M (KXBTC15M)</button>
+              <button type="button" id="btn-tf-1h" class="chip" style="padding:2px 8px; font-size:0.72rem; cursor:pointer;" onclick="switchTimeframe('1h')">1H (KXBTCD)</button>
+            </div>
+          </div>
           <span id="market-status-badge" style="color:var(--green);">● ACTIVE</span>
         </div>
 
@@ -798,10 +804,32 @@ function updateBalanceDisplay() {
   }
 }
 
+// Timeframe toggle state: '15m' or '1h'
+var currentTimeframe = '15m';
+
+function switchTimeframe(tf) {
+  currentTimeframe = tf;
+  const btn15m = document.getElementById('btn-tf-15m');
+  const btn1h = document.getElementById('btn-tf-1h');
+  if (btn15m && btn1h) {
+    if (tf === '15m') {
+      btn15m.classList.add('active');
+      btn1h.classList.remove('active');
+      document.getElementById('panel-series-title').textContent = '15M CONTRACT TELEMETRY';
+    } else {
+      btn1h.classList.add('active');
+      btn15m.classList.remove('active');
+      document.getElementById('panel-series-title').textContent = '1H CONTRACT TELEMETRY';
+    }
+  }
+  document.getElementById('market-ticker').textContent = 'SWITCHING...';
+  fetchMarket();
+}
+
 // Polling live market data
 async function fetchMarket() {
   try {
-    const res = await fetch('/api/kalshi/15m/active');
+    const res = await fetch('/api/kalshi/active?timeframe=' + currentTimeframe);
     if (!res.ok) return;
     const m = await res.json();
     if (!m || !m.ticker) return;
@@ -809,7 +837,8 @@ async function fetchMarket() {
     closeTimeMs = Date.parse(m.close_time);
 
     document.getElementById('market-ticker').textContent = m.ticker;
-    document.getElementById('market-target').textContent = 'Settlement strike: $' + Number(m.floor_strike).toLocaleString();
+    const strikeText = m.subtitle ? m.subtitle : ('Settlement strike: $' + Number(m.floor_strike).toLocaleString());
+    document.getElementById('market-target').textContent = strikeText;
     document.getElementById('yes-bid').textContent = Math.round(m.yes_bid * 100) + '¢';
     document.getElementById('yes-ask').textContent = Math.round(m.yes_ask * 100) + '¢';
     document.getElementById('no-bid').textContent = Math.round(m.no_bid * 100) + '¢';

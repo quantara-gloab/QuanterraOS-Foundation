@@ -45,6 +45,7 @@ function toMarketQuote(market: KalshiLiveMarket): MarketQuote {
 export interface BtcPaperTradeCycleDeps {
   db: DatabaseSync;
   kalshiUrl?: string;
+  fetchMarkets?: () => Promise<KalshiLiveMarket[]> | KalshiLiveMarket[];
   fetchBtcTicks: (nowMs: number, windowMinutes?: number) => { at: number; value: number }[];
 }
 
@@ -77,13 +78,18 @@ export async function runBtcPaperTradingCycle(
   deps: BtcPaperTradeCycleDeps,
   options: BtcPaperTradeCycleOptions,
 ): Promise<BtcPaperTradeCycleResult[]> {
-  const kalshiUrl = deps.kalshiUrl ??
-    "https://external-api.kalshi.com/trade-api/v2/markets?series_ticker=KXBTC15M&status=open&limit=20";
-
   const now = Date.now();
-  const response = await fetch(kalshiUrl, { signal: AbortSignal.timeout(10_000) });
-  if (!response.ok) throw new Error(`Kalshi markets ${response.status}`);
-  const markets = ((await response.json()).markets ?? []) as KalshiLiveMarket[];
+  let markets: KalshiLiveMarket[];
+
+  if (deps.fetchMarkets) {
+    markets = await deps.fetchMarkets();
+  } else {
+    const kalshiUrl = deps.kalshiUrl ??
+      "https://external-api.kalshi.com/trade-api/v2/markets?series_ticker=KXBTC15M&status=open&limit=20";
+    const response = await fetch(kalshiUrl, { signal: AbortSignal.timeout(10_000) });
+    if (!response.ok) throw new Error(`Kalshi markets ${response.status}`);
+    markets = ((await response.json()).markets ?? []) as KalshiLiveMarket[];
+  }
 
   // Only act on contracts that haven't closed yet
   const openMarkets = markets.filter((m) => Date.parse(m.close_time) > now);

@@ -40,11 +40,10 @@ describe("runBtcPaperTradingCycle", () => {
 
     const deps: BtcPaperTradeCycleDeps = {
       db,
+      fetchMarkets: () => [synthMarket()],
       fetchBtcTicks: () => mockBtcTicks(),
     };
 
-    // Mock fetch by providing kalshiUrl to a local stub
-    // For now, test with the real Kalshi API
     const results = await runBtcPaperTradingCycle(deps, { owner: "trader" });
 
     // Should have logged at least one paper trade
@@ -62,6 +61,7 @@ describe("runBtcPaperTradingCycle", () => {
 
     const deps: BtcPaperTradeCycleDeps = {
       db,
+      fetchMarkets: () => [synthMarket()],
       fetchBtcTicks: () => [], // No ticks = no model prediction
     };
 
@@ -78,17 +78,18 @@ describe("runBtcPaperTradingCycle", () => {
 
     const deps: BtcPaperTradeCycleDeps = {
       db,
+      fetchMarkets: () => [synthMarket()],
       fetchBtcTicks: () => mockBtcTicks(),
     };
 
-    await runBtcPaperTradingCycle(deps, { owner: "trader", edgeThreshold: 0.5 });
+    await runBtcPaperTradingCycle(deps, { owner: "trader", edgeThreshold: 0.99 });
 
     // Even with high threshold (forcing SKIPs), trades should be logged
     const trades = db.prepare("SELECT * FROM paper_trades").all();
     assert.ok(trades.length > 0);
 
     // All should be proposed status
-    for (const t of trades) {
+    for (const t of trades as { status: string }[]) {
       assert.equal(t.status, "proposed");
     }
 
@@ -100,6 +101,7 @@ describe("runBtcPaperTradingCycle", () => {
 
     const deps: BtcPaperTradeCycleDeps = {
       db,
+      fetchMarkets: () => [synthMarket()],
       fetchBtcTicks: () => mockBtcTicks(),
     };
 

@@ -327,16 +327,25 @@ export function renderCalculatorPageHtml(): string {
             <input type="number" id="input-count" class="number-input" value="100" min="1" max="10000" oninput="recalc()">
           </div>
           <div class="input-group">
-            <label style="font-size:0.8rem; color:var(--muted); display:block; margin-bottom:6px;">Exchange Venue</label>
-            <select id="select-venue" class="number-input" onchange="recalc()">
-              <option value="kalshi">Kalshi (CFTC Regulated)</option>
-              <option value="polymarket">Polymarket (2% Winner Fee)</option>
+            <label style="font-size:0.8rem; color:var(--muted); display:block; margin-bottom:6px;">Contract Cadence &amp; Series</label>
+            <select id="select-contract" class="number-input" onchange="recalc()">
+              <option value="kalshi-15m" selected>Kalshi 15-Minute Above/Below (KXBTC15M)</option>
+              <option value="kalshi-1h">Kalshi 1-Hour Above/Below (KXBTCD)</option>
+              <option value="polymarket-15m">Polymarket 15-Minute (Binary)</option>
             </select>
           </div>
         </div>
 
-        <div class="banner-note">
-          <strong>Why this matters:</strong> At 50¢ on Kalshi, exchange taker fees peak at ~1.75¢ per contract. Combined with a typical 2¢ spread (1¢ half-spread drag), you sacrifice <strong>2.75¢ of edge</strong> on entry. Picking the winner 52% of the time still produces a guaranteed financial loss.
+        <div class="input-group" style="margin-top:14px;">
+          <label style="font-size:0.8rem; color:var(--muted); display:block; margin-bottom:6px;">Directional Thesis (Above vs Below)</label>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <button type="button" id="btn-side-above" class="number-input" style="background:rgba(16,185,129,0.15); border:1px solid var(--green); color:var(--green); cursor:pointer; font-weight:600;" onclick="setSide('above')">▲ Above Strike (BUY YES)</button>
+            <button type="button" id="btn-side-below" class="number-input" style="background:rgba(255,255,255,0.04); border:1px solid var(--panel-border); color:var(--muted); cursor:pointer; font-weight:600;" onclick="setSide('below')">▼ Below Strike (BUY NO)</button>
+          </div>
+        </div>
+
+        <div class="banner-note" id="contract-note">
+          <strong>Why this matters on Kalshi 15M &amp; 1H:</strong> At 50¢ on Kalshi, exchange taker fees peak at exactly <strong>1.75¢ per contract</strong> ($0.07 × P × (1 − P)). Combined with a typical 2¢ spread (1¢ half-spread drag), you sacrifice <strong>2.75¢ of edge</strong> on entry. Picking the winner 52% of the time still produces a guaranteed financial loss.
         </div>
       </div>
 
@@ -377,36 +386,81 @@ export function renderCalculatorPageHtml(): string {
           <span class="stat-val" style="color:var(--accent);" id="val-breakeven">52.75%</span>
         </div>
         <div class="stat-row">
+          <span class="stat-label">Settlement Reference Benchmark</span>
+          <span class="stat-val mono" style="color:#FFFFFF;" id="val-benchmark">CME CF BRTI 60s TWAP</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Contract Cadence &amp; Horizon</span>
+          <span class="stat-val mono" style="color:var(--accent-light);" id="val-cadence">15-Minute Intraday (KXBTC15M)</span>
+        </div>
+        <div class="stat-row">
           <span class="stat-label">Expected Drag over 100 trades</span>
           <span class="stat-val" style="color:var(--rose);" id="val-100-drag">-$275.00</span>
         </div>
 
         <div style="margin-top:20px; text-align:center;">
-          <a href="/kalshi" class="nav-cta" style="width:100%; justify-content:center; padding:10px;">TEST AGAINST LIVE 15M BTC MARKET &rarr;</a>
+          <a href="/kalshi" class="nav-cta" style="width:100%; justify-content:center; padding:10px;">TEST AGAINST LIVE KALSHI BTC DESK &rarr;</a>
         </div>
       </div>
     </div>
   </main>
 
   <script>
+    var currentSide = 'above';
+
+    function setSide(side) {
+      currentSide = side;
+      var btnAbove = document.getElementById('btn-side-above');
+      var btnBelow = document.getElementById('btn-side-below');
+      if (side === 'above') {
+        btnAbove.style.background = 'rgba(16,185,129,0.15)';
+        btnAbove.style.borderColor = 'var(--green)';
+        btnAbove.style.color = 'var(--green)';
+        btnBelow.style.background = 'rgba(255,255,255,0.04)';
+        btnBelow.style.borderColor = 'var(--panel-border)';
+        btnBelow.style.color = 'var(--muted)';
+      } else {
+        btnBelow.style.background = 'rgba(244,63,94,0.15)';
+        btnBelow.style.borderColor = 'var(--rose)';
+        btnBelow.style.color = 'var(--rose)';
+        btnAbove.style.background = 'rgba(255,255,255,0.04)';
+        btnAbove.style.borderColor = 'var(--panel-border)';
+        btnAbove.style.color = 'var(--muted)';
+      }
+      recalc();
+    }
+
     function recalc() {
       const price = Number(document.getElementById('slider-price').value) / 100;
       const prob = Number(document.getElementById('slider-prob').value) / 100;
       const spread = Number(document.getElementById('slider-spread').value) / 100;
       const count = Math.max(1, Number(document.getElementById('input-count').value) || 1);
-      const venue = document.getElementById('select-venue').value;
+      const contractType = document.getElementById('select-contract').value;
 
       document.getElementById('label-price').textContent = (price * 100).toFixed(0) + '¢ ($' + price.toFixed(2) + ')';
       document.getElementById('label-prob').textContent = (prob * 100).toFixed(1) + '%';
       document.getElementById('label-spread').textContent = (spread * 100).toFixed(1) + '¢';
 
-      // Kalshi fee formula: roundUp(count * 0.07 * price * (1 - price))
       let feePerContract = 0;
-      if (venue === 'kalshi') {
+      let benchmark = "CME CF BRTI 60s TWAP";
+      let cadence = "15-Minute Intraday (KXBTC15M)";
+
+      if (contractType === 'kalshi-15m') {
         feePerContract = Math.ceil(0.07 * price * (1 - price) * 100) / 100;
+        benchmark = "CME CF BRTI 60s TWAP";
+        cadence = "15-Minute Intraday (KXBTC15M)";
+        document.getElementById('contract-note').innerHTML = "<strong>Why this matters on Kalshi 15M:</strong> At 50¢ on Kalshi, exchange taker fees peak at exactly <strong>1.75¢ per contract</strong> ($0.07 × P × (1 − P)). Combined with a typical 2¢ spread (1¢ half-spread drag), you sacrifice <strong>2.75¢ of edge</strong> on entry. Picking the winner 52% of the time still produces a guaranteed financial loss.";
+      } else if (contractType === 'kalshi-1h') {
+        feePerContract = Math.ceil(0.07 * price * (1 - price) * 100) / 100;
+        benchmark = "CME CF BRTI Hourly TWAP";
+        cadence = "1-Hour Fixed Strike (KXBTCD)";
+        document.getElementById('contract-note').innerHTML = "<strong>Why this matters on Kalshi 1H:</strong> On hourly fixed-strike contracts ($K or above), directional bets have a 60-minute drift horizon. At the 50¢ moneyness inflection, taker fee drag is <strong>1.75¢ per contract</strong>. Theta decay and fee friction require a strict >52.75% directional hit rate to break even.";
       } else {
         // Polymarket ~2% of profit when won
         feePerContract = prob * (1 - price) * 0.02;
+        benchmark = "Chainlink / Binance Settlement";
+        cadence = "15-Minute Polymarket";
+        document.getElementById('contract-note').innerHTML = "<strong>Polymarket Fee Structure:</strong> Dynamic ~2% winner fee on positive payout. Note that off-chain cross-venue basis risk between Binance/Chainlink and the CME CF BRTI reference can cause divergent settlement outcomes.";
       }
 
       const halfSpreadDrag = spread / 2;
@@ -415,7 +469,6 @@ export function renderCalculatorPageHtml(): string {
       const netEvContract = grossEdge - totalDrag;
       const totalPnl = netEvContract * count;
       const breakevenProb = price + totalDrag;
-      const drag100 = totalDrag * count * 100;
 
       const isPositive = netEvContract > 0;
       const color = isPositive ? 'var(--green)' : 'var(--rose)';
@@ -434,6 +487,8 @@ export function renderCalculatorPageHtml(): string {
       document.getElementById('val-gross-edge').textContent = (grossEdge >= 0 ? '+' : '') + (grossEdge * 100).toFixed(2) + '¢';
       document.getElementById('val-total-drag').textContent = '-' + (totalDrag * 100).toFixed(2) + '¢';
       document.getElementById('val-breakeven').textContent = (breakevenProb * 100).toFixed(2) + '%';
+      document.getElementById('val-benchmark').textContent = benchmark;
+      document.getElementById('val-cadence').textContent = cadence;
       document.getElementById('val-100-drag').textContent = '-$' + (totalDrag * count * 10).toFixed(2);
 
       const badge = document.getElementById('badge-verdict');
