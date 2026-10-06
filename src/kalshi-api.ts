@@ -18,10 +18,10 @@ import { paperTrades, walletTransactions, subscriberWallets } from "./schema.ts"
 import { getOrCreateSubscriberWallet } from "./wallet-engine.ts";
 import { eq, desc } from "drizzle-orm";
 import {
-  KalshiTimeframe,
+  type KalshiTimeframe,
   selectAtmHourlyMarket,
   buildStrikeLadder,
-  KalshiStrikeLadderEntry,
+  type KalshiStrikeLadderEntry,
 } from "./kalshi-contracts.ts";
 
 export interface KalshiMarket {

@@ -102,7 +102,7 @@ import {
   KALSHI_CONTRACT_SPECS,
   calculateKalshiTakerFee,
   calculateBreakevenProbability,
-  KalshiTimeframe,
+  type KalshiTimeframe,
 } from "./kalshi-contracts.ts";
 import { renderKalshiTerminalHtml } from "./kalshi-terminal-page.ts";
 import {
