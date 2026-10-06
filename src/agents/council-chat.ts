@@ -400,8 +400,18 @@ export function generatePersonaDomainResponse(
     }
   }
 
-  if (norm.includes("competitor") || norm.includes("hedge fund") || norm.includes("stack up")) {
-    citations.push("docs/findings.md (§9b, §10)", "/calibration/market-price");
+  if (norm.includes("competitor") || norm.includes("hedge fund") || norm.includes("stack up") || norm.includes("oddpool") || norm.includes("stand.trade") || norm.includes("fiddler") || norm.includes("credo")) {
+    citations.push("docs/findings.md (§9b, §10)", "docs/competitive-analysis-top-10.md");
+    if (persona.id === "aria") {
+      return {
+        reply: `Our competitive counter-positioning turns competitor flaws into our greatest moats:
+1. **Prediction Markets (Oddpool, Stand.Trade, PillarLab)**: Other tools sell unhedged whale tracking, ignore Kalshi's steep quadratic taker fees ($0.07 × p × (1-p)), and lack statistical calibration. QuanterraOS proves across 1,316 settled windows that market mid-price (0.2001 Brier) beats theoretical models (0.2063), bakes real fees into every expected value calculation, and enforces Rule B5 ($0.00 live risk) backed by our $10,000 sandbox wallet at **/kalshi**.
+2. **Enterprise AI Governance (TrustOS vs. Credo AI, Fiddler, Arize)**: Competitors trap enterprises in subjective GRC questionnaires and $150k+ annual contracts. TrustOS delivers a fixed $20,000, 6-week pilot providing the empirical, mathematical audit evidence required by insurance commissioners (NAIC), bank examiners (ECOA), and state regulators (Colorado SB 26-189).
+
+Explore our TrustOS pilot at **/trustos** or read our full analysis in docs/competitive-analysis-top-10.md!`,
+        citations
+      };
+    }
     return {
       reply: `Hedge funds often market complex backtests that overfit in-sample history. In our benchmark of 1,316 settled 15-minute Kalshi windows, the market's own mid-price achieved a 0.2001 Brier score, beating theoretical models (0.2063). When we simulate trading discrepancies, held-out EV is -2.15¢ per contract after taker fees. Unlike funds claiming unproven predictive edge, our empirical work proves the market is already pricing distribution risk efficiently.`,
       citations
