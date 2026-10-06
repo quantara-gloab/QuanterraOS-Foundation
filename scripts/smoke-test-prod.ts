@@ -58,6 +58,8 @@ async function main() {
     { path: "/research", name: "Research Directory (/research)" },
     { path: "/trustos", name: "TrustOS Pilot Offer (/trustos)" },
     { path: "/wallet", name: "Subscriber Sandbox Wallet (/wallet)" },
+    { path: "/kalshi", name: "Kalshi 15M Bidding Desk (/kalshi)" },
+    { path: "/account", name: "Operator Account & Clearance (/account)" },
   ];
 
   for (const page of pages) {

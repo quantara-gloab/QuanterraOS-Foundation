@@ -846,6 +846,8 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     <div class="nav-left">
       <a href="/" class="nav-brand"><span class="brand-dot"></span> quanterraos</a>
       <div class="nav-links">
+        <a href="/kalshi" style="color:var(--accent);font-weight:600;">kalshi 15m</a>
+        <a href="/trustos" style="color:#10B981;font-weight:600;">trustos pilot</a>
         <a href="/calibration">calibration</a>
         <a href="/council">council</a>
         <a href="/predictions">predictions</a>
@@ -854,13 +856,14 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
         <a href="/growth">growth</a>
         <a href="/index">index</a>
         <a href="/spread">spread</a>
-        <a href="/methodology">methodology</a>
         <a href="/research">research</a>
+        <a href="/account">account</a>
         <a href="/status">status</a>
       </div>
     </div>
-    <div class="nav-right">
-      <a href="/council" class="nav-cta">COUNCIL CONSOLE &rarr;</a>
+    <div class="nav-right" style="display:flex;gap:10px;align-items:center;">
+      <a href="/kalshi" class="nav-cta" style="background:linear-gradient(180deg, #10B981 0%, #047857 100%);color:#fff;border-color:rgba(52,211,153,0.5);box-shadow:0 4px 14px rgba(16,185,129,0.35);">15M BIDDING &rarr;</a>
+      <a href="/council" class="nav-cta">COUNCIL CONSOLE</a>
     </div>
   </nav>
 
@@ -879,7 +882,8 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
           An auditable machine council synchronizing 8 specialized intelligence agents across order-book depth, tick continuity, and empirical Brier decomposition across 1,316 settled contracts.
         </p>
         <div class="hero-actions">
-          <a href="/council" class="btn-primary">Launch Council Console &rarr;</a>
+          <a href="/kalshi" class="btn-primary" style="background:linear-gradient(180deg, #10B981 0%, #059669 100%);border-color:#34D399;box-shadow:0 0 20px rgba(16,185,129,0.35);">15M Kalshi Desk &rarr;</a>
+          <a href="/council" class="btn-primary">Council Console</a>
           <a href="/calibration" class="btn-secondary">Audit Calibration Curve</a>
         </div>
       </div>
