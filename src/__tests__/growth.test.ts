@@ -151,7 +151,11 @@ test("signup records exact disclosures, converts prospect, and schedules a callb
 
 test("voice: never calls without consent, respects local hours, and 'stop calling' revokes", async () => {
   const db = openDb(":memory:");
-  handleSignup(db, { email: "p@co.com", name: "Pat Lee", phone: "+13125550100", timezone: "America/Chicago", consentCall: "on" }, {});
+  handleSignup(
+    db,
+    { email: "p@co.com", name: "Pat Lee", phone: "+13125550100", timezone: "America/Chicago", consentCall: "on" },
+    { now: new Date("2026-10-06T07:00:00Z") },
+  );
   const c = cfg();
   const dialed: string[] = [];
   const dial = async (to: string) => (dialed.push(to), { ok: true, sid: "CA1" });

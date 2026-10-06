@@ -307,7 +307,7 @@ export interface IngestLeadInput {
   name?: string;
   company?: string;
   title?: string;
-  source: string;
+  source?: string;
   tierInterest?: "free" | "pro" | "institutional" | "pilot";
   notes?: string;
 }
@@ -339,7 +339,7 @@ export function ingestLead(input: IngestLeadInput) {
     name: input.name ?? null,
     company: input.company ?? null,
     title: input.title ?? null,
-    source: input.source,
+    source: input.source ?? "direct",
     status: "new",
     tierInterest: input.tierInterest ?? "free",
     touches: 0,

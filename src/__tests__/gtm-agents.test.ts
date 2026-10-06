@@ -99,7 +99,7 @@ describe("Go-To-Market (GTM) Agents Engine (ai-marketing-sales-team-spec.md)", (
         amountUsd: 200.0,
       });
       assert.strictEqual(excessiveSpend.allowed, false);
-      assert.ok(excessiveSpend.reason.includes("Daily ad spend cap"));
+      assert.ok(excessiveSpend.reason?.includes("Daily ad spend cap"));
 
       // Spend targeting an unverified landing page is blocked by guardrail
       const unverifiedUrlSpend = evaluateAndLogAdSpend({
@@ -109,7 +109,7 @@ describe("Go-To-Market (GTM) Agents Engine (ai-marketing-sales-team-spec.md)", (
         amountUsd: 10.0,
       });
       assert.strictEqual(unverifiedUrlSpend.allowed, false);
-      assert.ok(unverifiedUrlSpend.reason.includes("does not match verified honest landing page routes"));
+      assert.ok(unverifiedUrlSpend.reason?.includes("does not match verified honest landing page routes"));
     });
   });
 

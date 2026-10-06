@@ -3034,8 +3034,8 @@ app.get("/api/kalshi/balance", async (req, res) => {
   const wallet = getWalletSummary(userId);
   const kalshiBal = await getKalshiPortfolioBalance();
   res.json({
-    sandbox_usd: wallet.usdBalance,
-    sandbox_btc: wallet.btcBalance,
+    sandbox_usd: wallet.wallet.balanceUsd,
+    sandbox_btc: wallet.wallet.balanceBtc,
     live_usd: kalshiBal.balance_dollars,
     live_authenticated: kalshiBal.authenticated,
   });

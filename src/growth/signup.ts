@@ -29,6 +29,7 @@ export interface SignupInput {
 export interface SignupMeta {
   ip?: string;
   userAgent?: string;
+  now?: Date;
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -81,12 +82,12 @@ export function handleSignup(db: DB, input: SignupInput, meta: SignupMeta): Sign
     id = Number(r.lastInsertRowid);
   }
 
-  const base = { contactId: id, source: "signup-form", ip: meta.ip, userAgent: meta.userAgent, at: nowIso() };
+  const base = { contactId: id, source: "signup-form", ip: meta.ip, userAgent: meta.userAgent, at: meta.now ? meta.now.toISOString() : nowIso() };
   if (truthy(input.consentEmail)) recordConsent(db, { ...base, subject: email, channel: "email", action: "grant", disclosureText: DISCLOSURES.email });
   let callbackScheduled = false;
   if (wantsCall && phone) {
     recordConsent(db, { ...base, subject: phone, channel: "call", action: "grant", disclosureText: DISCLOSURES.call });
-    scheduleCallback(db, id, phone);
+    scheduleCallback(db, id, phone, meta.now);
     callbackScheduled = true;
   }
   return { ok: true, contactId: id, callbackScheduled, isNew: !existing };
