@@ -560,23 +560,49 @@ export function generatePersonaDomainResponse(
     };
   }
 
-  // Question 9: Who are you / role introduction
+  // Question 11: Making bids on Kalshi 15m High/Low (check before generic greetings)
   if (
-    norm.includes("who are you") ||
-    norm.includes("what is your role") ||
-    norm.includes("what do you do") ||
-    norm.includes("about you") ||
-    norm.includes("hello") ||
-    norm.includes("hi")
+    norm.includes("bid") ||
+    norm.includes("order") ||
+    norm.includes("trade") ||
+    norm.includes("kalshi") ||
+    norm.includes("15m") ||
+    norm.includes("high low") ||
+    norm.includes("high/low") ||
+    norm.includes("kxbtc15m")
   ) {
-    citations.push("src/agents/council-personas.ts", "src/agents/council-data.ts");
+    citations.push("src/kalshi-api.ts", "/kalshi", "/fair-value/btc15m");
     return {
-      reply: `I am ${persona.name}, ${persona.role} for QuanterraOS. ${persona.shortBio} Our standing governance discipline requires that all telemetry is grounded strictly in stored records: we verify ${gt.sampleSize.toLocaleString()} settlement windows, deploy ${gt.capitalDeployed} live capital, and publish all findings openly. How can I assist your investigation?`,
+      reply: `To make bids on Kalshi 15-minute High/Low contracts tonight:
+1. Navigate to the **15M Bidding Desk** at **/kalshi** (or **/fair-value/btc15m**).
+2. You will see the active **KXBTC15M** contract with the current target strike and live second-by-second countdown clock.
+3. Select your side:
+   - **BUY YES** if you forecast Bitcoin will settle at or above the strike price.
+   - **BUY NO** if you forecast Bitcoin will settle below the strike price.
+4. Set your limit bid price (between 1¢ and 99¢) using the quick buttons (Bid, Mid, Ask) and select your contract count.
+5. In **Sandbox Mode** (default), your order executes using your **$10,000 USD paper wallet** with zero financial risk under Rule B5. If you have configured your Kalshi API keys, you can also toggle to Live API mode.
+6. Click **Place 15M Bid**—your order is recorded immediately and tracks P&L in real-time in the Active Positions table below!`,
       citations
     };
   }
 
-  
+  // Question 12: Account Login & Clearance
+  if (
+    norm.includes("log in") ||
+    norm.includes("login") ||
+    norm.includes("sign in") ||
+    norm.includes("account") ||
+    norm.includes("clearance") ||
+    norm.includes("password") ||
+    norm.includes("register")
+  ) {
+    citations.push("src/auth.ts", "/account");
+    return {
+      reply: `You can log in right now at **/account**. To make your test run seamless tonight, we have added an **Instant 1-Click Test Operator Login** on the clearance terminal. Simply click "Log In As Test Operator" and you will be immediately authenticated into the Pro Terminal with real-time streaming feeds and full $10,000 paper wallet access!`,
+      citations
+    };
+  }
+
   // Question 10: Electronic Currency Wallet
   if (
     norm.includes("wallet") ||
@@ -591,7 +617,56 @@ export function generatePersonaDomainResponse(
     };
   }
 
-  // General in-character answer tailored to persona domain
+  // Conversational response for Aria Concierge
+  if (persona.id === "aria") {
+    citations.push("Aria Virtual Desk Assistant", "quanterraos.com");
+    if (
+      /\b(hello|hi|hey|howdy|greetings)\b/i.test(norm) ||
+      norm.includes("how are you") ||
+      norm.includes("good evening") ||
+      norm.includes("good night") ||
+      norm.includes("help") ||
+      norm.includes("can you talk") ||
+      norm.includes("what can you do") ||
+      norm.includes("communicate") ||
+      norm.includes("interactive")
+    ) {
+      return {
+        reply: `Hello! I'm **Aria**, your executive concierge and virtual desk assistant. I'm fully active and ready to communicate with you!
+
+Here is what you can do right now for your test run:
+1. **Instant Login**: Head over to **/account** and click the green **"Log In As Test Operator"** button to get full Pro access.
+2. **Make 15M Kalshi Bids**: Go to **/kalshi** to view the active KXBTC15M contract, check the live countdown, and place simulated or live limit bids.
+3. **Electronic Currency Wallet**: Inspect your $10,000 USD and 0.25 BTC paper wallet balance at **/wallet**.
+4. **Calibration & Telemetry**: Inspect our 0.2001 Brier calibration proof at **/calibration** and audit the 8 Council specialists at **/council**.
+
+Feel free to ask me anything about placing orders, spot prices, or system mechanics!`,
+        citations
+      };
+    }
+
+    return {
+      reply: `I'm here with you! As your QuanterraOS executive concierge, I can walk you through making 15-minute Kalshi bids at **/kalshi**, checking your electronic currency wallet at **/wallet**, or authenticating with 1-click at **/account**. What would you like to do next?`,
+      citations
+    };
+  }
+
+  // Question 9: Who are you / role introduction (for non-Aria council personas)
+  if (
+    norm.includes("who are you") ||
+    norm.includes("what is your role") ||
+    norm.includes("what do you do") ||
+    norm.includes("about you") ||
+    /\b(hello|hi|hey)\b/i.test(norm)
+  ) {
+    citations.push("src/agents/council-personas.ts", "src/agents/council-data.ts");
+    return {
+      reply: `I am ${persona.name}, ${persona.role} for QuanterraOS. ${persona.shortBio} Our standing governance discipline requires that all telemetry is grounded strictly in stored records: we verify ${gt.sampleSize.toLocaleString()} settlement windows, deploy ${gt.capitalDeployed} live capital, and publish all findings openly. How can I assist your investigation?`,
+      citations
+    };
+  }
+
+  // General in-character answer tailored to specialist persona domain
   citations.push("docs/findings.md", "src/agents/council-data.ts");
   return {
     reply: `As ${persona.name} (${persona.role}), my analysis is grounded in verified platform records rather than speculative claims. In our benchmark of ${gt.sampleSize.toLocaleString()} settled 15-minute contracts, the market mid-price demonstrates calibration at a ${gt.marketBrier} Brier score. Under QuanterraOS governance rules, our live capital deployment is strictly ${gt.capitalDeployed}, and the execution gate is locked in standby mode. Feel free to ask about our calibration curve, data pipeline hygiene, or backtest findings.`,

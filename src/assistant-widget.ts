@@ -534,6 +534,7 @@ For direct human inquiries, our team is reachable at <strong>support@quanterraos
   let isVoiceEnabled = false;
   let isOpen = false;
   let isSending = false;
+  let conversationHistory = [];
 
   const bubble = document.getElementById('qos-assistant-bubble');
   const drawer = document.getElementById('qos-assistant-drawer');
@@ -692,6 +693,7 @@ For direct human inquiries, our team is reachable at <strong>support@quanterraos
     isSending = true;
     sendBtn.disabled = true;
     appendMessage('user', trimmed);
+    conversationHistory.push({ role: 'user', content: trimmed });
     chatInput.value = '';
 
     const typingIndicator = showTyping();
@@ -700,7 +702,7 @@ For direct human inquiries, our team is reachable at <strong>support@quanterraos
       const response = await fetch('/api/assistant/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: trimmed, agentId: 'aria' }),
+        body: JSON.stringify({ message: trimmed, agentId: 'aria', history: conversationHistory.slice(-10) }),
       });
 
       if (!response.ok) {
@@ -718,6 +720,7 @@ For direct human inquiries, our team is reachable at <strong>support@quanterraos
       const reply = data && typeof data.reply === 'string' && data.reply.trim()
         ? data.reply
         : 'Standing by for telemetry inquiries.';
+      conversationHistory.push({ role: 'assistant', content: reply });
       appendMessage('assistant', reply);
     } catch (err) {
       console.warn('Aria request failed:', err);

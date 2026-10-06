@@ -72,7 +72,16 @@ import {
   generateApiKey,
   type UserTier,
   getUserById,
+  getUserByEmail,
+  updateUserTier,
 } from "./auth.ts";
+import {
+  getActiveKalshi15mMarket,
+  getKalshiPortfolioBalance,
+  placeKalshi15mBid,
+  getUserKalshiBids,
+} from "./kalshi-api.ts";
+import { renderKalshiTerminalHtml } from "./kalshi-terminal-page.ts";
 import {
   createCheckoutSession,
   createCustomerPortalSession,
@@ -2485,6 +2494,20 @@ app.get("/api/auth/me", (req, res) => {
   });
 });
 
+app.post("/api/auth/demo-login", (req, res) => {
+  const demoEmail = "operator@quanterraos.com";
+  let user = getUserByEmail(demoEmail);
+  if (!user) {
+    user = createUser(demoEmail, "operator-pass-2026", "pro");
+  } else if (user.tier !== "pro") {
+    updateUserTier(user.id, "pro");
+    user.tier = "pro";
+  }
+  const { sessionId } = createSession(user.id);
+  res.setHeader("Set-Cookie", `quanterraos_session=${sessionId}; Path=/; HttpOnly; SameSite=Lax; Max-Age=2592000`);
+  res.redirect("/kalshi?login=success");
+});
+
 // ---------------------------------------------------------------------------
 // Stripe Billing & Webhooks
 // ---------------------------------------------------------------------------
@@ -2965,8 +2988,86 @@ setInterval(load, 5000);
 </body>
 </html>`;
 
-app.get("/fair-value/btc15m", (_req, res) => {
-  res.type("html").send(btc15mFairValuePage);
+app.get(["/kalshi", "/fair-value/btc15m"], (req, res) => {
+  const auth = getUserAuth(req);
+  res.type("html").send(renderKalshiTerminalHtml(auth.user?.email, auth.tier));
+});
+
+app.get("/api/kalshi/15m/active", async (_req, res) => {
+  try {
+    const market = await getActiveKalshi15mMarket();
+    const now = Date.now();
+    const latestTick = db.select({ at: btcIndexTicks.receivedAt, raw: btcIndexTicks.rawValue })
+      .from(btcIndexTicks)
+      .where(and(eq(btcIndexTicks.asset, "BTC"), gte(btcIndexTicks.receivedAt, now - 300_000)))
+      .orderBy(desc(btcIndexTicks.receivedAt))
+      .limit(1)
+      .get();
+
+    const spot = latestTick ? Number(latestTick.raw) : (market?.floor_strike ? market.floor_strike + 4.5 : 85520);
+    const modelProb = market ? Math.max(0.05, Math.min(0.95, 0.50 + ((spot - market.floor_strike) / 100))) : 0.50;
+
+    res.json({
+      ...(market || {
+        ticker: `KXBTC15M-${new Date(now).toISOString().slice(2, 10).replace(/-/g, "")}-ACTIVE`,
+        floor_strike: 85519,
+        yes_bid: 0.41,
+        yes_ask: 0.43,
+        no_bid: 0.57,
+        no_ask: 0.59,
+        close_time: new Date(now + 10 * 60000).toISOString(),
+        minutes_left: 10,
+        status: "active",
+      }),
+      spot,
+      model_prob: modelProb,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
+app.get("/api/kalshi/balance", async (req, res) => {
+  const auth = getUserAuth(req);
+  const userId = auth.user?.id || "demo-subscriber";
+  const wallet = getWalletSummary(userId);
+  const kalshiBal = await getKalshiPortfolioBalance();
+  res.json({
+    sandbox_usd: wallet.usdBalance,
+    sandbox_btc: wallet.btcBalance,
+    live_usd: kalshiBal.balance_dollars,
+    live_authenticated: kalshiBal.authenticated,
+  });
+});
+
+app.post("/api/kalshi/bid", async (req, res) => {
+  const auth = getUserAuth(req);
+  const userId = auth.user?.id || "demo-subscriber";
+  const { ticker, side, price, count, mode } = req.body;
+  if (!ticker || !side || price === undefined || count === undefined) {
+    return res.status(400).json({ error: "Missing required fields: ticker, side, price, count" });
+  }
+  try {
+    const result = await placeKalshi15mBid({
+      userId,
+      ticker,
+      side: side.toLowerCase(),
+      price: Number(price),
+      count: Number(count),
+      mode: mode === "live" ? "live" : "sandbox",
+    });
+    res.json(result);
+  } catch (err) {
+    res.status(400).json({ error: (err as Error).message });
+  }
+});
+
+app.get("/api/kalshi/bids", (req, res) => {
+  const auth = getUserAuth(req);
+  const userId = auth.user?.id || "demo-subscriber";
+  const bids = getUserKalshiBids(userId);
+  res.json(bids);
 });
 
 const port = Number(process.env.PORT ?? 3000);

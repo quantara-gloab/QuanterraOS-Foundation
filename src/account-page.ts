@@ -409,6 +409,25 @@ export function renderAccountPageHtml(user: UserRecord | null, tier: UserTier, e
         <h1>Clearance Terminal</h1>
         <p class="subtitle">Sign in or register an operator account to manage your QuanterraOS telemetry tier.</p>
 
+        <!-- 1-Click Instant Test Operator Login -->
+        <div style="margin-bottom: 24px; padding: 18px 20px; background: linear-gradient(135deg, rgba(223,184,67,0.14) 0%, rgba(14,19,26,0.85) 100%); border: 1px solid rgba(223,184,67,0.38); border-radius: 8px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+            <div>
+              <div style="font-weight:700; color:#FFFFFF; font-size:0.95rem; margin-bottom:3px; display:flex; align-items:center; gap:8px;">
+                <span>⚡</span> Instant 1-Click Test Operator Login
+              </div>
+              <div style="font-size:0.8rem; color:var(--text-dim); line-height:1.4;">
+                Authenticate immediately as <strong>operator@quanterraos.com</strong> (PRO tier) to run test bids on Kalshi 15m.
+              </div>
+            </div>
+            <form action="/api/auth/demo-login" method="POST" style="margin:0;">
+              <button type="submit" class="btn btn-primary" style="padding:10px 18px; font-weight:700; font-size:0.85rem; white-space:nowrap; background:linear-gradient(180deg, #FAF1D4 0%, #DFB843 40%, #B88E28 100%); color:#000;">
+                Log In As Test Operator →
+              </button>
+            </form>
+          </div>
+        </div>
+
         <div class="tabs-header">
           <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Sign In</button>
           <button class="tab-btn" id="tab-register" onclick="switchTab('register')">Create Account</button>

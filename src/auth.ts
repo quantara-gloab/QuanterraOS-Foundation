@@ -131,6 +131,21 @@ export function getUserById(userId: string): UserRecord | null {
   };
 }
 
+export function getUserByEmail(email: string): UserRecord | null {
+  const normalizedEmail = email.trim().toLowerCase();
+  const row = db.select().from(users).where(eq(users.email, normalizedEmail)).get();
+  if (!row) return null;
+  return {
+    id: row.id,
+    email: row.email,
+    tier: row.tier as UserTier,
+    stripeCustomerId: row.stripeCustomerId,
+    stripeSubscriptionId: row.stripeSubscriptionId,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+  };
+}
+
 export function updateUserTier(userId: string, tier: UserTier, stripeCustomerId?: string | null, stripeSubscriptionId?: string | null): void {
   const now = new Date().toISOString();
   const updateValues: Record<string, unknown> = { tier, updatedAt: now };
