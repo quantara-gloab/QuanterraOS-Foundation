@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QuanterraOS Growth Engine</title>
+<meta name="description" content="Five AI agents that find, reach and convert your buyers — with every message, call and consent recorded in a verifiable ledger.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#070b16; --panel:#0e1526; --panel-2:#131c31; --line:#223052; --line-2:#2c3d66;
+  --text:#e7ecf6; --muted:#93a0bd; --dim:#64708c;
+  --teal:#5eead4; --teal-ink:#052b26; --amber:#fbbf24; --rose:#fb7185; --blue:#7aa2ff;
+  --radius:14px; --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--ink);color:var(--text);font:16px/1.6 "Instrument Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--teal);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--teal)}
+h1,h2,h3{line-height:1.15;margin:0;font-weight:600;letter-spacing:-.02em}
+h1{font-size:clamp(38px,6vw,64px)}
+h2{font-size:clamp(28px,4vw,40px)}
+h3{font-size:19px}
+p{margin:0}
+.muted{color:var(--muted)}
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:inherit;font-weight:600;font-size:15px;line-height:1;border-radius:10px;padding:14px 20px;border:1px solid transparent;cursor:pointer;transition:transform .15s,background .15s,border-color .15s}
+.btn:hover{text-decoration:none;transform:translateY(-1px)}
+.btn-primary{background:var(--teal);color:var(--teal-ink)}
+.btn-ghost{background:transparent;color:var(--text);border-color:var(--line-2)}
+.btn-ghost:hover{border-color:var(--teal)}
+
+/* nav */
+nav{position:sticky;top:0;z-index:20;background:rgba(7,11,22,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--text);letter-spacing:-.01em}
+.brand:hover{text-decoration:none}
+.mark{width:26px;height:26px;border-radius:7px;border:1.5px solid var(--teal);display:grid;place-items:center}
+.mark i{width:8px;height:8px;background:var(--teal);border-radius:2px;transform:rotate(45deg)}
+.brand small{font:500 12px var(--mono);color:var(--muted);font-weight:400;margin-left:2px}
+nav .links{display:flex;gap:28px;align-items:center;font-size:14px}
+nav .links a{color:var(--muted)}
+nav .links a.btn{color:var(--teal-ink)}
+@media(max-width:720px){nav .links a:not(.btn){display:none}}
+
+/* hero */
+.hero{padding:88px 0 72px;background:
+  radial-gradient(700px 340px at 85% 10%,rgba(94,234,212,.10),transparent 70%),
+  linear-gradient(transparent 0 calc(100% - 1px),var(--line) 0) 0 0/100% 56px;
+  border-bottom:1px solid var(--line)}
+.hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+.hero p.lead{font-size:19px;color:var(--muted);margin:22px 0 32px;max-width:540px}
+.hero .ctas{display:flex;gap:12px;flex-wrap:wrap}
+.hero .fine{margin-top:22px;font-size:13px;color:var(--dim)}
+@media(max-width:900px){.hero .wrap{grid-template-columns:1fr}.hero{padding:56px 0}}
+
+/* ledger card */
+.ledger{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:0 30px 80px -30px rgba(0,0,0,.7)}
+.ledger header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line);font:500 12px var(--mono);color:var(--muted)}
+.ledger header b{color:var(--text);font-weight:500}
+.ok{display:inline-flex;align-items:center;gap:6px;color:var(--teal)}
+.ok::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 4px rgba(94,234,212,.15)}
+.row{display:grid;grid-template-columns:76px 1fr;gap:12px;padding:13px 18px;border-bottom:1px solid var(--line);font-size:14px;opacity:0;transform:translateY(6px);animation:in .5s forwards}
+.row:last-child{border-bottom:0}
+.row .agent{font:500 11px var(--mono);text-transform:uppercase;letter-spacing:.06em;padding-top:2px}
+.row .what{color:var(--text)}
+.row .why{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+.row .hash{display:block;font:400 11px var(--mono);color:var(--dim);margin-top:4px}
+.a-scout{color:var(--blue)} .a-herald{color:var(--teal)} .a-call{color:var(--amber)} .a-sentinel{color:var(--rose)} .a-concierge{color:#c4b5fd}
+.tag{font:500 10.5px var(--mono);padding:2px 6px;border-radius:5px;margin-left:6px;vertical-align:1px}
+.tag.allow{background:rgba(94,234,212,.12);color:var(--teal)}
+.tag.block{background:rgba(251,113,133,.12);color:var(--rose)}
+.ledger footer{padding:10px 18px;font:400 11px var(--mono);color:var(--dim);border-top:1px solid var(--line);background:var(--panel-2)}
+@keyframes in{to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.row{animation:none;opacity:1;transform:none}html{scroll-behavior:auto}}
+
+section{padding:96px 0;border-bottom:1px solid var(--line)}
+.sec-head{max-width:640px;margin-bottom:48px}
+.sec-head h2{margin-top:14px}
+.sec-head p{margin-top:16px;color:var(--muted);font-size:17px}
+
+/* agents */
+.agents{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.agent-card{background:var(--panel);padding:26px 22px;display:flex;flex-direction:column;gap:12px;min-height:290px}
+.agent-card .id{font:500 12px var(--mono);letter-spacing:.06em}
+.agent-card p{color:var(--muted);font-size:15px}
+.agent-card .guard{margin-top:auto;padding-top:14px;border-top:1px dashed var(--line-2);font-size:13px;color:var(--text)}
+.agent-card .guard::before{content:"Guardrail";display:block;font:500 10.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:4px}
+@media(max-width:1000px){.agents{grid-template-columns:repeat(2,1fr)}.agent-card:last-child{grid-column:1/-1}}
+@media(max-width:560px){.agents{grid-template-columns:1fr}.agent-card{min-height:0}}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;counter-reset:s}
+.step{counter-increment:s;padding-top:22px;border-top:2px solid var(--line-2)}
+.step::before{content:"0" counter(s);font:500 13px var(--mono);color:var(--teal);display:block;margin-bottom:14px}
+.step p{color:var(--muted);font-size:15px;margin-top:8px}
+@media(max-width:860px){.steps{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.steps{grid-template-columns:1fr}}
+
+/* trust */
+.trust{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
+.checks{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.checks li{display:grid;grid-template-columns:28px 1fr;gap:10px;padding:16px 0;border-bottom:1px solid var(--line)}
+.checks li::before{content:"";width:18px;height:18px;margin-top:3px;border-radius:5px;border:1.5px solid var(--teal);background:linear-gradient(135deg,transparent 45%,var(--teal) 45% 55%,transparent 55%)}
+.checks b{display:block;font-weight:600}
+.checks span{color:var(--muted);font-size:15px}
+@media(max-width:860px){.trust{grid-template-columns:1fr;gap:32px}}
+
+/* signup */
+.signup{display:grid;grid-template-columns:.9fr 1.1fr;gap:56px;align-items:start}
+form{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:28px;display:grid;gap:16px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{display:grid;gap:6px;font-size:13px;color:var(--muted);font-weight:500}
+input[type=text],input[type=email],input[type=tel],select{font:inherit;font-size:15px;color:var(--text);background:var(--ink);border:1px solid var(--line-2);border-radius:9px;padding:11px 12px;width:100%}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-offset:1px;border-color:transparent}
+.consent{display:grid;grid-template-columns:20px 1fr;gap:10px;align-items:start;font-size:13.5px;color:var(--muted);font-weight:400;line-height:1.5;padding:12px;border:1px solid var(--line);border-radius:9px;background:var(--panel-2)}
+.consent input{width:18px;height:18px;margin:2px 0 0;accent-color:var(--teal)}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.form-msg{font-size:14px;min-height:1.4em}
+.form-msg.err{color:var(--rose)} .form-msg.good{color:var(--teal)}
+.legal{font-size:12px;color:var(--dim)}
+@media(max-width:860px){.signup{grid-template-columns:1fr;gap:32px}}
+@media(max-width:480px){.grid2{grid-template-columns:1fr}form{padding:20px}}
+
+footer.site{padding:40px 0;color:var(--dim);font-size:13px}
+footer.site .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+/* concierge */
+.cz-btn{position:fixed;right:20px;bottom:20px;z-index:40;background:var(--teal);color:var(--teal-ink);border:0;border-radius:999px;padding:14px 18px;font:600 14px "Instrument Sans",sans-serif;display:flex;gap:8px;align-items:center;cursor:pointer;box-shadow:0 12px 30px -8px rgba(94,234,212,.45)}
+.cz-btn svg{width:18px;height:18px}
+.cz{position:fixed;right:20px;bottom:84px;z-index:40;width:min(380px,calc(100vw - 32px));height:min(520px,calc(100vh - 120px));background:var(--panel);border:1px solid var(--line-2);border-radius:16px;display:none;flex-direction:column;overflow:hidden;box-shadow:0 30px 80px -20px rgba(0,0,0,.8)}
+.cz.open{display:flex}
+.cz header{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.cz header b{font-weight:600}
+.cz header small{display:block;color:var(--dim);font-size:12px}
+.cz header button{background:none;border:0;color:var(--muted);font-size:22px;cursor:pointer;line-height:1}
+.cz-log{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:85%;padding:10px 13px;border-radius:12px;font-size:14.5px;line-height:1.5;white-space:pre-wrap}
+.msg.bot{background:var(--panel-2);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
+.msg.me{background:var(--teal);color:var(--teal-ink);align-self:flex-end;border-bottom-right-radius:4px}
+.msg.typing{color:var(--dim)}
+.cz form{border:0;border-top:1px solid var(--line);border-radius:0;padding:10px;display:flex;gap:8px;background:var(--panel)}
+.cz textarea{flex:1;resize:none;font:inherit;font-size:14.5px;color:var(--text);background:var(--ink);border:1px solid var(--line-2);border-radius:9px;padding:10px;height:44px}
+.cz form button{background:var(--teal);color:var(--teal-ink);border:0;border-radius:9px;padding:0 14px;font-weight:600;cursor:pointer}
+@media(max-width:480px){.cz{right:16px;bottom:80px}.cz-btn{right:16px;bottom:16px}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="/"><span class="mark"><i></i></span>QuanterraOS <small>/ growth</small></a>
+    <div class="links">
+      <a href="#agents">Agents</a>
+      <a href="#how">How it works</a>
+      <a href="#trust">Compliance</a>
+      <a class="btn btn-primary" href="#signup" style="padding:10px 16px">Create account</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <span class="eyebrow">QuanterraOS Growth Engine</span>
+      <h1 style="margin-top:18px">Growth that can<br>show its work.</h1>
+      <p class="lead">Five AI agents find your buyers, reach out, answer questions and call back the people who ask — and every message, call and consent is written to a ledger you can verify.</p>
+      <div class="ctas">
+        <a class="btn btn-primary" href="#signup">Create your account</a>
+        <button class="btn btn-ghost" type="button" data-open-concierge>Ask the Concierge</button>
+      </div>
+      <p class="fine">Built on the same attribution layer as Quanterra Trust.</p>
+    </div>
+
+    <div class="ledger" aria-label="Example of the Growth Engine activity ledger">
+      <header><span><b>growth.ledger</b> · illustrative</span><span class="ok">chain verified</span></header>
+      <div class="row" style="animation-delay:.1s"><span class="agent a-scout">Scout</span><div class="what">Imported 240 prospects from your CRM<span class="why">218 accepted · 22 skipped (personal inboxes, suppressed)</span></div></div>
+      <div class="row" style="animation-delay:.35s"><span class="agent a-herald">Herald</span><div class="what">First note to a CRO at a regional bank<span class="tag allow">ALLOW</span><span class="why">B2B, US, opt-out included · touch 1 of 3</span></div></div>
+      <div class="row" style="animation-delay:.6s"><span class="agent a-herald">Herald</span><div class="what">Held outreach to a German prospect<span class="tag block">BLOCK</span><span class="why">No consent or documented lawful basis for DE</span></div></div>
+      <div class="row" style="animation-delay:.85s"><span class="agent a-concierge">Concierge</span><div class="what">Visitor signed up, ticked “Call me”<span class="why">Consent stored with exact wording, time and source</span><span class="hash">sha256 9f2c…e41a ← 77b0…c3d9</span></div></div>
+      <div class="row" style="animation-delay:1.1s"><span class="agent a-call">Callback</span><div class="what">Call queued for 9:00 their time<span class="why">Requested at 11:42 PM local — outside calling hours</span></div></div>
+      <div class="row" style="animation-delay:1.35s"><span class="agent a-sentinel">Sentinel</span><div class="what">Ledger verified · 1,204 entries<span class="why">Outbound stays on while the chain is intact</span></div></div>
+      <footer>every decision: who · what · why · when</footer>
+    </div>
+  </div>
+</header>
+
+<section id="agents">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">The team</span>
+      <h2>Five agents, one accountable pipeline.</h2>
+      <p>Each agent has a single job and a hard guardrail. Sentinel watches all of them and stops the line if anything doesn't add up.</p>
+    </div>
+    <div class="agents">
+      <article class="agent-card">
+        <span class="id a-scout">01 · Scout</span><h3>Prospect intake</h3>
+        <p>Brings in the business contacts you're entitled to use — your CRM, inbound inquiries, licensed lists — and cleans, dedupes and screens them.</p>
+        <p class="guard">Personal inboxes and anyone who opted out are filtered before outreach.</p>
+      </article>
+      <article class="agent-card">
+        <span class="id a-herald">02 · Herald</span><h3>Outreach email</h3>
+        <p>Writes short, specific notes for each prospect and follows up twice at most. A reply hands the thread to your team.</p>
+        <p class="guard">Honest subject lines, one-click unsubscribe, region rules and daily send caps.</p>
+      </article>
+      <article class="agent-card">
+        <span class="id a-concierge">03 · Concierge</span><h3>Site chat</h3>
+        <p>Answers visitor questions on your site around the clock and guides qualified visitors to sign up or request a call.</p>
+        <p class="guard">Speaks only from approved product facts. Never invents results or prices.</p>
+      </article>
+      <article class="agent-card">
+        <span class="id a-call">04 · Callback</span><h3>Voice agent</h3>
+        <p>Calls back people who asked for a call, answers questions in natural conversation and hands warm leads to a person.</p>
+        <p class="guard">Opt-in only. Says it's an AI up front, calls in local business hours, stops on request.</p>
+      </article>
+      <article class="agent-card">
+        <span class="id a-sentinel">05 · Sentinel</span><h3>Supervisor</h3>
+        <p>Runs the schedule, tracks the funnel, retries what failed and reports what each agent did and why.</p>
+        <p class="guard">Verifies the consent ledger every cycle and halts outbound if it's been altered.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">How it works</span>
+      <h2>From list to booked conversation.</h2>
+    </div>
+    <div class="steps">
+      <div class="step"><h3>Load your audience</h3><p>Import prospects from sources you can use. Scout screens them and marks which regions are eligible for outreach.</p></div>
+      <div class="step"><h3>Reach out, carefully</h3><p>Herald sends personal notes on a measured cadence. Every send records the rule that allowed it.</p></div>
+      <div class="step"><h3>Convert interest</h3><p>Concierge answers questions on-site. Visitors sign up and can ask for a call — consent captured word for word.</p></div>
+      <div class="step"><h3>Talk and hand off</h3><p>Callback rings them in business hours, then passes ready buyers to your team with the full transcript.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="trust">
+  <div class="wrap trust">
+    <div class="sec-head" style="margin:0">
+      <span class="eyebrow">Compliance built in</span>
+      <h2>Automation that stays on the right side of the line.</h2>
+      <p>Most automated outreach gets blacklisted, fined or ignored. The Growth Engine is designed so your domain, numbers and reputation stay clean — and so you can prove it.</p>
+    </div>
+    <ul class="checks">
+      <li><div><b>Tamper-evident consent ledger</b><span>Every grant and opt-out is hash-chained with the exact wording shown, time and source.</span></div></li>
+      <li><div><b>Opt-in voice only</b><span>The AI never dials a cold number. It discloses that it's an AI and honors “stop calling” instantly.</span></div></li>
+      <li><div><b>One-click unsubscribe</b><span>Every email carries a working unsubscribe, your postal address and why the person is receiving it.</span></div></li>
+      <li><div><b>Region-aware rules</b><span>Outreach is enabled per country, so regions that require prior consent are held until you have it.</span></div></li>
+      <li><div><b>Fail-closed supervisor</b><span>Missing settings or a broken ledger pause all outbound until fixed.</span></div></li>
+    </ul>
+  </div>
+</section>
+
+<section id="signup" style="border-bottom:0">
+  <div class="wrap signup">
+    <div class="sec-head" style="margin:0">
+      <span class="eyebrow">Get started</span>
+      <h2>Create your QuanterraOS account.</h2>
+      <p>Set up takes a few minutes. Want to talk it through first? Tick “Call me” and our AI assistant will ring you during business hours — or just ask the Concierge.</p>
+    </div>
+
+    <form id="signup-form" novalidate>
+      <div class="grid2">
+        <label>Full name<input type="text" name="name" autocomplete="name" required></label>
+        <label>Work email<input type="email" name="email" autocomplete="email" required></label>
+      </div>
+      <div class="grid2">
+        <label>Company<input type="text" name="company" autocomplete="organization"></label>
+        <label>Role<input type="text" name="title" autocomplete="organization-title"></label>
+      </div>
+      <div class="grid2">
+        <label>Country
+          <select name="country" autocomplete="country">
+            <option value="">Select…</option>
+            <option value="US">United States</option><option value="CA">Canada</option><option value="MX">Mexico</option>
+            <option value="GB">United Kingdom</option><option value="IE">Ireland</option><option value="DE">Germany</option>
+            <option value="FR">France</option><option value="ES">Spain</option><option value="IT">Italy</option>
+            <option value="NL">Netherlands</option><option value="CH">Switzerland</option><option value="SE">Sweden</option>
+            <option value="AE">United Arab Emirates</option><option value="SA">Saudi Arabia</option><option value="IL">Israel</option>
+            <option value="IN">India</option><option value="SG">Singapore</option><option value="HK">Hong Kong</option>
+            <option value="JP">Japan</option><option value="KR">South Korea</option><option value="AU">Australia</option>
+            <option value="NZ">New Zealand</option><option value="BR">Brazil</option><option value="CO">Colombia</option>
+            <option value="AR">Argentina</option><option value="CL">Chile</option><option value="ZA">South Africa</option>
+            <option value="NG">Nigeria</option><option value="PH">Philippines</option><option value="">Other</option>
+          </select>
+        </label>
+        <label>Phone <span style="font-weight:400;color:var(--dim)">· for a call</span><input type="tel" name="phone" autocomplete="tel" placeholder="+1 555 010 0100"></label>
+      </div>
+
+      <label class="consent"><input type="checkbox" name="consentEmail"><span data-disclosure="email">Email me product updates and onboarding tips from QuanterraOS (Quantara Global LLC). I can unsubscribe anytime.</span></label>
+      <label class="consent"><input type="checkbox" name="consentCall"><span data-disclosure="call">Call me at the number above. I agree that QuanterraOS (Quantara Global LLC) may call me using an AI voice assistant about my signup. Consent is not required to create an account, and I can say "stop calling" anytime.</span></label>
+
+      <div class="hp" aria-hidden="true"><label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+      <input type="hidden" name="timezone">
+
+      <button class="btn btn-primary" type="submit" style="justify-content:center">Create account</button>
+      <p class="form-msg" role="status" aria-live="polite"></p>
+      <p class="legal">By creating an account you agree to our <a href="/terms">Terms</a> and <a href="/privacy">Privacy Policy</a>.</p>
+    </form>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap">
+    <span>© <span id="yr"></span> Quantara Global LLC · QuanterraOS</span>
+    <span><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="mailto:hello@quanterraos.com">hello@quanterraos.com</a></span>
+  </div>
+</footer>
+
+<!-- Concierge -->
+<button class="cz-btn" type="button" data-open-concierge aria-controls="cz" aria-expanded="false">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>
+  Ask the Concierge
+</button>
+<div class="cz" id="cz" role="dialog" aria-label="QuanterraOS Concierge">
+  <header><div><b>Concierge</b><small>AI assistant · answers from QuanterraOS product facts</small></div><button type="button" aria-label="Close" data-close-concierge>×</button></header>
+  <div class="cz-log" id="cz-log" aria-live="polite"></div>
+  <form id="cz-form"><textarea name="q" placeholder="Ask about QuanterraOS…" aria-label="Message" required></textarea><button type="submit">Send</button></form>
+</div>
+
+<script>
+(function () {
+  document.getElementById("yr").textContent = new Date().getFullYear();
+  var API = "/api/growth";
+
+  // Keep checkbox wording identical to what the server stores in the consent ledger.
+  fetch(API + "/disclosures").then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+    if (!d) return;
+    document.querySelectorAll("[data-disclosure]").forEach(function (el) {
+      var k = el.getAttribute("data-disclosure"); if (d[k]) el.textContent = d[k];
+    });
+  }).catch(function () {});
+
+  // ---- signup
+  var form = document.getElementById("signup-form"), F = function (n) { return form.elements.namedItem(n); };
+  var msg = form.querySelector(".form-msg");
+  try { F("timezone").value = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch (e) {}
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    msg.className = "form-msg"; msg.textContent = "";
+    var data = {
+      name: F("name").value, email: F("email").value, company: F("company").value, title: F("title").value,
+      country: F("country").value, phone: F("phone").value, timezone: F("timezone").value, website: F("website").value,
+      consentEmail: F("consentEmail").checked, consentCall: F("consentCall").checked
+    };
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(data.email.trim())) { msg.className = "form-msg err"; msg.textContent = "Please enter a valid email address."; F("email").focus(); return; }
+    if (data.consentCall && data.phone.replace(/\D/g, "").length < 8) { msg.className = "form-msg err"; msg.textContent = "Add a phone number so we can call you."; F("phone").focus(); return; }
+    var btn = form.querySelector("button[type=submit]"); btn.disabled = true; btn.textContent = "Creating…";
+    fetch(API + "/signup", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(data) })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (res) {
+        if (!res.ok) throw new Error(res.j.error || "Something went wrong.");
+        msg.className = "form-msg good";
+        msg.textContent = res.j.callbackScheduled
+          ? "You're in. Check your inbox — and expect a call from our AI assistant during business hours."
+          : "You're in. Check your inbox for next steps.";
+        form.reset(); try { F("timezone").value = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch (e) {}
+      })
+      .catch(function (err) { msg.className = "form-msg err"; msg.textContent = err.message; })
+      .finally(function () { btn.disabled = false; btn.textContent = "Create account"; });
+  });
+
+  // ---- concierge
+  var panel = document.getElementById("cz"), log = document.getElementById("cz-log"), czForm = document.getElementById("cz-form");
+  var launcher = document.querySelector(".cz-btn"), history = [];
+  function add(role, text, cls) {
+    var d = document.createElement("div"); d.className = "msg " + (role === "user" ? "me" : "bot") + (cls ? " " + cls : "");
+    d.textContent = text; log.appendChild(d); log.scrollTop = log.scrollHeight; return d;
+  }
+  function open() {
+    panel.classList.add("open"); launcher.setAttribute("aria-expanded", "true");
+    if (!log.children.length) add("assistant", "Hi — I'm the QuanterraOS Concierge, an AI assistant. Ask me what QuanterraOS does, who it's for, or how to get started.");
+    czForm.q.focus();
+  }
+  function close() { panel.classList.remove("open"); launcher.setAttribute("aria-expanded", "false"); }
+  document.querySelectorAll("[data-open-concierge]").forEach(function (b) { b.addEventListener("click", function () { panel.classList.contains("open") && b === launcher ? close() : open(); }); });
+  document.querySelector("[data-close-concierge]").addEventListener("click", close);
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
+  czForm.q.addEventListener("keydown", function (e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); czForm.requestSubmit(); } });
+  czForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var q = czForm.q.value.trim(); if (!q) return;
+    czForm.q.value = ""; add("user", q); history.push({ role: "user", content: q });
+    var t = add("assistant", "Thinking…", "typing");
+    fetch(API + "/chat", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ messages: history.slice(-16) }) })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (res) {
+        t.remove();
+        if (!res.ok) throw new Error(res.j.error || "The Concierge is unavailable right now.");
+        add("assistant", res.j.reply); history.push({ role: "assistant", content: res.j.reply });
+      })
+      .catch(function (err) { t.remove(); add("assistant", err.message + " You can still sign up below or email hello@quanterraos.com."); history.pop(); });
+  });
+})();
+</script>
+</body>
+</html>

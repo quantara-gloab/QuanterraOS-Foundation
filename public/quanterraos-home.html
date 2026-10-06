@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QuanterraOS Homepage v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: pit-wall telemetry. One proof-first hero, then sections stacked like timing-board panels on a night grid. Deliberately single dark theme. */
+:root{
+color-scheme: dark;
+--asphalt:#0d1014; /* page ground, blue-black like wet track */
+--panel:#151a20; /* raised panels */
+--rule:#26303a; /* hairlines */
+--platinum:#d9dee4; /* primary text */
+--steel:#8d98a5; /* secondary text */
+--amber:#f2a93b; /* standby / pit-light signal, the one accent */
+--go:#5cc497; /* semantic: live */
+--display:"Saira Condensed","Arial Narrow",system-ui,sans-serif;
+--body:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+--mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{background:var(--asphalt);color:var(--platinum);font:16px/1.6 var(--body);margin:0}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:20px}
+a{color:inherit}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;letter-spacing:.01em}
+.eyebrow{font:600 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--amber)}
+.muted{color:var(--steel)}
+.mono{font-family:var(--mono)}
+/* nav */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:color-mix(in srgb,var(--asphalt) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--rule)}
+header .wrap{display:flex;align-items:center;gap:20px;padding-block:14px;flex-wrap:wrap}
+.brand{font:800 20px/1 var(--display);letter-spacing:.12em;text-decoration:none;display:flex;gap:10px;align-items:center}
+.brand b{display:grid;place-items:center;width:30px;height:30px;border:1.5px solid var(--platinum);border-radius:50%;font-size:15px;letter-spacing:0}
+nav{display:flex;gap:18px;flex-wrap:wrap;margin-left:auto;font-size:14px}
+nav a{text-decoration:none;color:var(--steel)}
+nav a:hover{color:var(--platinum)}
+.btn{display:inline-flex;align-items:center;gap:8px;font:600 14px/1 var(--body);padding:12px 18px;border-radius:4px;text-decoration:none;cursor:pointer;border:1px solid var(--rule);background:transparent;color:var(--platinum)}
+.btn.primary{background:var(--amber);border-color:var(--amber);color:#1a1206}
+.btn:hover{filter:brightness(1.1)}
+section{padding-block:72px;border-bottom:1px solid var(--rule)}
+.head{display:grid;gap:12px;max-width:62ch;margin-bottom:36px}
+.head h2{font-size:clamp(30px,4.4vw,46px);line-height:1.02;text-transform:uppercase}
+/* hero */
+.hero{padding-block:64px 56px}
+.hero-grid{display:grid;grid-template-columns:1.25fr 1fr;gap:48px;align-items:end}
+.hero h1{font-size:clamp(44px,7.6vw,92px);line-height:.92;text-transform:uppercase;font-weight:800}
+.hero h1 span{color:var(--amber)}
+.hero p.lede{font-size:18px;max-width:52ch;margin:22px 0 28px;color:var(--steel)}
+.hero p.lede strong{color:var(--platinum);font-weight:500}
+.ctas{display:flex;gap:12px;flex-wrap:wrap}
+.board{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:22px;min-width:0}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);margin-bottom:22px}
+.stat{background:var(--panel);padding:14px 12px}
+.stat .n{font:700 28px/1 var(--display);font-variant-numeric:tabular-nums}
+.stat .l{font-size:12px;color:var(--steel);margin-top:6px;line-height:1.35}
+.scale-label{display:flex;justify-content:space-between;font:12px var(--mono);color:var(--steel)}
+.scale{position:relative;height:46px;margin:10px 0 6px}
+.scale .track{position:absolute;left:0;right:0;top:20px;height:6px;background:linear-gradient(90deg,var(--go),var(--steel) 70%,#5a6470);border-radius:3px}
+.mark{position:absolute;top:0;transform:translateX(-50%);display:grid;justify-items:center;gap:2px;font:600 11px/1 var(--mono);white-space:nowrap}
+.mark i{display:block;width:2px;height:28px;background:var(--platinum)}
+.mark.amber{color:var(--amber)} .mark.amber i{background:var(--amber)}
+.status{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:18px;font:12px var(--mono);color:var(--steel)}
+.chip{display:inline-flex;align-items:center;gap:6px;font:600 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;padding:6px 9px;border-radius:3px;border:1px solid var(--rule)}
+.chip::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.chip.live{color:var(--go)} .chip.standby{color:var(--amber)} .chip.road{color:var(--steel)}
+/* Lion */
+.lion{display:grid;grid-template-columns:280px 1fr;gap:40px;align-items:center}
+.avatar{aspect-ratio:1;max-width:100%;border-radius:50%;border:1px solid var(--rule);background:radial-gradient(circle at 50% 38%,#2a2112 0,var(--panel) 62%);display:grid;place-items:center;position:relative}
+.avatar svg{width:56%;height:auto}
+.avatar .ring{position:absolute;inset:-1px;border-radius:50%;border:2px solid var(--amber);opacity:0;transition:opacity .3s}
+.speaking .avatar .ring{opacity:1;animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.035);opacity:.5}}
+@media (prefers-reduced-motion:reduce){.speaking .avatar .ring{animation:none}}
+.verdict{background:var(--panel);border:1px solid var(--rule);border-left:3px solid var(--amber);padding:20px 22px;border-radius:4px;font-size:17px;max-width:62ch}
+.verdict cite{display:block;font:600 12px var(--mono);font-style:normal;color:var(--amber);letter-spacing:.1em;margin-bottom:10px}
+.lion .ctas{margin-top:20px}
+/* council */
+.layers{display:grid;gap:28px}
+.layer{display:grid;grid-template-columns:200px 1fr;gap:24px;align-items:start}
+.layer-name{border-top:2px solid var(--amber);padding-top:10px}
+.layer-name .k{font:600 12px var(--mono);color:var(--amber)}
+.layer-name h3{font-size:24px;text-transform:uppercase;margin-top:4px}
+.officers{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.officer{border:1px solid var(--rule);border-radius:4px;padding:16px;min-width:0}
+.officer h4{margin:0;font:700 20px/1.1 var(--display);text-transform:uppercase;letter-spacing:.03em}
+.officer .role{font:12px var(--mono);color:var(--steel);margin:4px 0 8px}
+.officer p{margin:0;font-size:14px;color:var(--steel)}
+.rule-line{margin-top:28px;font:13px var(--mono);color:var(--steel)}
+.rule-line b{color:var(--platinum)}
+/* fleet */
+.fleet-img{width:100%;border-radius:6px;border:1px solid var(--rule);display:block;margin-bottom:28px}
+.fleet{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+.car{background:var(--asphalt);padding:20px;display:grid;gap:8px;align-content:start;min-width:0}
+.car .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.car .no{font:800 34px/1 var(--display);color:var(--rule);font-variant-numeric:tabular-nums}
+.car h3{font-size:24px;text-transform:uppercase}
+.car p{margin:0;font-size:14px;color:var(--steel)}
+.car ul{margin:4px 0 0;padding-left:18px;font-size:13px;color:var(--steel)}
+/* showcase */
+.sessions{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.session{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:20px;text-decoration:none;display:grid;gap:10px;align-content:start;min-width:0}
+.session:hover{border-color:var(--steel)}
+.session .path{font:12px var(--mono);color:var(--amber)}
+.session h3{font-size:22px;text-transform:uppercase}
+.session p{margin:0;font-size:14px;color:var(--steel)}
+/* team + paper */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+.people{display:grid;gap:12px}
+.person{display:flex;gap:14px;align-items:center;border-bottom:1px solid var(--rule);padding-bottom:12px}
+.person .ini{width:44px;height:44px;flex:none;border-radius:50%;border:1px solid var(--rule);display:grid;place-items:center;font:700 16px var(--display)}
+.person b{display:block;font-weight:600}
+.person span{font-size:13px;color:var(--steel)}
+.toc{counter-reset:s;list-style:none;padding:0;margin:0 0 20px;display:grid;gap:8px}
+.toc li{counter-increment:s;display:flex;gap:12px;font-size:15px}
+.toc li::before{content:"§" counter(s);font:600 12px/1.9 var(--mono);color:var(--amber);min-width:28px}
+/* investor */
+form{display:grid;gap:12px;max-width:520px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{font-size:13px;color:var(--steel);display:grid;gap:6px}
+input,select{font:15px var(--body);color:var(--platinum);background:var(--panel);border:1px solid var(--rule);border-radius:4px;padding:11px 12px;width:100%}
+.note{font-size:12px;color:var(--steel);max-width:62ch}
+.done{border:1px solid var(--go);color:var(--go);padding:14px;border-radius:4px;font-size:14px}
+footer{padding-block:32px;font-size:13px;color:var(--steel)}
+footer .wrap{display:flex;gap:16px;flex-wrap:wrap;justify-content:space-between}
+@media (max-width:860px){
+.hero-grid,.lion,.split,.layer{grid-template-columns:1fr}
+.lion .avatar{max-width:200px}
+.fleet,.sessions{grid-template-columns:1fr}
+nav{margin-left:0;width:100%}
+}
+@media (max-width:480px){.row{grid-template-columns:1fr}.stats{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+<div class="wrap">
+<a class="brand" href="#top"><b>Q</b>QUANTERRAOS</a>
+<nav aria-label="Primary">
+<a href="#proof">Proof</a>
+<a href="#lion">Lion</a>
+<a href="#council">The Council</a>
+<a href="#fleet">Fleet</a>
+<a href="#sessions">Sessions</a>
+<a href="#whitepaper">Whitepaper</a>
+<a href="#team">Team</a>
+<a href="/growth">Growth</a>
+<a href="/wallet">Wallet</a>
+</nav>
+<a class="btn primary" href="#access">Request access</a>
+</div>
+</header>
+<main id="top">
+<section class="hero" id="proof">
+<div class="wrap hero-grid">
+<div>
+<div class="eyebrow">Prediction-market calibration · Kalshi 15-min BTC</div>
+<h1 style="margin-top:16px">Pricing truth.<br><span>On the record.</span></h1>
+<p class="lede">We publish every backtest, including the ones where we lose. <strong>1,316 settled markets audited.</strong> No hidden edge claimed, because we haven't found one yet. That's the standard every agent in the fleet is held to.</p>
+<div class="ctas">
+<a class="btn primary" href="/council">Launch Council Terminal →</a>
+<a class="btn" href="/calibration">See calibration proof</a>
+</div>
+</div>
+<div class="board" aria-label="Calibration scoreboard">
+<div class="stats">
+<div class="stat"><div class="n">1,316</div><div class="l">settled markets, every one published</div></div>
+<div class="stat"><div class="n">0.2001</div><div class="l">market-mid Brier score</div></div>
+<div class="stat"><div class="n" style="color:var(--amber)">$0.00</div><div class="l">live capital deployed</div></div>
+</div>
+<div class="scale-label"><span>Brier score (lower is better)</span><span>n = 1,316</span></div>
+<div class="scale" role="img" aria-label="Brier scale from 0 perfect to 0.25 coin flip; market mid sits at 0.2001">
+<div class="track"></div>
+<div class="mark" style="left:0%;transform:none;justify-items:start"><i></i>0.00 perfect</div>
+<div class="mark amber" style="left:80.04%"><i></i>0.2001 mid</div>
+<div class="mark" style="left:100%;transform:translateX(-100%);justify-items:end"><i></i>0.25 coin flip</div>
+</div>
+<div class="status">
+<span class="chip standby">Calibrated · Standby</span>
+<span>Execution: Rule B5 locked</span>
+</div>
+</div>
+</div>
+</section>
+<section id="lion">
+<div class="wrap lion" id="lionWrap">
+<div class="avatar" aria-hidden="true">
+<div class="ring"></div>
+<svg viewBox="0 0 100 100" fill="none" stroke="#f2a93b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+<path d="M50 14 L62 22 L76 20 L78 34 L88 44 L80 56 L82 70 L68 74 L60 86 L50 80 L40 86 L32 74 L18 70 L20 56 L12 44 L22 34 L24 20 L38 22 Z" fill="#1d1810"/>
+<path d="M38 46 h6 M56 46 h6"/>
+<path d="M44 62 Q50 67 56 62"/>
+<path d="M50 50 v8"/>
+</svg>
+</div>
+<div>
+<div class="eyebrow">Meet Lion · Council spokesperson</div>
+<h2 style="font-size:clamp(30px,4.4vw,46px);text-transform:uppercase;line-height:1.02;margin:12px 0 18px">One voice for eight specialists.</h2>
+<blockquote class="verdict" id="verdictText" style="margin:0">
+<cite>LION · CURRENT VERDICT</cite>
+Across 1,316 settled fifteen-minute Bitcoin markets, the market mid-price scored a Brier of 0.2001. That beats a coin flip and beats our own models. The market is close to well calibrated. We have not found an edge, so execution stays locked and capital stays at zero.
+</blockquote>
+<div class="ctas">
+<button class="btn primary" id="speak" type="button"> Hear Lion's verdict</button>
+<a class="btn" href="/council">Interrogate the Council</a>
+</div>
+<p class="note" style="margin-top:14px">Lion reads only from the audited record. Ask anything; if the record doesn't support an answer, Lion says so.</p>
+</div>
+</div>
+</section>
+<section id="council">
+<div class="wrap">
+<div class="head">
+<div class="eyebrow">The Council</div>
+<h2>Eight specialists. Three layers of verification.</h2>
+<p class="muted" style="margin:0">Each agent verifies, monitors, or stress-tests one layer of the market. Nothing is reported until the layer before it has signed off.</p>
+</div>
+<div class="layers">
+<div class="layer">
+<div class="layer-name"><div class="k">Layer 1</div><h3>Ingest &amp; verify</h3></div>
+<div class="officers">
+<div class="officer"><h4>Draco</h4><div class="role">Data integrity</div><p>Checks every incoming figure and pipeline before it is used or reported.</p></div>
+<div class="officer"><h4>Sentinel</h4><div class="role">Systems monitoring</div><p>Watches feeds for outages, stale ticks and anomalies in real time.</p></div>
+<div class="officer"><h4>Phoenix</h4><div class="role">Execution gate</div><p>Holds execution in standby. Zero capital until a signal is proven.</p></div>
+</div>
+</div>
+<div class="layer">
+<div class="layer-name"><div class="k">Layer 2</div><h3>Structure &amp; scan</h3></div>
+<div class="officers">
+<div class="officer"><h4>Falcon</h4><div class="role">Order-book depth</div><p>Tracks depth and bid/ask imbalance for research. Flagged, never acted on.</p></div>
+<div class="officer"><h4>Wolf</h4><div class="role">Microstructure</div><p>Studies spreads and liquidity to understand the market, not predict it.</p></div>
+</div>
+</div>
+<div class="layer">
+<div class="layer-name"><div class="k">Layer 3</div><h3>Calibrate &amp; grade</h3></div>
+<div class="officers">
+<div class="officer"><h4>Quantum Fox</h4><div class="role">Quant research</div><p>Runs fair-value backtests and publishes them, including the failures.</p></div>
+<div class="officer"><h4>Kraken</h4><div class="role">Risk oversight</div><p>Aggregates exposure and stress-tests any active position.</p></div>
+<div class="officer"><h4>Lion</h4><div class="role">Calibration synthesis</div><p>Combines the Council's findings into one auditable verdict.</p></div>
+</div>
+</div>
+</div>
+<p class="rule-line"><b>Council rule:</b> cite the record or say nothing.</p>
+</div>
+</section>
+<section id="fleet">
+<div class="wrap">
+<div class="head">
+<div class="eyebrow">The Fleet · Roadmap</div>
+<h2>One verification engine. Six markets to run it in.</h2>
+<p class="muted" style="margin:0">The Council's method of auditing an AI's claims against what actually happened is the product. Prediction markets are where we proved it. Each car below takes the same engine into a new domain, and each one goes live only when it has its own published record.</p>
+</div>
+<img class="fleet-img" src="/fleet.jpg" alt="The QuanterraOS fleet: six modules lined up behind the Quantaras 07 car, with Orchestration Command and six core engines below">
+<div class="fleet">
+<div class="car"><div class="top"><span class="no">01</span><span class="chip live">Live</span></div><h3>QuanterraOS</h3><p>The calibration engine and Council. Running today on Kalshi markets.</p></div>
+<div class="car"><div class="top"><span class="no">04</span><span class="chip standby">Next · Pilot</span></div><h3>TrustOS</h3><p>Quanterra Trust: rule attribution, confidence calibration and outcome resolution for enterprise AI decisions in finance, healthcare and government.</p></div>
+<div class="car"><div class="top"><span class="no">03</span><span class="chip road">Roadmap</span></div><h3>GrowthOS</h3><p>Revenue agents held to the same audit standard.</p><ul><li>Voice agents and AI receptionist</li><li>Lead qualification with logged reasoning</li></ul></div>
+<div class="car"><div class="top"><span class="no">02</span><span class="chip road">Roadmap</span></div><h3>EnterpriseOS</h3><p>Workflow automation where every automated step leaves an audit trail.</p></div>
+<div class="car"><div class="top"><span class="no">05</span><span class="chip road">Roadmap</span></div><h3>SystemsOS</h3><p>Infrastructure for running Councils inside a customer's own cloud.</p></div>
+<div class="car"><div class="top"><span class="no">06</span><span class="chip road">Roadmap</span></div><h3>World Model</h3><p>Forecasting and scenario simulation, scored against reality the way the Council scores markets.</p></div>
+</div>
+</div>
+</section>
+<section id="sessions">
+<div class="wrap">
+<div class="head">
+<div class="eyebrow">Council Sessions</div>
+<h2>Watch it work. Check our math.</h2>
+</div>
+<div class="sessions">
+<a class="session" href="/council"><span class="path">/council</span><h3>Live Council Terminal</h3><p>Watch the eight officers run a cycle and question any of them directly.</p></a>
+<a class="session" href="/calibration"><span class="path">/calibration</span><h3>Calibration Proof</h3><p>The 10-bin calibration table and methodology behind the 0.2001 score.</p></a>
+<a class="session" href="/calibration/market-price"><span class="path">/calibration/market-price</span><h3>Market-Price Curve</h3><p>Quoted mid-price against settled outcomes, bin by bin.</p></a>
+</div>
+</div>
+</section>
+<section>
+<div class="wrap split">
+<div id="whitepaper">
+<div class="eyebrow">Whitepaper</div>
+<h2 style="font-size:clamp(28px,3.6vw,38px);text-transform:uppercase;margin:12px 0 20px">Verification over generation</h2>
+<ol class="toc">
+<li>Why AI output needs an audit layer</li>
+<li>Rule attribution: tracing a decision to its source</li>
+<li>Confidence calibration and the Brier standard</li>
+<li>Outcome resolution: scoring claims against reality</li>
+<li>The Council architecture</li>
+<li>Evidence: 1,316 settled markets</li>
+</ol>
+<a class="btn" href="#access">Request the whitepaper</a>
+</div>
+<div id="team">
+<div class="eyebrow">Team</div>
+<h2 style="font-size:clamp(28px,3.6vw,38px);text-transform:uppercase;margin:12px 0 20px">Who builds the Council</h2>
+<div class="people">
+<div class="person"><div class="ini">MQ</div><div><b>Michael Quantara</b><span>Founder &amp; CEO, Quantara Global LLC</span></div></div>
+<div class="person"><div class="ini">CM</div><div><b>Chief Marketing Officer</b><span>Announcement pending</span></div></div>
+<div class="person"><div class="ini">LD</div><div><b>Lead Developer</b><span>Announcement pending</span></div></div>
+</div>
+</div>
+</div>
+</section>
+<section id="access" style="border-bottom:0">
+<div class="wrap split">
+<div class="head" style="margin:0">
+<div class="eyebrow">Early access &amp; investor materials</div>
+<h2>Build your council.</h2>
+<p class="muted" style="margin:0">Enterprise teams can join the TrustOS pilot waitlist. Accredited investors can request the whitepaper and company materials.</p>
+</div>
+<div>
+<form id="accessForm">
+<div class="row">
+<label for="f-name">Name<input id="f-name" required autocomplete="name" placeholder="Jordan Avery"></label>
+<label for="f-email">Work email<input id="f-email" type="email" required autocomplete="email" placeholder="jordan@example.com"></label>
+</div>
+<label for="f-org">Organization<input id="f-org" autocomplete="organization" placeholder="Example Capital"></label>
+<label for="f-type">I'm interested in
+<select id="f-type"><option>TrustOS pilot</option><option>Council Terminal access</option><option>Whitepaper</option><option>Investor materials (accredited investors)</option></select>
+</label>
+<button class="btn primary" type="submit" style="justify-self:start">Send request</button>
+<div class="done" id="done" hidden>Your request has been recorded. Our team will follow up directly.</div>
+<p class="note">Investor materials are shared only with verified accredited investors. Nothing on this site is an offer to sell securities.</p>
+</form>
+</div>
+</div>
+</section>
+</main>
+<footer>
+<div class="wrap"><span>© 2026 QuanterraOS · Quantara Global LLC</span><span><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></span></div>
+</footer>
+<script>
+(function(){
+var btn=document.getElementById('speak'), wrap=document.getElementById('lionWrap');
+var text=document.getElementById('verdictText').innerText.replace('LION · CURRENT VERDICT','').trim();
+if(!('speechSynthesis' in window)){btn.textContent='Voice unavailable in this browser';btn.disabled=true;return;}
+btn.addEventListener('click',function(){
+try{
+if(speechSynthesis.speaking){speechSynthesis.cancel();wrap.classList.remove('speaking');btn.textContent=" Hear Lion's verdict";return;}
+var u=new SpeechSynthesisUtterance(text);u.rate=.97;u.pitch=.85;
+u.onstart=function(){wrap.classList.add('speaking');btn.textContent='■ Stop';};
+u.onend=u.onerror=function(){wrap.classList.remove('speaking');btn.textContent=" Hear Lion's verdict";};
+speechSynthesis.speak(u);
+}catch(e){btn.textContent='Voice unavailable';}
+});
+})();
+document.getElementById('accessForm').addEventListener('submit',function(e){
+  e.preventDefault();
+  var name = document.getElementById('f-name').value;
+  var email = document.getElementById('f-email').value;
+  var org = document.getElementById('f-org').value;
+  var interest = document.getElementById('f-type').value;
+  fetch('/api/growth/signup', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: name, email: email, company: org, title: interest, consentEmail: true })
+  }).catch(function(){});
+  document.getElementById('done').hidden = false;
+});
+</script>
+</body>
+</html>

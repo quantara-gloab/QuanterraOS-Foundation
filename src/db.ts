@@ -41,6 +41,8 @@ export function runMigrations(): void {
     "0013_prediction_ledger.sql",
     "0014_user_accounts_and_billing.sql",
     "0015_events_and_metrics.sql",
+    "0016_subscriber_wallets.sql",
+    "0017_gtm_agents_and_pipeline.sql",
   ]) {
     const migrationPath = path.join(migrationsDir, migration);
     if (migration === "0006_multi_asset.sql") {

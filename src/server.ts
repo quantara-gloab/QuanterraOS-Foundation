@@ -9,6 +9,7 @@ import { renderLandingPage } from "./landing-page.ts";
  */
 import "dotenv/config";
 import express from "express";
+import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { eq, and, gte, asc, desc, sql } from "drizzle-orm";
 import { db, runMigrations } from "./db.ts";
@@ -45,6 +46,23 @@ import { getAutopilotLedger } from "./autopilot-engine.ts";
 import { renderPricingPageHtml } from "./pricing-page.ts";
 import { renderTwoStrategiesLostPageHtml } from "./blog-page.ts";
 import { renderAccountPageHtml } from "./account-page.ts";
+import { renderWalletPageHtml } from "./wallet-page.ts";
+import {
+  getWalletSummary,
+  executeSimulatedDeposit,
+  executeSimulatedWithdrawal,
+  resetSubscriberWallet,
+} from "./wallet-engine.ts";
+import { startGrowthEngine } from "./growth/index.ts";
+import {
+  getGtmSummary,
+  listContentDrafts,
+  draftContentPiece,
+  approveContentDraft,
+  getOrCreateAdSpendCaps,
+  listInstitutionalPipeline,
+  updatePipelineStage,
+} from "./gtm-engine.ts";
 import {
   createUser,
   authenticateUser,
@@ -84,6 +102,75 @@ app.use(
   })
 );
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.resolve("public")));
+app.use("/assets", express.static(path.resolve("public/assets")));
+app.get("/assets/assistant-avatar.jpg", (_req, res) => {
+  res.sendFile(path.resolve("public/assets/assistant-avatar.jpg"));
+});
+
+// QuanterraOS Growth Engine: outreach, concierge chat, opt-in voice callbacks, and tamper-evident consent ledger
+const growth = startGrowthEngine({ pagePath: path.resolve("public/growth.html") });
+app.use(growth.handler);
+
+// QuanterraOS Homepage v2 Preview (Lion spokesperson, 3-layer Council, F1 Fleet graphic)
+app.get(["/preview", "/home-v2"], (_req, res) => {
+  res.sendFile(path.resolve("public/quanterraos-home.html"));
+});
+app.get("/fleet.jpg", (_req, res) => {
+  res.sendFile(path.resolve("public/fleet.jpg"));
+});
+
+// TrustOS Enterprise AI Pilot Offer ($20,000 / 6-Week Calibration Audit)
+app.get(["/trustos", "/pilot"], (_req, res) => {
+  res.sendFile(path.resolve("public/trustos.html"));
+});
+
+// Go-To-Market (GTM) Agents API (Content, Ad Platform, CRM, Sales Pipeline)
+app.get("/api/gtm/summary", (_req, res) => {
+  res.json(getGtmSummary());
+});
+
+app.get("/api/gtm/drafts", (_req, res) => {
+  res.json(listContentDrafts());
+});
+
+app.post("/api/gtm/drafts/new", (req, res) => {
+  try {
+    const draft = draftContentPiece(req.body);
+    res.json(draft);
+  } catch (err) {
+    res.status(400).json({ error: (err as Error).message });
+  }
+});
+
+app.post("/api/gtm/drafts/approve", (req, res) => {
+  try {
+    const result = approveContentDraft(req.body.draftId, req.body.approvedBy || "Michael Quantara");
+    res.json(result);
+  } catch (err) {
+    res.status(400).json({ error: (err as Error).message });
+  }
+});
+
+app.get("/api/gtm/pipeline", (_req, res) => {
+  res.json(listInstitutionalPipeline());
+});
+
+app.post("/api/gtm/pipeline/stage", (req, res) => {
+  try {
+    const result = updatePipelineStage(req.body.opportunityId, req.body.stage);
+    res.json(result);
+  } catch (err) {
+    res.status(400).json({ error: (err as Error).message });
+  }
+});
+
+app.get("/api/gtm/ad-caps", (_req, res) => {
+  res.json({
+    google: getOrCreateAdSpendCaps("google"),
+    meta: getOrCreateAdSpendCaps("meta"),
+  });
+});
 
 app.post("/api/workspace/resolve", async (req, res) => {
   const user = getChatGPTUser(req);
@@ -2130,6 +2217,83 @@ app.get("/api/predictions", (req, res) => {
   const limit = req.query.limit ? Number(req.query.limit) : 50;
   const auth = getUserAuth(req);
   res.json(getPredictionsLedger({ isReplay, limit, tier: auth.tier }));
+});
+
+
+app.get("/wallet", (req, res) => {
+  const auth = getUserAuth(req);
+  const userId = auth.user?.id || "demo-subscriber";
+  const summary = getWalletSummary(userId);
+  let notice: { type: "success" | "error"; message: string } | undefined;
+  if (req.query.deposit === "success") {
+    notice = { type: "success", message: "Simulated electronic currency upload confirmed! Funds are active in your sandbox portfolio." };
+  } else if (req.query.withdraw === "success") {
+    notice = { type: "success", message: "Simulated electronic withdrawal broadcasted! Transaction recorded in immutable ledger." };
+  } else if (req.query.reset === "success") {
+    notice = { type: "success", message: "Sandbox electronic wallet balance reset to default ($10,000 USD + 0.25 BTC)." };
+  } else if (req.query.error) {
+    notice = { type: "error", message: decodeURIComponent(req.query.error as string) };
+  }
+  res.type("html").send(renderWalletPageHtml(summary, notice));
+});
+
+app.get("/api/wallet", (req, res) => {
+  const auth = getUserAuth(req);
+  const userId = auth.user?.id || "demo-subscriber";
+  res.json(getWalletSummary(userId));
+});
+
+app.post("/api/wallet/deposit", (req, res) => {
+  const auth = getUserAuth(req);
+  const userId = auth.user?.id || "demo-subscriber";
+  const currency = (req.body.currency || "USD").toUpperCase();
+  const amount = Number(req.body.amount);
+
+  try {
+    const result = executeSimulatedDeposit({ userId, currency, amount });
+    if (req.headers.accept?.includes("application/json") && !req.is("urlencoded")) {
+      return res.json({ success: true, ...result });
+    }
+    res.redirect("/wallet?deposit=success");
+  } catch (err) {
+    const errMsg = (err as Error).message;
+    if (req.headers.accept?.includes("application/json") && !req.is("urlencoded")) {
+      return res.status(400).json({ error: errMsg });
+    }
+    res.redirect(`/wallet?error=${encodeURIComponent(errMsg)}`);
+  }
+});
+
+app.post("/api/wallet/withdraw", (req, res) => {
+  const auth = getUserAuth(req);
+  const userId = auth.user?.id || "demo-subscriber";
+  const currency = (req.body.currency || "USD").toUpperCase();
+  const amount = Number(req.body.amount);
+  const destinationAddress = req.body.destinationAddress;
+
+  try {
+    const result = executeSimulatedWithdrawal({ userId, currency, amount, destinationAddress });
+    if (req.headers.accept?.includes("application/json") && !req.is("urlencoded")) {
+      return res.json({ success: true, ...result });
+    }
+    res.redirect("/wallet?withdraw=success");
+  } catch (err) {
+    const errMsg = (err as Error).message;
+    if (req.headers.accept?.includes("application/json") && !req.is("urlencoded")) {
+      return res.status(400).json({ error: errMsg });
+    }
+    res.redirect(`/wallet?error=${encodeURIComponent(errMsg)}`);
+  }
+});
+
+app.post("/api/wallet/reset", (req, res) => {
+  const auth = getUserAuth(req);
+  const userId = auth.user?.id || "demo-subscriber";
+  resetSubscriberWallet(userId);
+  if (req.headers.accept?.includes("application/json") && !req.is("urlencoded")) {
+    return res.json({ success: true, message: "Sandbox wallet reset to default" });
+  }
+  res.redirect("/wallet?reset=success");
 });
 
 app.get("/autopilot", (req, res) => {

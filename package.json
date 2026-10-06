@@ -11,6 +11,10 @@
     "test": "node --experimental-strip-types --test --test-concurrency=1 src/__tests__/*.ts",
     "test:highlow": "node --experimental-strip-types --test src/__tests__/falcon-highlow.test.ts",
     "test:jev": "node --experimental-strip-types --test src/__tests__/falcon-jev.test.ts",
+    "test:growth": "node --experimental-strip-types --test src/__tests__/growth.test.ts",
+    "growth:supervisor": "node --experimental-strip-types scripts/run-supervisor.ts",
+    "growth:import": "node --experimental-strip-types scripts/import-prospects.ts",
+    "growth:verify": "node --experimental-strip-types scripts/verify-ledger.ts",
     "backtest:highlow": "node --experimental-strip-types src/highlow-backtest.ts",
     "typecheck": "tsc --noEmit"
   },

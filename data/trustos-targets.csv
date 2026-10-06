@@ -1,0 +1,33 @@
+email,country,name,company,title,timezone,source
+cro@happymoney.com,US,Chief Risk Officer,Happy Money,Chief Risk Officer,America/Los_Angeles,trustos-pilot-oct2026
+head.credit@happymoney.com,US,VP Credit Model Risk,Happy Money,VP Credit Model Risk,America/Los_Angeles,trustos-pilot-oct2026
+cro@oppfi.com,US,Chief Risk Officer,OppFi,Chief Risk Officer,America/Chicago,trustos-pilot-oct2026
+model.risk@oppfi.com,US,Head of Decision Science,OppFi,Head of Decision Science,America/Chicago,trustos-pilot-oct2026
+cro@missionlane.com,US,Chief Risk Officer,Mission Lane,Chief Risk Officer,America/New_York,trustos-pilot-oct2026
+underwriting@missionlane.com,US,VP Credit Underwriting,Mission Lane,VP Credit Underwriting,America/New_York,trustos-pilot-oct2026
+cro@avant.com,US,Chief Risk Officer,Avant,Chief Risk Officer,America/Chicago,trustos-pilot-oct2026
+modelgov@avant.com,US,Head of Model Governance,Avant,Head of Model Governance,America/Chicago,trustos-pilot-oct2026
+cro@rootinsurance.com,US,Chief Risk Officer,Root Insurance,Chief Risk Officer,America/New_York,trustos-pilot-oct2026
+chief.actuary@rootinsurance.com,US,Chief Actuary,Root Insurance,Chief Actuary,America/New_York,trustos-pilot-oct2026
+cro@kin.com,US,Chief Risk Officer,Kin Insurance,Chief Risk Officer,America/Chicago,trustos-pilot-oct2026
+underwriting@kin.com,US,VP Underwriting Analytics,Kin Insurance,VP Underwriting Analytics,America/Chicago,trustos-pilot-oct2026
+cro@steadily.com,US,Chief Risk Officer,Steadily,Chief Risk Officer,America/Chicago,trustos-pilot-oct2026
+underwriting@steadily.com,US,Head of Automated Underwriting,Steadily,Head of Automated Underwriting,America/Chicago,trustos-pilot-oct2026
+model.risk@upstart.com,US,Head of Model Risk Management,Upstart,Head of Model Risk Management,America/Los_Angeles,trustos-pilot-oct2026
+risk@pagaya.com,US,Chief Risk Officer,Pagaya Technologies,Chief Risk Officer,America/New_York,trustos-pilot-oct2026
+cro@oportun.com,US,Chief Risk Officer,Oportun,Chief Risk Officer,America/Los_Angeles,trustos-pilot-oct2026
+chief.actuary@hippo.com,US,Chief Underwriting Officer,Hippo Insurance,Chief Underwriting Officer,America/Los_Angeles,trustos-pilot-oct2026
+claims.compliance@lemonade.com,US,VP Regulatory Affairs,Lemonade,VP Regulatory Affairs,America/New_York,trustos-pilot-oct2026
+credit.risk@bestegg.com,US,Head of Credit Risk,Best Egg (Marlette Funding),Head of Credit Risk,America/New_York,trustos-pilot-oct2026
+lending.risk@myblue.com,US,Chief Lending Officer,Blue Federal Credit Union,Chief Lending Officer,America/Denver,trustos-pilot-oct2026
+underwriting@kashable.com,US,Head of Underwriting,Kashable,Head of Underwriting,America/New_York,trustos-pilot-oct2026
+actuarial@clearcover.com,US,VP Insurance Analytics,Clearcover,VP Insurance Analytics,America/Chicago,trustos-pilot-oct2026
+underwriting@ourbranch.com,US,Head of Underwriting Strategy,Branch Insurance,Head of Underwriting Strategy,America/New_York,trustos-pilot-oct2026
+credit@petalcard.com,US,Head of Credit & Risk,Petal Card,Head of Credit & Risk,America/New_York,trustos-pilot-oct2026
+compliance@blend.com,US,Head of Compliance Solutions,Blend Labs,Head of Compliance Solutions,America/Los_Angeles,trustos-pilot-oct2026
+analytics@enova.com,US,Head of Analytics & Risk,Enova International,Head of Analytics & Risk,America/Chicago,trustos-pilot-oct2026
+credit.policy@prosper.com,US,VP Credit Policy,Prosper Marketplace,VP Credit Policy,America/Los_Angeles,trustos-pilot-oct2026
+risk@upgrade.com,US,Head of Credit & Risk Operations,Upgrade Inc.,Head of Credit & Risk Operations,America/Los_Angeles,trustos-pilot-oct2026
+compliance@figure.com,US,Chief Compliance Officer,Figure Technology Solutions,Chief Compliance Officer,America/Los_Angeles,trustos-pilot-oct2026
+regulatory@doma.com,US,VP Title Underwriting Technology,Doma Holdings,VP Title Underwriting Technology,America/Los_Angeles,trustos-pilot-oct2026
+underwriting@nextinsurance.com,US,Head of Automated Underwriting,Next Insurance,Head of Automated Underwriting,America/Los_Angeles,trustos-pilot-oct2026

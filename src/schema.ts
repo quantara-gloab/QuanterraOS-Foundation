@@ -467,6 +467,130 @@ export const events = sqliteTable(
   }),
 );
 
+export const subscriberWallets = sqliteTable(
+  "subscriber_wallets",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id").notNull(),
+    balanceUsd: real("balance_usd").notNull().default(10000.0),
+    balanceBtc: real("balance_btc").notNull().default(0.25),
+    createdAt: text("created_at").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (table) => ({
+    userIdIdx: index("subscriber_wallets_user_id_idx").on(table.userId),
+  }),
+);
 
+export const walletTransactions = sqliteTable(
+  "wallet_transactions",
+  {
+    id: text("id").primaryKey(),
+    walletId: text("wallet_id").notNull(),
+    userId: text("user_id").notNull(),
+    type: text("type").notNull(), // 'SIMULATED_DEPOSIT' | 'SIMULATED_WITHDRAWAL' | 'RESET'
+    currency: text("currency").notNull(), // 'USD' | 'BTC' | 'USDC'
+    amount: real("amount").notNull(),
+    txHash: text("tx_hash").notNull(),
+    status: text("status").notNull().default("CONFIRMED"),
+    destinationAddress: text("destination_address"),
+    description: text("description"),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => ({
+    walletIdIdx: index("wallet_transactions_wallet_id_idx").on(table.walletId),
+    userIdIdx: index("wallet_transactions_user_id_idx").on(table.userId),
+    createdAtIdx: index("wallet_transactions_created_at_idx").on(table.createdAt),
+  }),
+);
 
+export const leads = sqliteTable(
+  "leads",
+  {
+    id: text("id").primaryKey(),
+    email: text("email").notNull(),
+    name: text("name"),
+    company: text("company"),
+    title: text("title"),
+    source: text("source").notNull(),
+    status: text("status").notNull().default("new"),
+    tierInterest: text("tier_interest").notNull().default("free"),
+    touches: integer("touches").notNull().default(0),
+    lastContactAt: text("last_contact_at"),
+    nextFollowupAt: text("next_followup_at"),
+    notes: text("notes"),
+    createdAt: text("created_at").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (table) => ({
+    emailIdx: index("leads_email_idx").on(table.email),
+    statusIdx: index("leads_status_idx").on(table.status),
+  }),
+);
+
+export const adSpendCaps = sqliteTable(
+  "ad_spend_caps",
+  {
+    id: text("id").primaryKey(),
+    platform: text("platform").notNull().unique(), // 'google' | 'meta'
+    dailyCapUsd: real("daily_cap_usd").notNull().default(100.0),
+    monthlyCapUsd: real("monthly_cap_usd").notNull().default(2500.0),
+    currentDaySpendUsd: real("current_day_spend_usd").notNull().default(0.0),
+    currentMonthSpendUsd: real("current_month_spend_usd").notNull().default(0.0),
+    circuitLocked: integer("circuit_locked").notNull().default(1),
+    approvedBy: text("approved_by"),
+    updatedAt: text("updated_at").notNull(),
+  },
+);
+
+export const adSpendLedger = sqliteTable(
+  "ad_spend_ledger",
+  {
+    id: text("id").primaryKey(),
+    platform: text("platform").notNull(),
+    campaignName: text("campaign_name").notNull(),
+    targetUrl: text("target_url").notNull(),
+    amountUsd: real("amount_usd").notNull(),
+    status: text("status").notNull(), // 'APPROVED' | 'BLOCKED_CAP_EXCEEDED'
+    reason: text("reason").notNull(),
+    createdAt: text("created_at").notNull(),
+  },
+);
+
+export const contentDrafts = sqliteTable(
+  "content_drafts",
+  {
+    id: text("id").primaryKey(),
+    title: text("title").notNull(),
+    category: text("category").notNull(), // 'weekly_ledger' | 'findings_faq' | 'predictions_social' | 'blog'
+    draftText: text("draft_text").notNull(),
+    provenanceSources: text("provenance_sources").notNull(), // JSON array
+    guardrailStatus: text("guardrail_status").notNull(), // 'PASSED' | 'FLAGGED'
+    guardrailViolations: text("guardrail_violations"), // JSON array
+    reviewStatus: text("review_status").notNull().default("PENDING_HUMAN_APPROVAL"),
+    approvedAt: text("approved_at"),
+    createdAt: text("created_at").notNull(),
+  },
+);
+
+export const institutionalPipeline = sqliteTable(
+  "institutional_pipeline",
+  {
+    id: text("id").primaryKey(),
+    leadId: text("lead_id").notNull(),
+    targetDesk: text("target_desk").notNull(),
+    targetTier: text("target_tier").notNull().default("INSTITUTIONAL"),
+    stage: text("stage").notNull().default("IDENTIFIED"),
+    researchDossier: text("research_dossier"),
+    autoSendBlocked: integer("auto_send_blocked").notNull().default(1),
+    owner: text("owner").notNull().default("Michael Quantara"),
+    dealValueMonthlyUsd: real("deal_value_monthly_usd").notNull().default(750.0),
+    createdAt: text("created_at").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (table) => ({
+    leadIdIdx: index("inst_pipe_lead_id_idx").on(table.leadId),
+    stageIdx: index("inst_pipe_stage_idx").on(table.stage),
+  }),
+);
 

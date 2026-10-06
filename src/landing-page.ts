@@ -850,6 +850,8 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
         <a href="/council">council</a>
         <a href="/predictions">predictions</a>
         <a href="/autopilot">autopilot</a>
+        <a href="/wallet">wallet</a>
+        <a href="/growth">growth</a>
         <a href="/index">index</a>
         <a href="/spread">spread</a>
         <a href="/methodology">methodology</a>
@@ -1249,6 +1251,8 @@ ${miniCircles}
         <a href="/council">council</a>
         <a href="/predictions">predictions</a>
         <a href="/autopilot">autopilot</a>
+        <a href="/wallet">wallet</a>
+        <a href="/growth">growth</a>
         <a href="/index">index</a>
         <a href="/spread">spread</a>
         <a href="/methodology">methodology</a>

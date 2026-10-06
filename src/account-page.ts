@@ -291,6 +291,8 @@ export function renderAccountPageHtml(user: UserRecord | null, tier: UserTier, e
       <a href="/research">Research</a>
       <a href="/predictions">Predictions</a>
       <a href="/autopilot">Autopilot</a>
+      <a href="/wallet">Wallet</a>
+      <a href="/growth">Growth</a>
       <a href="/pricing" class="btn-pricing">Pricing</a>
     </div>
   </nav>
@@ -329,6 +331,41 @@ export function renderAccountPageHtml(user: UserRecord | null, tier: UserTier, e
         <div class="grid-row">
           <div class="grid-label">SAFETY GATE</div>
           <div class="grid-val font-mono" style="color:var(--accent);">RULE B5 LOCKED · $0.00 CAPITAL DEPLOYED</div>
+        </div>
+
+        
+        <!-- Subscriber Sandbox Electronic Wallet -->
+        <div class="downloads-box" style="margin-top: 20px; border-color: rgba(223,184,67,0.35); background: linear-gradient(135deg, rgba(20,27,38,0.7) 0%, rgba(12,15,23,0.7) 100%);">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div>
+              <h3 style="color:#FFFFFF; margin-bottom:4px; display:flex; align-items:center; gap:8px;">
+                <span>💳</span> Subscriber Electronic Currency Wallet
+              </h3>
+              <p style="font-size:0.82rem; color:var(--text-dim);">
+                Rule B5 paper sandbox wallet. Upload electronic test funds, simulate crypto withdrawals, and test prediction sizing risk-free.
+              </p>
+            </div>
+            <a href="/wallet" class="btn btn-primary" style="display:inline-block; font-size:0.82rem; padding:8px 18px; text-decoration:none;">
+              Launch Wallet Portal →
+            </a>
+          </div>
+        </div>
+
+        <!-- Growth Engine Card -->
+        <div class="downloads-box" style="margin-top: 16px; border-color: rgba(94,234,212,0.35); background: linear-gradient(135deg, rgba(14,21,38,0.7) 0%, rgba(7,11,22,0.7) 100%);">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div>
+              <h3 style="color:#FFFFFF; margin-bottom:4px; display:flex; align-items:center; gap:8px;">
+                <span style="color:#5EEAD4;">⚡</span> QuanterraOS Growth Engine
+              </h3>
+              <p style="font-size:0.82rem; color:var(--text-dim);">
+                Auditable B2B pipeline: Scout, Herald, Concierge, opt-in Voice Callback, and Sentinel supervisor backed by a tamper-evident consent ledger.
+              </p>
+            </div>
+            <a href="/growth" class="btn btn-primary" style="display:inline-block; font-size:0.82rem; padding:8px 18px; text-decoration:none; background:#5EEAD4; color:#052B26;">
+              Open Growth Engine →
+            </a>
+          </div>
         </div>
 
         <!-- Downloads & Data Exports (Gated) -->

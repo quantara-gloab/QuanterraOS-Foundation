@@ -576,6 +576,21 @@ export function generatePersonaDomainResponse(
     };
   }
 
+  
+  // Question 10: Electronic Currency Wallet
+  if (
+    norm.includes("wallet") ||
+    norm.includes("deposit") ||
+    norm.includes("withdraw") ||
+    norm.includes("upload")
+  ) {
+    citations.push("src/wallet-engine.ts", "/wallet", "Rule B5 Governance Policy");
+    return {
+      reply: `QuanterraOS provides subscribers with a dedicated Simulated Electronic Currency Sandbox Wallet at /wallet ($0.00 real exposure under Rule B5). Each subscriber is provisioned with a default allocation of $10,000 USD and 0.25 BTC. You can simulate electronic currency uploads (deposits in USD, BTC, or USDC) and test simulated withdrawals to external addresses with cryptographic transaction hashes. You can manage your wallet anytime at /wallet.`,
+      citations
+    };
+  }
+
   // General in-character answer tailored to persona domain
   citations.push("docs/findings.md", "src/agents/council-data.ts");
   return {

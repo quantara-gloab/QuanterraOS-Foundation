@@ -1,12 +1,14 @@
 /**
  * QuanterraOS Virtual Desk Assistant & Customer Support Widget
  *
+ * Featured Persona: Aria · Lead Executive Concierge & Market Surveillance Specialist
+ *
  * Implements:
- * 1. Bottom-right floating interactive assistant that pops up and speaks (Text-to-Speech via Web Speech API).
+ * 1. Bottom-right floating interactive assistant with photographic avatar, glowing gold halo, and audio speech (Web Speech API).
  * 2. Verified contact channels (email only until a live, staffed phone line exists):
  *    - Primary Support: support@quanterraos.com
  *    - Legal & Securities: compliance@quanterraos.com
- * 3. Interactive conversational engine hooked to /api/assistant/chat (Sentinel Operational Watchdog persona).
+ * 3. Interactive conversational engine hooked to /api/assistant/chat (Aria Concierge persona).
  * 4. Strict Rule B4 & Rule B5 guardrails: zero unbacked claims, 0.2001 Brier baseline, $0.00 paper safety.
  *
  * Security: user input is rendered with textContent; assistant replies are HTML-escaped
@@ -17,18 +19,17 @@ export const ASSISTANT_WIDGET_HTML = `
 <!-- QuanterraOS Virtual Desk Assistant Widget -->
 <div id="qos-assistant-root">
   <!-- Floating Launcher Bubble (Bottom-Right) -->
-  <button id="qos-assistant-bubble" aria-label="Open QuanterraOS Desk Assistant" aria-expanded="false" aria-controls="qos-assistant-drawer" title="QuanterraOS Desk Assistant & Support">
+  <button id="qos-assistant-bubble" aria-label="Open Aria Desk Assistant" aria-expanded="false" aria-controls="qos-assistant-drawer" title="Aria · QuanterraOS Executive Concierge">
     <div class="qos-bubble-inner">
       <div class="qos-pulse-ring"></div>
-      <div class="qos-avatar-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
-          <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-          <line x1="12" y1="19" x2="12" y2="22"></line>
-        </svg>
+      <div class="qos-bubble-avatar-wrap">
+        <img src="/assets/assistant-avatar.jpg" alt="Aria" class="qos-bubble-avatar" />
+        <span class="qos-bubble-online-badge" aria-hidden="true"></span>
       </div>
-      <span class="qos-bubble-label">Desk Assistant</span>
-      <span class="qos-bubble-status" aria-hidden="true">●</span>
+      <div class="qos-bubble-text">
+        <span class="qos-bubble-name">Aria</span>
+        <span class="qos-bubble-role">Concierge</span>
+      </div>
     </div>
   </button>
 
@@ -38,12 +39,12 @@ export const ASSISTANT_WIDGET_HTML = `
     <div class="qos-drawer-header">
       <div class="qos-header-left">
         <div class="qos-header-avatar">
-          <span aria-hidden="true">🛡️</span>
+          <img src="/assets/assistant-avatar.jpg" alt="Aria" class="qos-avatar-photo" />
           <span class="qos-avatar-pulse"></span>
         </div>
         <div>
-          <div class="qos-header-title">Sentinel Desk Assistant</div>
-          <div class="qos-header-sub">AI assistant 24/7 · Human support by email</div>
+          <div class="qos-header-title">Aria <span class="qos-title-badge">Concierge</span></div>
+          <div class="qos-header-sub">Online · Market Specialist 24/7</div>
         </div>
       </div>
       <div class="qos-header-actions">
@@ -68,31 +69,44 @@ export const ASSISTANT_WIDGET_HTML = `
 
     <!-- Chat Messages Scroll Area -->
     <div id="qos-chat-messages" class="qos-messages-container" aria-live="polite">
-      <!-- Initial greeting (static, trusted markup) -->
-      <div class="qos-msg qos-msg-assistant">
-        <div class="qos-msg-bubble">
-Hello operator. I am <strong>Sentinel</strong>, QuanterraOS's operational watchdog.
-<br><br>
-I can assist you with live prediction ledger auditing, account clearance, the <strong>$0.00 paper mode (Rule B5)</strong>, or support requests.
-<br><br>
-For a human response, email <strong>support@quanterraos.com</strong>. How can I assist you today?
+      <!-- Aria Welcome Hero Card -->
+      <div class="qos-aria-hero-card">
+        <img src="/assets/assistant-avatar.jpg" alt="Aria" class="qos-hero-img" />
+        <div class="qos-hero-body">
+          <div class="qos-hero-name">Aria <span class="qos-hero-verified">✓ Concierge</span></div>
+          <div class="qos-hero-tagline">Executive Concierge & Market Specialist</div>
+          <div class="qos-hero-desc">Ask me about live calibration proofs, Brier scoring, pricing tiers, or platform governance.</div>
         </div>
-        <div class="qos-msg-meta">Sentinel · Just now</div>
+      </div>
+
+      <!-- Initial greeting -->
+      <div class="qos-msg qos-msg-assistant">
+        <img src="/assets/assistant-avatar.jpg" alt="Aria" class="qos-msg-avatar" />
+        <div class="qos-msg-content">
+          <div class="qos-msg-bubble">
+Hello! I am <strong>Aria</strong>, your QuanterraOS executive concierge and market specialist.
+<br><br>
+I'm here to assist you with exploring our <strong>canonical calibration proof (0.2001 Brier)</strong>, delayed vs real-time ledgers, or our <strong>$0.00 paper mode (Rule B5)</strong>.
+<br><br>
+For direct human inquiries, our team is reachable at <strong>support@quanterraos.com</strong>. How may I assist you today?
+          </div>
+          <div class="qos-msg-meta">Aria · Just now</div>
+        </div>
       </div>
     </div>
 
     <!-- Quick Question Chips -->
     <div class="qos-quick-chips">
-      <button class="qos-chip" data-q="How does the 20-min delayed free tier work?">Delayed free feed?</button>
       <button class="qos-chip" data-q="What is the canonical Brier baseline?">Brier baseline (0.2001)?</button>
-      <button class="qos-chip" data-q="Is any real customer money being traded?">Is capital at risk?</button>
-      <button class="qos-chip" data-q="How do I contact customer support?">Contact support</button>
+      <button class="qos-chip" data-q="How does the 20-min delayed free tier work?">Delayed free feed?</button>
+      <button class="qos-chip" data-q="Is any customer capital at risk?">Is capital at risk?</button>
       <button class="qos-chip" data-q="How do I subscribe to Pro Terminal ($199/mo)?">Upgrade to Pro?</button>
+      <button class="qos-chip" data-q="How do I contact customer support?">Contact support</button>
     </div>
 
     <!-- Chat Input Area -->
     <form id="qos-chat-form" class="qos-input-bar">
-      <input type="text" id="qos-chat-input" placeholder="Ask Sentinel about telemetry, pricing, or support…" autocomplete="off" maxlength="1000" aria-label="Message Sentinel" />
+      <input type="text" id="qos-chat-input" placeholder="Ask Aria about market calibration, telemetry, or support…" autocomplete="off" maxlength="1000" aria-label="Message Aria" />
       <button type="submit" id="qos-send-btn" aria-label="Send Message">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -116,10 +130,10 @@ For a human response, email <strong>support@quanterraos.com</strong>. How can I 
 /* Bubble Button */
 #qos-assistant-bubble {
   background: #0E131A;
-  border: 1px solid rgba(223, 184, 67, 0.4);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 20px rgba(223, 184, 67, 0.2);
-  border-radius: 30px;
-  padding: 8px 16px 8px 10px;
+  border: 1px solid rgba(223, 184, 67, 0.45);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65), 0 0 24px rgba(223, 184, 67, 0.22);
+  border-radius: 36px;
+  padding: 6px 16px 6px 8px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -129,59 +143,78 @@ For a human response, email <strong>support@quanterraos.com</strong>. How can I 
 #qos-assistant-bubble:hover {
   transform: translateY(-2px);
   border-color: #DFB843;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.7), 0 0 28px rgba(223, 184, 67, 0.35);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.75), 0 0 32px rgba(223, 184, 67, 0.4);
 }
 #qos-assistant-bubble:focus-visible { border-color: #DFB843; }
 
 .qos-bubble-inner {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   position: relative;
 }
-.qos-avatar-icon {
-  width: 32px;
-  height: 32px;
+.qos-bubble-avatar-wrap {
+  position: relative;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  background: rgba(223, 184, 67, 0.15);
-  border: 1px solid rgba(223, 184, 67, 0.5);
+  flex-shrink: 0;
+}
+.qos-bubble-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid #DFB843;
+  box-shadow: 0 0 10px rgba(223, 184, 67, 0.4);
+  display: block;
+}
+.qos-bubble-online-badge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #10B981;
+  border: 2px solid #0E131A;
+  box-shadow: 0 0 6px #10B981;
+}
+.qos-bubble-text {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #DFB843;
+  flex-direction: column;
+  text-align: left;
 }
-.qos-avatar-icon svg { width: 16px; height: 16px; }
-.qos-bubble-label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #F8FAFC;
+.qos-bubble-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #FFFFFF;
   letter-spacing: -0.01em;
+  line-height: 1.2;
 }
-.qos-bubble-status {
+.qos-bubble-role {
+  font-size: 0.68rem;
   color: #DFB843;
-  font-size: 0.65rem;
-  animation: qosPulse 2s infinite;
-}
-@keyframes qosPulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.85); }
+  font-family: "IBM Plex Mono", monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 /* Pop-up Drawer Card */
 #qos-assistant-drawer {
-  width: 380px;
+  width: 390px;
   max-width: calc(100vw - 32px);
-  height: 540px;
+  height: 560px;
   max-height: calc(100vh - 100px);
   background: #0A0E14;
   border: 1px solid rgba(223, 184, 67, 0.35);
-  border-radius: 12px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 30px rgba(223, 184, 67, 0.15);
+  border-radius: 14px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 35px rgba(223, 184, 67, 0.18);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   position: absolute;
-  bottom: 60px;
+  bottom: 64px;
   right: 0;
   transition: opacity 0.2s, transform 0.2s;
 }
@@ -203,34 +236,51 @@ For a human response, email <strong>support@quanterraos.com</strong>. How can I 
 .qos-header-left {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 .qos-header-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  background: rgba(223, 184, 67, 0.15);
-  border: 1px solid rgba(223, 184, 67, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
   position: relative;
+  flex-shrink: 0;
+}
+.qos-avatar-photo {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid #DFB843;
+  box-shadow: 0 0 10px rgba(223, 184, 67, 0.35);
 }
 .qos-avatar-pulse {
   position: absolute;
-  bottom: -2px;
-  right: -2px;
-  width: 8px;
-  height: 8px;
+  bottom: -1px;
+  right: -1px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
-  background: #DFB843;
-  box-shadow: 0 0 6px #DFB843;
+  background: #10B981;
+  border: 1.5px solid #0E131A;
+  box-shadow: 0 0 6px #10B981;
 }
 .qos-header-title {
-  font-size: 0.88rem;
+  font-size: 0.92rem;
   font-weight: 700;
   color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.qos-title-badge {
+  font-size: 0.62rem;
+  color: #DFB843;
+  background: rgba(223, 184, 67, 0.12);
+  border: 1px solid rgba(223, 184, 67, 0.35);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: "IBM Plex Mono", monospace;
+  text-transform: uppercase;
 }
 .qos-header-sub {
   font-size: 0.7rem;
@@ -289,13 +339,81 @@ For a human response, email <strong>support@quanterraos.com</strong>. How can I 
   flex-direction: column;
   gap: 12px;
 }
-.qos-msg {
+
+/* Aria Hero Card */
+.qos-aria-hero-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, rgba(20, 27, 38, 0.9) 0%, rgba(14, 19, 26, 0.95) 100%);
+  border: 1px solid rgba(223, 184, 67, 0.25);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 4px;
+}
+.qos-hero-img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid #DFB843;
+  box-shadow: 0 0 12px rgba(223, 184, 67, 0.35);
+  flex-shrink: 0;
+}
+.qos-hero-body {
   display: flex;
   flex-direction: column;
-  max-width: 86%;
+  gap: 2px;
+}
+.qos-hero-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.qos-hero-verified {
+  font-size: 0.65rem;
+  color: #10B981;
+  font-weight: 600;
+}
+.qos-hero-tagline {
+  font-size: 0.7rem;
+  color: #DFB843;
+  font-family: "IBM Plex Mono", monospace;
+}
+.qos-hero-desc {
+  font-size: 0.72rem;
+  color: #94A3B8;
+  line-height: 1.35;
+}
+
+/* Chat Messages */
+.qos-msg {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 92%;
 }
 .qos-msg-assistant { align-self: flex-start; }
-.qos-msg-user { align-self: flex-end; }
+.qos-msg-user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+.qos-msg-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(223, 184, 67, 0.6);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.qos-msg-content {
+  display: flex;
+  flex-direction: column;
+}
 .qos-msg-bubble {
   padding: 10px 14px;
   border-radius: 8px;
@@ -427,7 +545,7 @@ For a human response, email <strong>support@quanterraos.com</strong>. How can I 
   const sendBtn = document.getElementById('qos-send-btn');
   const messagesContainer = document.getElementById('qos-chat-messages');
 
-  const FALLBACK_REPLY = 'Sentinel is temporarily unavailable. For a human response, email support@quanterraos.com. QuanterraOS operates on $0.00 live funds under the Rule B5 circuit lock.';
+  const FALLBACK_REPLY = 'Aria is temporarily checking telemetry. For a human response, email support@quanterraos.com. QuanterraOS operates on $0.00 live funds under the Rule B5 circuit lock.';
 
   function setOpen(open, focusInput) {
     isOpen = open;
@@ -461,7 +579,7 @@ For a human response, email <strong>support@quanterraos.com</strong>. How can I 
   }
 
   function formatAssistantText(str) {
-    return escapeHtml(str).replace(/\\*\\*(.+?)\\*\\*/g, '<strong>$1</strong>');
+    return escapeHtml(str).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
   }
 
   // Voice Speech Synthesis
@@ -471,8 +589,18 @@ For a human response, email <strong>support@quanterraos.com</strong>. How can I 
       window.speechSynthesis.cancel();
       const clean = String(text).replace(/<[^>]*>/g, '').replace(/[*_#]/g, '');
       const utter = new SpeechSynthesisUtterance(clean);
-      utter.rate = 1.05;
-      utter.pitch = 0.95;
+      utter.rate = 1.0;
+      utter.pitch = 1.05; // warm feminine voice pitch
+      
+      const voices = window.speechSynthesis.getVoices();
+      const femaleVoice = voices.find(function(v) {
+        return (
+          v.name.match(/samantha|victoria|karen|zira|jenny|moira|fiona|serena|stephanie|female/i) ||
+          v.voiceURI.match(/female|zira|samantha/i)
+        ) && v.lang.startsWith('en');
+      }) || voices.find(function(v) { return v.lang.startsWith('en'); });
+
+      if (femaleVoice) utter.voice = femaleVoice;
       window.speechSynthesis.speak(utter);
     } catch (e) {
       console.warn('Speech synthesis error:', e);
@@ -485,7 +613,7 @@ For a human response, email <strong>support@quanterraos.com</strong>. How can I 
     voiceToggle.setAttribute('aria-pressed', isVoiceEnabled ? 'true' : 'false');
     if (isVoiceEnabled) {
       voiceIcon.textContent = '🔊 Voice ON';
-      speakText('Voice output activated. Sentinel will speak responses.');
+      speakText('Voice output activated. I will speak responses for you.');
     } else {
       voiceIcon.textContent = '🔇 Voice OFF';
       if ('speechSynthesis' in window) window.speechSynthesis.cancel();
@@ -496,6 +624,17 @@ For a human response, email <strong>support@quanterraos.com</strong>. How can I 
   function appendMessage(role, text) {
     const msgDiv = document.createElement('div');
     msgDiv.className = 'qos-msg qos-msg-' + (role === 'user' ? 'user' : 'assistant');
+
+    if (role === 'assistant') {
+      const avatarImg = document.createElement('img');
+      avatarImg.src = '/assets/assistant-avatar.jpg';
+      avatarImg.alt = 'Aria';
+      avatarImg.className = 'qos-msg-avatar';
+      msgDiv.appendChild(avatarImg);
+    }
+
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'qos-msg-content';
 
     const bubbleDiv = document.createElement('div');
     bubbleDiv.className = 'qos-msg-bubble';
@@ -510,10 +649,11 @@ For a human response, email <strong>support@quanterraos.com</strong>. How can I 
     metaDiv.className = 'qos-msg-meta';
     metaDiv.textContent = role === 'user'
       ? 'You'
-      : 'Sentinel · ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      : 'Aria · ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    msgDiv.appendChild(bubbleDiv);
-    msgDiv.appendChild(metaDiv);
+    contentDiv.appendChild(bubbleDiv);
+    contentDiv.appendChild(metaDiv);
+    msgDiv.appendChild(contentDiv);
     messagesContainer.appendChild(msgDiv);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
@@ -523,10 +663,22 @@ For a human response, email <strong>support@quanterraos.com</strong>. How can I 
   function showTyping() {
     const el = document.createElement('div');
     el.className = 'qos-msg qos-msg-assistant qos-msg-typing';
+    
+    const avatarImg = document.createElement('img');
+    avatarImg.src = '/assets/assistant-avatar.jpg';
+    avatarImg.alt = 'Aria';
+    avatarImg.className = 'qos-msg-avatar';
+    el.appendChild(avatarImg);
+
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'qos-msg-content';
+
     const b = document.createElement('div');
     b.className = 'qos-msg-bubble';
-    b.textContent = 'Sentinel is analyzing telemetry…';
-    el.appendChild(b);
+    b.textContent = 'Aria is analyzing telemetry…';
+    contentDiv.appendChild(b);
+    el.appendChild(contentDiv);
+
     messagesContainer.appendChild(el);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
     return el;
@@ -548,7 +700,7 @@ For a human response, email <strong>support@quanterraos.com</strong>. How can I 
       const response = await fetch('/api/assistant/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: trimmed, agentId: 'sentinel' }),
+        body: JSON.stringify({ message: trimmed, agentId: 'aria' }),
       });
 
       if (!response.ok) {
@@ -565,10 +717,10 @@ For a human response, email <strong>support@quanterraos.com</strong>. How can I 
       typingIndicator.remove();
       const reply = data && typeof data.reply === 'string' && data.reply.trim()
         ? data.reply
-        : 'Operational standby.';
+        : 'Standing by for telemetry inquiries.';
       appendMessage('assistant', reply);
     } catch (err) {
-      console.warn('Sentinel request failed:', err);
+      console.warn('Aria request failed:', err);
       typingIndicator.remove();
       appendMessage('assistant', FALLBACK_REPLY);
     } finally {
@@ -589,8 +741,7 @@ For a human response, email <strong>support@quanterraos.com</strong>. How can I 
     });
   });
 
-  // Auto-pop greeting after 3 seconds on first visit (desktop only; no input focus,
-  // so mobile keyboards are not forced open).
+  // Auto-pop greeting after 3 seconds on first visit (desktop only; no input focus)
   setTimeout(function() {
     let seen = false;
     try { seen = !!sessionStorage.getItem('qos_assistant_seen'); } catch (e) {}
