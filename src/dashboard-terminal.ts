@@ -1034,9 +1034,9 @@ ${clerkScripts}
     <!-- Four Metric Tiles -->
     <section class="metric-bar">
       <div class="metric-tile">
-        <div class="metric-tile-label">market-mid Brier score</div>
+        <div class="metric-tile-label">Kalshi market-mid Brier</div>
         <div class="metric-tile-val accent" id="metric-market-brier">0.2001</div>
-        <div class="metric-tile-sub">vs 0.2500 uncalibrated baseline (calibrated edge)</div>
+        <div class="metric-tile-sub">market benchmark vs 0.2500 coin-flip · model (0.2063) does not beat it</div>
       </div>
       <div class="metric-tile">
         <div class="metric-tile-label">Falcon Brier score</div>

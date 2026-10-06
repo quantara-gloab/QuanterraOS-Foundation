@@ -86,7 +86,7 @@ export const ASSISTANT_WIDGET_HTML = `
           <div class="qos-msg-bubble">
 Hello! I am <strong>Aria</strong>, your QuanterraOS executive concierge and market specialist.
 <br><br>
-I'm here to assist you with exploring our <strong>canonical calibration proof (0.2001 Brier)</strong>, delayed vs real-time ledgers, or our <strong>$0.00 paper mode (Rule B5)</strong>.
+I'm here to assist you with exploring the <strong>canonical market calibration baseline (0.2001 Kalshi Brier)</strong>, delayed vs real-time ledgers, or our <strong>$0.00 paper mode (Rule B5)</strong>.
 <br><br>
 For direct human inquiries, our team is reachable at <strong>support@quanterraos.com</strong>. How may I assist you today?
           </div>

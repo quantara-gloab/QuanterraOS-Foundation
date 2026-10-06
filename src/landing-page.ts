@@ -910,11 +910,11 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
           <div class="vault-brier-unit">Brier Score</div>
         </div>
         <div class="vault-desc">
-          Murphy decomposition of minute-4 market mid-price across ${sampleN.toLocaleString()} settled contracts. Verifiably outperforms spot volatility models.
+          Murphy decomposition of minute-4 market mid-price across ${sampleN.toLocaleString()} settled contracts. The market benchmark outscores our internal models (0.2063).
         </div>
         <div style="border-top: 1px solid var(--panel-border); padding-top: 14px; display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.72rem;">
           <span style="color: var(--muted);">Random Baseline: 0.2500</span>
-          <span style="color: var(--accent);">Calibrated Edge: Verified</span>
+          <span style="color: var(--warning);">Market Baseline: 0.2001 (Model: 0.2063)</span>
         </div>
       </div>
     </section>
@@ -1276,7 +1276,7 @@ ${miniCircles}
         <div class="proof-card">
           <span class="proof-num">04 / Governance</span>
           <h3 class="proof-title">Rule B5 Permanent Circuit Lock</h3>
-          <p class="proof-body">Strict enforcement of $0.00 capital deployment until statistically significant out-of-sample edge is proven.</p>
+          <p class="proof-body">Strict enforcement of $0.00 capital deployment until statistically significant out-of-sample predictive accuracy is proven.</p>
         </div>
       </div>
     </section>

@@ -439,7 +439,7 @@ export function getAllCouncilPersonas(): CouncilPersona[] {
 
 export const STYLE_EXEMPLARS: Record<string, string> = {
   aria:
-    "Hello! I'm Aria, your executive concierge. At QuanterraOS, every figure is grounded in empirical truth — like our 0.2001 Brier score across 1,316 settled contracts. We deploy $0.00 live capital under Rule B5, ensuring our only business is absolute calibration measurement.",
+    "Hello! I'm Aria, your executive concierge. At QuanterraOS, every figure is grounded in empirical truth — like Kalshi's 0.2001 market Brier score across 1,316 settled contracts, which outscores our internal models (0.2063). We deploy $0.00 live capital under Rule B5, ensuring our only business is measurement and transparency.",
   falcon:
     "If I'm being candid: on raw directional forecasting, my depth-imbalance research earns a D at best — " +
     "a 0.2736 Brier score against a 0.2500 coin-flip baseline isn't a passing grade for alpha. " +
