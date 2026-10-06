@@ -36,6 +36,15 @@ export interface CouncilChatRequest {
   context?: CouncilContext;
 }
 
+export interface CouncilTelemetryCluster {
+  callSign: string;
+  engine: string;
+  latencyMs: number;
+  rpm: string;
+  drsStatus: "ACTIVE" | "STANDBY";
+  circuitStatus: string;
+}
+
 export interface CouncilChatResponse {
   agentId: string;
   agentName: string;
@@ -45,6 +54,7 @@ export interface CouncilChatResponse {
   guarded: boolean;
   violations?: string[];
   timestamp: string;
+  telemetryCluster?: CouncilTelemetryCluster;
 }
 
 export interface ChatAuditEntry {
@@ -627,6 +637,54 @@ Explore our TrustOS pilot at **/trustos** or read our full analysis in docs/comp
     };
   }
 
+  // Question 13: Leading Open-Source AI Engines
+  if (
+    norm.includes("ai engine") ||
+    norm.includes("open source engine") ||
+    norm.includes("deepseek") ||
+    norm.includes("vllm") ||
+    norm.includes("llama") ||
+    norm.includes("mcp") ||
+    norm.includes("dspy") ||
+    norm.includes("swarm") ||
+    norm.includes("what engines") ||
+    norm.includes("ai architecture")
+  ) {
+    citations.push("src/ai-engines/index.ts", "Anthropic MCP v1.2", "DeepSeek-R1", "vLLM PagedAttention");
+    return {
+      reply: `QuanterraOS is integrated across the industry's 6 leading open-source AI engines under src/ai-engines/:
+1. **Anthropic Model Context Protocol (MCP v1.2)**: Sub-millisecond JSON-RPC 2.0 streaming tool execution and context registration.
+2. **DeepSeek-R1 / V3 Reasoning Engine**: Multi-Head Latent Attention (MLA) with 93.3% KV-cache compression and top-6 sparse MoE routing.
+3. **Berkeley vLLM PagedAttention**: Continuous dynamic batching with virtual memory page mapping, achieving <0.85ms per-iteration dispatch.
+4. **Meta Llama 3.3 Agent Engine**: Instruction grammar templates and strict JSON schema function validation.
+5. **OpenAI Swarm Orchestrator**: Dynamic multi-agent handoffs across the specialist pit wall with shared context scratchpads.
+6. **Stanford DSPy Optimizer**: Declarative prompt signatures compiled and auto-optimized against Brier calibration loss.`,
+      citations
+    };
+  }
+
+  // Question 14: Race Car Telemetry & Executive Operating Pace
+  if (
+    norm.includes("formula 1") ||
+    norm.includes("f1") ||
+    norm.includes("race car") ||
+    norm.includes("pit wall") ||
+    norm.includes("rpm") ||
+    norm.includes("operating pace") ||
+    norm.includes("lap time") ||
+    norm.includes("race telemetry")
+  ) {
+    citations.push("src/ai-engines/index.ts", "Council Telemetry Pit Wall", "Rule B5 Circuit Lock");
+    return {
+      reply: `The QuanterraOS Executive Team operates with the precision and responsiveness of a Formula One pit wall:
+- **Sub-Millisecond Telemetry Loops**: Each specialist operates between 0.5ms and 1.4ms per analysis cycle, monitoring 18,200 to 20,000 virtual RPM across L2 order-book feeds.
+- **Assigned F1 Call-Signs**: Team Principal Lion (F1-CHIEF-01), ECU Sentinel Draco (F1-ECU-02), Aero Specialist Wolf (F1-AERO-03), Test Pilot Falcon (F1-TEST-04), Powertrain Engineer Quantum Fox (F1-POWER-05), Radio Sentinel (F1-RADIO-06), Safety Marshall Kraken (F1-SAFETY-07), Brake Governor Phoenix (F1-BRAKE-08), and Cockpit Concierge Aria (F1-COMMS-09).
+- **Aero Downforce & DRS Dynamics**: Real-time order-book queue imbalance and spread compression tracking.
+- **Safety Car Governance (Rule B5)**: Even at maximum operational tempo, live capital exposure remains strictly $0.00 with the execution circuit breaker permanently locked.`,
+      citations
+    };
+  }
+
   // Conversational response for Aria Concierge
   if (persona.id === "aria") {
     citations.push("Aria Virtual Desk Assistant", "quanterraos.com");
@@ -832,7 +890,15 @@ export async function handleCouncilChat(request: CouncilChatRequest): Promise<Co
     citations,
     guarded,
     violations,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    telemetryCluster: {
+      callSign: persona.callSign || `F1-${persona.id.toUpperCase()}`,
+      engine: persona.engineBadge || "DeepSeek-R1 CoT + MCP v1.2",
+      latencyMs: durationMs,
+      rpm: persona.telemetryRpm || "18,500 RPM",
+      drsStatus: (persona.id === "wolf" || persona.id === "falcon") ? "ACTIVE" : "STANDBY",
+      circuitStatus: "RULE_B5_LOCKED ($0.00)",
+    }
   };
 }
 

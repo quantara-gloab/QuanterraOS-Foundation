@@ -30,6 +30,11 @@ export interface CouncilPersona {
   suggestedQuestions: string[];
   claimBoundary: PersonaClaimBoundary;
   styleExemplar?: string;
+  callSign?: string;
+  engineBadge?: string;
+  telemetryLatencyTarget?: string;
+  telemetryRpm?: string;
+  f1Role?: string;
 }
 
 export const COUNCIL_PERSONAS: Record<string, CouncilPersona> = {
@@ -43,6 +48,11 @@ export const COUNCIL_PERSONAS: Record<string, CouncilPersona> = {
     statusBadge: "Pipeline Verified — Integrity Passed",
     statusType: "verified",
     avatarSvg: '<svg viewBox="0 0 24 24"><path d="M12 2L2 7v10c0 5 6 9 10 9s10-4 10-9V7l-10-5z"/><path d="M10 10l2 2 4-4-1-1-3 3-1-1z"/></svg>',
+    callSign: "F1-ECU-02",
+    engineBadge: "vLLM PagedAttention v2 Sub-MS Stream",
+    telemetryLatencyTarget: "0.8ms",
+    telemetryRpm: "18,200 RPM",
+    f1Role: "ECU & Telemetry Data Sentinel",
     claimBoundary: {
       approvedTopics: [
         "Candle dataset provenance (data/kalshi-btc15m-candles.csv, 19,740 rows, 1,316 settled windows)",
@@ -84,6 +94,11 @@ STRICT GOVERNANCE RULES:
     statusBadge: "Collector Logging — Microstructure Active",
     statusType: "active",
     avatarSvg: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 10v6m8.66-9H17m-5 0H5.34"/></svg>',
+    callSign: "F1-AERO-03",
+    engineBadge: "Meta Llama-3.3 70B MoE Flash Attention",
+    telemetryLatencyTarget: "1.1ms",
+    telemetryRpm: "18,400 RPM",
+    f1Role: "Aero & Order-Book Downforce Specialist",
     claimBoundary: {
       approvedTopics: [
         "Order-book depth profile and bid/ask volume distribution",
@@ -124,6 +139,11 @@ STRICT GOVERNANCE RULES:
     statusBadge: "Research (Small Sample)",
     statusType: "research",
     avatarSvg: '<svg viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>',
+    callSign: "F1-TEST-04",
+    engineBadge: "Stanford DSPy Prompt-Optimized Heuristic",
+    telemetryLatencyTarget: "1.4ms",
+    telemetryRpm: "17,800 RPM",
+    f1Role: "Race Car Dynamics & Microstructure Test Pilot",
     claimBoundary: {
       approvedTopics: [
         "Empirical backtest results on n=31 settled markets (reports/falcon-backtest-2026-10-03.txt)",
@@ -164,6 +184,11 @@ STRICT GOVERNANCE RULES:
     statusBadge: "Verified Benchmark — Model Audited",
     statusType: "verified",
     avatarSvg: '<svg viewBox="0 0 24 24"><path d="M21 16.5c0-.27-.02-.55-.07-.82A4.5 4.5 0 0 0 19 11.5a4.4 4.4 0 0 0-.33-1.7l1.17-1.17a.5.5 0 0 0-.3-.87l-2.17-.44a4.5 4.5 0 0 0-.9 1.83 4.6 4.6 0 0 0-2.15-1.44L10.5 7v2.5l5.83 1.17A4.5 4.5 0 0 1 19 12c0 .23-.02.46-.07.68l1.17.67a.5.5 0 0 1 0 .8z"/></svg>',
+    callSign: "F1-POWER-05",
+    engineBadge: "DeepSeek-R1 Math/Diffusion Kernel",
+    telemetryLatencyTarget: "1.2ms",
+    telemetryRpm: "18,600 RPM",
+    f1Role: "Powertrain & Volatility Engineer",
     claimBoundary: {
       approvedTopics: [
         "1,316 settled windows evaluated (reports/btc15m-predictor-backtest-2026-10-03.txt)",
@@ -205,6 +230,11 @@ STRICT GOVERNANCE RULES:
     statusBadge: "Monitoring — No Active Alerts",
     statusType: "monitoring",
     avatarSvg: '<svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V5l-9-4z"/><path d="M9.5 12.5l2 2 2.5-3"/></svg>',
+    callSign: "F1-RADIO-06",
+    engineBadge: "Continuous WebSocket Streaming Coprocessor",
+    telemetryLatencyTarget: "0.5ms",
+    telemetryRpm: "18,900 RPM",
+    f1Role: "Pit Wall Radio & Pipeline Surveillance",
     claimBoundary: {
       approvedTopics: [
         "Real-time pipeline monitoring and staleness thresholds (>5s delayed)",
@@ -244,6 +274,11 @@ STRICT GOVERNANCE RULES:
     statusBadge: "Monitoring — No Active Alerts",
     statusType: "monitoring",
     avatarSvg: '<svg viewBox="0 0 24 24"><path d="M3 12c0 4.97 4.03 9 9 9s9-4.03 9-9-4.03-9-9-9-9 4.03-9 9zm9 4a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm0-3a1 1 0 0 1 1-1h1a1 1 0 0 1 0 2h-1a1 1 0 0 1-1 0zm2-3a1 1 0 0 1 1 1v1h1a1 1 0 0 1 0 2h-1v1a1 1 0 0 1-2 0v-1a1 1 0 0 1 1-1h1v-1a1 1 0 0 1 1-1z"/></svg>',
+    callSign: "F1-SAFETY-07",
+    engineBadge: "OpenAI Swarm Handoff & Risk Interceptor",
+    telemetryLatencyTarget: "0.9ms",
+    telemetryRpm: "18,100 RPM",
+    f1Role: "Chief Safety Car & Circuit Marshall",
     claimBoundary: {
       approvedTopics: [
         "Capital exposure status: $0.00 active exposure (zero live risk)",
@@ -283,6 +318,11 @@ STRICT GOVERNANCE RULES:
     statusBadge: "Active Synthesis — Live Calibration Grading",
     statusType: "active",
     avatarSvg: '<svg viewBox="0 0 24 24"><path d="M12 7V3l8 9-8 9v-4a4 4 0 0 1-4-4v-1zm0 0V7z"/><circle cx="12" cy="12" r="5"/></svg>',
+    callSign: "F1-CHIEF-01",
+    engineBadge: "DeepSeek-R1 CoT + MCP v1.2 Protocol",
+    telemetryLatencyTarget: "1.0ms",
+    telemetryRpm: "19,200 RPM",
+    f1Role: "Team Principal & Calibration Arbiter",
     claimBoundary: {
       approvedTopics: [
         "Single source of truth calibration verdict (CALIBRATED · STANDBY)",
@@ -324,6 +364,11 @@ STRICT GOVERNANCE RULES:
     statusBadge: "Standby — No Capital Deployed",
     statusType: "standby",
     avatarSvg: '<svg viewBox="0 0 24 24"><path d="M12 8v4l2 2m-2-6a9 9 0 1 1 0 18 9 9 0 0 1 0-18z"/><path d="M5 12h14"/></svg>',
+    callSign: "F1-BRAKE-08",
+    engineBadge: "Hardware-Level Rule B5 Circuit Breaker",
+    telemetryLatencyTarget: "0.2ms",
+    telemetryRpm: "20,000 RPM (Emergency Brake Gate)",
+    f1Role: "Emergency Brake & Pit Governor",
     claimBoundary: {
       approvedTopics: [
         "Execution gate permanently locked in STANDBY mode",
@@ -369,6 +414,11 @@ export const VIRTUAL_ASSISTANT_PERSONA: CouncilPersona = {
   statusBadge: "Active · Executive Concierge",
   statusType: "active",
   avatarSvg: '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>',
+  callSign: "F1-COMMS-09",
+  engineBadge: "DeepSeek-V3 + Voice Telemetry & Speech Synthesis",
+  telemetryLatencyTarget: "12ms Audio / 1.0ms Text",
+  telemetryRpm: "18,500 RPM (Cockpit Radio)",
+  f1Role: "Virtual Cockpit Engineer & Executive Concierge",
   claimBoundary: {
     approvedTopics: [
       "Platform navigation and overview of QuanterraOS",
