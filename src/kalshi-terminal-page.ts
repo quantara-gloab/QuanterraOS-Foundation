@@ -483,8 +483,8 @@ export function renderKalshiTerminalHtml(userEmail?: string, userTier: string = 
   <main>
     <div class="terminal-header">
       <div>
-        <h1>Kalshi 15-Minute High/Low Bidding Desk</h1>
-        <p class="subtitle">Live continuous orderbook, spot BRTI convergence, and dual-mode execution.</p>
+        <h1>Kalshi Above/Below Desk (15M &amp; 1H)</h1>
+        <p class="subtitle">Live continuous orderbook, Quanterra spot composite proxy, and dual-mode execution.</p>
       </div>
 
       <div class="mode-pill-wrap">
@@ -524,7 +524,7 @@ export function renderKalshiTerminalHtml(userEmail?: string, userTier: string = 
 
         <div class="stat-grid">
           <div class="stat-box">
-            <div class="stat-label">BRTI SPOT INDEX</div>
+            <div class="stat-label" title="Quanterra BTC Spot Composite (Coinbase/Kraken/Bitstamp median proxy). Official CME CF BRTI requires an institutional license.">SPOT COMPOSITE (BRTI PROXY)</div>
             <div class="stat-val" id="brti-spot">$—</div>
           </div>
           <div class="stat-box">
@@ -686,6 +686,12 @@ export function renderKalshiTerminalHtml(userEmail?: string, userTier: string = 
           </tbody>
         </table>
       </div>
+    </div>
+
+    <!-- Settlement & Benchmark Disclaimer -->
+    <div style="margin-top:24px; padding:16px 20px; border-radius:8px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); font-size:0.75rem; color:var(--muted); line-height:1.6;">
+      <strong style="color:var(--text); display:block; margin-bottom:4px; letter-spacing:0.04em;">BENCHMARK &amp; SETTLEMENT DESIGNATION</strong>
+      Kalshi event contracts (<code>KXBTC15M</code> and <code>KXBTCD</code>) settle against the official <strong>CME CF Bitcoin Real-Time Index (BRTI)</strong> 60-second TWAP prior to close. The spot index displayed on this terminal is the <strong>Quanterra BTC Spot Composite</strong> (real-time median of Tier 1 spot venues: Coinbase, Kraken, Bitstamp) serving as an empirical proxy. QuanterraOS does not represent its composite index as the official BRTI or CME benchmark, which requires an institutional feed license and is never synthesized.
     </div>
   </main>
 
