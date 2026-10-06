@@ -456,6 +456,16 @@ export function renderAccountPageHtml(user: UserRecord | null, tier: UserTier, e
             <label for="reg-password">NEW PASSWORD (SCRYPT ENCRYPTED)</label>
             <input type="password" id="reg-password" name="password" placeholder="••••••••••••" required autocomplete="new-password" />
           </div>
+          <div class="form-group">
+            <label for="reg-phone">MOBILE PHONE (OPTIONAL FOR SMS ALERTS)</label>
+            <input type="tel" id="reg-phone" name="phone" placeholder="+1 (312) 555-0199" autocomplete="tel" />
+          </div>
+          <div style="margin-bottom: 22px; padding: 14px; background: rgba(223, 184, 67, 0.05); border: 1px solid rgba(223, 184, 67, 0.2); border-radius: 6px;">
+            <label style="display:flex; align-items:flex-start; gap:10px; font-size:0.78rem; color:var(--text-dim); line-height:1.45; cursor:pointer;" for="reg-sms-optin">
+              <input type="checkbox" id="reg-sms-optin" name="smsOptIn" value="true" style="width:16px; height:16px; margin-top:2px; accent-color:var(--accent); cursor:pointer; flex-shrink:0;" />
+              <span>I agree to receive marketing texts from QuanterraOS. Message and data rates may apply. Message frequency varies. Reply STOP to unsubscribe, HELP for help.</span>
+            </label>
+          </div>
           <button type="submit" class="btn btn-primary" style="width:100%;">CREATE OPERATOR ACCOUNT →</button>
         </form>
       </div>

@@ -15,6 +15,7 @@ export type UserTier = "free" | "pro" | "institutional";
 export interface UserRecord {
   id: string;
   email: string;
+  phone: string | null;
   tier: UserTier;
   stripeCustomerId: string | null;
   stripeSubscriptionId: string | null;
@@ -67,7 +68,7 @@ export function verifyPassword(password: string, storedHash: string): boolean {
 // User Operations
 // ---------------------------------------------------------------------------
 
-export function createUser(email: string, password: string, tier: UserTier = "free"): UserRecord {
+export function createUser(email: string, password: string, tier: UserTier = "free", phone: string | null = null): UserRecord {
   const normalizedEmail = email.trim().toLowerCase();
   const existing = db.select().from(users).where(eq(users.email, normalizedEmail)).get();
   if (existing) {
@@ -82,6 +83,7 @@ export function createUser(email: string, password: string, tier: UserTier = "fr
     .values({
       id,
       email: normalizedEmail,
+      phone: phone || null,
       passwordHash,
       tier,
       createdAt: now,
@@ -92,6 +94,7 @@ export function createUser(email: string, password: string, tier: UserTier = "fr
   return {
     id,
     email: normalizedEmail,
+    phone: phone || null,
     tier,
     stripeCustomerId: null,
     stripeSubscriptionId: null,
@@ -109,6 +112,7 @@ export function authenticateUser(email: string, password: string): UserRecord | 
   return {
     id: row.id,
     email: row.email,
+    phone: row.phone ?? null,
     tier: row.tier as UserTier,
     stripeCustomerId: row.stripeCustomerId,
     stripeSubscriptionId: row.stripeSubscriptionId,
@@ -123,6 +127,7 @@ export function getUserById(userId: string): UserRecord | null {
   return {
     id: row.id,
     email: row.email,
+    phone: row.phone ?? null,
     tier: row.tier as UserTier,
     stripeCustomerId: row.stripeCustomerId,
     stripeSubscriptionId: row.stripeSubscriptionId,
@@ -138,6 +143,7 @@ export function getUserByEmail(email: string): UserRecord | null {
   return {
     id: row.id,
     email: row.email,
+    phone: row.phone ?? null,
     tier: row.tier as UserTier,
     stripeCustomerId: row.stripeCustomerId,
     stripeSubscriptionId: row.stripeSubscriptionId,

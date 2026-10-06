@@ -43,6 +43,7 @@ export function runMigrations(): void {
     "0015_events_and_metrics.sql",
     "0016_subscriber_wallets.sql",
     "0017_gtm_agents_and_pipeline.sql",
+    "0018_sms_marketing_and_compliance.sql",
   ]) {
     const migrationPath = path.join(migrationsDir, migration);
     if (migration === "0006_multi_asset.sql") {
@@ -66,6 +67,12 @@ export function runMigrations(): void {
           .slice(-1)[0],
       );
       continue;
+    }
+    if (migration === "0018_sms_marketing_and_compliance.sql") {
+      const userCols = sqlite.prepare("PRAGMA table_info(users)").all() as Array<{ name: string }>;
+      if (!userCols.some((col) => col.name === "phone")) {
+        sqlite.exec("ALTER TABLE users ADD COLUMN phone text");
+      }
     }
     sqlite.exec(readFileSync(migrationPath, "utf-8"));
   }

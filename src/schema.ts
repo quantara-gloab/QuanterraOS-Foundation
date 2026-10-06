@@ -390,6 +390,7 @@ export const users = sqliteTable(
   {
     id: text("id").primaryKey(),
     email: text("email").notNull().unique(),
+    phone: text("phone"),
     passwordHash: text("password_hash").notNull(),
     tier: text("tier").notNull().default("free"), // 'free' | 'pro' | 'institutional'
     stripeCustomerId: text("stripe_customer_id"),
@@ -591,6 +592,53 @@ export const institutionalPipeline = sqliteTable(
   (table) => ({
     leadIdIdx: index("inst_pipe_lead_id_idx").on(table.leadId),
     stageIdx: index("inst_pipe_stage_idx").on(table.stage),
+  }),
+);
+
+// ---------------------------------------------------------------------------
+// Compliant SMS Marketing & 10DLC Consent Ledger
+// ---------------------------------------------------------------------------
+
+export const smsConsents = sqliteTable(
+  "sms_consents",
+  {
+    id: text("id").primaryKey(),
+    phone: text("phone").notNull().unique(), // E.164 formatted
+    userId: text("user_id"),
+    leadId: text("lead_id"),
+    status: text("status").notNull().default("subscribed"), // 'subscribed' | 'unsubscribed'
+    consentTimestamp: text("consent_timestamp").notNull(),
+    consentSource: text("consent_source").notNull(),
+    disclosureText: text("disclosure_text").notNull(),
+    ip: text("ip"),
+    userAgent: text("user_agent"),
+    optOutTimestamp: text("opt_out_timestamp"),
+    optOutReason: text("opt_out_reason"),
+    createdAt: text("created_at").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (table) => ({
+    phoneIdx: index("sms_consents_phone_idx").on(table.phone),
+    statusIdx: index("sms_consents_status_idx").on(table.status),
+    userIdIdx: index("sms_consents_user_id_idx").on(table.userId),
+  }),
+);
+
+export const smsSendLog = sqliteTable(
+  "sms_send_log",
+  {
+    id: text("id").primaryKey(),
+    phone: text("phone").notNull(),
+    messageBody: text("message_body").notNull(),
+    campaignId: text("campaign_id"),
+    status: text("status").notNull(), // 'sent' | 'blocked' | 'failed' | 'dry_run'
+    providerSid: text("provider_sid"),
+    errorDetail: text("error_detail"),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => ({
+    phoneIdx: index("sms_send_log_phone_idx").on(table.phone),
+    createdAtIdx: index("sms_send_log_created_at_idx").on(table.createdAt),
   }),
 );
 

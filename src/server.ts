@@ -14,7 +14,7 @@ import { randomUUID } from "node:crypto";
 import { eq, and, gte, asc, desc, sql } from "drizzle-orm";
 import { db, runMigrations } from "./db.ts";
 import { getChatGPTUser } from "./auth.ts";
-import { researchObservations, researchResolutions, researchResolutionHistory, edgeScores, falconRecommendations, btcIndexTicks } from "./schema.ts";
+import { researchObservations, researchResolutions, researchResolutionHistory, edgeScores, falconRecommendations, btcIndexTicks, users, sessions } from "./schema.ts";
 import { buildPrediction, type LiveMarket } from "./btc15m-predictor.ts";
 import { handleResolve, handleEdgeScore, handleObserve } from "./routes/workspace.ts";
 import { handleFalconRecommend, handleFalconJevRecommend, handleFalconDecision, type FalconRecommendationRow } from "./routes/falcon.ts";
@@ -51,6 +51,16 @@ import { renderWalletPageHtml } from "./wallet-page.ts";
 import { renderCalculatorPageHtml } from "./calculator-page.ts";
 import { renderCalibrationSurfacePageHtml } from "./calibration-surface-page.ts";
 import { renderMcpPageHtml, MCP_SERVER_MANIFEST } from "./mcp-server.ts";
+import { renderSmsOptInPageHtml } from "./sms-optin-page.ts";
+import {
+  SMS_MARKETING_DISCLOSURE,
+  normalizeE164Phone,
+  recordSmsOptIn,
+  recordSmsOptOut,
+  handleInboundSms,
+  sendMarketingSms,
+  validTwilioSmsSignature,
+} from "./sms-marketing.ts";
 import {
   getWalletSummary,
   executeSimulatedDeposit,
@@ -2251,6 +2261,125 @@ app.get("/status", (_req, res) => {
   }
 });
 
+// ---------------------------------------------------------------------------
+// Compliant SMS Marketing & 10DLC Webhooks
+// ---------------------------------------------------------------------------
+
+app.get(["/sms", "/updates"], (_req, res) => {
+  const error = _req.query.error as string | undefined;
+  const success = _req.query.success as string | undefined;
+  res.type("html").send(renderSmsOptInPageHtml(error, success));
+});
+
+app.post("/api/sms/opt-in", (req, res) => {
+  const rawPhone = (req.body.phone ?? "").trim();
+  const consentGiven = req.body.smsConsent === "true" || req.body.smsConsent === true || req.body.smsConsent === "on";
+
+  if (!consentGiven) {
+    if (req.headers["accept"]?.includes("text/html") || req.body.redirect !== "false") {
+      return res.redirect("/sms?error=" + encodeURIComponent("Explicit consent is required: you must check the box agreeing to receive SMS marketing."));
+    }
+    return res.status(400).json({ error: "Explicit consent is required: you must check the box agreeing to receive SMS marketing." });
+  }
+
+  const phone = normalizeE164Phone(rawPhone);
+  if (!phone) {
+    if (req.headers["accept"]?.includes("text/html") || req.body.redirect !== "false") {
+      return res.redirect("/sms?error=" + encodeURIComponent("Invalid phone number format. Please enter a standard 10-digit or E.164 phone number (e.g. +13125550199)."));
+    }
+    return res.status(400).json({ error: "Invalid phone number format. Please enter a standard 10-digit or E.164 phone number." });
+  }
+
+  try {
+    const auth = getUserAuth(req);
+    const consent = recordSmsOptIn({
+      phone,
+      userId: auth.user?.id || null,
+      source: "sms_lead_page",
+      disclosureText: SMS_MARKETING_DISCLOSURE,
+      ip: req.ip || (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim(),
+      userAgent: req.headers["user-agent"],
+    });
+
+    logEvent("sms_opt_in", auth.user?.id, { phone, source: "sms_lead_page" });
+
+    if (req.headers["accept"]?.includes("text/html") || req.body.redirect !== "false") {
+      return res.redirect("/sms?success=" + encodeURIComponent("Subscribed! You will receive QuanterraOS market telemetry & calibration alerts. Reply STOP to cancel at any time."));
+    }
+    return res.json({ success: true, consent });
+  } catch (err) {
+    if (req.headers["accept"]?.includes("text/html") || req.body.redirect !== "false") {
+      return res.redirect("/sms?error=" + encodeURIComponent((err as Error).message));
+    }
+    return res.status(400).json({ error: (err as Error).message });
+  }
+});
+
+app.post(["/api/sms/webhook", "/api/sms/inbound"], (req, res) => {
+  const payload = req.body || {};
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+  const signature = req.headers["x-twilio-signature"] as string | undefined;
+
+  if (authToken && signature) {
+    const fullUrl = (process.env.PUBLIC_BASE_URL || "https://quanterraos.com") + req.originalUrl;
+    if (!validTwilioSmsSignature(authToken, fullUrl, payload, signature)) {
+      return res.status(403).type("text/xml").send("<Response><Message>Forbidden: Invalid signature</Message></Response>");
+    }
+  }
+
+  const result = handleInboundSms({
+    From: payload.From || "",
+    To: payload.To || "",
+    Body: payload.Body || "",
+    MessageSid: payload.MessageSid || "",
+  });
+
+  logEvent("sms_inbound", undefined, {
+    action: result.action,
+    phone: result.phone,
+    keyword: result.keyword,
+  });
+
+  res.type("text/xml").send(result.replyTwiMl);
+});
+
+app.post("/api/sms/send-test", async (req, res) => {
+  const adminKey = req.headers["x-admin-key"] as string | undefined;
+  const auth = getUserAuth(req);
+  const isAuthorized = (adminKey && adminKey === process.env.ADMIN_METRICS_KEY) || (auth.user && auth.tier !== "free");
+
+  if (!isAuthorized) {
+    return res.status(403).json({ error: "Unauthorized: Admin key or authorized session required" });
+  }
+
+  const { to, message, campaignId } = req.body;
+  try {
+    const result = await sendMarketingSms({
+      to,
+      message,
+      campaignId: campaignId || "test_campaign",
+      dryRun: req.body.dryRun === true || req.body.dryRun === "true",
+    });
+    return res.json(result);
+  } catch (err) {
+    return res.status(400).json({ error: (err as Error).message });
+  }
+});
+
+app.post("/api/admin/clean-test-accounts", (req, res) => {
+  const adminKey = req.headers["x-admin-key"] as string | undefined;
+  if (!adminKey || adminKey !== process.env.ADMIN_METRICS_KEY) {
+    return res.status(403).json({ error: "Unauthorized" });
+  }
+  const email = (req.body.email as string) || "smoke-test-operator@quanterraos.com";
+  const user = db.select().from(users).where(eq(users.email, email)).get();
+  if (user) {
+    db.delete(sessions).where(eq(sessions.userId, user.id)).run();
+    db.delete(users).where(eq(users.id, user.id)).run();
+  }
+  res.json({ ok: true, deleted: email });
+});
+
 app.get("/legal", (_req, res) => {
   res.type("html").send(renderLegalPageHtml());
 });
@@ -2462,21 +2591,55 @@ app.post("/api/keys", (req, res) => {
 app.post("/api/auth/register", (req, res) => {
   const email = (req.body.email ?? req.body.operatorId ?? "").trim();
   const password = (req.body.password ?? req.body.accessKey ?? "").trim();
+  const rawPhone = (req.body.phone ?? "").trim();
+  const smsOptIn = req.body.smsOptIn === "true" || req.body.smsOptIn === true || req.body.smsOptIn === "on";
+
   if (!email || !password || password.length < 6) {
     if (req.headers["accept"]?.includes("text/html") || req.body.redirect !== "false") {
       return res.redirect("/account?error=" + encodeURIComponent("Password must be at least 6 characters"));
     }
     return res.status(400).json({ error: "Password must be at least 6 characters" });
   }
+
+  if (smsOptIn && !rawPhone) {
+    if (req.headers["accept"]?.includes("text/html") || req.body.redirect !== "false") {
+      return res.redirect("/account?error=" + encodeURIComponent("Please provide a valid phone number to receive SMS alerts"));
+    }
+    return res.status(400).json({ error: "Please provide a valid phone number to receive SMS alerts" });
+  }
+
+  let normalizedPhone: string | null = null;
+  if (rawPhone) {
+    normalizedPhone = normalizeE164Phone(rawPhone);
+    if (smsOptIn && !normalizedPhone) {
+      if (req.headers["accept"]?.includes("text/html") || req.body.redirect !== "false") {
+        return res.redirect("/account?error=" + encodeURIComponent("Invalid phone number format. Please provide a standard 10-digit or E.164 phone number."));
+      }
+      return res.status(400).json({ error: "Invalid phone number format. Please provide a standard 10-digit or E.164 phone number." });
+    }
+  }
+
   try {
-    const user = createUser(email, password, "free");
-    logEvent("signup", user.id, { email: user.email, tier: "free" });
+    const user = createUser(email, password, "free", normalizedPhone);
+    logEvent("signup", user.id, { email: user.email, tier: "free", smsOptIn });
+
+    if (smsOptIn && normalizedPhone) {
+      recordSmsOptIn({
+        phone: normalizedPhone,
+        userId: user.id,
+        source: "signup_form",
+        disclosureText: SMS_MARKETING_DISCLOSURE,
+        ip: req.ip || (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim(),
+        userAgent: req.headers["user-agent"],
+      });
+    }
+
     const { sessionId } = createSession(user.id);
     res.setHeader("Set-Cookie", `quanterraos_session=${sessionId}; Path=/; HttpOnly; SameSite=Lax`);
     if (req.headers["accept"]?.includes("text/html") || req.body.redirect !== "false") {
       return res.redirect("/account?success=" + encodeURIComponent("Account created successfully. Welcome to QuanterraOS Free Explorer."));
     }
-    res.json({ user, sessionId });
+    res.json({ user, sessionId, smsSubscribed: smsOptIn && !!normalizedPhone });
   } catch (err) {
     if (req.headers["accept"]?.includes("text/html") || req.body.redirect !== "false") {
       return res.redirect("/account?error=" + encodeURIComponent((err as Error).message));

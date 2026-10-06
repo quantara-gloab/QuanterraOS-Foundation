@@ -7,7 +7,7 @@
 import { createHash } from "node:crypto";
 import { type DB, nowIso, normEmail, normPhone } from "./db.ts";
 
-export type Channel = "email" | "call";
+export type Channel = "email" | "call" | "sms";
 export type ConsentAction = "grant" | "revoke";
 
 export interface ConsentInput {
