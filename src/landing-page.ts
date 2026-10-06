@@ -862,7 +862,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       </div>
     </div>
     <div class="nav-right" style="display:flex;gap:10px;align-items:center;">
-      <a href="/kalshi" class="nav-cta" style="background:linear-gradient(180deg, #10B981 0%, #047857 100%);color:#fff;border-color:rgba(52,211,153,0.5);box-shadow:0 4px 14px rgba(16,185,129,0.35);">15M BIDDING &rarr;</a>
+      <a href="/calculator" class="nav-cta" style="background:linear-gradient(180deg, #10B981 0%, #047857 100%);color:#fff;border-color:rgba(52,211,153,0.5);box-shadow:0 4px 14px rgba(16,185,129,0.35);">TRUE COST CALC &rarr;</a>
       <a href="/council" class="nav-cta">COUNCIL CONSOLE</a>
     </div>
   </nav>
@@ -873,18 +873,28 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     <section class="hero-section">
       <div class="hero-left">
         <div class="hero-badge">
-          <span class="pulse-beacon"></span> Autonomous Prediction Market Calibration Council
+          <span class="pulse-beacon"></span> Sovereign Intelligence for Short-Duration Prediction Markets
         </div>
         <h1 class="hero-heading">
-          Continuous calibration &amp; microstructure auditing.
+          Independent pricing, settlement &amp; friction intelligence.
         </h1>
         <p class="hero-subhead">
-          An auditable machine council synchronizing 8 specialized intelligence agents across order-book depth, tick continuity, and empirical Brier decomposition across 1,316 settled contracts.
+          While broad calibration is commoditized, short-duration crypto prediction markets ($4.1B 30-day volume on Kalshi KXBTC15M &amp; Polymarket 5m/15m) require sub-second CME CF BRTI basis tracking, non-linear taker fee modeling, and sovereign AI agent governance.
         </p>
         <div class="hero-actions">
-          <a href="/kalshi" class="btn-primary" style="background:linear-gradient(180deg, #10B981 0%, #059669 100%);border-color:#34D399;box-shadow:0 0 20px rgba(16,185,129,0.35);">15M Kalshi Desk &rarr;</a>
-          <a href="/council" class="btn-primary">Council Console</a>
-          <a href="/calibration" class="btn-secondary">Audit Calibration Curve</a>
+          <a href="/calculator" class="btn-primary" style="background:linear-gradient(180deg, #10B981 0%, #059669 100%);border-color:#34D399;box-shadow:0 0 20px rgba(16,185,129,0.35);">True Cost &amp; Net EV Calc &rarr;</a>
+          <a href="/calibration/surface" class="btn-secondary">Calibration Surface (Min 1–14)</a>
+          <a href="/mcp" class="btn-secondary">Model Context Protocol (MCP)</a>
+        </div>
+
+        <div style="background: rgba(14, 20, 30, 0.7); border: 1px solid rgba(212, 175, 55, 0.25); border-radius: 6px; padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 24px; width: 100%; font-family: var(--font-mono); font-size: 0.74rem;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#10B981; box-shadow:0 0 8px #10B981;"></span>
+            <span style="color:var(--text); font-weight:600;">SOVEREIGN AGENT DEPLOYMENT</span>
+            <span style="color:rgba(255,255,255,0.2);">//</span>
+            <span style="color:var(--muted);">DUAL MCP &amp; A2A PROTOCOL</span>
+          </div>
+          <a href="/mcp" style="color:var(--accent); text-decoration:underline;">Inspect Manifest &rarr;</a>
         </div>
       </div>
 
@@ -945,6 +955,65 @@ ${miniCircles}
             <span>dashed: ideal diagonal</span>
             <span style="color: var(--accent);">gold: Kalshi outcome</span>
           </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- 3-Layer Sovereign OS Architecture Section -->
+    <section class="section-block">
+      <div class="section-heading-group">
+        <div class="section-eyebrow">Sovereign Architecture</div>
+        <h2 class="section-heading">The 3-Layer Sovereign AI Governance Stack</h2>
+        <p class="section-description">
+          Engineered for institutional desks, prop firms, and autonomous agent swarms requiring deterministic settlement verification, transaction friction accounting, and air-gapped readiness.
+        </p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 8px;">
+        <!-- Layer 1 -->
+        <div style="background: var(--panel); border: 1px solid var(--panel-border); border-radius: 6px; padding: 26px; backdrop-filter: blur(20px); display: flex; flex-direction: column;">
+          <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">LAYER 1 // FOUNDATION</div>
+          <h3 style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 10px;">Intelligence Spine</h3>
+          <p style="font-size: 0.86rem; color: var(--muted); line-height: 1.6; margin-bottom: 16px; flex-grow: 1;">
+            Deterministic multi-venue ingestion, order-book L2 microstructure, and settlement target verification.
+          </p>
+          <ul style="list-style: none; font-family: var(--font-mono); font-size: 0.76rem; color: #CBD5E1; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--panel-border-subtle); padding-top: 14px;">
+            <li><span style="color:var(--accent);">▸</span> CME CF BRTI Settlement Basis Engine</li>
+            <li><span style="color:var(--accent);">▸</span> Composite Spot Index (Coinbase, Kraken, Bitstamp)</li>
+            <li><span style="color:var(--accent);">▸</span> 19,740 Audited Minute Candles (1,316 Windows)</li>
+            <li><span style="color:var(--accent);">▸</span> Minute-by-Minute (1–14) Calibration Surface</li>
+          </ul>
+        </div>
+
+        <!-- Layer 2 -->
+        <div style="background: linear-gradient(180deg, rgba(20, 26, 40, 0.9) 0%, rgba(13, 17, 26, 0.95) 100%); border: 1px solid rgba(223, 184, 67, 0.45); border-radius: 6px; padding: 26px; backdrop-filter: blur(20px); box-shadow: inset 0 1px 0 rgba(247, 231, 180, 0.25), 0 0 25px rgba(223, 184, 67, 0.12); display: flex; flex-direction: column;">
+          <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-light); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">LAYER 2 // GOVERNANCE</div>
+          <h3 style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 10px;">Trust &amp; Control Plane</h3>
+          <p style="font-size: 0.86rem; color: var(--muted); line-height: 1.6; margin-bottom: 16px; flex-grow: 1;">
+            Model Context Protocol (MCP) server, 8-agent council audit trails, and strict mathematical circuit breakers.
+          </p>
+          <ul style="list-style: none; font-family: var(--font-mono); font-size: 0.76rem; color: #CBD5E1; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--panel-border-subtle); padding-top: 14px;">
+            <li><span style="color:var(--accent);">▸</span> Model Context Protocol (MCP) Live Tools</li>
+            <li><span style="color:var(--accent);">▸</span> Agent-to-Agent (A2A) Telemetry Handshake</li>
+            <li><span style="color:var(--accent);">▸</span> Rule B5 Permanent Circuit Lock ($0.00 Capital)</li>
+            <li><span style="color:var(--accent);">▸</span> Decile Reliability with 95% Wilson CIs</li>
+          </ul>
+        </div>
+
+        <!-- Layer 3 -->
+        <div style="background: var(--panel); border: 1px solid var(--panel-border); border-radius: 6px; padding: 26px; backdrop-filter: blur(20px); display: flex; flex-direction: column;">
+          <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">LAYER 3 // WORKFLOW</div>
+          <h3 style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 10px;">Execution Mesh</h3>
+          <p style="font-size: 0.86rem; color: var(--muted); line-height: 1.6; margin-bottom: 16px; flex-grow: 1;">
+            Friction-aware expectancy modeling, transaction cost analysis, and private container deployments.
+          </p>
+          <ul style="list-style: none; font-family: var(--font-mono); font-size: 0.76rem; color: #CBD5E1; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--panel-border-subtle); padding-top: 14px;">
+            <li><span style="color:var(--accent);">▸</span> True Cost &amp; Net Expected Value (EV) Engine</li>
+            <li><span style="color:var(--accent);">▸</span> Kalshi Variable Taker Fee Drag ($0.07×P×(1-P))</li>
+            <li><span style="color:var(--accent);">▸</span> Cross-Venue Basis Surveillance (Kalshi vs Poly)</li>
+            <li><span style="color:var(--accent);">▸</span> Sovereign On-Prem / Air-Gapped Readiness</li>
+          </ul>
         </div>
       </div>
     </section>
@@ -1267,7 +1336,7 @@ ${miniCircles}
       </div>
       <div class="footer-disclaimer">
         <p style="margin-bottom: 8px;">
-          <strong>Regulatory &amp; Non-Affiliation Notice (Rule B10):</strong> Kalshi, CME Group, CF Benchmarks, Coinbase, Kraken, Bitstamp, Gemini, and Polymarket are trademarks of their respective owners. QuanterraOS is an independent measurement and statistical verification system operated by Quantara Global LLC and is not affiliated with, endorsed by, or sponsored by any exchange, index provider, or market operator.
+          <strong>Regulatory &amp; Non-Affiliation Notice (Rule B10):</strong> Kalshi, CME Group, CF Benchmarks, Coinbase, Kraken, Bitstamp, Gemini, and Polymarket are trademarks of their respective owners. QuanterraOS is an independent measurement and statistical verification system operated by Quantara Global LLC and is not affiliated with, endorsed by, or sponsored by any exchange, index provider, or market operator. Architecture aligned with SOC 2 Type II trust principles and ISO 42001 AI Management Standards.
         </p>
         <p>
           <strong>Not Investment Advice (Rule B5):</strong> QuanterraOS does not provide investment, financial, or trading advice, and does not route or execute live orders. In accordance with internal safety Rule B5, zero live capital is deployed ($0.00 exposure). Simulated and historical calibration results have inherent limitations under CFTC Rule 4.41. Past performance does not guarantee future results. <a href="/legal" style="color:var(--accent); text-decoration:underline;">Read full Legal Notices, Terms &amp; Regulatory Disclaimers &rarr;</a>

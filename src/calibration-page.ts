@@ -98,6 +98,16 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
     </g>
   `).join("");
 
+  function computeWilsonInterval(k: number, n: number): [number, number] {
+    if (n === 0) return [0, 1];
+    const z = 1.96;
+    const p = k / n;
+    const denom = 1 + (z * z) / n;
+    const center = (p + (z * z) / (2 * n)) / denom;
+    const spread = (z * Math.sqrt((p * (1 - p)) / n + (z * z) / (4 * n * n))) / denom;
+    return [Math.max(0, center - spread), Math.min(1, center + spread)];
+  }
+
   // Table rows
   const tableRows = bins.map((b) => {
     const quotedMid = (b.rangeStart + b.rangeEnd) / 2;
@@ -105,13 +115,17 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
     const error = actualRate - quotedMid;
     const errorColor = Math.abs(error) <= 0.05 ? "var(--green)" : Math.abs(error) <= 0.1 ? "var(--amber)" : "var(--red)";
     const sign = error >= 0 ? "+" : "";
+    const k = Math.round(b.count * actualRate);
+    const [ciLow, ciHigh] = computeWilsonInterval(k, b.count);
+    const smallSampleBadge = b.count < 30 ? ` <span style="font-size:0.68rem; color:var(--accent); border:1px solid rgba(223,184,67,0.3); padding:1px 4px; border-radius:2px;" title="Sample size n < 30: interpret with statistical caution">n&lt;30</span>` : "";
 
     return `
       <tr>
         <td class="bucket-col"><strong>${b.label}</strong></td>
         <td>${(quotedMid * 100).toFixed(0)}%</td>
-        <td class="count-col">${b.count.toLocaleString()}</td>
+        <td class="count-col">${b.count.toLocaleString()}${smallSampleBadge}</td>
         <td class="actual-col"><span class="rate-badge">${(actualRate * 100).toFixed(1)}%</span></td>
+        <td class="mono" style="font-size:0.8rem; color:var(--muted);">[${(ciLow * 100).toFixed(1)}%, ${(ciHigh * 100).toFixed(1)}%]</td>
         <td class="error-col" style="color:${errorColor};">${sign}${(error * 100).toFixed(1)}%</td>
       </tr>
     `;
@@ -670,12 +684,12 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
         </div>
       </a>
       <div class="nav-links">
+        <a href="/kalshi">Kalshi 15m</a>
+        <a href="/calculator">EV Calculator</a>
         <a href="/calibration" class="active">Calibration Proof</a>
-        <a href="/council">Council Terminal</a>
+        <a href="/calibration/surface">Surface (1–14m)</a>
         <a href="/index">Composite Index</a>
         <a href="/spread">Spread Monitor</a>
-        <a href="/status">System Status</a>
-        <a href="/methodology">Methodology</a>
         <a href="/research">Research</a>
       </div>
     </div>
@@ -698,16 +712,24 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
       We continuously benchmark whether the market's quoted entry price is actually well-calibrated against real settlement outcomes — publishing reproducible proof, not predictive claims.
     </p>
 
-    <!-- Live Debate Context: Vanderbilt Study vs. Kalshi Rebuttal -->
+    <!-- Live Research Context: Kalshi August 2026 Paper & Short-Duration Exclusion -->
     <div class="debate-banner">
-      <div class="debate-tag">// Live Research Context · Academic Debate Hook</div>
-      <h2 class="debate-title">Addressing the Public Debate: Calibration vs. "Accuracy"</h2>
+      <div class="debate-tag">// Empirical Frontier · Short-Duration Territory</div>
+      <h2 class="debate-title">Independent Verification: The Short-Duration Segment Kalshi Excluded</h2>
       <p class="debate-text">
-        A recent study by Vanderbilt researchers Joshua Clinton and TzuFeng Huang examined 2,500 prediction markets and found Kalshi "78% accurate," raising concerns about market efficiency and herd behavior. Kalshi's Jack Such pushed back, arguing that prediction markets must be evaluated on <em>calibration</em> — whether a market priced at 20% actually resolves YES about 20% of the time — rather than naive binary accuracy. Rather than taking sides in an abstract dispute, QuanterraOS audited the empirical data: below is our independently measured calibration curve for <code>KXBTC15M</code> across 1,316 canonical settled windows.
+        In August 2026, Kalshi published a comprehensive calibration study covering 2,243,741 event contracts across eleven categories. Notably, Kalshi's cleanest analysis <em>explicitly excluded short-dated daily, hourly, and 15-minute crypto markets</em> — the single fastest-growing prediction volume segment in the world ($4.1B traded in Kalshi crypto in 30 days; $60M+ single-day volume on Polymarket 5m/15m). QuanterraOS owns this exact territory: independent, minute-by-minute calibration auditing for short-duration contracts against the CME CF Bitcoin Real-Time Index (BRTI).
       </p>
-      <a href="/research/kalshi-calibration-response" class="debate-link">
-        Read our full editorial response: "Is Kalshi's BTC Market Actually Calibrated? We Checked." →
-      </a>
+      <div style="display:flex; gap:16px; flex-wrap:wrap; margin-top:14px;">
+        <a href="/research/kalshi-calibration-response" class="debate-link">
+          Read full research response: "Is Kalshi's BTC Market Actually Calibrated? We Checked." →
+        </a>
+        <a href="/calibration/surface" class="debate-link" style="color:var(--accent-light);">
+          View Minute-by-Minute (1–14m) Surface →
+        </a>
+        <a href="/calculator" class="debate-link" style="color:var(--accent);">
+          True Cost &amp; EV Calculator →
+        </a>
+      </div>
     </div>
 
     <!-- Section 1: Headline Stat Cards -->
@@ -791,6 +813,7 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
               <th>Bucket Mid</th>
               <th class="count-col">Sample Size (n)</th>
               <th class="actual-col">Actual Settlement Rate</th>
+              <th>95% Wilson CI</th>
               <th class="error-col">Calibration Drift</th>
             </tr>
           </thead>
@@ -823,7 +846,7 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
         <ul>
           <li><strong>Minute-4 Target:</strong> Uses only the entry candle at minute 4 of each 15-minute window.</li>
           <li><strong>Strict Provenance:</strong> Evaluates exactly 1,316 settled markets from <code>kalshi-btc15m-candles.csv</code>.</li>
-          <li><strong>Documented Failures:</strong> All 12 tested hypotheses — including rules that lost money after spread and fees — are preserved in our research findings: <a href="https://github.com/quanterra/quanterraos/blob/main/docs/findings.md" target="_blank" rel="noopener noreferrer" style="color:var(--accent); text-decoration:underline;">Read findings.md methodology</a>.</li>
+          <li><strong>Documented Failures:</strong> All 12 tested hypotheses — including rules that lost money after spread and fees — are preserved in our research findings: <a href="/research" style="color:var(--accent); text-decoration:underline;">Research Archive</a> and public repository <a href="https://github.com/quantara-gloab/QuanterraOS-Foundation/blob/main/docs/findings.md" target="_blank" rel="noopener noreferrer" style="color:var(--accent); text-decoration:underline;">findings.md on GitHub</a>.</li>
         </ul>
       </div>
     </section>

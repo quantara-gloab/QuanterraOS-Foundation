@@ -386,10 +386,12 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
     </a>
     <div class="nav-links">
       <a href="/">Home</a>
-      <a href="/research">Research</a>
-      <a href="/predictions">Predictions</a>
-      <a href="/autopilot">Autopilot</a>
+      <a href="/calculator">True Cost Calc</a>
+      <a href="/calibration/surface">Surface</a>
       <a href="/calibration">Calibration</a>
+      <a href="/spread">Spread Monitor</a>
+      <a href="/mcp">MCP / AI</a>
+      <a href="/pricing" class="active">Pricing</a>
       <a href="/account" class="btn-account">Account / Login</a>
     </div>
   </nav>
@@ -439,13 +441,13 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
           <div class="price-period">Billed monthly · Self-serve cancellation</div>
         </div>
         <ul class="features-list">
-          <li><span class="check-icon">✓</span> <span><strong>Real-time /predictions feed</strong> (sub-second)</span></li>
-          <li><span class="check-icon">✓</span> <span><strong>Live continuous /autopilot</strong> P&L tracking</span></li>
-          <li><span class="check-icon">✓</span> <span><strong>Real-time /calibration</strong> 10-bin curve</span></li>
+          <li><span class="check-icon">✓</span> <span><strong>Minute-by-minute calibration surface</strong> (min 1–14)</span></li>
+          <li><span class="check-icon">✓</span> <span><strong>Live CME CF BRTI settlement basis</strong> & spread monitor</span></li>
+          <li><span class="check-icon">✓</span> <span><strong>Real-time True Cost & EV calculator</strong> (taker fee drag)</span></li>
+          <li><span class="check-icon">✓</span> <span><strong>Model Context Protocol (MCP)</strong> agent access</span></li>
+          <li><span class="check-icon">✓</span> <span><strong>Real-time /predictions feed</strong> (sub-second telemetry)</span></li>
           <li><span class="check-icon">✓</span> <span><strong>Automated CSV export</strong> (predictions & autopilot)</span></li>
-          <li><span class="check-icon">✓</span> <span>Swing-event telemetry alerts</span></li>
-          <li><span class="check-icon">✓</span> <span>Depth imbalance & basis monitor</span></li>
-          <li><span class="dash-icon">—</span> <span style="color:var(--muted);">Raw tick feeds reserved for Institutional</span></li>
+          <li><span class="dash-icon">—</span> <span style="color:var(--muted);">Raw tick exports reserved for Institutional</span></li>
         </ul>
         <form action="/api/billing/checkout" method="POST">
           <input type="hidden" name="tier" value="pro" />
@@ -466,11 +468,11 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
         <ul class="features-list">
           <li><span class="check-icon">✓</span> <span><strong>Everything in Pro Terminal</strong></span></li>
           <li><span class="check-icon">✓</span> <span><strong>Raw tick data exports</strong> (19,740 candle rows)</span></li>
-          <li><span class="check-icon">✓</span> <span><strong>Unmetered WebSocket telemetry stream</strong></span></li>
-          <li><span class="check-icon">✓</span> <span><strong>Rate-limited API access keys</strong> (REST + WS)</span></li>
-          <li><span class="check-icon">✓</span> <span>Full order-book depth JSON snapshots</span></li>
+          <li><span class="check-icon">✓</span> <span><strong>Sovereign container deployment</strong> (air-gapped ready)</span></li>
+          <li><span class="check-icon">✓</span> <span><strong>Unmetered MCP server & REST/WS API keys</strong></span></li>
+          <li><span class="check-icon">✓</span> <span>Full order-book depth JSON snapshots & BRTI logs</span></li>
           <li><span class="check-icon">✓</span> <span>Pre-registration datasets & JEV protocol feeds</span></li>
-          <li><span class="check-icon">✓</span> <span>Dedicated desk technical support</span></li>
+          <li><span class="check-icon">✓</span> <span>Dedicated institutional quant desk support</span></li>
         </ul>
         <form action="/api/billing/checkout" method="POST">
           <input type="hidden" name="tier" value="institutional" />
