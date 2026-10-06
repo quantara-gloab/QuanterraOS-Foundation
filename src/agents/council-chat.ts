@@ -660,7 +660,7 @@ Explore our TrustOS pilot at **/trustos** or read our full analysis in docs/comp
     };
   }
 
-  // Question 14: Race Car Telemetry & Executive Operating Pace
+  // Question 14: Executive Council Operating Structure & Cadence
   if (
     norm.includes("formula 1") ||
     norm.includes("f1") ||
@@ -671,13 +671,12 @@ Explore our TrustOS pilot at **/trustos** or read our full analysis in docs/comp
     norm.includes("lap time") ||
     norm.includes("race telemetry")
   ) {
-    citations.push("src/ai-engines/index.ts", "Council Telemetry Pit Wall", "Rule B5 Circuit Lock");
+    citations.push("src/agents/council-pipeline.ts", "Rule B5 Circuit Lock");
     return {
-      reply: `The QuanterraOS Executive Team operates with the precision and responsiveness of a Formula One pit wall:
-- **Sub-Millisecond Telemetry Loops**: Each specialist operates between 0.5ms and 1.4ms per analysis cycle, monitoring 18,200 to 20,000 virtual RPM across L2 order-book feeds.
-- **Assigned F1 Call-Signs**: Team Principal Lion (F1-CHIEF-01), ECU Sentinel Draco (F1-ECU-02), Aero Specialist Wolf (F1-AERO-03), Test Pilot Falcon (F1-TEST-04), Powertrain Engineer Quantum Fox (F1-POWER-05), Radio Sentinel (F1-RADIO-06), Safety Marshall Kraken (F1-SAFETY-07), Brake Governor Phoenix (F1-BRAKE-08), and Cockpit Concierge Aria (F1-COMMS-09).
-- **Aero Downforce & DRS Dynamics**: Real-time order-book queue imbalance and spread compression tracking.
-- **Safety Car Governance (Rule B5)**: Even at maximum operational tempo, live capital exposure remains strictly $0.00 with the execution circuit breaker permanently locked.`,
+      reply: `The QuanterraOS Executive Council operates with continuous coordination:
+- **Periodic Verification Pipeline**: Evaluates incoming L2 order books, tick events, and settlement indices across venues every 30 seconds.
+- **Specialist Roles**: Team Principal Lion synthesizes verdicts, Draco monitors data quality, Wolf tracks order-book depth, Falcon conducts research, Quantum Fox evaluates baselines, Sentinel checks pipeline uptime, Kraken enforces safety boundaries, Phoenix governs circuit breakers, and Aria provides conversational assistance.
+- **Strict Risk Governance (Rule B5)**: Regardless of analysis tempo, live capital exposure remains strictly $0.00 with the execution circuit breaker permanently locked.`,
       citations
     };
   }

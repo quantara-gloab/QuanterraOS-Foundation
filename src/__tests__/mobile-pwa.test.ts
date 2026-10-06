@@ -41,37 +41,14 @@ describe('QuanterraOS Mobile App & Store Distribution Suite', () => {
     assert.ok(fs.existsSync(appleTouchIconPath) && fs.statSync(appleTouchIconPath).size > 0, 'apple-touch-icon.png must exist');
   });
 
-  it('validates Google Play / Samsung Android Digital Asset Links (assetlinks.json)', () => {
+  it('validates Rule B11 enforcement: placeholder assetlinks and AASA files are not published until accounts are enrolled', () => {
     const assetlinksPath = path.join(rootDir, 'public', '.well-known', 'assetlinks.json');
-    assert.ok(fs.existsSync(assetlinksPath), 'assetlinks.json must exist in public/.well-known');
-
-    const assetlinks = JSON.parse(fs.readFileSync(assetlinksPath, 'utf8'));
-    assert.ok(Array.isArray(assetlinks), 'assetlinks must be an array');
-    assert.ok(assetlinks.length >= 1, 'assetlinks must have at least one statement');
-
-    const handleUrlsStmt = assetlinks.find((stmt: any) =>
-      stmt.relation && stmt.relation.includes('delegate_permission/common.handle_all_urls')
-    );
-    assert.ok(handleUrlsStmt, 'must include handle_all_urls permission for TWA');
-    assert.strictEqual(handleUrlsStmt.target.package_name, 'com.quanterraos.app');
-    assert.ok(Array.isArray(handleUrlsStmt.target.sha256_cert_fingerprints), 'must have sha256 fingerprints placeholder');
-    assert.ok(handleUrlsStmt.target.sha256_cert_fingerprints.length >= 1, 'must have at least one fingerprint entry');
-  });
-
-  it('validates Apple iOS Universal Links (apple-app-site-association)', () => {
     const aasaPath = path.join(rootDir, 'public', '.well-known', 'apple-app-site-association');
     const rootAasaPath = path.join(rootDir, 'public', 'apple-app-site-association');
-    assert.ok(fs.existsSync(aasaPath), 'apple-app-site-association must exist in public/.well-known');
-    assert.ok(fs.existsSync(rootAasaPath), 'apple-app-site-association must exist at root of public');
 
-    const aasa = JSON.parse(fs.readFileSync(aasaPath, 'utf8'));
-    assert.ok(aasa.applinks, 'must define applinks object');
-    assert.ok(Array.isArray(aasa.applinks.details), 'applinks details must be an array');
-    
-    const primaryApp = aasa.applinks.details[0];
-    assert.ok(primaryApp.appID.includes('com.quanterraos.app'), 'must target com.quanterraos.app bundle');
-    assert.ok(primaryApp.paths.includes('/dashboard*'), 'must link /dashboard*');
-    assert.ok(primaryApp.paths.includes('/mobile*'), 'must link /mobile*');
+    assert.strictEqual(fs.existsSync(assetlinksPath), false, 'placeholder assetlinks.json must NOT be published in public/.well-known');
+    assert.strictEqual(fs.existsSync(aasaPath), false, 'placeholder apple-app-site-association must NOT be published in public/.well-known');
+    assert.strictEqual(fs.existsSync(rootAasaPath), false, 'placeholder apple-app-site-association must NOT be published in public root');
   });
 
   it('validates Service Worker offline shell, financial no-cache guards, and push handlers', () => {
