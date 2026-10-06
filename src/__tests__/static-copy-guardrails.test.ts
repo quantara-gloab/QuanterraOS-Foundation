@@ -10,6 +10,7 @@ import { renderAutopilotPage } from '../autopilot-page.ts';
 import { renderPricingPageHtml } from '../pricing-page.ts';
 import { renderTwoStrategiesLostPageHtml } from '../blog-page.ts';
 import { renderAccountPageHtml } from '../account-page.ts';
+import { renderKalshiTerminalHtml } from '../kalshi-terminal-page.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,6 +26,7 @@ describe('Static Copy Guardrail Audit — Rule B4 Compliance', () => {
   const statusPagePath = path.join(srcDir, 'status-page.ts');
   const predictionsPagePath = path.join(srcDir, 'predictions-page.ts');
   const autopilotPagePath = path.join(srcDir, 'autopilot-page.ts');
+  const kalshiPagePath = path.join(srcDir, 'kalshi-terminal-page.ts');
 
   const serverContent = fs.readFileSync(serverPath, 'utf8');
   const dashboardContent = fs.readFileSync(dashboardPath, 'utf8');
@@ -35,6 +37,7 @@ describe('Static Copy Guardrail Audit — Rule B4 Compliance', () => {
   const statusPageContent = fs.readFileSync(statusPagePath, 'utf8');
   const predictionsPageContent = fs.readFileSync(predictionsPagePath, 'utf8');
   const autopilotPageContent = fs.readFileSync(autopilotPagePath, 'utf8');
+  const kalshiContent = fs.readFileSync(kalshiPagePath, 'utf8');
 
   // Extract /subscribe and /account rendered templates from server.ts
   const subscribeMatch = serverContent.match(/const clerkSubscribePage = `([\s\S]*?)`;/);
@@ -50,6 +53,7 @@ describe('Static Copy Guardrail Audit — Rule B4 Compliance', () => {
   const renderedPricingHtml = renderPricingPageHtml();
   const renderedBlogHtml = renderTwoStrategiesLostPageHtml();
   const renderedAccountHtml = renderAccountPageHtml(null, "free");
+  const renderedKalshiHtml = renderKalshiTerminalHtml();
 
   const allStaticSources = [
     { name: 'server.ts', content: serverContent },
@@ -71,6 +75,8 @@ describe('Static Copy Guardrail Audit — Rule B4 Compliance', () => {
     { name: 'renderedPricingHtml', content: renderedPricingHtml },
     { name: 'renderedBlogHtml', content: renderedBlogHtml },
     { name: 'renderedAccountHtml', content: renderedAccountHtml },
+    { name: 'kalshi-terminal-page.ts', content: kalshiContent },
+    { name: 'renderedKalshiHtml', content: renderedKalshiHtml },
   ];
 
   it('no banned marketing superlatives or unvalidated comparisons (Tesla, Citadel)', () => {
@@ -246,5 +252,30 @@ describe('Static Copy Guardrail Audit — Rule B4 Compliance', () => {
     assert.match(renderedAutopilotHtml, /CFTC Rule 4\.41/i, '/autopilot must display CFTC Rule 4.41 disclosure');
     assert.match(renderedAutopilotHtml, /HYPOTHETICAL OR SIMULATED PERFORMANCE RESULTS/i, '/autopilot must display full CFTC disclosure text');
     assert.match(renderedPredictionsLiveHtml, /HYPOTHETICAL OR SIMULATED PERFORMANCE RESULTS/i, '/predictions must display full CFTC disclosure text');
+  });
+
+  it('enforces that UI copy never falsely claims a live CME CF BRTI index feed and properly designates the Quanterra Composite Proxy', () => {
+    // Prohibit UI claiming direct live CME CF BRTI as our active feed
+    const prohibitedDirectBrtiFeedClaims = [
+      /\bBRTI SPOT INDEX\b/i,
+      /\bCME CF BRTI composite indices\b/i,
+      /\bLive CME CF BRTI settlement basis\b/i,
+      /CME CF BRTI BASIS:\s*\+/i,
+    ];
+
+    for (const source of allStaticSources) {
+      for (const pattern of prohibitedDirectBrtiFeedClaims) {
+        assert.strictEqual(
+          pattern.test(source.content),
+          false,
+          `${source.name} must not claim direct live CME CF BRTI feed: ${pattern}`
+        );
+      }
+    }
+
+    // Both /kalshi and / (index) must explicitly disclose that BRTI is proprietary and requires an institutional license
+    assert.match(renderedKalshiHtml, /BENCHMARK &amp; SETTLEMENT DESIGNATION/i, '/kalshi must render benchmark disclosure');
+    assert.match(renderedKalshiHtml, /requires an institutional feed license and is never synthesized/i, '/kalshi must disclose BRTI licensing requirement');
+    assert.match(renderedLandingHtml, /SPOT DISPERSION/i, 'Landing page must track spot dispersion, not claim live BRTI basis');
   });
 });
