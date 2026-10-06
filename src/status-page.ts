@@ -193,7 +193,7 @@ export function getSystemStatusData(dbPath = process.env.DB_PATH || "quanterraos
       { name: "Web Application & REST Engine", unit: "quanterra-web.service", type: "daemon", status: "ACTIVE" },
       { name: "Order-Book Depth Watchdog", unit: "quanterra-orderbook-watchdog.service", type: "daemon", status: "ACTIVE" },
       { name: "Multi-Exchange Spot Poller", unit: "quanterra-exchange-price-poller.service", type: "daemon", status: "ACTIVE" },
-      { name: "CME CF BRTI Settlement Index Logger", unit: "quanterra-kalshi-btc-logger.service", type: "daemon", status: "ACTIVE" },
+      { name: "Kalshi CF Benchmarks Index Logger", unit: "quanterra-kalshi-btc-logger.service", type: "daemon", status: "ACTIVE" },
       { name: "Prediction Market Outcome Tracker", unit: "quanterra-outcome-tracker.service", type: "daemon", status: "ACTIVE" },
       { name: "Daily Falcon Evaluation Timer", unit: "quanterra-falcon-eval.timer", type: "systemd-timer", status: "SCHEDULED" },
     ],
@@ -464,7 +464,7 @@ export function renderStatusPageHtml(dbPath = process.env.DB_PATH || "quanterrao
     <div class="ticker-content">
       <span class="ticker-item"><span class="ticker-pulse"></span>LIVE INGESTION &amp; SURVEILLANCE TELEMETRY</span>
       <span class="ticker-sep">//</span>
-      <span class="ticker-item">BRTI TICKS: ${data.database.totalIndexTicks.toLocaleString()}</span>
+      <span class="ticker-item">INDEX TICKS: ${data.database.totalIndexTicks.toLocaleString()}</span>
       <span class="ticker-sep">//</span>
       <span class="ticker-item">SPOT PRICES: ${data.database.totalExchangePrices.toLocaleString()}</span>
       <span class="ticker-sep">//</span>
@@ -513,7 +513,7 @@ export function renderStatusPageHtml(dbPath = process.env.DB_PATH || "quanterrao
       </div>
 
       <h1>System &amp; Ingestion Status</h1>
-      <p class="lead">Continuous monitoring of multi-venue spot pollers, CME CF BRTI index loggers, Draco data-quality gates, and daily evaluation timers.</p>
+      <p class="lead">Continuous monitoring of multi-venue spot pollers, Kalshi index loggers, Draco data-quality gates, and daily evaluation timers.</p>
 
       <div class="status-banner">
         <div class="status-indicator">
@@ -527,9 +527,9 @@ export function renderStatusPageHtml(dbPath = process.env.DB_PATH || "quanterrao
 
       <div class="grid-2">
         <div class="card">
-          <div class="card-label">Stored BRTI Settlement Ticks</div>
+          <div class="card-label">Logged Index &amp; Settlement Ticks</div>
           <div class="card-val accent">${data.database.totalIndexTicks.toLocaleString()}</div>
-          <div class="card-meta">CME CF Bitcoin Real-Time Index ticks logged in SQLite (WAL mode).</div>
+          <div class="card-meta">Kalshi CF Benchmarks WebSocket ticks logged in SQLite (WAL mode).</div>
         </div>
 
         <div class="card">

@@ -833,7 +833,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
   <!-- Top Live Ticker Strip -->
   <div class="live-ticker-strip">
     <div class="ticker-items">
-      <div class="ticker-item"><span class="ticker-tag-green">● LIVE AUDIT</span> CME CF BRTI BASIS: <strong>+1.4 BPS</strong></div>
+      <div class="ticker-item"><span class="ticker-tag-green">● LIVE AUDIT</span> SPOT DISPERSION: <strong>+1.4 BPS</strong></div>
       <div class="ticker-item">CANONICAL CORPUS: <strong>1,316 SETTLED WINDOWS (19,740 ROWS)</strong></div>
       <div class="ticker-item">MARKET-MID BRIER: <strong>${brierScore} (NOMINAL)</strong></div>
       <div class="ticker-item"><span class="ticker-tag-warn">RULE B5 LOCKED</span> CAPITAL DEPLOYED: <strong>$0.00</strong></div>
@@ -879,7 +879,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
           Independent pricing, settlement &amp; friction intelligence.
         </h1>
         <p class="hero-subhead">
-          While broad calibration is commoditized, high-velocity short-duration crypto prediction markets (Kalshi KXBTC15M and Polymarket 5m/15m) require sub-second CME CF BRTI basis tracking, non-linear taker fee modeling, and sovereign AI agent governance.
+          While broad calibration is commoditized, high-velocity short-duration crypto prediction markets (Kalshi KXBTC15M and Polymarket 5m/15m) require sub-second spot basis tracking, non-linear taker fee modeling, and sovereign AI agent governance.
         </p>
         <div class="hero-actions">
           <a href="/calculator" class="btn-primary" style="background:linear-gradient(180deg, #10B981 0%, #059669 100%);border-color:#34D399;box-shadow:0 0 20px rgba(16,185,129,0.35);">True Cost &amp; Net EV Calc &rarr;</a>
@@ -979,7 +979,7 @@ ${miniCircles}
             Deterministic multi-venue ingestion, order-book L2 microstructure, and settlement target verification.
           </p>
           <ul style="list-style: none; font-family: var(--font-mono); font-size: 0.76rem; color: #CBD5E1; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--panel-border-subtle); padding-top: 14px;">
-            <li><span style="color:var(--accent);">▸</span> CME CF BRTI Settlement Basis Engine</li>
+            <li><span style="color:var(--accent);">▸</span> Spot Dispersion &amp; Settlement Basis Engine</li>
             <li><span style="color:var(--accent);">▸</span> Composite Spot Index (Coinbase, Kraken, Bitstamp)</li>
             <li><span style="color:var(--accent);">▸</span> 19,740 Audited Minute Candles (1,316 Windows)</li>
             <li><span style="color:var(--accent);">▸</span> Minute-by-Minute (1–14) Calibration Surface</li>
@@ -1202,7 +1202,7 @@ ${miniCircles}
                   <span class="spec-name">Kraken</span>
                   <span class="spec-badge warning">locked</span>
                 </div>
-                <div class="spec-role">Risk governance &amp; BRTI basis</div>
+                <div class="spec-role">Risk governance &amp; spot basis</div>
               </div>
             </div>
             <div class="spec-metric-row">
@@ -1210,7 +1210,7 @@ ${miniCircles}
               <div style="font-size: 0.72rem; color: var(--muted); font-family: var(--font-mono);">authorized exposure</div>
             </div>
             <div class="spec-detail" style="margin-top: 8px;">
-              Enforces zero live capital exposure under Rule B5 while monitoring CME CF BRTI basis divergence.
+              Enforces zero live capital exposure under Rule B5 while monitoring spot dispersion and settlement basis divergence.
             </div>
           </div>
           <div class="spec-actions">

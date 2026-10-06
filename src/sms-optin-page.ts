@@ -344,7 +344,7 @@ export function renderSmsOptInPageHtml(error?: string, success?: string): string
       <div class="feature-grid">
         <div class="feature-pill">
           <strong>Cross-Venue Basis Alerts</strong>
-          <span>Instant alerts when spot-to-BRTI basis dispersion exceeds 30 bps.</span>
+          <span>Instant alerts when cross-venue spot dispersion exceeds 30 bps.</span>
         </div>
         <div class="feature-pill">
           <strong>Calibration Surfaces</strong>

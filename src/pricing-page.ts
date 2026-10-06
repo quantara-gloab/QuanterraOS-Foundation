@@ -442,7 +442,7 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
         </div>
         <ul class="features-list">
           <li><span class="check-icon">✓</span> <span><strong>Minute-by-minute calibration surface</strong> (min 1–14)</span></li>
-          <li><span class="check-icon">✓</span> <span><strong>Live CME CF BRTI settlement basis</strong> & spread monitor</span></li>
+          <li><span class="check-icon">✓</span> <span><strong>Live settlement basis & spread monitor</strong> (multi-venue)</span></li>
           <li><span class="check-icon">✓</span> <span><strong>Real-time True Cost & EV calculator</strong> (taker fee drag)</span></li>
           <li><span class="check-icon">✓</span> <span><strong>Model Context Protocol (MCP)</strong> agent access</span></li>
           <li><span class="check-icon">✓</span> <span><strong>Real-time /predictions feed</strong> (sub-second telemetry)</span></li>
@@ -470,7 +470,7 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
           <li><span class="check-icon">✓</span> <span><strong>Raw tick data exports</strong> (19,740 candle rows)</span></li>
           <li><span class="check-icon">✓</span> <span><strong>Sovereign container deployment</strong> (air-gapped ready)</span></li>
           <li><span class="check-icon">✓</span> <span><strong>Unmetered MCP server & REST/WS API keys</strong></span></li>
-          <li><span class="check-icon">✓</span> <span>Full order-book depth JSON snapshots & BRTI logs</span></li>
+          <li><span class="check-icon">✓</span> <span>Full order-book depth JSON snapshots & settlement logs</span></li>
           <li><span class="check-icon">✓</span> <span>Pre-registration datasets & JEV protocol feeds</span></li>
           <li><span class="check-icon">✓</span> <span>Dedicated institutional quant desk support</span></li>
         </ul>

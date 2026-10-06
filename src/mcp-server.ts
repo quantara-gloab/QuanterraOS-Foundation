@@ -48,8 +48,8 @@ export const MCP_SERVER_MANIFEST = {
       }
     },
     {
-      name: "get_brti_basis",
-      description: "Returns basis divergence between spot exchanges and the CME CF BRTI settlement reference index.",
+      name: "get_spot_basis",
+      description: "Returns basis divergence across spot exchanges against the composite settlement proxy.",
       parameters: {
         type: "object",
         properties: {
@@ -239,7 +239,7 @@ export function renderMcpPageHtml(): string {
     <div class="eyebrow">Agent Protocol · 2026 Interoperability</div>
     <h1>Model Context Protocol (MCP) Server</h1>
     <p class="lead">
-      Empower Claude, Cursor, ChatGPT, and autonomous trading agents to query QuanterraOS's independent calibration benchmarks, CME BRTI basis, and True Cost friction calculations in real time.
+      Empower Claude, Cursor, ChatGPT, and autonomous trading agents to query QuanterraOS's independent calibration benchmarks, spot basis dispersion, and True Cost friction calculations in real time.
     </p>
 
     <div class="card">
@@ -281,8 +281,8 @@ export function renderMcpPageHtml(): string {
           <div class="tool-desc">Evaluates fee and spread friction, net EV, and breakeven probabilities for any prediction contract.</div>
         </div>
         <div class="tool-item">
-          <div class="tool-name">get_brti_basis</div>
-          <div class="tool-desc">Surveils basis divergence between spot crypto venues and the CME CF BRTI settlement index.</div>
+          <div class="tool-name">get_spot_basis</div>
+          <div class="tool-desc">Surveils basis divergence across spot crypto venues against the composite settlement proxy.</div>
         </div>
       </div>
     </div>

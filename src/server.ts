@@ -3171,10 +3171,10 @@ async function load() {
     }
     document.getElementById("details").innerHTML =
       row("Target (strike)", "$" + Number(r.target).toLocaleString()) +
-      row("BRTI now", r.brti ? "$" + Number(r.brti.value).toLocaleString() + " (" + r.brti.ageSeconds + "s old" + (r.brti.fresh ? "" : ", STALE") + ")" : "no data") +
+      row("Spot composite (BRTI proxy)", r.brti ? "$" + Number(r.brti.value).toLocaleString() + " (" + r.brti.ageSeconds + "s old" + (r.brti.fresh ? "" : ", STALE") + ")" : "no data") +
       row("YES bid / ask", Number(r.quotes.yesBid).toFixed(2) + " / " + Number(r.quotes.yesAsk).toFixed(2)) +
       row("NO bid / ask", Number(r.quotes.noBid).toFixed(2) + " / " + Number(r.quotes.noAsk).toFixed(2)) +
-      row("Fair-value model (cross-check)", r.model ? pct(r.model.pHigher) + " Higher" : "unavailable (BRTI stale or too little history)") +
+      row("Fair-value model (cross-check)", r.model ? pct(r.model.pHigher) + " Higher" : "unavailable (spot ticks stale or too little history)") +
       row("Model EV after fee: YES / NO", r.model && r.model.expectedValuePerContract ? (r.model.expectedValuePerContract.yes * 100).toFixed(1) + "¢ / " + (r.model.expectedValuePerContract.no * 100).toFixed(1) + "¢" : "—");
     document.getElementById("edge").textContent = "Edge: " + r.edge;
     if (r.evidence && r.evidence.brierByMinute) {
