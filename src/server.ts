@@ -3386,6 +3386,36 @@ app.post("/api/kalshi/bid", async (req, res) => {
   if (!ticker || !side || price === undefined || count === undefined) {
     return res.status(400).json({ error: "Missing required fields: ticker, side, price, count" });
   }
+
+  const requestedMode = mode === "live" ? "live" : "sandbox";
+
+  // HARD ENFORCEMENT OF RULE B5 & LIVE ORDER SAFETY
+  if (requestedMode === "live") {
+    // 1. Env flag check (Rule B5)
+    if (process.env.KALSHI_LIVE !== "true") {
+      return res.status(403).json({
+        error: "Rule B5 Active: Live trading is strictly disabled ($0.00 live capital exposure). KALSHI_LIVE=true is not set in environment.",
+        rule: "RULE_B5_BLOCKED",
+      });
+    }
+
+    // 2. Signed-in admin check
+    const isAdmin = checkAdminAuth(req) || (auth.user && auth.tier === "institutional");
+    if (!isAdmin) {
+      return res.status(403).json({
+        error: "Forbidden: Live order execution requires signed-in administrator authentication.",
+      });
+    }
+
+    // 3. Max contract count per order
+    const MAX_LIVE_CONTRACTS = 10;
+    if (Number(count) > MAX_LIVE_CONTRACTS) {
+      return res.status(400).json({
+        error: `Order limit exceeded: Live orders are capped at ${MAX_LIVE_CONTRACTS} contracts per order. Requested: ${count}`,
+      });
+    }
+  }
+
   try {
     const result = await placeKalshi15mBid({
       userId,
@@ -3393,7 +3423,7 @@ app.post("/api/kalshi/bid", async (req, res) => {
       side: side.toLowerCase(),
       price: Number(price),
       count: Number(count),
-      mode: mode === "live" ? "live" : "sandbox",
+      mode: requestedMode,
     });
     res.json(result);
   } catch (err) {

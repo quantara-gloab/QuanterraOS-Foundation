@@ -74,11 +74,36 @@ export interface KalshiStrikeLadderEntry {
   subtitle: string;
   distanceFromSpot: number; // Spot - Strike in dollars
   distanceBps: number;
-  yesBid: number;
-  yesAsk: number;
-  impliedProb: number;
-  takerFee: number;
-  netEvAtFiftyPctWin: number;
+  yesBid: number | null;
+  yesAsk: number | null;
+  impliedProb: number | null;
+  takerFee: number | null;
+  netEvAtFiftyPctWin: number | null;
+  closeTime?: string;
+}
+
+/**
+ * Safely parses price quotes from Kalshi payloads.
+ * Handles both dollar strings/floats ("0.48") and integer cents (48 -> 0.48).
+ * Returns null if missing or 0 to avoid fabricating fake prices.
+ */
+export function parseQuotePrice(dollarsVal: any, centsVal: any): number | null {
+  if (dollarsVal !== undefined && dollarsVal !== null && dollarsVal !== "") {
+    const parsed = parseFloat(dollarsVal);
+    if (!isNaN(parsed) && parsed > 0 && parsed <= 1.0) {
+      return Math.round(parsed * 10000) / 10000;
+    }
+  }
+  if (centsVal !== undefined && centsVal !== null && centsVal !== "") {
+    const parsedCents = parseFloat(centsVal);
+    if (!isNaN(parsedCents) && parsedCents > 0) {
+      const dollars = parsedCents >= 1 ? parsedCents / 100 : parsedCents;
+      if (dollars > 0 && dollars <= 1.0) {
+        return Math.round(dollars * 10000) / 10000;
+      }
+    }
+  }
+  return null;
 }
 
 /**
@@ -110,14 +135,14 @@ export function normalizeKalshiContract(raw: any, timeframe: KalshiTimeframe): K
   const closeMs = Date.parse(raw.close_time || "");
   const minutesLeft = Math.max(0, Math.round(((closeMs - now) / 60000) * 10) / 10);
 
-  const yesAsk = parseFloat(raw.yes_ask_dollars ?? raw.yes_ask ?? "0.50") || 0.50;
-  const yesBid = parseFloat(raw.yes_bid_dollars ?? raw.yes_bid ?? "0.48") || 0.48;
-  const noAsk = parseFloat(raw.no_ask_dollars ?? raw.no_ask ?? "0.52") || 0.52;
-  const noBid = parseFloat(raw.no_bid_dollars ?? raw.no_bid ?? "0.50") || 0.50;
+  const yesAsk = parseQuotePrice(raw.yes_ask_dollars, raw.yes_ask);
+  const yesBid = parseQuotePrice(raw.yes_bid_dollars, raw.yes_bid);
+  const noAsk = parseQuotePrice(raw.no_ask_dollars, raw.no_ask);
+  const noBid = parseQuotePrice(raw.no_bid_dollars, raw.no_bid);
 
   const strike = raw.floor_strike ?? raw.cap_strike ?? 0;
-  const takerFeeYes = calculateKalshiTakerFee(yesAsk);
-  const takerFeeNo = calculateKalshiTakerFee(noAsk);
+  const takerFeeYes = yesAsk !== null ? calculateKalshiTakerFee(yesAsk) : 0;
+  const takerFeeNo = noAsk !== null ? calculateKalshiTakerFee(noAsk) : 0;
 
   return {
     ticker: raw.ticker || `KXBTC${timeframe === "15m" ? "15M" : "D"}-SIMULATED`,
@@ -130,21 +155,22 @@ export function normalizeKalshiContract(raw: any, timeframe: KalshiTimeframe): K
     closeTime: raw.close_time || new Date(now + (timeframe === "15m" ? 15 : 60) * 60000).toISOString(),
     openTime: raw.open_time || new Date(now).toISOString(),
     minutesLeft,
-    yesBid,
-    yesAsk,
-    noBid,
-    noAsk,
-    lastPrice: parseFloat(raw.last_price_dollars ?? raw.last_price ?? "0.50") || 0.50,
+    yesBid: yesBid ?? 0,
+    yesAsk: yesAsk ?? 0,
+    noBid: noBid ?? 0,
+    noAsk: noAsk ?? 0,
+    lastPrice: parseQuotePrice(raw.last_price_dollars, raw.last_price) ?? 0,
     takerFeeYes,
     takerFeeNo,
-    breakevenYes: calculateBreakevenProbability(yesAsk, true),
-    breakevenNo: calculateBreakevenProbability(noAsk, false),
+    breakevenYes: yesAsk !== null ? calculateBreakevenProbability(yesAsk, true) : 0,
+    breakevenNo: noAsk !== null ? calculateBreakevenProbability(noAsk, false) : 0,
     status: raw.status || "active",
   };
 }
 
 /**
  * Selects the optimal At-The-Money (ATM) contract from a list of open hourly markets.
+ * Strictly scopes to the nearest hourly event window so different expiries are never mixed.
  */
 export function selectAtmHourlyMarket(markets: any[], currentSpot: number): any | null {
   if (!markets || markets.length === 0) return null;
@@ -152,11 +178,15 @@ export function selectAtmHourlyMarket(markets: any[], currentSpot: number): any 
   const valid = markets.filter(m => Date.parse(m.close_time) > now);
   if (valid.length === 0) return null;
 
+  // Filter to the nearest event window
+  const minCloseMs = Math.min(...valid.map(m => Date.parse(m.close_time)));
+  const nearestMarkets = valid.filter(m => Math.abs(Date.parse(m.close_time) - minCloseMs) < 10 * 60000);
+
   // Find contract whose floor_strike is closest to currentSpot
-  let best = valid[0];
+  let best = nearestMarkets[0];
   let minDiff = Infinity;
 
-  for (const m of valid) {
+  for (const m of nearestMarkets) {
     const strike = m.floor_strike ?? m.cap_strike ?? 0;
     if (strike <= 0) continue;
     const diff = Math.abs(currentSpot - strike);
@@ -171,24 +201,53 @@ export function selectAtmHourlyMarket(markets: any[], currentSpot: number): any 
 
 /**
  * Builds an ordered strike ladder around current spot price for 1-hour contracts.
+ * Strictly filters to the nearest hourly expiry so different hours are never mixed.
+ * Preserves null for empty books to prevent displaying fabricated quotes.
  */
 export function buildStrikeLadder(markets: any[], currentSpot: number): KalshiStrikeLadderEntry[] {
   const now = Date.now();
-  const valid = (markets || [])
-    .filter(m => Date.parse(m.close_time) > now && (m.floor_strike || m.cap_strike))
-    .sort((a, b) => (b.floor_strike ?? 0) - (a.floor_strike ?? 0));
+  const allFuture = (markets || []).filter(
+    m => Date.parse(m.close_time) > now && (m.floor_strike || m.cap_strike)
+  );
 
-  return valid.map(m => {
+  if (allFuture.length === 0) return [];
+
+  // Filter strictly to the nearest hourly event window
+  const minCloseMs = Math.min(...allFuture.map(m => Date.parse(m.close_time)));
+  const nearestHourMarkets = allFuture.filter(
+    m => Math.abs(Date.parse(m.close_time) - minCloseMs) < 10 * 60000
+  );
+
+  const sorted = nearestHourMarkets.sort(
+    (a, b) => (b.floor_strike ?? b.cap_strike ?? 0) - (a.floor_strike ?? a.cap_strike ?? 0)
+  );
+
+  return sorted.map(m => {
     const strike = m.floor_strike ?? m.cap_strike ?? 0;
-    const yesAsk = parseFloat(m.yes_ask_dollars ?? m.yes_ask ?? "0.50") || 0.50;
-    const yesBid = parseFloat(m.yes_bid_dollars ?? m.yes_bid ?? "0.48") || 0.48;
-    const impliedProb = (yesAsk + yesBid) / 2;
-    const takerFee = calculateKalshiTakerFee(yesAsk);
+    const yesAsk = parseQuotePrice(m.yes_ask_dollars, m.yes_ask);
+    const yesBid = parseQuotePrice(m.yes_bid_dollars, m.yes_bid);
+
+    const hasAsk = yesAsk !== null && yesAsk > 0;
+    const hasBid = yesBid !== null && yesBid > 0;
+
+    let impliedProb: number | null = null;
+    if (hasAsk && hasBid) {
+      impliedProb = Math.round(((yesAsk! + yesBid!) / 2) * 100) / 100;
+    } else if (hasAsk) {
+      impliedProb = yesAsk;
+    } else if (hasBid) {
+      impliedProb = yesBid;
+    }
+
+    const takerFee = hasAsk ? calculateKalshiTakerFee(yesAsk!) : null;
     const dist = Math.round((currentSpot - strike) * 100) / 100;
     const distBps = currentSpot > 0 ? Math.round((dist / currentSpot) * 10000 * 10) / 10 : 0;
-    
+
     // EV of a trade with an assumed 50% true win rate: 0.50 * $1.00 - (yesAsk + fee)
-    const netEvAtFiftyPctWin = Math.round((0.50 - (yesAsk + takerFee)) * 10000) / 10000;
+    const netEvAtFiftyPctWin =
+      hasAsk && takerFee !== null
+        ? Math.round((0.50 - (yesAsk! + takerFee)) * 10000) / 10000
+        : null;
 
     return {
       ticker: m.ticker,
@@ -198,9 +257,10 @@ export function buildStrikeLadder(markets: any[], currentSpot: number): KalshiSt
       distanceBps: distBps,
       yesBid,
       yesAsk,
-      impliedProb: Math.round(impliedProb * 100) / 100,
+      impliedProb,
       takerFee,
       netEvAtFiftyPctWin,
+      closeTime: m.close_time,
     };
   });
 }

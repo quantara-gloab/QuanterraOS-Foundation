@@ -931,7 +931,7 @@ export function renderKalshiTerminalHtml(userEmail?: string, userTier: string = 
           </div>
           <div style="display:flex; justify-content:space-between; font-size:0.70rem; color:var(--muted); font-family:var(--font-mono); margin-top:6px;">
             <span id="twap-samples-label">0 / 60 1-sec ticks recorded</span>
-            <span>Kalshi settles on 60-sec arithmetic mean</span>
+            <span>Kalshi settles on 60-sec arithmetic mean of CME CF BRTI during minute 59</span>
           </div>
         </div>
 
@@ -1112,7 +1112,7 @@ export function renderKalshiTerminalHtml(userEmail?: string, userTier: string = 
     <!-- Settlement & Benchmark Disclaimer -->
     <div style="margin-top:24px; padding:16px 20px; border-radius:8px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); font-size:0.75rem; color:var(--muted); line-height:1.6;">
       <strong style="color:var(--text); display:block; margin-bottom:4px; letter-spacing:0.04em;">BENCHMARK &amp; SETTLEMENT DESIGNATION</strong>
-      Kalshi event contracts (<code>KXBTC15M</code> and <code>KXBTCD</code>) settle against the official <strong>CME CF Bitcoin Real-Time Index (BRTI)</strong> 60-second TWAP prior to close. The spot index displayed on this terminal is the <strong>Quanterra BTC Spot Composite</strong> (real-time median of Tier 1 spot venues: Coinbase, Kraken, Bitstamp) serving as an empirical proxy. QuanterraOS does not represent its composite index as the official BRTI or CME benchmark, which requires an institutional feed license and is never synthesized.
+      Kalshi event contracts (<code>KXBTC15M</code> and <code>KXBTCD</code>) settle against the official <strong>CME CF Bitcoin Real-Time Index (BRTI)</strong> 60-second TWAP during the final minute before close (minute 59 for hourly contracts, minute 14 for 15-minute contracts). The spot index displayed on this terminal is the <strong>Quanterra BTC Spot Composite</strong> (real-time median of Tier 1 spot venues: Coinbase, Kraken, Bitstamp) serving as an empirical proxy. QuanterraOS does not represent its composite index as the official BRTI or CME benchmark, which requires an institutional feed license and is never synthesized.
     </div>
   </main>
 
@@ -1388,12 +1388,16 @@ async function fetchHourlyLadder() {
       }
 
       const rowClass = isSelected ? 'ladder-row-selected' : (isAtm ? 'ladder-row-atm' : '');
-      const yesBidCents = Math.round(s.yesBid * 100);
-      const yesAskCents = Math.round(s.yesAsk * 100);
-      const noBidCents = Math.round((1 - s.yesAsk) * 100);
-      const noAskCents = Math.round((1 - s.yesBid) * 100);
-      const feeCents = (s.takerFee * 100).toFixed(1);
-      const probPct = Math.round(s.impliedProb * 100);
+      const hasYesBid = s.yesBid !== null && s.yesBid !== undefined && s.yesBid > 0;
+      const hasYesAsk = s.yesAsk !== null && s.yesAsk !== undefined && s.yesAsk > 0;
+      const yesQuote = (hasYesBid ? Math.round(s.yesBid * 100) + '¢' : '—') + ' / ' + (hasYesAsk ? Math.round(s.yesAsk * 100) + '¢' : '—');
+
+      const noBidCents = hasYesAsk ? Math.round((1 - s.yesAsk) * 100) + '¢' : '—';
+      const noAskCents = hasYesBid ? Math.round((1 - s.yesBid) * 100) + '¢' : '—';
+      const noQuote = noBidCents + ' / ' + noAskCents;
+
+      const feeCents = s.takerFee !== null && s.takerFee !== undefined ? (s.takerFee * 100).toFixed(1) + '¢' : '—';
+      const probPct = s.impliedProb !== null && s.impliedProb !== undefined ? Math.round(s.impliedProb * 100) + '%' : '—';
 
       // Serialized entry for button
       const payload = JSON.stringify({
@@ -1405,15 +1409,20 @@ async function fetchHourlyLadder() {
         distanceFromSpot: s.distanceFromSpot
       }).replace(/"/g, '&quot;');
 
+      const isBookEmpty = !hasYesBid && !hasYesAsk;
+      const buttonHtml = isBookEmpty
+        ? '<button type="button" class="btn-select-strike" style="opacity:0.4; cursor:not-allowed;" disabled>Book Empty</button>'
+        : '<button type="button" class="btn-select-strike" onclick="selectLadderStrike(' + payload + ')">⚡ Trade Strike</button>';
+
       return '<tr class="' + rowClass + '">' +
         '<td><strong style="color:#FFF;">$' + Number(s.strike).toLocaleString() + '</strong></td>' +
         '<td>' + moneynessBadge + '</td>' +
         '<td style="color:' + distColor + '; font-weight:600;">' + distStr + ' <span style="font-size:0.68rem; color:var(--muted); font-weight:400;">(' + (s.distanceBps >= 0 ? '+' : '') + s.distanceBps + ' bps)</span></td>' +
-        '<td style="color:var(--green); font-weight:600;">' + yesBidCents + '¢ / ' + yesAskCents + '¢</td>' +
-        '<td style="color:var(--rose); font-weight:600;">' + noBidCents + '¢ / ' + noAskCents + '¢</td>' +
-        '<td>' + probPct + '%</td>' +
-        '<td style="color:var(--accent);">' + feeCents + '¢</td>' +
-        '<td><button type="button" class="btn-select-strike" onclick="selectLadderStrike(' + payload + ')">⚡ Trade Strike</button></td>' +
+        '<td style="color:var(--green); font-weight:600;">' + yesQuote + '</td>' +
+        '<td style="color:var(--rose); font-weight:600;">' + noQuote + '</td>' +
+        '<td>' + probPct + '</td>' +
+        '<td style="color:var(--accent);">' + feeCents + '</td>' +
+        '<td>' + buttonHtml + '</td>' +
       '</tr>';
     }).join('');
   } catch (err) {
@@ -1648,7 +1657,9 @@ async function submitBid() {
       throw new Error(data.error || data.message || 'Bid rejected');
     }
 
-    showToast('BID CONFIRMED & FILLED', data.message || ('Filled ' + count + 'x ' + currentSide.toUpperCase() + ' @ $' + price.toFixed(2)));
+    const statusText = data.status || (currentMode === 'live' ? 'RESTING' : 'FILLED');
+    const toastTitle = currentMode === 'live' ? ('ORDER BROADCASTED (' + statusText + ')') : 'PAPER BID RECORDED';
+    showToast(toastTitle, data.message || ('Order ' + count + 'x ' + currentSide.toUpperCase() + ' @ $' + price.toFixed(2) + ' · Status: ' + statusText));
     loadBalances();
     loadUserBids();
   } catch (err) {

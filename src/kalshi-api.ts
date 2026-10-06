@@ -64,7 +64,7 @@ export interface BidResult {
   count: number;
   totalCost: number;
   mode: "sandbox" | "live";
-  status: "FILLED" | "PENDING" | "REJECTED";
+  status: "FILLED" | "RESTING" | "PENDING" | "ACCEPTED" | "REJECTED" | "CANCELLED";
   message: string;
   timestamp: string;
   walletBalanceRemaining?: number;
@@ -156,39 +156,26 @@ export async function getActiveKalshi1hMarket(spotPrice?: number): Promise<Kalsh
  * Fetches the full strike ladder for Kalshi 1-hour KXBTCD contracts.
  */
 export async function getKalshi1hStrikeLadder(spotPrice: number = 85000): Promise<KalshiStrikeLadderEntry[]> {
-  try {
-    const url = "https://external-api.kalshi.com/trade-api/v2/markets?series_ticker=KXBTCD&status=open&limit=100";
-    const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
-    if (res.ok) {
-      const data = await res.json();
-      const ladder = buildStrikeLadder(data.markets ?? [], spotPrice);
-      if (ladder.length > 0) return ladder;
+  const hosts = [
+    "https://api.elections.kalshi.com",
+    "https://external-api.kalshi.com"
+  ];
+  for (const host of hosts) {
+    try {
+      const url = `${host}/trade-api/v2/markets?series_ticker=KXBTCD&status=open&limit=100`;
+      const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+      if (res.ok) {
+        const data = await res.json();
+        const ladder = buildStrikeLadder(data.markets ?? [], spotPrice);
+        if (ladder.length > 0) return ladder;
+      }
+    } catch (err) {
+      console.warn(`Failed to fetch 1h strike ladder from ${host}:`, err);
     }
-  } catch (err) {
-    console.warn("Failed to fetch live Kalshi 1h strike ladder, falling back to simulated ladder:", err);
   }
 
-  // Fallback: Generate calibrated strike ladder around spotPrice at $500 intervals
-  const baseStrike = Math.round(spotPrice / 500) * 500;
-  const offsets = [-1500, -1000, -500, 0, 500, 1000, 1500];
-  const now = Date.now();
-  const futureClose = new Date(now + 45 * 60000).toISOString();
-  const simMarkets = offsets.map((off) => {
-    const s = baseStrike + off;
-    const diff = spotPrice - s;
-    const p = Math.max(0.05, Math.min(0.95, 0.50 + diff / 2000));
-    const yesAsk = Math.min(0.99, Math.round((p + 0.01) * 100) / 100);
-    const yesBid = Math.max(0.01, Math.round((p - 0.01) * 100) / 100);
-    return {
-      ticker: `KXBTCD-SIM-T${s}`,
-      floor_strike: s,
-      subtitle: `$${s.toLocaleString()} or above`,
-      yes_ask_dollars: yesAsk.toFixed(4),
-      yes_bid_dollars: yesBid.toFixed(4),
-      close_time: futureClose,
-    };
-  });
-  return buildStrikeLadder(simMarkets, spotPrice);
+  // Return empty array if live markets unavailable — NEVER synthesize fake prices
+  return [];
 }
 
 function parseMarketsResponse(data: any, timeframe: KalshiTimeframe = "15m", spotPrice?: number): KalshiMarket | null {
@@ -277,6 +264,19 @@ export async function placeKalshi15mBid(input: PlaceBidInput): Promise<BidResult
   const now = new Date().toISOString();
 
   if (input.mode === "live") {
+    // 1. Enforce KALSHI_LIVE environment guard (Rule B5)
+    if (process.env.KALSHI_LIVE !== "true") {
+      throw new Error(
+        "Rule B5 Violation: Live trading blocked ($0.00 capital exposure). KALSHI_LIVE=true is not set in environment."
+      );
+    }
+
+    // 2. Enforce max contract count
+    const MAX_LIVE_CONTRACTS = 10;
+    if (count > MAX_LIVE_CONTRACTS) {
+      throw new Error(`Risk limit exceeded: Live orders are capped at ${MAX_LIVE_CONTRACTS} contracts per order.`);
+    }
+
     const creds = getKalshiCredentials();
     if (!creds) {
       throw new Error("Live Kalshi credentials not configured or private key missing.");
@@ -308,6 +308,10 @@ export async function placeKalshi15mBid(input: PlaceBidInput): Promise<BidResult
       throw new Error(`Kalshi API rejected order: ${errMsg}`);
     }
 
+    const kalshiStatus = (data.order?.status || "resting").toUpperCase();
+    const orderStatus: "FILLED" | "RESTING" | "ACCEPTED" | "CANCELLED" =
+      kalshiStatus === "EXECUTED" ? "FILLED" : (kalshiStatus as any) || "RESTING";
+
     return {
       success: true,
       orderId: data.order?.order_id || orderId,
@@ -317,8 +321,8 @@ export async function placeKalshi15mBid(input: PlaceBidInput): Promise<BidResult
       count,
       totalCost,
       mode: "live",
-      status: "FILLED",
-      message: `Live Kalshi order broadcasted successfully! Order ID: ${data.order?.order_id || orderId}`,
+      status: orderStatus,
+      message: `Live Kalshi order placed. Status: ${orderStatus}. Order ID: ${data.order?.order_id || orderId}`,
       timestamp: now,
     };
   }

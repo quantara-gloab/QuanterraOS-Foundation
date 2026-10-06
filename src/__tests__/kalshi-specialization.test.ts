@@ -7,7 +7,9 @@ import {
   normalizeKalshiContract,
   selectAtmHourlyMarket,
   buildStrikeLadder,
+  parseQuotePrice,
 } from "../kalshi-contracts.ts";
+import { placeKalshi15mBid } from "../kalshi-api.ts";
 import { renderKalshiTerminalHtml } from "../kalshi-terminal-page.ts";
 
 describe("Kalshi Specialization Engine: 15-Minute & 1-Hour Above/Below", () => {
@@ -147,5 +149,83 @@ describe("Kalshi Specialization Engine: 15-Minute & 1-Hour Above/Below", () => {
     assert.ok(html1h.includes("1H HOURLY MULTI-STRIKE TELEMETRY"), "telemetry panel must reflect 1h horizon");
     assert.ok(html1h.includes("FINAL 60s HOURLY SETTLEMENT TWAP WINDOW (MINUTE 59)"), "TWAP window must designate minute 59");
     assert.ok(html1h.includes("KALSHI 1H HOURLY DESK"), "brand sub-badge must reflect 1h desk");
+  });
+
+  it("safely parses quote prices without fabricating fake prices or misinterpreting cents as dollars", () => {
+    // Dollar string
+    assert.strictEqual(parseQuotePrice("0.4800", undefined), 0.48);
+    assert.strictEqual(parseQuotePrice("0.52", "52"), 0.52);
+
+    // Cents integer correctly normalized to dollars (45 cents -> $0.45, NOT $45)
+    assert.strictEqual(parseQuotePrice(undefined, 45), 0.45);
+    assert.strictEqual(parseQuotePrice(undefined, 99), 0.99);
+    assert.strictEqual(parseQuotePrice(undefined, 1), 0.01);
+
+    // Missing or zero quotes return null (empty book), NEVER fabricated 0.50 or 0.48
+    assert.strictEqual(parseQuotePrice(undefined, undefined), null);
+    assert.strictEqual(parseQuotePrice("", 0), null);
+    assert.strictEqual(parseQuotePrice(null, null), null);
+  });
+
+  it("filters strike ladder to the nearest hourly event window so different hours are not mixed together", () => {
+    const now = Date.now();
+    const nearestHourClose = new Date(now + 20 * 60000).toISOString();
+    const nextHourClose = new Date(now + 80 * 60000).toISOString(); // 1 hour later
+
+    const mixedMarkets = [
+      { ticker: "KXBTCD-NEAR-1", floor_strike: 85000, yes_ask_dollars: "0.60", yes_bid_dollars: "0.58", close_time: nearestHourClose },
+      { ticker: "KXBTCD-NEAR-2", floor_strike: 85500, yes_ask_dollars: "0.40", yes_bid_dollars: "0.38", close_time: nearestHourClose },
+      // Later hour markets:
+      { ticker: "KXBTCD-FAR-1", floor_strike: 86000, yes_ask_dollars: "0.50", yes_bid_dollars: "0.48", close_time: nextHourClose },
+      { ticker: "KXBTCD-FAR-2", floor_strike: 86500, yes_ask_dollars: "0.30", yes_bid_dollars: "0.28", close_time: nextHourClose },
+    ];
+
+    const ladder = buildStrikeLadder(mixedMarkets, 85200);
+    // Ladder must only contain the 2 nearest markets
+    assert.strictEqual(ladder.length, 2);
+    assert.ok(ladder.every(entry => entry.ticker.startsWith("KXBTCD-NEAR")));
+  });
+
+  it("preserves null for empty orderbook quotes instead of fabricating 0.50 / 0.48", () => {
+    const now = Date.now();
+    const futureClose = new Date(now + 30 * 60000).toISOString();
+
+    const emptyBookMarkets = [
+      { ticker: "KXBTCD-EMPTY", floor_strike: 85000, close_time: futureClose }, // no quotes at all
+      { ticker: "KXBTCD-BID-ONLY", floor_strike: 85500, yes_bid: 40, close_time: futureClose }, // bid only (cents)
+    ];
+
+    const ladder = buildStrikeLadder(emptyBookMarkets, 85200);
+    assert.strictEqual(ladder.length, 2);
+
+    const emptyEntry = ladder.find(e => e.ticker === "KXBTCD-EMPTY");
+    assert.ok(emptyEntry);
+    assert.strictEqual(emptyEntry.yesBid, null, "empty book must have null bid");
+    assert.strictEqual(emptyEntry.yesAsk, null, "empty book must have null ask");
+    assert.strictEqual(emptyEntry.takerFee, null, "empty book must have null taker fee");
+    assert.strictEqual(emptyEntry.netEvAtFiftyPctWin, null, "empty book must have null EV");
+
+    const bidOnlyEntry = ladder.find(e => e.ticker === "KXBTCD-BID-ONLY");
+    assert.ok(bidOnlyEntry);
+    assert.strictEqual(bidOnlyEntry.yesBid, 0.40, "40 cents must parse to 0.40");
+    assert.strictEqual(bidOnlyEntry.yesAsk, null, "missing ask must remain null");
+  });
+
+  it("strictly blocks live Kalshi order placement under Rule B5 when KALSHI_LIVE is not true", async () => {
+    delete process.env.KALSHI_LIVE;
+
+    await assert.rejects(
+      async () => {
+        await placeKalshi15mBid({
+          userId: "test-user",
+          ticker: "KXBTC15M-TEST",
+          side: "yes",
+          price: 0.50,
+          count: 1,
+          mode: "live",
+        });
+      },
+      /Rule B5/
+    );
   });
 });
