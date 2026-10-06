@@ -8,16 +8,14 @@ QuanterraOS is evolving from an academic "calibration engine" into the **indepen
 ## 1. The Core Strategic Pivot
 
 ### The Flaw in Previous Positioning
-- "Most transparent calibration engine" is crowded and increasingly free (Brier.fyi, Octagon, Polyguana).
+- "Most transparent calibration engine" is crowded and served by free platforms ([Brier.fyi](https://brier.fyi), [Polyguana](https://polyguana.net), [Octagon](https://octagonai.co)).
 - Academic findings ("we tested models and found no edge against Kalshi mid-price") validated Kalshi's pricing power but failed to offer active traders a compelling commercial reason to pay $199/month.
 - Kalshi published its own 2,243,741-market calibration study in August 2026. Competing on sheer historical market count is a losing game.
 
 ### The Uncontested Niche We Own
-- **Kalshi's August 2026 study explicitly excluded short-duration daily, hourly, and 15-minute markets.**
-- Short-duration crypto prediction markets have exploded:
-  - **$4.1B** was traded in Kalshi crypto markets between Aug 28 and Sep 26, 2026 alone (+20% MoM).
-  - Polymarket 5-minute and 15-minute BTC contracts frequently exceed **$60M in 24-hour volume**.
-- **QuanterraOS's Defensible Wedge:** We are the **sole independent truth and measurement layer for short-duration crypto contracts (Kalshi 15m BTC/ETH/SOL, Polymarket 5m/15m BTC)**, providing real-time settlement basis tracking against the CME CF Bitcoin Real-Time Index (BRTI), transaction friction analytics, and mathematical verification.
+- **Kalshi's 2026 Operator Study ("Calibration in Prediction Markets: Theory and Evidence" by Kagan & Baiocchi)** analyzed 2,243,741 resolved contracts, but focused on longer-dated horizons and excluded short-duration intraday 15-minute crypto markets.
+- High-velocity crypto contracts (Kalshi 15m KXBTC/KXETH/KXSOL and Polymarket 5m/15m BTC) represent the highest trade frequency segment.
+- **QuanterraOS's Defensible Wedge:** We provide the **independent measurement layer for short-duration crypto contracts (Kalshi 15m BTC/ETH/SOL, Polymarket 5m/15m BTC)**, delivering live multi-venue spot dispersion (Coinbase, Kraken, Bitstamp), transaction fee drag modeling ($0.07 × P × (1-P)), and empirical Brier calibration across 1,316 settled windows.
 
 ---
 

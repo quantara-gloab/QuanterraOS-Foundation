@@ -34,6 +34,7 @@ import { getOrComputeCalibrationReport, renderCalibrationHtml } from "./calibrat
 import { renderResponsePostPage } from "./response-post-page.ts";
 import { getLatestCompositeIndex, getCompositeIndexHistory } from "./composite-index.ts";
 import { renderIndexPageHtml, renderSpreadPageHtml } from "./index-page.ts";
+import { getLiveQuotes } from "./live-quotes.ts";
 import { renderMethodologyPageHtml } from "./methodology-page.ts";
 import { renderResearchPageHtml } from "./research-page.ts";
 import { renderStatusPageHtml, getSystemStatusData, getGlobalEdgeNodes } from "./status-page.ts";
@@ -2174,33 +2175,10 @@ app.get(["/api/mcp", "/api/mcp/manifest"], (_req, res) => {
   res.json(MCP_SERVER_MANIFEST);
 });
 
-app.get("/api/quotes", (req, res) => {
+app.get("/api/quotes", async (req, res) => {
   const asset = String(req.query.asset || "BTC").toUpperCase();
-  const latestComposite = getLatestCompositeIndex(asset);
-  const spotPrice = latestComposite.compositePrice || 84250.00;
-  const brtiBasisBps = 1.4;
-  const brtiPrice = Math.round((spotPrice * (1 + brtiBasisBps / 10000)) * 100) / 100;
-  const coinbasePrice = Math.round((spotPrice - 1.25) * 100) / 100;
-  const krakenPrice = Math.round((spotPrice + 0.85) * 100) / 100;
-  const bitstampPrice = Math.round((spotPrice - 0.40) * 100) / 100;
-  
-  res.json({
-    asset,
-    timestamp: Date.now(),
-    composite: spotPrice,
-    brti: {
-      value: brtiPrice,
-      basisBps: brtiBasisBps,
-      source: "CME CF BRTI Reference",
-      target: "Kalshi KXBTC15M Settlement",
-    },
-    venues: [
-      { venue: "Coinbase", price: coinbasePrice, spread: -1.25, bps: -0.15, status: "NORMAL" },
-      { venue: "Kraken", price: krakenPrice, spread: +0.85, bps: +0.10, status: "NORMAL" },
-      { venue: "Bitstamp", price: bitstampPrice, spread: -0.40, bps: -0.05, status: "NORMAL" },
-      { venue: "CME CF BRTI", price: brtiPrice, spread: +(brtiPrice - spotPrice).toFixed(2), bps: brtiBasisBps, status: "MONITORED" },
-    ],
-  });
+  const quotes = await getLiveQuotes(asset);
+  res.json(quotes);
 });
 
 app.get(["/dashboard", "/council"], (_req, res) => {
@@ -2249,8 +2227,9 @@ app.get("/index", (_req, res) => {
   res.type("html").send(renderIndexPageHtml());
 });
 
-app.get("/spread", (_req, res) => {
-  res.type("html").send(renderSpreadPageHtml());
+app.get("/spread", async (_req, res) => {
+  const quotes = await getLiveQuotes("BTC");
+  res.type("html").send(renderSpreadPageHtml(quotes));
 });
 
 app.get(["/methodology", "/methodology/index"], (_req, res) => {

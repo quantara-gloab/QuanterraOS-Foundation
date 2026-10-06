@@ -717,7 +717,7 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
       <div class="debate-tag">// Empirical Frontier · Short-Duration Territory</div>
       <h2 class="debate-title">Independent Verification: The Short-Duration Segment Kalshi Excluded</h2>
       <p class="debate-text">
-        In August 2026, Kalshi published a comprehensive calibration study covering 2,243,741 event contracts across eleven categories. Notably, Kalshi's cleanest analysis <em>explicitly excluded short-dated daily, hourly, and 15-minute crypto markets</em> — the single fastest-growing prediction volume segment in the world ($4.1B traded in Kalshi crypto in 30 days; $60M+ single-day volume on Polymarket 5m/15m). QuanterraOS owns this exact territory: independent, minute-by-minute calibration auditing for short-duration contracts against the CME CF Bitcoin Real-Time Index (BRTI).
+        In 2026, Kalshi published an operator calibration study (&ldquo;Calibration in Prediction Markets: Theory and Evidence&rdquo; by Nicole Kagan and Rubens Baiocchi) evaluating 2,243,741 event contracts across eleven categories. That analysis focused on multi-week and multi-month contracts and excluded intraday 15-minute crypto markets. QuanterraOS provides independent, third-party verification specifically focused on 15-minute contracts (KXBTC15M) settled against the CME CF Bitcoin Real-Time Index (BRTI).
       </p>
       <div style="display:flex; gap:16px; flex-wrap:wrap; margin-top:14px;">
         <a href="/research/kalshi-calibration-response" class="debate-link">

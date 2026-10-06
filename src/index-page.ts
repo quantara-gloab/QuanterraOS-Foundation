@@ -1,3 +1,4 @@
+import type { LiveQuotesReport } from "./live-quotes.ts";
 /**
  * Quanterra BTC Composite Index Page & Spread Monitor (/index, /spread)
  * 
@@ -569,16 +570,19 @@ ${ASSISTANT_WIDGET_HTML}
 </html>`;
 }
 
-export function renderSpreadPageHtml(): string {
-  const result = getLatestCompositeIndex("BTC");
-  const spotNum = result.compositePrice ?? 84250.00;
-  const priceDisplay = result.compositePrice !== null 
-    ? `$${result.compositePrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` 
-    : "$84,250.00";
-  const brtiPrice = Math.round((spotNum * 1.00014) * 100) / 100;
-  const coinbasePrice = Math.round((spotNum - 1.25) * 100) / 100;
-  const krakenPrice = Math.round((spotNum + 0.85) * 100) / 100;
-  const bitstampPrice = Math.round((spotNum - 0.40) * 100) / 100;
+export function renderSpreadPageHtml(initialQuotes?: LiveQuotesReport): string {
+  const cbVenue = initialQuotes?.venues.find(v => v.venue.includes("Coinbase"));
+  const krVenue = initialQuotes?.venues.find(v => v.venue.includes("Kraken"));
+  const bsVenue = initialQuotes?.venues.find(v => v.venue.includes("Bitstamp"));
+
+  const spotNum = initialQuotes?.compositePrice ?? 85000.00;
+  const priceDisplay = initialQuotes?.compositePrice !== null && initialQuotes?.compositePrice !== undefined
+    ? `$${initialQuotes.compositePrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+    : "CONNECTING...";
+
+  const coinbasePrice = cbVenue?.price ?? null;
+  const krakenPrice = krVenue?.price ?? null;
+  const bitstampPrice = bsVenue?.price ?? null;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -952,7 +956,7 @@ export function renderSpreadPageHtml(): string {
         <tbody>
           <tr>
             <td class="mono" style="font-weight:600; color:var(--accent);">Quanterra Composite</td>
-            <td>Volume-Weighted Median (v0.1)</td>
+            <td>Constituent Spot Median</td>
             <td class="mono" style="font-weight:600;" id="comp-price">${priceDisplay}</td>
             <td class="mono" id="comp-spread">$0.00</td>
             <td class="mono" id="comp-bps">0.0 bps</td>
@@ -962,33 +966,33 @@ export function renderSpreadPageHtml(): string {
             <td class="mono" style="font-weight:500;">Coinbase (BTC-USD)</td>
             <td>Constituent Spot</td>
             <td class="mono" id="cb-price">${coinbasePrice !== null ? '$' + coinbasePrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—'}</td>
-            <td class="mono" id="cb-spread">-$1.25</td>
-            <td class="mono" id="cb-bps">-0.1 bps</td>
-            <td><span class="badge badge-normal" id="cb-badge">NORMAL</span></td>
+            <td class="mono" id="cb-spread">${cbVenue?.spread !== null && cbVenue?.spread !== undefined ? (cbVenue.spread >= 0 ? '+$' : '-$') + Math.abs(cbVenue.spread).toFixed(2) : '—'}</td>
+            <td class="mono" id="cb-bps">${cbVenue?.spreadBps !== null && cbVenue?.spreadBps !== undefined ? (cbVenue.spreadBps >= 0 ? '+' : '') + cbVenue.spreadBps.toFixed(1) + ' bps' : '—'}</td>
+            <td><span class="badge badge-normal" id="cb-badge">${cbVenue?.status ?? 'ONLINE'}</span></td>
           </tr>
           <tr>
             <td class="mono" style="font-weight:500;">Kraken (XBT/USD)</td>
             <td>Constituent Spot</td>
             <td class="mono" id="kr-price">${krakenPrice !== null ? '$' + krakenPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—'}</td>
-            <td class="mono" id="kr-spread">+$0.85</td>
-            <td class="mono" id="kr-bps">+0.1 bps</td>
-            <td><span class="badge badge-normal" id="kr-badge">NORMAL</span></td>
+            <td class="mono" id="kr-spread">${krVenue?.spread !== null && krVenue?.spread !== undefined ? (krVenue.spread >= 0 ? '+$' : '-$') + Math.abs(krVenue.spread).toFixed(2) : '—'}</td>
+            <td class="mono" id="kr-bps">${krVenue?.spreadBps !== null && krVenue?.spreadBps !== undefined ? (krVenue.spreadBps >= 0 ? '+' : '') + krVenue.spreadBps.toFixed(1) + ' bps' : '—'}</td>
+            <td><span class="badge badge-normal" id="kr-badge">${krVenue?.status ?? 'ONLINE'}</span></td>
           </tr>
           <tr>
             <td class="mono" style="font-weight:500;">Bitstamp (BTC/USD)</td>
             <td>Constituent Spot</td>
             <td class="mono" id="bs-price">${bitstampPrice !== null ? '$' + bitstampPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—'}</td>
-            <td class="mono" id="bs-spread">-$0.40</td>
-            <td class="mono" id="bs-bps">-0.0 bps</td>
-            <td><span class="badge badge-normal" id="bs-badge">NORMAL</span></td>
+            <td class="mono" id="bs-spread">${bsVenue?.spread !== null && bsVenue?.spread !== undefined ? (bsVenue.spread >= 0 ? '+$' : '-$') + Math.abs(bsVenue.spread).toFixed(2) : '—'}</td>
+            <td class="mono" id="bs-bps">${bsVenue?.spreadBps !== null && bsVenue?.spreadBps !== undefined ? (bsVenue.spreadBps >= 0 ? '+' : '') + bsVenue.spreadBps.toFixed(1) + ' bps' : '—'}</td>
+            <td><span class="badge badge-normal" id="bs-badge">${bsVenue?.status ?? 'ONLINE'}</span></td>
           </tr>
           <tr>
             <td class="mono" style="font-weight:500;">CME CF BRTI Reference</td>
-            <td>Settlement Target (Kalshi)</td>
-            <td class="mono" id="brti-price">${brtiPrice !== null ? '$' + brtiPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—'}</td>
-            <td class="mono" id="brti-spread">+${(brtiPrice - spotNum).toFixed(2)}</td>
-            <td class="mono" id="brti-bps">+1.4 bps</td>
-            <td><span class="badge badge-monitored" id="brti-badge">MONITORED</span></td>
+            <td>Kalshi Settlement Target</td>
+            <td class="mono" id="brti-price" style="color:var(--muted);">—</td>
+            <td class="mono" id="brti-spread" style="color:var(--muted);">—</td>
+            <td class="mono" id="brti-bps" style="color:var(--muted);">—</td>
+            <td><span class="badge badge-monitored" id="brti-badge">REQUIRES CME LICENSE</span></td>
           </tr>
         </tbody>
       </table>
@@ -996,7 +1000,7 @@ export function renderSpreadPageHtml(): string {
 
     <footer>
       <p>
-        <strong>Notice:</strong> Spread and divergence measurements reflect liquidity, fee friction, and latency between independent order books. QuanterraOS does not route orders or facilitate execution.
+        <strong>Live Data Verification:</strong> Spot prices for Coinbase, Kraken, and Bitstamp are fetched directly in real-time from their public exchange REST APIs. The Quanterra Composite Benchmark represents the calculated median of active spot venues. The CME CF Bitcoin Real-Time Index (BRTI) is the proprietary settlement benchmark published by CF Benchmarks Ltd / CME Group and requires an institutional feed license. QuanterraOS does not synthesize or fabricate price quotes.
       </p>
       <p>
         Kalshi, CME Group, CF Benchmarks, Coinbase, Kraken, Bitstamp, and Gemini are trademarks of their respective owners. QuanterraOS is an independent measurement system. Rule B5 locked: zero live capital deployed.
@@ -1009,50 +1013,39 @@ export function renderSpreadPageHtml(): string {
         var res = await fetch('/api/quotes?asset=BTC');
         if (!res.ok) return;
         var data = await res.json();
-        if (!data || !data.venues) return;
+        if (!data || !Array.isArray(data.venues)) return;
 
         var fmt = function(num) { return '$' + Number(num).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
         var fmtDiff = function(num) { return (num >= 0 ? '+$' : '-$') + Math.abs(num).toFixed(2); };
         var fmtBps = function(num) { return (num >= 0 ? '+' : '') + Number(num).toFixed(1) + ' bps'; };
 
-        if (data.compositePrice) {
+        if (data.compositePrice !== null && data.compositePrice !== undefined) {
           var compEl = document.getElementById('comp-price');
           if (compEl) compEl.textContent = fmt(data.compositePrice);
         }
 
-        var v = data.venues;
-        if (v.coinbase) {
-          var pEl = document.getElementById('cb-price');
-          var sEl = document.getElementById('cb-spread');
-          var bEl = document.getElementById('cb-bps');
-          if (pEl) pEl.textContent = fmt(v.coinbase.price);
-          if (sEl) sEl.textContent = fmtDiff(v.coinbase.spread);
-          if (bEl) bEl.textContent = fmtBps(v.coinbase.spreadBps);
-        }
-        if (v.kraken) {
-          var pEl = document.getElementById('kr-price');
-          var sEl = document.getElementById('kr-spread');
-          var bEl = document.getElementById('kr-bps');
-          if (pEl) pEl.textContent = fmt(v.kraken.price);
-          if (sEl) sEl.textContent = fmtDiff(v.kraken.spread);
-          if (bEl) bEl.textContent = fmtBps(v.kraken.spreadBps);
-        }
-        if (v.bitstamp) {
-          var pEl = document.getElementById('bs-price');
-          var sEl = document.getElementById('bs-spread');
-          var bEl = document.getElementById('bs-bps');
-          if (pEl) pEl.textContent = fmt(v.bitstamp.price);
-          if (sEl) sEl.textContent = fmtDiff(v.bitstamp.spread);
-          if (bEl) bEl.textContent = fmtBps(v.bitstamp.spreadBps);
-        }
-        if (v.brti) {
-          var pEl = document.getElementById('brti-price');
-          var sEl = document.getElementById('brti-spread');
-          var bEl = document.getElementById('brti-bps');
-          if (pEl) pEl.textContent = fmt(v.brti.price);
-          if (sEl) sEl.textContent = fmtDiff(v.brti.spread);
-          if (bEl) bEl.textContent = fmtBps(v.brti.spreadBps);
-        }
+        var updateVenue = function(prefix, matchText) {
+          var item = data.venues.find(function(v) { return v.venue && v.venue.indexOf(matchText) !== -1; });
+          if (!item) return;
+
+          var pEl = document.getElementById(prefix + '-price');
+          var sEl = document.getElementById(prefix + '-spread');
+          var bEl = document.getElementById(prefix + '-bps');
+          var badgeEl = document.getElementById(prefix + '-badge');
+
+          if (pEl) pEl.textContent = item.price !== null ? fmt(item.price) : '—';
+          if (sEl) sEl.textContent = item.spread !== null ? fmtDiff(item.spread) : '—';
+          if (bEl) bEl.textContent = item.spreadBps !== null ? fmtBps(item.spreadBps) : '—';
+          if (badgeEl && item.status) {
+            badgeEl.textContent = item.status;
+            badgeEl.className = 'badge ' + (item.status === 'NORMAL' ? 'badge-normal' : item.status === 'BENCHMARK' ? 'badge-benchmark' : 'badge-monitored');
+          }
+        };
+
+        updateVenue('cb', 'Coinbase');
+        updateVenue('kr', 'Kraken');
+        updateVenue('bs', 'Bitstamp');
+        updateVenue('brti', 'BRTI');
       } catch (_e) {}
     }
     setInterval(updateSpreadQuotes, 3000);

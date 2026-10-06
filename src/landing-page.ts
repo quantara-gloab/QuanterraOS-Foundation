@@ -838,7 +838,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       <div class="ticker-item">MARKET-MID BRIER: <strong>${brierScore} (NOMINAL)</strong></div>
       <div class="ticker-item"><span class="ticker-tag-warn">RULE B5 LOCKED</span> CAPITAL DEPLOYED: <strong>$0.00</strong></div>
     </div>
-    <div style="font-family: var(--font-mono); color: var(--muted);">SOC-2 / REPRODUCIBILITY VERIFIED</div>
+    <div style="font-family: var(--font-mono); color: var(--muted);">CRYPTOGRAPHIC REPRODUCIBILITY VERIFIED</div>
   </div>
 
   <!-- Navigation -->
@@ -879,7 +879,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
           Independent pricing, settlement &amp; friction intelligence.
         </h1>
         <p class="hero-subhead">
-          While broad calibration is commoditized, short-duration crypto prediction markets ($4.1B 30-day volume on Kalshi KXBTC15M &amp; Polymarket 5m/15m) require sub-second CME CF BRTI basis tracking, non-linear taker fee modeling, and sovereign AI agent governance.
+          While broad calibration is commoditized, high-velocity short-duration crypto prediction markets (Kalshi KXBTC15M and Polymarket 5m/15m) require sub-second CME CF BRTI basis tracking, non-linear taker fee modeling, and sovereign AI agent governance.
         </p>
         <div class="hero-actions">
           <a href="/calculator" class="btn-primary" style="background:linear-gradient(180deg, #10B981 0%, #059669 100%);border-color:#34D399;box-shadow:0 0 20px rgba(16,185,129,0.35);">True Cost &amp; Net EV Calc &rarr;</a>
@@ -1336,7 +1336,7 @@ ${miniCircles}
       </div>
       <div class="footer-disclaimer">
         <p style="margin-bottom: 8px;">
-          <strong>Regulatory &amp; Non-Affiliation Notice (Rule B10):</strong> Kalshi, CME Group, CF Benchmarks, Coinbase, Kraken, Bitstamp, Gemini, and Polymarket are trademarks of their respective owners. QuanterraOS is an independent measurement and statistical verification system operated by Quantara Global LLC and is not affiliated with, endorsed by, or sponsored by any exchange, index provider, or market operator. Architecture aligned with SOC 2 Type II trust principles and ISO 42001 AI Management Standards.
+          <strong>Regulatory &amp; Non-Affiliation Notice (Rule B10):</strong> Kalshi, CME Group, CF Benchmarks, Coinbase, Kraken, Bitstamp, Gemini, and Polymarket are trademarks of their respective owners. QuanterraOS is an independent measurement and statistical verification system operated by Quantara Global LLC and is not affiliated with, endorsed by, or sponsored by any exchange, index provider, or market operator.
         </p>
         <p>
           <strong>Not Investment Advice (Rule B5):</strong> QuanterraOS does not provide investment, financial, or trading advice, and does not route or execute live orders. In accordance with internal safety Rule B5, zero live capital is deployed ($0.00 exposure). Simulated and historical calibration results have inherent limitations under CFTC Rule 4.41. Past performance does not guarantee future results. <a href="/legal" style="color:var(--accent); text-decoration:underline;">Read full Legal Notices, Terms &amp; Regulatory Disclaimers &rarr;</a>
