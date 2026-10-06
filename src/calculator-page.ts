@@ -268,7 +268,8 @@ export function renderCalculatorPageHtml(): string {
     <div class="nav-left">
       <a href="/" class="nav-brand"><span class="brand-dot"></span> quanterraos</a>
       <div class="nav-links">
-        <a href="/kalshi">kalshi 15m</a>
+        <a href="/kalshi/15m">kalshi 15m</a>
+        <a href="/kalshi/1h">kalshi 1h</a>
         <a href="/calculator" class="active" style="color:var(--accent);font-weight:600;">ev calculator</a>
         <a href="/calibration">calibration</a>
         <a href="/index">composite index</a>
@@ -278,7 +279,7 @@ export function renderCalculatorPageHtml(): string {
       </div>
     </div>
     <div>
-      <a href="/kalshi" class="nav-cta">LIVE 15M DESK &rarr;</a>
+      <a href="/kalshi" class="nav-cta">LIVE 15M &amp; 1H DESK &rarr;</a>
     </div>
   </nav>
 

@@ -8,6 +8,7 @@ import {
   selectAtmHourlyMarket,
   buildStrikeLadder,
 } from "../kalshi-contracts.ts";
+import { renderKalshiTerminalHtml } from "../kalshi-terminal-page.ts";
 
 describe("Kalshi Specialization Engine: 15-Minute & 1-Hour Above/Below", () => {
   it("defines formal contract specifications for both KXBTC15M and KXBTCD", () => {
@@ -122,5 +123,29 @@ describe("Kalshi Specialization Engine: 15-Minute & 1-Hour Above/Below", () => {
     assert.ok(mid);
     assert.strictEqual(mid.distanceFromSpot, 50); // 85550 - 85500
     assert.strictEqual(mid.impliedProb, 0.51);
+  });
+
+  it("renders 15-minute desk by default with dual-desk switcher and 15m active state", () => {
+    const html15m = renderKalshiTerminalHtml("trader@test.com", "pro", "15m");
+    assert.ok(html15m.includes("15-Minute Above/Below Desk"), "must contain 15-Minute Desk card");
+    assert.ok(html15m.includes("1-Hour Multi-Strike Ladder Desk"), "must contain 1-Hour Desk card");
+    assert.ok(html15m.includes("desk-card active") && html15m.includes("id=\"desk-card-15m\" class=\"desk-card active\""), "15m card must be active");
+    assert.ok(html15m.includes("KXBTC15M"), "must reference KXBTC15M");
+    assert.ok(html15m.includes("/kalshi/1h"), "must link to 1h desk");
+    assert.ok(html15m.includes("/kalshi/15m"), "must link to 15m desk");
+    assert.ok(html15m.includes("PLACE 15M BID"), "ticket button must target 15m");
+    assert.ok(html15m.includes("BENCHMARK &amp; SETTLEMENT DESIGNATION"), "must preserve BRTI benchmark designation");
+  });
+
+  it("renders dedicated 1-hour desk with multi-strike ladder matrix and 1h active state", () => {
+    const html1h = renderKalshiTerminalHtml("trader@test.com", "pro", "1h");
+    assert.ok(html1h.includes("id=\"desk-card-1h\" class=\"desk-card active\""), "1h card must be active");
+    assert.ok(html1h.includes("KXBTCD"), "must reference KXBTCD");
+    assert.ok(html1h.includes("KXBTCD 1-HOUR MULTI-STRIKE LADDER"), "must render 1-Hour Strike Ladder header");
+    assert.ok(html1h.includes("ladder-table"), "must include ladder table markup");
+    assert.ok(html1h.includes("PLACE 1H BID"), "ticket button must target 1h");
+    assert.ok(html1h.includes("1H HOURLY MULTI-STRIKE TELEMETRY"), "telemetry panel must reflect 1h horizon");
+    assert.ok(html1h.includes("FINAL 60s HOURLY SETTLEMENT TWAP WINDOW (MINUTE 59)"), "TWAP window must designate minute 59");
+    assert.ok(html1h.includes("KALSHI 1H HOURLY DESK"), "brand sub-badge must reflect 1h desk");
   });
 });

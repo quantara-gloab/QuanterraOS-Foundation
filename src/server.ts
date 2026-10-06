@@ -3277,7 +3277,18 @@ setInterval(load, 5000);
 
 app.get(["/kalshi", "/fair-value/btc15m"], (req, res) => {
   const auth = getUserAuth(req);
-  res.type("html").send(renderKalshiTerminalHtml(auth.user?.email, auth.tier));
+  const tf = (req.query.timeframe === "1h" ? "1h" : "15m") as KalshiTimeframe;
+  res.type("html").send(renderKalshiTerminalHtml(auth.user?.email, auth.tier, tf));
+});
+
+app.get(["/kalshi/1h", "/kalshi-1h", "/kalshi/hourly", "/fair-value/btc1h"], (req, res) => {
+  const auth = getUserAuth(req);
+  res.type("html").send(renderKalshiTerminalHtml(auth.user?.email, auth.tier, "1h"));
+});
+
+app.get(["/kalshi/15m", "/kalshi-15m"], (req, res) => {
+  const auth = getUserAuth(req);
+  res.type("html").send(renderKalshiTerminalHtml(auth.user?.email, auth.tier, "15m"));
 });
 
 app.get("/api/kalshi/specs", (_req, res) => {

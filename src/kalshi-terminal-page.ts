@@ -16,13 +16,13 @@
 
 import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
 
-export function renderKalshiTerminalHtml(userEmail?: string, userTier: string = "pro"): string {
+export function renderKalshiTerminalHtml(userEmail?: string, userTier: string = "pro", initialTimeframe: "15m" | "1h" = "15m"): string {
   return `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>QuanterraOS — Kalshi 15M High/Low Bidding Terminal</title>
+<title>QuanterraOS — Kalshi Prediction Terminal (15M &amp; 1H Desks)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -54,6 +54,211 @@ export function renderKalshiTerminalHtml(userEmail?: string, userTier: string = 
     min-height: 100vh;
     padding-bottom: 80px;
     line-height: 1.5;
+  }
+
+  /* Dual Desk Switcher Hero */
+  .desk-selector-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 768px) {
+    .desk-selector-bar { grid-template-columns: 1fr; }
+  }
+  .desk-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .desk-card:hover {
+    border-color: rgba(223, 184, 67, 0.45);
+    background: var(--card-hover);
+    transform: translateY(-1px);
+  }
+  .desk-card.active {
+    border-color: var(--accent);
+    background: linear-gradient(135deg, rgba(223, 184, 67, 0.1) 0%, rgba(12, 15, 23, 0.95) 100%);
+    box-shadow: 0 0 24px rgba(223, 184, 67, 0.18), inset 0 1px 0 rgba(223, 184, 67, 0.35);
+  }
+  .desk-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .desk-tag {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(16, 185, 129, 0.12);
+    color: var(--green);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+  }
+  .desk-tag.hourly {
+    background: rgba(223, 184, 67, 0.14);
+    color: var(--accent-light);
+    border: 1px solid rgba(223, 184, 67, 0.35);
+  }
+  .desk-ticker {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-dim);
+  }
+  .desk-card-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin-bottom: 4px;
+  }
+  .desk-card-desc {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    line-height: 1.4;
+    margin-bottom: 12px;
+  }
+  .desk-card-meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .meta-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--muted);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 2px 7px;
+    border-radius: 4px;
+  }
+  .meta-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 6px var(--green);
+  }
+  .meta-dot.gold {
+    background: var(--accent);
+    box-shadow: 0 0 6px var(--accent);
+  }
+
+  /* 1-Hour Strike Ladder Panel */
+  .hourly-ladder-panel {
+    background: rgba(10, 13, 20, 0.95);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+  .ladder-header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .ladder-title {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+  }
+  .ladder-sub {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-left: 8px;
+  }
+  .ladder-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+  }
+  .ladder-table th {
+    padding: 8px 10px;
+    color: var(--muted);
+    font-size: 0.70rem;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    text-align: left;
+  }
+  .ladder-table td {
+    padding: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    vertical-align: middle;
+  }
+  .ladder-row-atm {
+    background: rgba(223, 184, 67, 0.1);
+    box-shadow: inset 3px 0 0 var(--accent);
+  }
+  .ladder-row-selected {
+    background: rgba(16, 185, 129, 0.12);
+    box-shadow: inset 3px 0 0 var(--green);
+  }
+  .badge-atm {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: rgba(223, 184, 67, 0.2);
+    color: var(--accent-light);
+    border: 1px solid var(--accent);
+    display: inline-block;
+  }
+  .badge-itm {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: rgba(16, 185, 129, 0.15);
+    color: #34D399;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    display: inline-block;
+  }
+  .badge-otm {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: rgba(244, 63, 94, 0.15);
+    color: #FB7185;
+    border: 1px solid rgba(244, 63, 94, 0.3);
+    display: inline-block;
+  }
+  .btn-select-strike {
+    background: rgba(223, 184, 67, 0.15);
+    border: 1px solid rgba(223, 184, 67, 0.4);
+    color: var(--accent-light);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .btn-select-strike:hover {
+    background: var(--accent);
+    color: #07080B;
   }
 
   /* Nav */
@@ -565,11 +770,12 @@ export function renderKalshiTerminalHtml(userEmail?: string, userTier: string = 
   <nav class="top-nav">
     <div class="nav-left">
       <a href="/" class="brand-title">QUANTERRAOS</a>
-      <span class="brand-sub">KALSHI 15M DESK</span>
+      <span class="brand-sub" id="brand-sub-badge">${initialTimeframe === '1h' ? 'KALSHI 1H HOURLY DESK' : 'KALSHI 15M DESK'}</span>
     </div>
     <div class="nav-links">
       <a href="/">Home</a>
-      <a href="/kalshi" class="active">15m Bidding</a>
+      <a href="/kalshi/15m" id="nav-link-15m" class="${initialTimeframe === '15m' ? 'active' : ''}">15m Bidding</a>
+      <a href="/kalshi/1h" id="nav-link-1h" class="${initialTimeframe === '1h' ? 'active' : ''}">1h Hourly Desk</a>
       <a href="/predictions">Predictions</a>
       <a href="/autopilot">Autopilot</a>
       <a href="/calibration">Calibration</a>
@@ -581,7 +787,7 @@ export function renderKalshiTerminalHtml(userEmail?: string, userTier: string = 
   <main>
     <div class="terminal-header">
       <div>
-        <h1>Kalshi Above/Below Desk (15M &amp; 1H)</h1>
+        <h1>Kalshi Prediction Terminal (15M &amp; 1H Desks)</h1>
         <p class="subtitle">Live continuous orderbook, Quanterra spot composite proxy, and dual-mode execution.</p>
       </div>
 
@@ -595,15 +801,46 @@ export function renderKalshiTerminalHtml(userEmail?: string, userTier: string = 
       </div>
     </div>
 
+    <!-- Dual Desk Selector Bar -->
+    <div class="desk-selector-bar">
+      <div id="desk-card-15m" class="desk-card ${initialTimeframe === '15m' ? 'active' : ''}" onclick="switchTimeframe('15m')">
+        <div class="desk-card-top">
+          <span class="desk-tag">FAST INTERVAL</span>
+          <span class="desk-ticker">SERIES KXBTC15M</span>
+        </div>
+        <div class="desk-card-title">15-Minute Above/Below Desk</div>
+        <div class="desk-card-desc">15m cadence · Relative strike at window open · 60s TWAP settlement window</div>
+        <div class="desk-card-meta">
+          <span class="meta-pill"><span class="meta-dot"></span> Single Strike</span>
+          <span class="meta-pill">Cadence: 15 Min</span>
+          <span class="meta-pill">Taker Fee: $0.07·P·(1-P)</span>
+        </div>
+      </div>
+
+      <div id="desk-card-1h" class="desk-card ${initialTimeframe === '1h' ? 'active' : ''}" onclick="switchTimeframe('1h')">
+        <div class="desk-card-top">
+          <span class="desk-tag hourly">HOURLY CLOSE</span>
+          <span class="desk-ticker">SERIES KXBTCD</span>
+        </div>
+        <div class="desk-card-title">1-Hour Multi-Strike Ladder Desk</div>
+        <div class="desk-card-desc">60m cadence · Fixed strike ladder matrix ($500 steps) · Selectable moneyness</div>
+        <div class="desk-card-meta">
+          <span class="meta-pill"><span class="meta-dot gold"></span> Multi-Strike Ladder</span>
+          <span class="meta-pill">Cadence: 1 Hour</span>
+          <span class="meta-pill">ATM / ITM / OTM Matrix</span>
+        </div>
+      </div>
+    </div>
+
     <div class="grid-layout">
       <!-- Left Column: Market HUD -->
       <div class="panel">
         <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center;">
           <div style="display:flex; align-items:center; gap:8px;">
-            <span id="panel-series-title">KALSHI CONTRACT TELEMETRY</span>
+            <span id="panel-series-title">${initialTimeframe === '1h' ? '1H HOURLY MULTI-STRIKE TELEMETRY' : '15M CONTRACT TELEMETRY'}</span>
             <div style="display:inline-flex; gap:4px; margin-left:6px;">
-              <button type="button" id="btn-tf-15m" class="chip active" style="padding:2px 8px; font-size:0.72rem; cursor:pointer;" onclick="switchTimeframe('15m')">15M (KXBTC15M)</button>
-              <button type="button" id="btn-tf-1h" class="chip" style="padding:2px 8px; font-size:0.72rem; cursor:pointer;" onclick="switchTimeframe('1h')">1H (KXBTCD)</button>
+              <button type="button" id="btn-tf-15m" class="chip ${initialTimeframe === '15m' ? 'active' : ''}" style="padding:2px 8px; font-size:0.72rem; cursor:pointer;" onclick="switchTimeframe('15m')">15M (KXBTC15M)</button>
+              <button type="button" id="btn-tf-1h" class="chip ${initialTimeframe === '1h' ? 'active' : ''}" style="padding:2px 8px; font-size:0.72rem; cursor:pointer;" onclick="switchTimeframe('1h')">1H (KXBTCD)</button>
             </div>
           </div>
           <span id="market-status-badge" style="color:var(--green);">● ACTIVE</span>
@@ -611,7 +848,7 @@ export function renderKalshiTerminalHtml(userEmail?: string, userTier: string = 
 
         <div class="ticker-row">
           <div>
-            <div class="contract-ticker" id="market-ticker">KXBTC15M-LOADING…</div>
+            <div class="contract-ticker" id="market-ticker">${initialTimeframe === '1h' ? 'KXBTCD-LOADING…' : 'KXBTC15M-LOADING…'}</div>
             <div class="contract-target" id="market-target">Settlement strike: $—</div>
           </div>
           <div class="timer-pill">
@@ -630,15 +867,49 @@ export function renderKalshiTerminalHtml(userEmail?: string, userTier: string = 
             <div class="stat-val" id="strike-gap">—</div>
           </div>
           <div class="stat-box">
-            <div class="stat-label">ESTIMATED VOL (15M)</div>
-            <div class="stat-val">0.42%</div>
+            <div class="stat-label">CADENCE HORIZON</div>
+            <div class="stat-val" id="cadence-label">${initialTimeframe === '1h' ? '60 MIN' : '15 MIN'}</div>
+          </div>
+        </div>
+
+        <!-- 1-Hour Strike Ladder Matrix -->
+        <div id="hourly-ladder-panel" class="hourly-ladder-panel" style="display:${initialTimeframe === '1h' ? 'block' : 'none'};">
+          <div class="ladder-header-bar">
+            <div>
+              <span class="ladder-title">KXBTCD 1-HOUR MULTI-STRIKE LADDER</span>
+              <span class="ladder-sub" id="ladder-count-label">Loading strikes…</span>
+            </div>
+            <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--text-dim);">
+              Click <strong>Trade Strike</strong> to load strike into ticket
+            </div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="ladder-table">
+              <thead>
+                <tr>
+                  <th>Strike</th>
+                  <th>Moneyness</th>
+                  <th>Spot Gap</th>
+                  <th>YES Bid / Ask</th>
+                  <th>NO Bid / Ask</th>
+                  <th>Implied P(YES)</th>
+                  <th>Kalshi Fee</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="ladder-tbody">
+                <tr>
+                  <td colspan="8" style="text-align:center; padding:18px; color:var(--muted);">Loading 1-Hour strike ladder…</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
         <!-- 60-Second Settlement TWAP Projector & Countdown Visualizer -->
         <div id="twap-card" class="twap-card">
           <div class="twap-header">
-            <span style="font-weight:600; letter-spacing:0.04em; color:var(--accent-light);">FINAL 60s SETTLEMENT TWAP WINDOW (CME BRTI ACCUMULATOR)</span>
+            <span id="twap-title-label" style="font-weight:600; letter-spacing:0.04em; color:var(--accent-light);">${initialTimeframe === '1h' ? 'FINAL 60s HOURLY SETTLEMENT TWAP WINDOW (MINUTE 59)' : 'FINAL 60s SETTLEMENT TWAP WINDOW (CME BRTI ACCUMULATOR)'}</span>
             <span id="twap-status-badge" class="twap-badge waiting">PRE-TWAP (STARTS T-60s)</span>
           </div>
           <div class="twap-stats-row">
@@ -708,7 +979,7 @@ export function renderKalshiTerminalHtml(userEmail?: string, userTier: string = 
       <!-- Right Column: Bidding Ticket -->
       <div class="panel">
         <div class="panel-title">
-          <span>PLACE 15M BID</span>
+          <span id="ticket-header-title">PLACE ${initialTimeframe === '1h' ? '1H' : '15M'} BID</span>
           <span id="balance-pill" style="font-size:0.75rem; color:var(--text-dim);">Balance: Loading…</span>
         </div>
 
@@ -799,7 +1070,7 @@ export function renderKalshiTerminalHtml(userEmail?: string, userTier: string = 
 
           <!-- Submit Button -->
           <button id="btn-submit" class="btn-submit-bid" onclick="submitBid()">
-            ⚡ PLACE 15M BID (SANDBOX)
+            ⚡ PLACE ${initialTimeframe === '1h' ? '1H' : '15M'} BID (SANDBOX)
           </button>
         </div>
       </div>
@@ -808,7 +1079,7 @@ export function renderKalshiTerminalHtml(userEmail?: string, userTier: string = 
     <!-- Active Bids Table -->
     <div class="panel positions-panel">
       <div class="panel-title">
-        <span>MY ACTIVE 15-MINUTE BIDS &amp; POSITIONS</span>
+        <span id="positions-title">MY ACTIVE BIDS &amp; POSITIONS (15M &amp; 1H)</span>
         <button class="chip-btn" onclick="loadUserBids()">↻ Refresh</button>
       </div>
       <div style="overflow-x:auto;">
@@ -1008,25 +1279,178 @@ function updateBalanceDisplay() {
 }
 
 // Timeframe toggle state: '15m' or '1h'
-var currentTimeframe = '15m';
+var currentTimeframe = '${initialTimeframe}';
 
 function switchTimeframe(tf) {
   currentTimeframe = tf;
   const btn15m = document.getElementById('btn-tf-15m');
   const btn1h = document.getElementById('btn-tf-1h');
-  if (btn15m && btn1h) {
-    if (tf === '15m') {
-      btn15m.classList.add('active');
-      btn1h.classList.remove('active');
-      document.getElementById('panel-series-title').textContent = '15M CONTRACT TELEMETRY';
-    } else {
-      btn1h.classList.add('active');
-      btn15m.classList.remove('active');
-      document.getElementById('panel-series-title').textContent = '1H CONTRACT TELEMETRY';
+  const desk15m = document.getElementById('desk-card-15m');
+  const desk1h = document.getElementById('desk-card-1h');
+  const nav15m = document.getElementById('nav-link-15m');
+  const nav1h = document.getElementById('nav-link-1h');
+  const ladderPanel = document.getElementById('hourly-ladder-panel');
+  const seriesTitle = document.getElementById('panel-series-title');
+  const brandBadge = document.getElementById('brand-sub-badge');
+  const ticketTitle = document.getElementById('ticket-header-title');
+  const submitBtn = document.getElementById('btn-submit');
+  const twapTitle = document.getElementById('twap-title-label');
+  const cadenceLabel = document.getElementById('cadence-label');
+
+  if (tf === '15m') {
+    if (btn15m) btn15m.classList.add('active');
+    if (btn1h) btn1h.classList.remove('active');
+    if (desk15m) desk15m.classList.add('active');
+    if (desk1h) desk1h.classList.remove('active');
+    if (nav15m) nav15m.classList.add('active');
+    if (nav1h) nav1h.classList.remove('active');
+    if (ladderPanel) ladderPanel.style.display = 'none';
+    if (seriesTitle) seriesTitle.textContent = '15M CONTRACT TELEMETRY';
+    if (brandBadge) brandBadge.textContent = 'KALSHI 15M DESK';
+    if (ticketTitle) ticketTitle.textContent = 'PLACE 15M BID';
+    if (twapTitle) twapTitle.textContent = 'FINAL 60s SETTLEMENT TWAP WINDOW (CME BRTI ACCUMULATOR)';
+    if (cadenceLabel) cadenceLabel.textContent = '15 MIN';
+    if (submitBtn) {
+      submitBtn.textContent = currentMode === 'sandbox' ? '⚡ PLACE 15M BID (SANDBOX)' : '⚡ PLACE REAL KALSHI BID';
+    }
+  } else {
+    if (btn1h) btn1h.classList.add('active');
+    if (btn15m) btn15m.classList.remove('active');
+    if (desk1h) desk1h.classList.add('active');
+    if (desk15m) desk15m.classList.remove('active');
+    if (nav1h) nav1h.classList.add('active');
+    if (nav15m) nav15m.classList.remove('active');
+    if (ladderPanel) ladderPanel.style.display = 'block';
+    if (seriesTitle) seriesTitle.textContent = '1H HOURLY MULTI-STRIKE TELEMETRY';
+    if (brandBadge) brandBadge.textContent = 'KALSHI 1H HOURLY DESK';
+    if (ticketTitle) ticketTitle.textContent = 'PLACE 1H BID';
+    if (twapTitle) twapTitle.textContent = 'FINAL 60s HOURLY SETTLEMENT TWAP WINDOW (MINUTE 59)';
+    if (cadenceLabel) cadenceLabel.textContent = '60 MIN';
+    if (submitBtn) {
+      submitBtn.textContent = currentMode === 'sandbox' ? '⚡ PLACE 1H BID (SANDBOX)' : '⚡ PLACE REAL KALSHI BID';
     }
   }
+
+  if (window.history && window.history.replaceState) {
+    window.history.replaceState(null, '', tf === '1h' ? '/kalshi/1h' : '/kalshi/15m');
+  }
+
   document.getElementById('market-ticker').textContent = 'SWITCHING...';
   fetchMarket();
+  if (tf === '1h') {
+    fetchHourlyLadder();
+  }
+}
+
+// 1-Hour Strike Ladder Fetcher
+async function fetchHourlyLadder() {
+  try {
+    const res = await fetch('/api/kalshi/1h/ladder');
+    if (!res.ok) return;
+    const data = await res.json();
+    const ladder = data.ladder || [];
+    const spot = data.spot || (activeMarket ? activeMarket.spot : 0);
+    const countLabel = document.getElementById('ladder-count-label');
+    if (countLabel) {
+      countLabel.textContent = ladder.length + ' strikes active around spot $' + Number(spot).toLocaleString();
+    }
+    const tbody = document.getElementById('ladder-tbody');
+    if (!tbody) return;
+    if (ladder.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:18px; color:var(--muted);">No hourly strikes currently open.</td></tr>';
+      return;
+    }
+
+    let closestDiff = Infinity;
+    let atmStrike = null;
+    for (const s of ladder) {
+      const d = Math.abs(spot - s.strike);
+      if (d < closestDiff) {
+        closestDiff = d;
+        atmStrike = s.strike;
+      }
+    }
+
+    tbody.innerHTML = ladder.map(s => {
+      const isAtm = s.strike === atmStrike;
+      const isSelected = activeMarket && (activeMarket.ticker === s.ticker || (activeMarket.floor_strike === s.strike && currentTimeframe === '1h'));
+      const dist = s.distanceFromSpot;
+      const distStr = (dist >= 0 ? '+' : '') + '$' + dist.toFixed(0);
+      const distColor = dist >= 0 ? 'var(--green)' : 'var(--rose)';
+      const isItm = dist > 0;
+      let moneynessBadge = '';
+      if (isAtm) {
+        moneynessBadge = '<span class="badge-atm">ATM (±$0)</span>';
+      } else if (isItm) {
+        moneynessBadge = '<span class="badge-itm">ITM (Above)</span>';
+      } else {
+        moneynessBadge = '<span class="badge-otm">OTM (Below)</span>';
+      }
+
+      const rowClass = isSelected ? 'ladder-row-selected' : (isAtm ? 'ladder-row-atm' : '');
+      const yesBidCents = Math.round(s.yesBid * 100);
+      const yesAskCents = Math.round(s.yesAsk * 100);
+      const noBidCents = Math.round((1 - s.yesAsk) * 100);
+      const noAskCents = Math.round((1 - s.yesBid) * 100);
+      const feeCents = (s.takerFee * 100).toFixed(1);
+      const probPct = Math.round(s.impliedProb * 100);
+
+      // Serialized entry for button
+      const payload = JSON.stringify({
+        ticker: s.ticker,
+        strike: s.strike,
+        subtitle: s.subtitle,
+        yesBid: s.yesBid,
+        yesAsk: s.yesAsk,
+        distanceFromSpot: s.distanceFromSpot
+      }).replace(/"/g, '&quot;');
+
+      return '<tr class="' + rowClass + '">' +
+        '<td><strong style="color:#FFF;">$' + Number(s.strike).toLocaleString() + '</strong></td>' +
+        '<td>' + moneynessBadge + '</td>' +
+        '<td style="color:' + distColor + '; font-weight:600;">' + distStr + ' <span style="font-size:0.68rem; color:var(--muted); font-weight:400;">(' + (s.distanceBps >= 0 ? '+' : '') + s.distanceBps + ' bps)</span></td>' +
+        '<td style="color:var(--green); font-weight:600;">' + yesBidCents + '¢ / ' + yesAskCents + '¢</td>' +
+        '<td style="color:var(--rose); font-weight:600;">' + noBidCents + '¢ / ' + noAskCents + '¢</td>' +
+        '<td>' + probPct + '%</td>' +
+        '<td style="color:var(--accent);">' + feeCents + '¢</td>' +
+        '<td><button type="button" class="btn-select-strike" onclick="selectLadderStrike(' + payload + ')">⚡ Trade Strike</button></td>' +
+      '</tr>';
+    }).join('');
+  } catch (err) {
+    console.warn('Failed to load strike ladder:', err);
+  }
+}
+
+function selectLadderStrike(s) {
+  activeMarket = {
+    ticker: s.ticker,
+    floor_strike: s.strike,
+    subtitle: s.subtitle || ('$' + Number(s.strike).toLocaleString() + ' or above'),
+    timeframe: '1h',
+    yes_bid: s.yesBid,
+    yes_ask: s.yesAsk,
+    no_bid: Math.round((1 - s.yesAsk) * 100) / 100,
+    no_ask: Math.round((1 - s.yesBid) * 100) / 100,
+    spot: activeMarket ? activeMarket.spot : (s.strike + s.distanceFromSpot),
+    close_time: activeMarket ? activeMarket.close_time : new Date(Date.now() + 45 * 60000).toISOString(),
+    status: 'active'
+  };
+  document.getElementById('market-ticker').textContent = s.ticker;
+  document.getElementById('market-target').textContent = s.subtitle || ('Settlement strike: $' + Number(s.strike).toLocaleString());
+  document.getElementById('yes-bid').textContent = Math.round(s.yesBid * 100) + '¢';
+  document.getElementById('yes-ask').textContent = Math.round(s.yesAsk * 100) + '¢';
+  document.getElementById('no-bid').textContent = Math.round((1 - s.yesAsk) * 100) + '¢';
+  document.getElementById('no-ask').textContent = Math.round((1 - s.yesBid) * 100) + '¢';
+
+  const priceInput = document.getElementById('input-price');
+  if (currentSide === 'yes') {
+    priceInput.value = Math.round(s.yesAsk * 100);
+  } else {
+    priceInput.value = Math.round((1 - s.yesBid) * 100);
+  }
+  updateCalculations();
+  showToast('STRIKE SELECTED', 'Loaded ' + s.ticker + ' ($' + Number(s.strike).toLocaleString() + ') into ticket.');
+  fetchHourlyLadder();
 }
 
 // Polling live market data
@@ -1191,7 +1615,7 @@ async function loadUserBids() {
 async function submitBid() {
   const btn = document.getElementById('btn-submit');
   if (!activeMarket) {
-    alert('Still connecting to live Kalshi 15m stream. Please try again in a few seconds.');
+    alert('Still connecting to live Kalshi ' + currentTimeframe + ' stream. Please try again in a few seconds.');
     return;
   }
 
@@ -1231,16 +1655,22 @@ async function submitBid() {
     alert('Failed to place bid: ' + err.message);
   } finally {
     btn.disabled = false;
-    btn.textContent = currentMode === 'sandbox' ? '⚡ PLACE 15M BID (SANDBOX)' : '⚡ PLACE REAL KALSHI BID';
+    btn.textContent = currentMode === 'sandbox' ? ('⚡ PLACE ' + (currentTimeframe === '1h' ? '1H' : '15M') + ' BID (SANDBOX)') : '⚡ PLACE REAL KALSHI BID';
   }
 }
 
 // Initial load
 fetchMarket();
+if (currentTimeframe === '1h') {
+  fetchHourlyLadder();
+}
 loadBalances();
 loadUserBids();
 updateCalculations();
 setInterval(fetchMarket, 4000);
+setInterval(() => {
+  if (currentTimeframe === '1h') fetchHourlyLadder();
+}, 5000);
 </script>
 </body>
 </html>`;

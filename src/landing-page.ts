@@ -846,7 +846,8 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     <div class="nav-left">
       <a href="/" class="nav-brand"><span class="brand-dot"></span> quanterraos</a>
       <div class="nav-links">
-        <a href="/kalshi" style="color:var(--accent);font-weight:600;">kalshi 15m</a>
+        <a href="/kalshi/15m" style="color:var(--accent);font-weight:600;">kalshi 15m</a>
+        <a href="/kalshi/1h" style="color:var(--accent-light);font-weight:600;">kalshi 1h</a>
         <a href="/trustos" style="color:#10B981;font-weight:600;">trustos pilot</a>
         <a href="/calibration">calibration</a>
         <a href="/council">council</a>

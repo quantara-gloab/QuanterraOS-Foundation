@@ -786,7 +786,8 @@ export function renderMobilePageHtml(): string {
   </a>
   <div class="nav-actions">
     <a href="/dashboard" class="nav-link">Live Cockpit</a>
-    <a href="/kalshi" class="nav-link">Kalshi Markets</a>
+    <a href="/kalshi/15m" class="nav-link">Kalshi 15M</a>
+    <a href="/kalshi/1h" class="nav-link">Kalshi 1H</a>
     <a href="/council" class="nav-link">Council</a>
     <a href="/dashboard" class="btn-outline-gold">Open Terminal</a>
   </div>
