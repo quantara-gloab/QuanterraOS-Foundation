@@ -77,7 +77,14 @@ export async function createCheckoutSession(params: CreateCheckoutParams): Promi
     return { url: data.url, sessionId: data.id };
   }
 
-  // Sandbox / Test Mode (when EIN is pending or in local test environment)
+  // In production, never silently fall back to sandbox checkout when Stripe keys are missing
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      "Live payment processor is awaiting EIN activation. Sandbox checkout fallback is disabled in production to protect commercial integrity."
+    );
+  }
+
+  // Sandbox / Test Mode (only in non-production environments)
   const sessionId = `cs_test_${randomUUID()}`;
   const mockUrl = `${params.successUrl}${params.successUrl.includes("?") ? "&" : "?"}mock_checkout=true&session_id=${sessionId}&tier=${params.tier}&user_id=${user.id}`;
   return { url: mockUrl, sessionId };

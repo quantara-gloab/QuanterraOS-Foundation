@@ -7,6 +7,7 @@ import {
   approveContentDraft,
   listContentDrafts,
   getOrCreateAdSpendCaps,
+  resetAdSpendCaps,
   evaluateAndLogAdSpend,
   ingestLead,
   generateLeadOutreachMessage,
@@ -74,6 +75,7 @@ describe("Go-To-Market (GTM) Agents Engine (ai-marketing-sales-team-spec.md)", (
   // ==========================================================================
   describe("2. Ad Platform Agent (Hard Spend Caps)", () => {
     it("enforces Rule B5 pattern: blocks spend if daily or monthly cap is exceeded", () => {
+      resetAdSpendCaps("google");
       const cap = getOrCreateAdSpendCaps("google");
       assert.ok(cap.dailyCapUsd > 0);
       assert.ok(cap.monthlyCapUsd > 0);

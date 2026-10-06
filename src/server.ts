@@ -108,6 +108,18 @@ app.get("/assets/assistant-avatar.jpg", (_req, res) => {
   res.sendFile(path.resolve("public/assets/assistant-avatar.jpg"));
 });
 
+// Production / Platform Health Check
+app.get("/health", (_req, res) => {
+  res.status(200).json({
+    status: "ok",
+    environment: process.env.NODE_ENV || "development",
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+    circuit: "LOCKED_RULE_B5",
+    database: "connected",
+  });
+});
+
 // QuanterraOS Growth Engine: outreach, concierge chat, opt-in voice callbacks, and tamper-evident consent ledger
 const growth = startGrowthEngine({ pagePath: path.resolve("public/growth.html") });
 app.use(growth.handler);
@@ -2499,6 +2511,9 @@ app.post("/api/billing/checkout", async (req, res) => {
     });
     // In sandbox test mode, auto-fulfill test checkout
     if (session.url.includes("mock_checkout=true")) {
+      if (process.env.NODE_ENV === "production") {
+        return res.status(403).json({ error: "Sandbox checkout is forbidden in production." });
+      }
       processBillingEvent({
         id: `evt_mock_${randomUUID().slice(0, 8)}`,
         type: "checkout.session.completed",

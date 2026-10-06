@@ -182,6 +182,13 @@ export function getOrCreateAdSpendCaps(platform: "google" | "meta") {
   return cap;
 }
 
+export function resetAdSpendCaps(platform: "google" | "meta") {
+  db.update(adSpendCaps)
+    .set({ currentDaySpendUsd: 0.0, currentMonthSpendUsd: 0.0, updatedAt: new Date().toISOString() })
+    .where(eq(adSpendCaps.platform, platform))
+    .run();
+}
+
 export interface EvaluateAdSpendInput {
   platform: "google" | "meta";
   campaignName: string;

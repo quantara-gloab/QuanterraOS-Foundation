@@ -351,6 +351,28 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
       font-size: 0.8rem;
       font-family: var(--font-mono);
     }
+    .cftc-disclosure-card {
+      margin-top: 48px;
+      padding: 20px 24px;
+      background: rgba(14, 19, 26, 0.7);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      line-height: 1.6;
+    }
+    .cftc-title {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #F8FAFC;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .cftc-text {
+      color: #94A3B8;
+    }
     footer a { color: var(--accent); text-decoration: none; transition: color 0.15s; }
     footer a:hover { color: var(--accent-light); text-decoration: underline; }
   </style>
@@ -522,6 +544,16 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <div class="cftc-disclosure-card">
+      <div class="cftc-title">CFTC Rule 4.41 Mandatory Regulatory Disclosure</div>
+      <p class="cftc-text">
+        HYPOTHETICAL OR SIMULATED PERFORMANCE RESULTS HAVE CERTAIN INHERENT LIMITATIONS. UNLIKE AN ACTUAL PERFORMANCE RECORD, SIMULATED RESULTS DO NOT REPRESENT ACTUAL TRADING. ALSO, SINCE THE TRADES HAVE NOT ACTUALLY BEEN EXECUTED, THE RESULTS MAY HAVE UNDER- OR OVER-COMPENSATED FOR THE IMPACT, IF ANY, OF CERTAIN MARKET FACTORS, SUCH AS LACK OF LIQUIDITY. SIMULATED TRADING PROGRAMS IN GENERAL ARE ALSO SUBJECT TO THE FACT THAT THEY ARE DESIGNED WITH THE BENEFIT OF HINDSIGHT. NO REPRESENTATION IS BEING MADE THAT ANY ACCOUNT WILL OR IS LIKELY TO ACHIEVE PROFITS OR LOSSES SIMILAR TO THOSE SHOWN.
+      </p>
+      <p style="margin-top: 8px; font-size: 0.74rem;">
+        QuanterraOS operates under internal safety Rule B5: zero live capital is deployed ($0.00 exposure) and live order execution paths are permanently disabled. All orders and metrics on this console represent simulated paper executions for research and evaluation purposes only.
+      </p>
     </div>
   </main>
 
