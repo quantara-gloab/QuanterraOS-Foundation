@@ -1,0 +1,12 @@
+node_modules
+.git
+.vscode
+scratch
+*.log
+*.log.*
+.env
+data/*.db
+data/*.db-shm
+data/*.db-wal
+quanterraos.db*
+tmp*
