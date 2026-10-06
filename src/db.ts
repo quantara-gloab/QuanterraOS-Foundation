@@ -78,6 +78,22 @@ export function runMigrations(): void {
   }
 }
 
+/**
+ * Auto-initialization guard:
+ * If the database connection connects to a newly created / empty SQLite file (e.g. during isolated
+ * tests or a fresh cold-start container), automatically apply migrations so schema tables exist.
+ */
+try {
+  const tableCheck = sqlite
+    .prepare("SELECT count(*) as count FROM sqlite_master WHERE type='table' AND name='predictions'")
+    .get() as { count: number } | undefined;
+  if (!tableCheck || tableCheck.count === 0) {
+    runMigrations();
+  }
+} catch {
+  // Gracefully skip if database is opened in a read-only context
+}
+
 export function closeDb(): void {
   sqlite.close();
 }
