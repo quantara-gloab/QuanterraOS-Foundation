@@ -10,12 +10,18 @@ import { getLatestCompositeIndex, COMPOSITE_METHODOLOGY_VERSION } from "./compos
 import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
 
 export function renderIndexPageHtml(): string {
-  const result = getLatestCompositeIndex("BTC");
-  const priceDisplay = result.compositePrice !== null 
-    ? `$${result.compositePrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` 
+  let result: any = null;
+  try {
+    result = getLatestCompositeIndex("BTC");
+  } catch (err) {
+    console.warn("renderIndexPageHtml composite lookup error:", err);
+  }
+
+  const priceDisplay = result?.compositePrice !== null && result?.compositePrice !== undefined
+    ? `$${Number(result.compositePrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` 
     : "SUPPRESSED (Insufficient Quorum)";
 
-  const statusBadge = result.status === "ACTIVE"
+  const statusBadge = result?.status === "ACTIVE"
     ? `<span class="badge badge-active">ACTIVE (QUORUM MET)</span>`
     : `<span class="badge badge-warning">SUPPRESSED (DRACO GATE)</span>`;
 

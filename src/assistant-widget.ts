@@ -48,8 +48,8 @@ export const ASSISTANT_WIDGET_HTML = `
         </div>
       </div>
       <div class="qos-header-actions">
-        <button id="qos-voice-toggle" class="qos-tool-btn" title="Toggle Voice / Read Aloud" aria-pressed="false">
-          <span id="qos-voice-icon">🔇 Voice OFF</span>
+        <button id="qos-voice-toggle" class="qos-tool-btn qos-voice-active" title="Toggle Voice / Read Aloud" aria-pressed="true">
+          <span id="qos-voice-icon">🔊 Voice ON</span>
         </button>
         <button id="qos-close-btn" class="qos-tool-btn" title="Minimize Drawer" aria-label="Close assistant">✕</button>
       </div>
@@ -107,6 +107,9 @@ For direct human inquiries, our team is reachable at <strong>support@quanterraos
     <!-- Chat Input Area -->
     <form id="qos-chat-form" class="qos-input-bar">
       <input type="text" id="qos-chat-input" placeholder="Ask Aria about market calibration, telemetry, or support…" autocomplete="off" maxlength="1000" aria-label="Message Aria" />
+      <button type="button" id="qos-mic-btn" class="qos-mic-btn" title="Speak to Aria (Speech-to-Text)" aria-label="Voice input">
+        <span id="qos-mic-icon">🎙️</span>
+      </button>
       <button type="submit" id="qos-send-btn" aria-label="Send Message">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -512,6 +515,34 @@ For direct human inquiries, our team is reachable at <strong>support@quanterraos
 .qos-input-bar button:disabled { opacity: 0.5; cursor: default; transform: none; }
 .qos-input-bar button svg { width: 14px; height: 14px; }
 
+.qos-mic-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(223, 184, 67, 0.3);
+  border-radius: 6px;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+  color: #DFB843;
+}
+.qos-mic-btn:hover {
+  background: rgba(223, 184, 67, 0.15);
+  border-color: #DFB843;
+}
+.qos-mic-btn.qos-mic-active {
+  background: rgba(244, 63, 94, 0.3) !important;
+  border-color: #F43F5E !important;
+  animation: qosMicPulse 0.9s infinite alternate;
+}
+@keyframes qosMicPulse {
+  0% { transform: scale(1); box-shadow: 0 0 4px rgba(244, 63, 94, 0.5); }
+  100% { transform: scale(1.1); box-shadow: 0 0 14px rgba(244, 63, 94, 0.9); }
+}
+
 /* Mobile: full-screen drawer below 480px */
 @media (max-width: 480px) {
   #qos-assistant-root { bottom: 16px; right: 16px; }
@@ -531,9 +562,10 @@ For direct human inquiries, our team is reachable at <strong>support@quanterraos
 
 <script>
 (function() {
-  let isVoiceEnabled = false;
+  let isVoiceEnabled = true; // Active by default
   let isOpen = false;
   let isSending = false;
+  let hasSpokenWelcome = false;
   let conversationHistory = [];
 
   const bubble = document.getElementById('qos-assistant-bubble');
@@ -544,15 +576,35 @@ For direct human inquiries, our team is reachable at <strong>support@quanterraos
   const chatForm = document.getElementById('qos-chat-form');
   const chatInput = document.getElementById('qos-chat-input');
   const sendBtn = document.getElementById('qos-send-btn');
+  const micBtn = document.getElementById('qos-mic-btn');
+  const micIcon = document.getElementById('qos-mic-icon');
   const messagesContainer = document.getElementById('qos-chat-messages');
 
-  const FALLBACK_REPLY = 'Aria is temporarily checking telemetry. For a human response, email support@quanterraos.com. QuanterraOS operates on $0.00 live funds under the Rule B5 circuit lock.';
+  const FALLBACK_REPLY = 'Aria is active and monitoring telemetry. For dedicated support, please email support@quanterraos.com. All operations adhere strictly to Rule B5 paper execution.';
+
+  // Cached voice loading
+  let cachedVoices = [];
+  function loadVoices() {
+    if ('speechSynthesis' in window) {
+      cachedVoices = window.speechSynthesis.getVoices() || [];
+    }
+  }
+  loadVoices();
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+  }
 
   function setOpen(open, focusInput) {
     isOpen = open;
     drawer.classList.toggle('qos-drawer-hidden', !open);
     bubble.setAttribute('aria-expanded', open ? 'true' : 'false');
-    if (open && focusInput) chatInput.focus();
+    if (open) {
+      if (focusInput) chatInput.focus();
+      if (isVoiceEnabled && !hasSpokenWelcome) {
+        hasSpokenWelcome = true;
+        speakText('Hello! I am Aria, your executive concierge. I am active and ready to communicate with you.');
+      }
+    }
   }
 
   bubble.addEventListener('click', function(e) {
@@ -569,7 +621,7 @@ For direct human inquiries, our team is reachable at <strong>support@quanterraos
     if (e.key === 'Escape' && isOpen) setOpen(false);
   });
 
-  // Escape all HTML, then allow only line breaks and **bold**.
+  // Escape HTML
   function escapeHtml(str) {
     return String(str)
       .replace(/&/g, '&amp;')
@@ -588,12 +640,21 @@ For direct human inquiries, our team is reachable at <strong>support@quanterraos
     if (!isVoiceEnabled || !('speechSynthesis' in window)) return;
     try {
       window.speechSynthesis.cancel();
-      const clean = String(text).replace(/<[^>]*>/g, '').replace(/[*_#]/g, '');
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+      }
+      const clean = String(text)
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/[*_#\x60~]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (!clean) return;
+
       const utter = new SpeechSynthesisUtterance(clean);
-      utter.rate = 1.0;
-      utter.pitch = 1.05; // warm feminine voice pitch
-      
-      const voices = window.speechSynthesis.getVoices();
+      utter.rate = 1.02;
+      utter.pitch = 1.05; // warm feminine tone
+
+      const voices = cachedVoices.length > 0 ? cachedVoices : window.speechSynthesis.getVoices();
       const femaleVoice = voices.find(function(v) {
         return (
           v.name.match(/samantha|victoria|karen|zira|jenny|moira|fiona|serena|stephanie|female/i) ||
@@ -621,7 +682,65 @@ For direct human inquiries, our team is reachable at <strong>support@quanterraos
     }
   });
 
-  // Append message to UI. User text is never parsed as HTML.
+  // Speech Recognition (Voice Input via Mic)
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition = null;
+  let isListening = false;
+
+  if (SpeechRec && micBtn) {
+    recognition = new SpeechRec();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    recognition.onstart = function() {
+      isListening = true;
+      micBtn.classList.add('qos-mic-active');
+      if (micIcon) micIcon.textContent = '🔴';
+      chatInput.placeholder = 'Listening... Speak now...';
+    };
+
+    recognition.onresult = function(event) {
+      if (event.results && event.results[0] && event.results[0][0]) {
+        const transcript = event.results[0][0].transcript;
+        if (transcript) {
+          chatInput.value = transcript;
+          sendMessage(transcript);
+        }
+      }
+    };
+
+    recognition.onerror = function(event) {
+      console.warn('Speech recognition error:', event.error);
+      isListening = false;
+      micBtn.classList.remove('qos-mic-active');
+      if (micIcon) micIcon.textContent = '🎙️';
+      chatInput.placeholder = 'Ask Aria about market calibration, telemetry, or support…';
+    };
+
+    recognition.onend = function() {
+      isListening = false;
+      micBtn.classList.remove('qos-mic-active');
+      if (micIcon) micIcon.textContent = '🎙️';
+      chatInput.placeholder = 'Ask Aria about market calibration, telemetry, or support…';
+    };
+
+    micBtn.addEventListener('click', function() {
+      if (!isListening) {
+        try {
+          recognition.start();
+        } catch (e) {
+          console.warn('Could not start speech recognition:', e);
+        }
+      } else {
+        recognition.stop();
+      }
+    });
+  } else if (micBtn) {
+    micBtn.style.display = 'none';
+  }
+
+  // Append message to UI
   function appendMessage(role, text) {
     const msgDiv = document.createElement('div');
     msgDiv.className = 'qos-msg qos-msg-' + (role === 'user' ? 'user' : 'assistant');
@@ -658,7 +777,9 @@ For direct human inquiries, our team is reachable at <strong>support@quanterraos
     messagesContainer.appendChild(msgDiv);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-    if (role === 'assistant') speakText(text);
+    if (role === 'assistant') {
+      speakText(text);
+    }
   }
 
   function showTyping() {

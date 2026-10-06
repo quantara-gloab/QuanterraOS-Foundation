@@ -168,40 +168,45 @@ export function computeCompositeV01(
  */
 export function getLatestCompositeIndex(
   asset = "BTC",
-  dbPath = "quanterraos.db",
+  dbPath = process.env.DB_PATH || "quanterraos.db",
   options?: { nowMs?: number; minVenues?: number }
 ): CompositeCalculationResult {
-  const db = new Database(dbPath, { readonly: true });
+  let rows: Array<{ venue: string; price: number; observedAt: number }> = [];
   try {
-    const rows = db
-      .prepare(
-        `SELECT exchange_name as venue, price, fetched_at as observedAt 
-         FROM exchange_prices 
-         WHERE asset = ? 
-         GROUP BY exchange_name 
-         HAVING fetched_at = MAX(fetched_at) 
-         ORDER BY exchange_name`
-      )
-      .all(asset) as Array<{ venue: string; price: number; observedAt: number }>;
-
-    const ticks: VenueTick[] = rows.map((r) => ({
-      venue: r.venue,
-      asset,
-      price: r.price,
-      observedAt: r.observedAt,
-      stale: false,
-    }));
-
-    // If options.nowMs not specified, take the maximum observedAt as epoch base for offline reproduction
-    const nowMs = options?.nowMs ?? (ticks.length > 0 ? Math.max(...ticks.map((t) => t.observedAt)) : Date.now());
-
-    return computeCompositeV01(ticks, {
-      nowMs,
-      minVenues: options?.minVenues,
-    });
-  } finally {
-    db.close();
+    const db = new Database(dbPath, { readonly: true });
+    try {
+      rows = db
+        .prepare(
+          `SELECT exchange_name as venue, price, fetched_at as observedAt 
+           FROM exchange_prices 
+           WHERE asset = ? 
+           GROUP BY exchange_name 
+           HAVING fetched_at = MAX(fetched_at) 
+           ORDER BY exchange_name`
+        )
+        .all(asset) as Array<{ venue: string; price: number; observedAt: number }>;
+    } finally {
+      db.close();
+    }
+  } catch (err) {
+    console.warn("getLatestCompositeIndex DB fallback:", err);
   }
+
+  const ticks: VenueTick[] = rows.map((r) => ({
+    venue: r.venue,
+    asset,
+    price: r.price,
+    observedAt: r.observedAt,
+    stale: false,
+  }));
+
+  // If options.nowMs not specified, take the maximum observedAt as epoch base for offline reproduction
+  const nowMs = options?.nowMs ?? (ticks.length > 0 ? Math.max(...ticks.map((t) => t.observedAt)) : Date.now());
+
+  return computeCompositeV01(ticks, {
+    nowMs,
+    minVenues: options?.minVenues,
+  });
 }
 
 /**
@@ -209,28 +214,33 @@ export function getLatestCompositeIndex(
  */
 export function getCompositeIndexHistory(
   asset = "BTC",
-  dbPath = "quanterraos.db",
+  dbPath = process.env.DB_PATH || "quanterraos.db",
   fromMs?: number,
   toMs?: number,
   limit = 100
 ): Array<{ timestamp: number; price: number; asset: string }> {
-  const db = new Database(dbPath, { readonly: true });
   try {
-    const queryFrom = fromMs ?? Date.now() - 24 * 3600 * 1000;
-    const queryTo = toMs ?? Date.now();
+    const db = new Database(dbPath, { readonly: true });
+    try {
+      const queryFrom = fromMs ?? Date.now() - 24 * 3600 * 1000;
+      const queryTo = toMs ?? Date.now();
 
-    const rows = db
-      .prepare(
-        `SELECT received_at as timestamp, CAST(raw_value AS REAL) as price, asset 
-         FROM btc_index_ticks 
-         WHERE asset = ? AND received_at >= ? AND received_at <= ? 
-         ORDER BY received_at DESC 
-         LIMIT ?`
-      )
-      .all(asset, queryFrom, queryTo, limit) as Array<{ timestamp: number; price: number; asset: string }>;
+      const rows = db
+        .prepare(
+          `SELECT received_at as timestamp, CAST(raw_value AS REAL) as price, asset 
+           FROM btc_index_ticks 
+           WHERE asset = ? AND received_at >= ? AND received_at <= ? 
+           ORDER BY received_at DESC 
+           LIMIT ?`
+        )
+        .all(asset, queryFrom, queryTo, limit) as Array<{ timestamp: number; price: number; asset: string }>;
 
-    return rows;
-  } finally {
-    db.close();
+      return rows;
+    } finally {
+      db.close();
+    }
+  } catch (err) {
+    console.warn("getCompositeIndexHistory DB fallback:", err);
+    return [];
   }
 }

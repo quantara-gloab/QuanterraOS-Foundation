@@ -2163,7 +2163,7 @@ document.getElementById('init-session').addEventListener('click', async function
 </body>
 </html>`;
 
-app.get("/", async (_req, res) => {
+app.get(["/", "/home"], async (_req, res) => {
   let report: MarketPriceCalibrationReport | null = null;
   try {
     report = await getOrComputeCalibrationReport();
@@ -2281,7 +2281,7 @@ app.get(["/research/two-strategies-lost", "/blog/two-strategies-lost"], (req, re
   res.type("html").send(renderTwoStrategiesLostPageHtml());
 });
 
-app.get("/index", (_req, res) => {
+app.get(["/index", "/index.html", "/composite", "/spot-index"], (_req, res) => {
   res.type("html").send(renderIndexPageHtml());
 });
 
@@ -2394,7 +2394,7 @@ app.post(["/api/sms/webhook", "/api/sms/inbound"], (req, res) => {
 app.post("/api/sms/send-test", async (req, res) => {
   const adminKey = req.headers["x-admin-key"] as string | undefined;
   const auth = getUserAuth(req);
-  const isAuthorized = (adminKey && adminKey === process.env.ADMIN_METRICS_KEY) || (auth.user && auth.tier !== "free");
+  const isAuthorized = (adminKey && adminKey === ADMIN_METRICS_KEY) || (auth.user && auth.tier !== "free");
 
   if (!isAuthorized) {
     return res.status(403).json({ error: "Unauthorized: Admin key or authorized session required" });
@@ -2944,7 +2944,7 @@ app.get("/api/index/btc/history", async (req, res) => {
     });
   }
 
-  const history = getCompositeIndexHistory("BTC", "quanterraos.db", fromParam, toParam, limit);
+  const history = getCompositeIndexHistory("BTC", process.env.DB_PATH || "quanterraos.db", fromParam, toParam, limit);
   res.json({
     asset: "BTC",
     count: history.length,
