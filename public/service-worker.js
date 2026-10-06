@@ -1,17 +1,35 @@
 // QuanterraOS Progressive Web App Service Worker
-// Version: 1.0.0 (High-Speed Edge Cache & Push Gateway)
+// Version: 1.1.0 (Strict Financial Guard: No Stale Pricing/Wallet Cache)
 
-const CACHE_NAME = 'quanterraos-shell-v1';
+const CACHE_NAME = 'quanterraos-shell-v2';
+
+// Safe static shell assets ONLY. Strictly excludes financial, pricing, and trading routes.
 const STATIC_ASSETS = [
-  '/',
-  '/dashboard',
   '/mobile',
   '/manifest.json',
+  '/apple-touch-icon.png',
   '/assets/icon.svg',
+  '/assets/icon-192.png',
+  '/assets/icon-512.png',
   '/assets/icon-192.svg',
   '/assets/icon-512.svg',
   '/assets/assistant-avatar.jpg'
 ];
+
+// Routes that MUST NEVER be cached to prevent dangerous stale prices, orders, or balances
+const NEVER_CACHE_PREFIXES = [
+  '/api/',
+  '/kalshi',
+  '/wallet',
+  '/fair-value',
+  '/predictions',
+  '/autopilot',
+  '/stripe'
+];
+
+function isNeverCacheUrl(pathname) {
+  return NEVER_CACHE_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+}
 
 // Install: Cache critical static shell
 self.addEventListener('install', (event) => {
@@ -35,7 +53,7 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch: Network-first for dynamic APIs, Cache-first for static assets
+// Fetch: Strict network-first for APIs, bypass cache for all trading & pricing routes
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
@@ -44,20 +62,36 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // API calls: Network first with fast timeout, bypass cache if possible
+  // Financial & Trading API routes: Strictly network-only. NEVER write to or read from cache.
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(
       fetch(event.request).catch(() => {
         return new Response(
-          JSON.stringify({ offline: true, error: 'Network unavailable. Operating in local buffer mode.' }),
-          { headers: { 'Content-Type': 'application/json' } }
+          JSON.stringify({
+            offline: true,
+            error: 'Network connection unavailable. Live pricing, order routing, and wallet balance operations are strictly halted while offline to prevent stale execution.'
+          }),
+          {
+            status: 503,
+            statusText: 'Service Unavailable (Offline Guard)',
+            headers: {
+              'Content-Type': 'application/json',
+              'Cache-Control': 'no-store, no-cache, must-revalidate'
+            }
+          }
         );
       })
     );
     return;
   }
 
-  // Shell & Static Assets: Stale-while-revalidate
+  // Dynamic trading & wallet pages: Strictly network-only (never cached stale)
+  if (isNeverCacheUrl(url.pathname)) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
+  // Safe static assets & offline shell: Stale-while-revalidate
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       const fetchPromise = fetch(event.request)
@@ -90,8 +124,8 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: data.body,
-    icon: '/assets/icon-192.svg',
-    badge: '/assets/icon-192.svg',
+    icon: '/assets/icon-192.png',
+    badge: '/assets/icon-192.png',
     vibrate: [100, 50, 100],
     data: {
       url: data.url || '/dashboard'

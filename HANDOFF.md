@@ -29,6 +29,7 @@ Our moat is **credibility**. Every number on the site must be live, computed, sa
 8. **Fabricated output is the most serious defect.** Never write anything formatted as a tool result, system message, or task completion in your own narration. Command output counts as evidence only if it was written to a file by the command itself, or produced by CI. Text you typed does not count. If you are unsure whether a background task finished, say so and wait for it.
 9. **Report files must be UTF-8.** Windows PowerShell writes UTF-16 by default, which git treats as binary. Use `| Out-File -Encoding utf8` or `cmd /c "... > file"`.
 10. **Third-party marks.** Refer to Kalshi, Polymarket, Coinbase and others by name only to identify their data. Never imply affiliation or endorsement. Include an attribution and non-affiliation notice on every page that displays their data.
+11. **No fictional external links or status claims.** Never report something as 'live,' 'linked,' or 'published' unless it can show a URL that loads. Never add store download links (Google Play, Apple App Store, Samsung Galaxy Store), Apple Team IDs, or production SHA-256 cert fingerprints until the respective accounts are enrolled, approved, and live. Store packaging templates must be explicitly labeled as scaffolding pending developer enrollment.
 ---
 ## C. Phase 0 — Truth Audit (do first, before any new feature)
 Goal: make the current site and repository honest and reproducible.

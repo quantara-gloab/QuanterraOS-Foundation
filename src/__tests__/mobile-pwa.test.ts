@@ -21,25 +21,24 @@ describe('QuanterraOS Mobile App & Store Distribution Suite', () => {
     assert.strictEqual(manifest.start_url, '/dashboard');
     assert.strictEqual(manifest.theme_color, '#06070A');
     assert.strictEqual(manifest.background_color, '#06070A');
+    assert.strictEqual(manifest.prefer_related_applications, false, 'must not prefer related applications until store listings exist');
 
-    // Check icons
-    assert.ok(Array.isArray(manifest.icons) && manifest.icons.length >= 2, 'manifest must have at least 2 icons');
-    const has192 = manifest.icons.some((i: any) => i.sizes === '192x192');
-    const has512 = manifest.icons.some((i: any) => i.sizes === '512x512');
-    const hasMaskable = manifest.icons.some((i: any) => i.purpose === 'maskable');
-    assert.ok(has192, 'manifest must include 192x192 icon');
-    assert.ok(has512, 'manifest must include 512x512 icon');
-    assert.ok(hasMaskable, 'manifest must include maskable icon for Samsung One UI');
+    // Check PNG & SVG icons
+    assert.ok(Array.isArray(manifest.icons) && manifest.icons.length >= 4, 'manifest must have at least 4 icon declarations');
+    const has192Png = manifest.icons.some((i: any) => i.sizes === '192x192' && i.type === 'image/png');
+    const has512Png = manifest.icons.some((i: any) => i.sizes === '512x512' && i.type === 'image/png');
+    const hasMaskablePng = manifest.icons.some((i: any) => i.purpose === 'maskable' && i.type === 'image/png');
+    assert.ok(has192Png, 'manifest must include 192x192 PNG icon for Android WebAPK');
+    assert.ok(has512Png, 'manifest must include 512x512 PNG icon for splash screens');
+    assert.ok(hasMaskablePng, 'manifest must include maskable PNG icon for Android adaptive launchers');
 
-    // Check related applications (Google Play & Apple iTunes)
-    assert.ok(Array.isArray(manifest.related_applications), 'manifest must declare related_applications');
-    const playApp = manifest.related_applications.find((a: any) => a.platform === 'play');
-    assert.ok(playApp, 'must declare Google Play platform');
-    assert.strictEqual(playApp.id, 'com.quanterraos.app');
-
-    const appleApp = manifest.related_applications.find((a: any) => a.platform === 'itunes');
-    assert.ok(appleApp, 'must declare Apple iTunes platform');
-    assert.ok(appleApp.url.includes('quanterraos-terminal'), 'must point to QuanterraOS on App Store');
+    // Verify icon files physically exist on disk and have non-zero size
+    const icon192Path = path.join(rootDir, 'public', 'assets', 'icon-192.png');
+    const icon512Path = path.join(rootDir, 'public', 'assets', 'icon-512.png');
+    const appleTouchIconPath = path.join(rootDir, 'public', 'apple-touch-icon.png');
+    assert.ok(fs.existsSync(icon192Path) && fs.statSync(icon192Path).size > 0, 'icon-192.png must exist');
+    assert.ok(fs.existsSync(icon512Path) && fs.statSync(icon512Path).size > 0, 'icon-512.png must exist');
+    assert.ok(fs.existsSync(appleTouchIconPath) && fs.statSync(appleTouchIconPath).size > 0, 'apple-touch-icon.png must exist');
   });
 
   it('validates Google Play / Samsung Android Digital Asset Links (assetlinks.json)', () => {
@@ -55,8 +54,8 @@ describe('QuanterraOS Mobile App & Store Distribution Suite', () => {
     );
     assert.ok(handleUrlsStmt, 'must include handle_all_urls permission for TWA');
     assert.strictEqual(handleUrlsStmt.target.package_name, 'com.quanterraos.app');
-    assert.ok(Array.isArray(handleUrlsStmt.target.sha256_cert_fingerprints), 'must have sha256 fingerprints');
-    assert.ok(handleUrlsStmt.target.sha256_cert_fingerprints.length >= 1, 'must have at least one fingerprint');
+    assert.ok(Array.isArray(handleUrlsStmt.target.sha256_cert_fingerprints), 'must have sha256 fingerprints placeholder');
+    assert.ok(handleUrlsStmt.target.sha256_cert_fingerprints.length >= 1, 'must have at least one fingerprint entry');
   });
 
   it('validates Apple iOS Universal Links (apple-app-site-association)', () => {
@@ -75,7 +74,7 @@ describe('QuanterraOS Mobile App & Store Distribution Suite', () => {
     assert.ok(primaryApp.paths.includes('/mobile*'), 'must link /mobile*');
   });
 
-  it('validates Service Worker offline shell and push notification handlers', () => {
+  it('validates Service Worker offline shell, financial no-cache guards, and push handlers', () => {
     const swPath = path.join(rootDir, 'public', 'service-worker.js');
     assert.ok(fs.existsSync(swPath), 'service-worker.js must exist');
 
@@ -85,28 +84,47 @@ describe('QuanterraOS Mobile App & Store Distribution Suite', () => {
     assert.ok(swContent.includes('fetch'), 'must handle fetch caching');
     assert.ok(swContent.includes('push'), 'must handle Web Push notifications');
     assert.ok(swContent.includes('notificationclick'), 'must handle notification click navigation');
+
+    // Strict financial safety rules: NEVER cache live prices, Kalshi, or wallet data
+    assert.ok(swContent.includes('/api/'), 'must explicitly inspect /api/ routes');
+    assert.ok(swContent.includes('/kalshi'), 'must explicitly inspect /kalshi routes');
+    assert.ok(swContent.includes('/wallet'), 'must explicitly inspect /wallet routes');
+    assert.ok(swContent.includes('status: 503'), 'must return 503 offline response for financial routes to prevent stale data execution');
   });
 
   it('validates rendered Mobile Download Portal HTML (/mobile)', () => {
     const html = renderMobilePageHtml();
     assert.ok(html.includes('QuanterraOS Mobile Terminal'), 'must have title');
-    assert.ok(html.includes('Google Play Store'), 'must mention Google Play Store');
-    assert.ok(html.includes('Apple App Store'), 'must mention Apple App Store');
-    assert.ok(html.includes('Samsung Galaxy Store'), 'must mention Samsung Galaxy Store');
-    assert.ok(html.includes('com.quanterraos.app'), 'must include package identifier');
-    assert.ok(html.includes('iPhone 16 Pro'), 'must showcase Apple iPhone 16 Pro');
-    assert.ok(html.includes('Samsung Galaxy S25'), 'must showcase Samsung Galaxy S25');
-    assert.ok(html.includes('RULE B5 ACTIVE') || html.includes('RULE B5: $0.00 EXPOSURE'), 'must disclose Rule B5');
-    assert.ok(html.includes('serviceWorker'), 'must register service worker');
+    assert.ok(html.includes('Add to Home Screen'), 'must provide iOS Safari Add to Home Screen instructions');
+    assert.ok(html.includes('Android &amp; Samsung') || html.includes('Android & Samsung'), 'must provide Android & Samsung direct install card');
+    assert.ok(html.includes('triggerPwaInstall'), 'must wire triggerPwaInstall button');
     assert.ok(html.includes('beforeinstallprompt'), 'must wire native Android/Samsung PWA install prompt');
+    assert.ok(html.includes('serviceWorker'), 'must register service worker');
+    assert.ok(html.includes('Store Scaffolding &amp; Distribution Transparency') || html.includes('Store Scaffolding & Distribution Transparency'), 'must include store transparency disclosure');
+    assert.ok(html.includes('apple-touch-icon.png'), 'must reference apple-touch-icon.png');
+    assert.ok(html.includes('icon-192.png'), 'must reference 192px PNG icon');
+
+    // Dead store link check: No fabricated store links or made-up App IDs
+    assert.strictEqual(html.includes('play.google.com/store/apps'), false, 'must NOT contain non-existent Google Play link');
+    assert.strictEqual(html.includes('apps.apple.com'), false, 'must NOT contain non-existent Apple App Store link');
+    assert.strictEqual(html.includes('galaxystore.samsung.com'), false, 'must NOT contain non-existent Galaxy Store link');
+    assert.strictEqual(html.includes('6504938210'), false, 'must NOT contain invented Apple App ID 6504938210');
+
+    // Fabricated hardware claims check: No fake endorsement marketing
+    assert.strictEqual(html.includes('iPhone 16 Pro'), false, 'must NOT use iPhone 16 Pro marketing as if endorsed');
+    assert.strictEqual(html.includes('Galaxy S25 Ultra'), false, 'must NOT use Galaxy S25 Ultra marketing as if endorsed');
+    assert.strictEqual(html.includes('<12ms offline launch'), false, 'must NOT make up offline launch latency figures');
 
     // Rule B4 Guardrail check on mobile page
     assert.strictEqual(/\bTesla\b/i.test(html), false, 'mobile page must NOT contain forbidden word Tesla');
     assert.strictEqual(/\bAlpha Citadel\b/i.test(html), false, 'mobile page must NOT contain Alpha Citadel');
     assert.strictEqual(/\bguaranteed profit\b/i.test(html), false, 'mobile page must NOT contain guaranteed profit');
+
+    // Rule B5 Guardrail check
+    assert.ok(html.includes('RULE B5 ACTIVE') || html.includes('RULE B5: $0.00 EXPOSURE'), 'must disclose Rule B5');
   });
 
-  it('validates native packaging templates in mobile/ folder', () => {
+  it('validates native packaging templates in mobile/ folder as developer scaffolding', () => {
     const twaManifest = path.join(rootDir, 'mobile', 'android', 'twa-manifest.json');
     const buildGradle = path.join(rootDir, 'mobile', 'android', 'app', 'build.gradle');
     const androidManifest = path.join(rootDir, 'mobile', 'android', 'app', 'src', 'main', 'AndroidManifest.xml');
@@ -131,3 +149,4 @@ describe('QuanterraOS Mobile App & Store Distribution Suite', () => {
     assert.ok(plistContent.includes('com.quanterraos.app'), 'plist must specify bundle identifier');
   });
 });
+

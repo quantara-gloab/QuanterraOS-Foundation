@@ -20,16 +20,19 @@ export function renderMobilePageHtml(): string {
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="QuanterraOS">
-<title>QuanterraOS Mobile Terminal — Apple iPhone & Samsung Android Download Portal</title>
-<meta name="description" content="Download QuanterraOS on Apple iPhone and Samsung Galaxy via Google Play Store, Samsung Store, and Progressive Web App. Real-time predictive intelligence, F1 pit wall telemetry, and Aria AI executive voice.">
+<title>QuanterraOS Mobile Terminal — Progressive Web App Direct Install</title>
+<meta name="description" content="Install QuanterraOS directly on Apple iPhone and Samsung Galaxy via Progressive Web App. Real-time predictive intelligence, low-latency market telemetry, and Aria AI executive voice.">
 
-<!-- PWA & Store Metadata -->
+<!-- PWA & Icon Metadata -->
 <link rel="manifest" href="/manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/assets/icon-512.png">
 <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
-<link rel="apple-touch-icon" href="/assets/icon-512.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
 <meta property="og:title" content="QuanterraOS Mobile Terminal">
-<meta property="og:description" content="High-speed quantitative intelligence and 8-specialist predictive council on iPhone and Samsung.">
-<meta property="og:image" content="/assets/icon-512.svg">
+<meta property="og:description" content="Quantitative intelligence and 8-specialist predictive council on mobile. Direct PWA installation.">
+<meta property="og:image" content="/assets/icon-512.png">
 
 <!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -414,7 +417,7 @@ export function renderMobilePageHtml(): string {
     perspective: 1000px;
   }
 
-  /* iPhone 16 Pro Mockup Frame */
+  /* Generic iOS Mobile Mockup Frame */
   .device-phone {
     width: 320px;
     height: 640px;
@@ -432,7 +435,7 @@ export function renderMobilePageHtml(): string {
     box-shadow: 0 35px 75px -12px rgba(0, 242, 254, 0.3), 0 0 0 10px #2D3036;
   }
 
-  /* Samsung Galaxy S25 Frame */
+  /* Generic Android Mobile Frame */
   .device-samsung {
     width: 320px;
     height: 640px;
@@ -798,11 +801,11 @@ export function renderMobilePageHtml(): string {
   <section class="hero-section">
     <div class="pill-badge">
       <div class="pulsing-dot"></div>
-      FORMULA ONE PIT WALL TELEMETRY • NATIVE MOBILE COCKPIT
+      PROGRESSIVE WEB APP • DIRECT MOBILE INSTALL
     </div>
-    <h1 class="hero-title">Empirical Quantitative Edge.<br>In the Palm of Your Hand.</h1>
+    <h1 class="hero-title">Empirical Market Telemetry.<br>Installed Directly in Your Browser.</h1>
     <p class="hero-subtitle">
-      Install QuanterraOS on your Apple iPhone and Samsung Galaxy device. Experience empirical market monitoring, 8-specialist consensus, and Aria Executive Voice directly on your mobile device.
+      Install QuanterraOS on any iOS or Android device in seconds with no app store required. Runs fullscreen with zero browser chrome, offline asset caching, and direct access to predictive intelligence.
     </p>
 
     <!-- Client-side OS Detection -->
@@ -812,49 +815,10 @@ export function renderMobilePageHtml(): string {
     </div>
   </section>
 
-  <!-- Download & Store Action Cards -->
-  <section class="download-grid">
-    <!-- Google Play Store (Samsung / Android) -->
-    <div class="download-card highlight" id="androidCard">
-      <div class="card-top">
-        <div class="card-header-icon">
-          <!-- Android / Google Play SVG -->
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-            <path d="M3.6 1.8L13.8 12L3.6 22.2C3.2 21.8 3 21.1 3 20.2V3.8C3 2.9 3.2 2.2 3.6 1.8Z" fill="#00E676"/>
-            <path d="M17.2 8.6L14.7 11.1L13.8 12L14.7 12.9L17.2 15.4L20.4 13.6C21.3 13.1 21.3 12.3 20.4 11.8L17.2 8.6Z" fill="#FFD600"/>
-            <path d="M13.8 12L3.6 1.8C4 1.4 4.7 1.3 5.4 1.7L17.2 8.6L13.8 12Z" fill="#00B0FF"/>
-            <path d="M13.8 12L17.2 15.4L5.4 22.3C4.7 22.7 4 22.6 3.6 22.2L13.8 12Z" fill="#FF3D00"/>
-          </svg>
-        </div>
-        <div class="card-title">
-          Google Play Store
-          <span class="badge-tag">Samsung & Android</span>
-        </div>
-        <p class="card-desc">
-          Official Google Play Store Trusted Web Activity package with automatic background updates and system push notifications.
-        </p>
-        <ul class="card-specs">
-          <li>Package: com.quanterraos.app</li>
-          <li>Target SDK: Android 15 & One UI 7.0</li>
-          <li>Digital Asset Links verified</li>
-          <li>Samsung Knox security compatible</li>
-        </ul>
-      </div>
-      <div>
-        <a href="https://play.google.com/store/apps/details?id=com.quanterraos.app" id="btnPlayStore" class="btn-store btn-google-play" style="margin-bottom: 10px;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M3 20.5v-17c0-.83.67-1.5 1.5-1.5h15c.83 0 1.5.67 1.5 1.5v17c0 .83-.67 1.5-1.5 1.5h-15c-.83 0-1.5-.67-1.5-1.5z"/>
-          </svg>
-          Get on Google Play
-        </a>
-        <button id="btnPwaAndroid" class="btn-store btn-pwa" onclick="triggerPwaInstall()">
-          ⚡ 1-Tap Direct Install (Samsung WebAPK)
-        </button>
-      </div>
-    </div>
-
-    <!-- Apple App Store (iPhone & iPad) -->
-    <div class="download-card" id="iosCard">
+  <!-- Direct Browser Install Action Cards -->
+  <section class="download-grid" style="grid-template-columns: 1fr 1fr;">
+    <!-- Apple iOS Safari WebClip -->
+    <div class="download-card highlight" id="iosCard">
       <div class="card-top">
         <div class="card-header-icon">
           <!-- Apple SVG -->
@@ -863,74 +827,89 @@ export function renderMobilePageHtml(): string {
           </svg>
         </div>
         <div class="card-title">
-          Apple App Store
-          <span class="badge-tag">iPhone & iPad</span>
+          Apple iOS Safari
+          <span class="badge-tag">iPhone &amp; iPad</span>
         </div>
         <p class="card-desc">
-          Universal Links integration for Apple iOS Safari. Native full-screen WebClip with zero browser chrome and Dynamic Island telemetry.
+          Add directly to your iOS Home Screen via Safari. Launches in native full-screen standalone mode with zero browser chrome and custom Apple Touch icon.
         </p>
         <ul class="card-specs">
-          <li>Bundle: com.quanterraos.app</li>
-          <li>iOS 17.4+ & iOS 18 WebClip Support</li>
-          <li>Apple App Site Association linked</li>
-          <li>Web Audio Voice Synthesizer active</li>
+          <li>No App Store account or download needed</li>
+          <li>Apple Touch Icon (180x180 PNG) included</li>
+          <li>Fullscreen standalone display</li>
+          <li>Web Audio Aria voice synthesizer support</li>
         </ul>
       </div>
       <div>
-        <a href="https://apps.apple.com/app/quanterraos-terminal/id6504938210" class="btn-store btn-apple" style="margin-bottom: 10px;">
-          Download on App Store
-        </a>
-        <button class="btn-store btn-pwa" onclick="openIosInstructions()">
+        <button class="btn-store btn-apple" onclick="openIosInstructions()" style="margin-bottom: 10px;">
           📲 Add to iPhone Home Screen
         </button>
+        <a href="/dashboard" class="btn-store btn-pwa">
+          ⚡ Open Web Terminal Now
+        </a>
       </div>
     </div>
 
-    <!-- Samsung Galaxy Store -->
-    <div class="download-card" id="samsungCard">
+    <!-- Android & Samsung Galaxy PWA -->
+    <div class="download-card highlight" id="androidCard">
       <div class="card-top">
         <div class="card-header-icon">
-          <!-- Samsung Galaxy Icon -->
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
-            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/>
-            <path d="M7 12a5 5 0 0 1 10 0" stroke="var(--cyan)" stroke-width="2" stroke-linecap="round"/>
-            <circle cx="12" cy="12" r="3" fill="var(--gold)"/>
+          <!-- Android SVG -->
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+            <path d="M3.6 1.8L13.8 12L3.6 22.2C3.2 21.8 3 21.1 3 20.2V3.8C3 2.9 3.2 2.2 3.6 1.8Z" fill="#00E676"/>
+            <path d="M17.2 8.6L14.7 11.1L13.8 12L14.7 12.9L17.2 15.4L20.4 13.6C21.3 13.1 21.3 12.3 20.4 11.8L17.2 8.6Z" fill="#FFD600"/>
+            <path d="M13.8 12L3.6 1.8C4 1.4 4.7 1.3 5.4 1.7L17.2 8.6L13.8 12Z" fill="#00B0FF"/>
+            <path d="M13.8 12L17.2 15.4L5.4 22.3C4.7 22.7 4 22.6 3.6 22.2L13.8 12Z" fill="#FF3D00"/>
           </svg>
         </div>
         <div class="card-title">
-          Samsung Galaxy Store
-          <span class="badge-tag">One UI 7</span>
+          Android &amp; Samsung
+          <span class="badge-tag">Chrome &amp; Samsung Internet</span>
         </div>
         <p class="card-desc">
-          Native Samsung Galaxy ecosystem optimization. Adaptive icon squircles, DeX desktop mode support, and Edge Panel quick shortcuts.
+          1-Tap Progressive Web App installation. Integrates natively with the Android app drawer and home screen using standard WebAPK.
         </p>
         <ul class="card-specs">
-          <li>One UI Squircle Maskable Icons</li>
-          <li>Samsung DeX multi-window scaling</li>
-          <li>Direct Galaxy Store deep-link protocol</li>
-          <li>Hardware-accelerated rendering</li>
+          <li>1-Tap direct installation prompt</li>
+          <li>High-res maskable PNG icons (192 &amp; 512px)</li>
+          <li>Standalone window without browser URL bar</li>
+          <li>Background service worker for offline shell</li>
         </ul>
       </div>
       <div>
-        <a href="https://galaxystore.samsung.com/detail/com.quanterraos.app" class="btn-store btn-samsung" style="margin-bottom: 10px;">
-          Get on Galaxy Store
-        </a>
-        <a href="/dashboard" class="btn-store btn-pwa">
-          🚀 Launch Instant Web Terminal
+        <button id="btnPwaAndroid" class="btn-store btn-pwa" onclick="triggerPwaInstall()" style="margin-bottom: 10px;">
+          🚀 Install QuanterraOS App
+        </button>
+        <a href="/dashboard" class="btn-store btn-apple" style="background:#181B24; color:#FFF; border:1px solid rgba(255,255,255,0.1);">
+          ⚡ Open Web Terminal Now
         </a>
       </div>
     </div>
   </section>
 
+  <!-- Distribution Transparency Notice -->
+  <div style="background: rgba(14, 19, 28, 0.7); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 20px 24px; margin-bottom: 48px; font-size: 13px; color: var(--text-muted); line-height: 1.6;">
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+      <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--gold);"></span>
+      <strong style="color:var(--text-primary); font-size:14px;">Store Scaffolding &amp; Distribution Transparency</strong>
+    </div>
+    <p style="margin-bottom: 8px;">
+      <strong>Browser PWA:</strong> QuanterraOS installs directly via the W3C Progressive Web App standard on all modern iOS and Android browsers today. No store account or third-party download is required.
+    </p>
+    <p style="margin-bottom: 0;">
+      <strong>Store Submissions:</strong> Packaging configs (Bubblewrap / Android TWA and Apple Xcode shell) are maintained as developer scaffolding in the repository for eventual submission once developer accounts are enrolled and financial-services review criteria are satisfied. No unverified store links are published.
+    </p>
+  </div>
+
   <!-- Interactive Dual Device Showcase -->
   <section class="showcase-section">
     <div class="showcase-header">
-      <h2 class="showcase-title">Built for the World's Leading Mobile Platforms</h2>
-      <p class="showcase-subtitle">Empirical calibration and market telemetry formatted natively for iPhone 16 Pro and Samsung Galaxy S25</p>
+      <h2 class="showcase-title">Mobile Interface &amp; Telemetry Preview</h2>
+      <p class="showcase-subtitle">Real-time market telemetry, predictive consensus, and voice synthesis formatted for mobile viewports</p>
     </div>
 
     <div class="devices-wrapper">
-      <!-- Apple iPhone 16 Pro Frame -->
+      <!-- iOS Device Frame -->
       <div>
         <div class="device-phone">
           <div class="dynamic-island">
@@ -947,7 +926,7 @@ export function renderMobilePageHtml(): string {
             <div class="screen-telemetry-hud">
               <div class="telemetry-row">
                 <span style="color:var(--text-muted)">CALLSIGN:</span>
-                <span style="color:var(--cyan); font-weight:700">F1-CHIEF-01</span>
+                <span style="color:var(--cyan); font-weight:700">DESK-OPERATOR</span>
               </div>
               <div class="telemetry-row">
                 <span style="color:var(--text-muted)">CALIBRATION:</span>
@@ -990,18 +969,18 @@ export function renderMobilePageHtml(): string {
             </div>
           </div>
         </div>
-        <div class="device-label">Apple iPhone 16 Pro</div>
-        <div class="device-sub">iOS 18 • Safari WebClip • Universal Links</div>
+        <div class="device-label">iOS Safari Standalone Preview</div>
+        <div class="device-sub">Fullscreen WebClip • Home Screen Icon</div>
       </div>
 
-      <!-- Samsung Galaxy S25 Frame -->
+      <!-- Android Device Frame -->
       <div>
         <div class="device-samsung">
           <div class="samsung-cam"></div>
           <div class="screen-content">
             <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:6px;">
               <span style="font-weight:800; font-size:11px; letter-spacing:1px; color:#FFF">QUANTERRA<span style="color:var(--cyan)">OS</span></span>
-              <span style="color:var(--gold); font-size:10px; font-family:var(--font-mono)">SAMSUNG ONE UI</span>
+              <span style="color:var(--gold); font-size:10px; font-family:var(--font-mono)">ANDROID PWA</span>
             </div>
 
             <div class="screen-telemetry-hud">
@@ -1039,13 +1018,13 @@ export function renderMobilePageHtml(): string {
 
             <div style="margin-top:auto; background:rgba(0,242,254,0.08); border:1px solid rgba(0,242,254,0.3); border-radius:6px; padding:6px; text-align:center">
               <span style="color:var(--cyan); font-size:10px; font-weight:700; font-family:var(--font-mono)">
-                TWA CERTIFIED: com.quanterraos.app
+                PWA STANDALONE: QUANTERRAOS MOBILE
               </span>
             </div>
           </div>
         </div>
-        <div class="device-label">Samsung Galaxy S25 Ultra</div>
-        <div class="device-sub">Android 15 • Google Play TWA • Knox Guard</div>
+        <div class="device-label">Android PWA Standalone Preview</div>
+        <div class="device-sub">Chrome / Samsung Internet • WebAPK Prompt</div>
       </div>
     </div>
   </section>
@@ -1167,8 +1146,8 @@ export function renderMobilePageHtml(): string {
   <section class="features-grid">
     <div class="feature-item">
       <div class="feature-icon">⚡</div>
-      <h4>High-Speed Edge Cache</h4>
-      <p>Offline Service Worker pre-caches core analytical models, UI components, and state trees so the app launches in under 12 milliseconds.</p>
+      <h4>Fast Offline Shell</h4>
+      <p>Offline Service Worker pre-caches static shell assets, styling, and brand icons. Financial pricing, order routing, and wallet operations are strictly network-gated to prevent stale data.</p>
     </div>
     <div class="feature-item">
       <div class="feature-icon">🎙️</div>
@@ -1177,8 +1156,8 @@ export function renderMobilePageHtml(): string {
     </div>
     <div class="feature-item">
       <div class="feature-icon">🔒</div>
-      <h4>Knox & Secure Enclave</h4>
-      <p>Hardened against tampering. Verified digital asset links ensure only official QuanterraOS cryptographic binaries execute.</p>
+      <h4>Client Sandbox Security</h4>
+      <p>Runs within the standard browser security sandbox. Does not require broad device permissions, keeping your hardware and data secure.</p>
     </div>
     <div class="feature-item">
       <div class="feature-icon">📊</div>
