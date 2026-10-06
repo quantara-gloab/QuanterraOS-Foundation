@@ -84,14 +84,28 @@ export function runMigrations(): void {
  * tests or a fresh cold-start container), automatically apply migrations so schema tables exist.
  */
 try {
-  const tableCheck = sqlite
-    .prepare("SELECT count(*) as count FROM sqlite_master WHERE type='table' AND name='predictions'")
-    .get() as { count: number } | undefined;
-  if (!tableCheck || tableCheck.count === 0) {
-    runMigrations();
+  if (!sqlite.readonly) {
+    const tableCheck = sqlite
+      .prepare("SELECT count(*) as count FROM sqlite_master WHERE type='table' AND name='predictions'")
+      .get() as { count: number } | undefined;
+    if (!tableCheck || tableCheck.count === 0) {
+      runMigrations();
+    }
   }
-} catch {
-  // Gracefully skip if database is opened in a read-only context
+} catch (err: any) {
+  const isReadOnly =
+    sqlite.readonly ||
+    err?.code === "SQLITE_READONLY" ||
+    err?.code === "SQLITE_READONLY_RECOVERY" ||
+    /readonly/i.test(err?.message ?? "");
+
+  if (isReadOnly) {
+    // Expected in read-only operational modes — skip migration execution
+  } else {
+    // Genuine corruption, disk/IO failure, or permission failure: rethrow to fail fast
+    console.error("[db] Critical database initialization failure:", err);
+    throw err;
+  }
 }
 
 export function closeDb(): void {
