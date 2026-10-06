@@ -103,7 +103,12 @@ describe("Phase 1 & Phase 2: Prediction Ledger & Autopilot Engine", () => {
     // Resolve the paper trade
     resolveAutopilotTrade(step.id, "YES");
 
-    const summary = getAutopilotLedger(10);
+    // Free tier delays recent trades by 20 minutes (clean DB has no historical trades)
+    const freeSummary = getAutopilotLedger(10, "free");
+    assert.equal(freeSummary.feedMode, "delayed_snapshot");
+
+    // Pro tier provides immediate real-time ledger access
+    const summary = getAutopilotLedger(10, "pro");
     assert.equal(summary.mode, "PAPER");
     assert.equal(summary.capital, "$0.00");
     assert.equal(summary.ruleB5Locked, true);

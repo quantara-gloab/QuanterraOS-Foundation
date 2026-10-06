@@ -3,6 +3,10 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { runMigrations } from '../db.ts';
+
+runMigrations();
+
 import { renderCouncilDashboardPage } from '../dashboard-terminal.ts';
 import { renderLandingPage } from '../landing-page.ts';
 import { renderPredictionsPage } from '../predictions-page.ts';

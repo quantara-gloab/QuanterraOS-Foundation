@@ -28,6 +28,9 @@ jobs:
       - name: Typecheck TypeScript
         run: npm run typecheck
 
+      - name: Initialize database
+        run: npm run db:init
+
       - name: Run test suite
         run: npm test
 
@@ -36,9 +39,6 @@ jobs:
           mkdir -p reports
           node --experimental-strip-types src/btc15m-predictor-backtest.ts > reports/btc15m-predictor-backtest-ci.txt
           cat reports/btc15m-predictor-backtest-ci.txt
-
-      - name: Initialize database for Falcon backtest smoke test
-        run: npm run db:init
 
       - name: Run Falcon Order-Book Backtest
         run: |

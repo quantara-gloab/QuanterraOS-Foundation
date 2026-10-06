@@ -12,6 +12,10 @@
  */
 import test from "node:test";
 import assert from "node:assert/strict";
+import { runMigrations } from "../db.ts";
+
+runMigrations();
+
 import { createUser, createSession, getUserFromSession, updateUserTier, generateApiKey } from "../auth.ts";
 import { recordPrediction, getPredictionsLedger } from "../prediction-ledger.ts";
 import { getAutopilotLedger, executeAutopilotPaperStep } from "../autopilot-engine.ts";
