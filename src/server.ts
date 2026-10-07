@@ -60,6 +60,7 @@ import { renderPilotAuditPageHtml } from "./pilot-audit-page.ts";
 import { renderAccessTerminalPage } from "./access-terminal-page.ts";
 import { renderWalletPageHtml } from "./wallet-page.ts";
 import { renderCalculatorPageHtml } from "./calculator-page.ts";
+import { renderVenueComparisonPageHtml } from "./venue-comparison-page.ts";
 import { renderCalibrationSurfacePageHtml } from "./calibration-surface-page.ts";
 import { renderMcpPageHtml, MCP_SERVER_MANIFEST, executeMcpTool } from "./mcp-server.ts";
 import { renderSmsOptInPageHtml } from "./sms-optin-page.ts";
@@ -1744,6 +1745,18 @@ app.get("/signup", (_req, res) => {
 
 app.get("/calculator", (_req, res) => {
   res.type("html").send(renderCalculatorPageHtml());
+});
+
+app.get(["/compare", "/venues"], (_req, res) => {
+  res.type("html").send(renderVenueComparisonPageHtml());
+});
+
+app.get("/api/venues/compare", (req, res) => {
+  const price = typeof req.query.price === "string" ? parseFloat(req.query.price) : 0.51;
+  const count = typeof req.query.count === "string" ? parseInt(req.query.count, 10) : 10;
+  const userProb = typeof req.query.prob === "string" ? parseFloat(req.query.prob) : 0.55;
+  const comparison = compareVenues({ price, count, userProb });
+  res.json({ success: true, comparison });
 });
 
 app.get(["/journal", "/decisions"], (req, res) => {

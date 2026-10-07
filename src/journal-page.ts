@@ -397,6 +397,7 @@ export function renderJournalPageHtml(
     </a>
     <div class="nav-links">
       <a href="/calculator">Calculator</a>
+      <a href="/compare" style="color:#38BDF8; font-weight:600;">Compare Venues</a>
       <a href="/journal" class="active" style="color:var(--accent); font-weight:600;">Journal</a>
       <a href="/dashboard">Terminal</a>
       <a href="/account">Account</a>

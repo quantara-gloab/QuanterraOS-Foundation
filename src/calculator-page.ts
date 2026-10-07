@@ -311,18 +311,19 @@ export function renderCalculatorPageHtml(): string {
     <div class="nav-left">
       <a href="/" class="nav-brand"><span class="brand-dot"></span> quanterraos</a>
       <div class="nav-links">
+        <a href="/calculator" class="active" style="color:var(--accent);font-weight:700;">true-cost calculator</a>
+        <a href="/compare" style="color:#38BDF8;font-weight:600;">compare venues</a>
+        <a href="/journal" style="color:#10B981;font-weight:600;">decision journal</a>
         <a href="/kalshi/15m">kalshi 15m</a>
         <a href="/kalshi/1h">kalshi 1h</a>
-        <a href="/calculator" class="active" style="color:var(--accent);font-weight:600;">ev calculator</a>
         <a href="/calibration">calibration</a>
         <a href="/index">composite index</a>
-        <a href="/spread">spread monitor</a>
         <a href="/research">research</a>
-        <a href="/pricing">pricing</a>
       </div>
     </div>
-    <div>
-      <a href="/kalshi" class="nav-cta">LIVE 15M &amp; 1H DESK &rarr;</a>
+    <div style="display:flex; gap:10px; align-items:center;">
+      <a href="/compare" class="nav-cta" style="background:rgba(56,189,248,0.15); color:#38BDF8; border-color:rgba(56,189,248,0.4);">COMPARE VENUES &rarr;</a>
+      <a href="/journal" class="nav-cta" style="background:rgba(16,185,129,0.15); color:#10B981; border-color:rgba(16,185,129,0.4);">MY JOURNAL &rarr;</a>
     </div>
   </nav>
 
