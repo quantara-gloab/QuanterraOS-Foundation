@@ -29,6 +29,11 @@ import { getLatestCouncilPipelineRun, runCouncilPipelineCycle } from "./agents/c
 import { getCouncilPersona, getAllCouncilPersonas } from "./agents/council-personas.ts";
 import { handleCouncilChat, getCouncilChatAuditLog } from "./agents/council-chat.ts";
 import { renderCouncilDashboardPage } from "./dashboard-terminal.ts";
+import {
+  runAutonomousLearningCycle,
+  getLatestLearningCycle,
+  get90DayAccelerationStatus,
+} from "./agents/autonomous-learning-engine.ts";
 import { renderMobilePageHtml } from "./mobile-page.ts";
 import { getSwingEventsSummary, readSwingEventsCsv, checkLiveSwingEvents } from "./swing-event-logger.ts";
 import { getOrComputeCalibrationReport, renderCalibrationHtml } from "./calibration-page.ts";
@@ -1798,6 +1803,26 @@ app.get(["/dashboard", "/council"], (_req, res) => {
   res.type("html").send(renderCouncilDashboardPage(clerkScripts, clerkConfigured));
 });
 
+app.get("/api/agents/learning-summary", async (_req, res) => {
+  try {
+    const cycle = await getLatestLearningCycle();
+    const acceleration = get90DayAccelerationStatus();
+    res.json({ success: true, cycle, acceleration });
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
+app.post("/api/agents/autonomous-train", async (_req, res) => {
+  try {
+    const cycle = await runAutonomousLearningCycle();
+    const acceleration = get90DayAccelerationStatus();
+    res.json({ success: true, cycle, acceleration });
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
 app.get(["/calibration", "/calibration/market-price"], async (_req, res) => {
   try {
     const report = await getOrComputeCalibrationReport();
@@ -2973,9 +2998,11 @@ app.listen(port, () => {
   // Run initial council coordination cycle and poll periodically every 30 seconds
   runCouncilPipelineCycle().catch((err) => console.error("Initial council pipeline run error:", err));
   checkLiveSwingEvents().catch((err) => console.error("Initial swing check error:", err));
+  runAutonomousLearningCycle().catch((err) => console.error("Initial learning cycle error:", err));
   setInterval(() => {
     runCouncilPipelineCycle().catch((err) => console.error("Periodic council pipeline run error:", err));
     checkLiveSwingEvents().catch((err) => console.error("Periodic swing check error:", err));
-  }, 30_000);
+    runAutonomousLearningCycle().catch((err) => console.error("Periodic learning cycle error:", err));
+  }, 60_000);
 });
 

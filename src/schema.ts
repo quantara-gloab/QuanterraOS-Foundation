@@ -642,3 +642,33 @@ export const smsSendLog = sqliteTable(
   }),
 );
 
+// ---------------------------------------------------------------------------
+// Autonomous Executive AI Continuous Learning & Self-Training Cycles
+// ---------------------------------------------------------------------------
+
+export const autonomousLearningCycles = sqliteTable(
+  "autonomous_learning_cycles",
+  {
+    id: text("id").primaryKey(),
+    cycleNumber: integer("cycle_number").notNull(),
+    startedAt: text("started_at").notNull(),
+    completedAt: text("completed_at").notNull(),
+    durationMs: integer("duration_ms").notNull(),
+    brierBaseline: real("brier_baseline").notNull(),
+    modelDivergence: real("model_divergence").notNull(),
+    hypothesesEvaluated: integer("hypotheses_evaluated").notNull().default(0),
+    hypothesesPassed: integer("hypotheses_passed").notNull().default(0),
+    stressScenariosRun: integer("stress_scenarios_run").notNull().default(0),
+    riskVerdict: text("risk_verdict").notNull(),
+    funnelInsightsJson: text("funnel_insights_json").notNull(),
+    executiveBriefMarkdown: text("executive_brief_markdown").notNull(),
+    accelerationScore: real("acceleration_score").notNull(),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => ({
+    cycleNumIdx: index("autonomous_learning_cycle_num_idx").on(table.cycleNumber),
+    createdAtIdx: index("autonomous_learning_created_at_idx").on(table.createdAt),
+  }),
+);
+
+
