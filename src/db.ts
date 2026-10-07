@@ -154,12 +154,7 @@ export function runMigrations(): void {
  */
 try {
   if (!sqlite.readonly) {
-    const tableCheck = sqlite
-      .prepare("SELECT count(*) as count FROM sqlite_master WHERE type='table' AND name='predictions'")
-      .get() as { count: number } | undefined;
-    if (!tableCheck || tableCheck.count === 0) {
-      runMigrations();
-    }
+    runMigrations();
   }
 } catch (err: any) {
   const isReadOnly =
