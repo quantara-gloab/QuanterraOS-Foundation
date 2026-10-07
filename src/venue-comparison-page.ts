@@ -266,7 +266,15 @@ export function renderVenueComparisonPageHtml(): string {
             <label for="slider-price" style="color:#FFFFFF; font-weight:600;">Contract Ask Price</label>
             <span id="label-price" style="color:#DFB843;">51¢ ($0.51)</span>
           </div>
-          <input type="range" id="slider-price" min="1" max="99" value="51" oninput="recalcCompare()" style="accent-color:#DFB843;">
+          <input type="range" id="slider-price" min="1" max="99" value="51" oninput="handleSliderSnap('slider-price', [10,25,50,51,75,90]); recalcCompare();" style="accent-color:#DFB843;">
+          <div style="display:flex; gap:6px; margin-top:6px; flex-wrap:wrap;">
+            <button type="button" class="preset-btn" onclick="setPrice(10)">10¢</button>
+            <button type="button" class="preset-btn" onclick="setPrice(25)">25¢</button>
+            <button type="button" class="preset-btn" onclick="setPrice(50)">50¢</button>
+            <button type="button" class="preset-btn" onclick="setPrice(51)" style="border-color:#DFB843; color:#DFB843;">51¢ (Std)</button>
+            <button type="button" class="preset-btn" onclick="setPrice(75)">75¢</button>
+            <button type="button" class="preset-btn" onclick="setPrice(90)">90¢</button>
+          </div>
         </div>
 
         <!-- Contract Count -->
@@ -290,7 +298,14 @@ export function renderVenueComparisonPageHtml(): string {
             <label for="slider-prob" style="color:#FFFFFF; font-weight:600;">Your Assessed Win Prob</label>
             <span id="label-prob" style="color:#38BDF8;">55.0%</span>
           </div>
-          <input type="range" id="slider-prob" min="1" max="99" value="55" oninput="recalcCompare()" style="accent-color:#38BDF8;">
+          <input type="range" id="slider-prob" min="1" max="99" value="55" oninput="handleSliderSnap('slider-prob', [35,50,55,65,75]); recalcCompare();" style="accent-color:#38BDF8;">
+          <div style="display:flex; gap:6px; margin-top:6px; flex-wrap:wrap;">
+            <button type="button" class="preset-btn" onclick="setProb(35)">35%</button>
+            <button type="button" class="preset-btn" onclick="setProb(50)">50% (Coin)</button>
+            <button type="button" class="preset-btn" onclick="setProb(55)" style="border-color:#38BDF8; color:#38BDF8;">55% (Std)</button>
+            <button type="button" class="preset-btn" onclick="setProb(65)">65%</button>
+            <button type="button" class="preset-btn" onclick="setProb(75)">75%</button>
+          </div>
         </div>
       </div>
     </div>
@@ -425,7 +440,41 @@ export function renderVenueComparisonPageHtml(): string {
   </main>
 
   <script>
+    function triggerHaptic() {
+      try {
+        if (navigator && typeof navigator.vibrate === 'function') {
+          navigator.vibrate(12);
+        }
+      } catch (_) {}
+    }
+
+    function handleSliderSnap(id, snapPoints) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const v = Number(el.value);
+      for (let i = 0; i < snapPoints.length; i++) {
+        if (Math.abs(v - snapPoints[i]) <= 0.8 && v !== snapPoints[i]) {
+          el.value = snapPoints[i];
+          triggerHaptic();
+          break;
+        }
+      }
+    }
+
+    function setPrice(p) {
+      triggerHaptic();
+      document.getElementById('slider-price').value = p;
+      recalcCompare();
+    }
+
+    function setProb(pr) {
+      triggerHaptic();
+      document.getElementById('slider-prob').value = pr;
+      recalcCompare();
+    }
+
     function setCount(n) {
+      triggerHaptic();
       document.getElementById('input-count').value = n;
       recalcCompare();
     }

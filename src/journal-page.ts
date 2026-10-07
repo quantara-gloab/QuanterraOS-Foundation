@@ -378,6 +378,32 @@ export function renderJournalPageHtml(
     .alert-success { background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); color: #6EE7B7; }
     .alert-error { background: rgba(244, 63, 94, 0.12); border: 1px solid rgba(244, 63, 94, 0.3); color: #FCA5A5; }
 
+    .btn-card-export {
+      background: rgba(223, 184, 67, 0.12);
+      border: 1px solid rgba(223, 184, 67, 0.35);
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .btn-card-export:hover {
+      background: rgba(223, 184, 67, 0.25);
+      color: #FFFFFF;
+    }
+
+    @media print {
+      body { background: #FFFFFF !important; color: #000000 !important; }
+      .top-nav, .header-block, .kpi-grid, .banner-onboarding, .journal-card-header, table, .btn-gold, .btn-settle, .btn-card-export { display: none !important; }
+      #evidence-card-modal { position: static !important; background: transparent !important; display: block !important; padding: 0 !important; }
+      #evidence-card-modal > div { border: 2px solid #000 !important; background: #FFF !important; color: #000 !important; box-shadow: none !important; max-width: 100% !important; }
+      #evidence-card-modal * { color: #000 !important; }
+    }
+
     @media (max-width: 640px) {
       .header-block { flex-direction: column; }
       .nav-links a:not(.active) { display: none; }
@@ -528,15 +554,20 @@ export function renderJournalPageHtml(
                     ` : `<span style="color:var(--muted);">Pending</span>`}
                   </td>
                   <td>
-                    ${e.outcome ? `
-                      <span class="badge-status ${e.outcome === 'WON' ? 'badge-won' : e.outcome === 'LOST' ? 'badge-lost' : 'badge-void'}">
-                        ${e.outcome}
-                      </span>
-                    ` : `
-                      <button type="button" class="btn-settle" onclick="openSettleModal('${e.id}', '${e.contractTicker}', ${e.contractCount || 10}, ${e.contractPrice || 0.51}, ${e.exchangeFee || 0.18})">
-                        Log Outcome &rarr;
+                    <div style="display:flex; gap:6px; align-items:center;">
+                      ${e.outcome ? `
+                        <span class="badge-status ${e.outcome === 'WON' ? 'badge-won' : e.outcome === 'LOST' ? 'badge-lost' : 'badge-void'}">
+                          ${e.outcome}
+                        </span>
+                      ` : `
+                        <button type="button" class="btn-settle" onclick="openSettleModal('${e.id}', '${e.contractTicker}', ${e.contractCount || 10}, ${e.contractPrice || 0.51}, ${e.exchangeFee || 0.18})">
+                          Log Outcome &rarr;
+                        </button>
+                      `}
+                      <button type="button" class="btn-card-export" onclick="showEvidenceCard('${e.id}', '${e.contractTicker}', '${e.venue}', '${e.side}', '${e.pricingBasis}', ${e.contractPrice || 0.51}, ${e.contractCount || 10}, ${e.purchaseCost || 5.10}, ${e.exchangeFee || 0.18}, ${e.breakevenWinProb || 52.8}, ${e.assessedWinProb || 55.0}, ${e.netExpectedValue || 0.22}, '${(e.settlementSource || 'CME CF BRTI 60s TWAP').replace(/'/g, "\\'")}', '${e.createdAt ? e.createdAt.slice(0, 16).replace('T', ' ') : ''}')" title="View &amp; Print Evidence Card">
+                        🖨 Card
                       </button>
-                    `}
+                    </div>
                   </td>
                   <td style="font-size:0.75rem; color:var(--muted);">
                     ${e.notes ? `<div style="color:var(--text); margin-bottom:2px; font-weight:500;">${e.notes}</div>` : ''}
@@ -596,6 +627,65 @@ export function renderJournalPageHtml(
         <div style="display:flex; justify-content:flex-end; gap:10px;">
           <button type="button" onclick="closeSettleModal()" class="btn-gold" style="background:rgba(255,255,255,0.06); color:var(--text); border-color:var(--border);">Cancel</button>
           <button type="button" onclick="submitSettlement()" class="btn-gold" id="btn-submit-settle">Commit Settlement &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Evidence Card Modal -->
+    <div id="evidence-card-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); z-index:300; align-items:center; justify-content:center; padding:16px;">
+      <div style="background:#0C0F17; border:1px solid rgba(212,175,55,0.4); border-radius:8px; max-width:540px; width:100%; padding:28px; box-shadow:0 20px 50px rgba(0,0,0,0.8);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; border-bottom:1px solid rgba(212,175,55,0.2); padding-bottom:12px;">
+          <div>
+            <div style="font-family:var(--font-mono); font-size:0.7rem; color:var(--accent); text-transform:uppercase; letter-spacing:0.08em;">QUANTERRAOS DECISION EVIDENCE CARD</div>
+            <div style="font-size:1.25rem; font-weight:700; color:#FFFFFF;" id="card-modal-ticker">KXBTC15M YES</div>
+          </div>
+          <span id="card-modal-date" class="mono" style="font-size:0.75rem; color:var(--muted);">2026-10-06</span>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; font-size:0.82rem;">
+          <div style="background:rgba(255,255,255,0.03); padding:10px; border-radius:4px; border:1px solid rgba(255,255,255,0.05);">
+            <div style="color:var(--muted); font-size:0.7rem; text-transform:uppercase;">Venue / Basis</div>
+            <div id="card-modal-venue" class="mono" style="font-weight:600; color:#FFFFFF; margin-top:2px;">Kalshi (Ask)</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.03); padding:10px; border-radius:4px; border:1px solid rgba(255,255,255,0.05);">
+            <div style="color:var(--muted); font-size:0.7rem; text-transform:uppercase;">Order Quantity</div>
+            <div id="card-modal-count" class="mono" style="font-weight:600; color:var(--cyan); margin-top:2px;">10 contracts</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.03); padding:10px; border-radius:4px; border:1px solid rgba(255,255,255,0.05);">
+            <div style="color:var(--muted); font-size:0.7rem; text-transform:uppercase;">Cost + Fee = Max Loss</div>
+            <div id="card-modal-cost" class="mono" style="font-weight:600; color:var(--rose); margin-top:2px;">$5.10 + $0.18 = $5.28</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.03); padding:10px; border-radius:4px; border:1px solid rgba(255,255,255,0.05);">
+            <div style="color:var(--muted); font-size:0.7rem; text-transform:uppercase;">Breakeven Hurdle</div>
+            <div id="card-modal-breakeven" class="mono" style="font-weight:700; color:var(--accent); margin-top:2px;">52.80%</div>
+          </div>
+        </div>
+
+        <div style="background:rgba(6,9,14,0.7); border:1px solid var(--border-subtle); border-radius:4px; padding:12px; margin-bottom:18px; font-size:0.78rem;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span style="color:var(--muted);">Assessed Probability:</span>
+            <span id="card-modal-prob" class="mono" style="font-weight:600; color:#FFFFFF;">55.0%</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span style="color:var(--muted);">Net Expected Value (EV):</span>
+            <span id="card-modal-ev" class="mono" style="font-weight:700; color:var(--green);">+$0.22</span>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <span style="color:var(--muted);">Settlement Benchmark:</span>
+            <span id="card-modal-oracle" class="mono" style="font-size:0.72rem; color:var(--text-dim);">CME CF BRTI 60s TWAP</span>
+          </div>
+        </div>
+
+        <div style="font-size:0.7rem; color:var(--muted); margin-bottom:20px; line-height:1.5; border-left:2px solid var(--accent); padding-left:10px;">
+          <strong>Rule B5 &amp; B4 Safeguards:</strong> Independent pre-trade friction audit. All evaluations run under $0.00 capital risk. Calculation reflects arithmetic cost hurdle; does not forecast market direction or guarantee trading returns.
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span id="card-modal-id" class="mono" style="font-size:0.68rem; color:var(--muted);">ID: jrn_...</span>
+          <div style="display:flex; gap:8px;">
+            <button type="button" onclick="window.print()" class="btn-gold" style="font-size:0.75rem; padding:8px 14px;">🖨 Print / PDF</button>
+            <button type="button" onclick="closeEvidenceCardModal()" class="btn-gold" style="background:rgba(255,255,255,0.06); color:var(--text); border-color:var(--border); font-size:0.75rem; padding:8px 14px;">Close</button>
+          </div>
         </div>
       </div>
     </div>
@@ -691,6 +781,25 @@ export function renderJournalPageHtml(
       // Log journal viewed event
       fetch('/api/analytics/journal-viewed', { method: 'POST' }).catch(function() {});
     });
+
+    function showEvidenceCard(id, ticker, venue, side, basis, price, count, cost, fee, breakeven, prob, ev, oracle, date) {
+      document.getElementById('card-modal-ticker').textContent = ticker + ' ' + (side ? side.toUpperCase() : 'YES');
+      document.getElementById('card-modal-date').textContent = date || new Date().toISOString().slice(0, 10);
+      document.getElementById('card-modal-venue').textContent = venue + ' (' + (basis === 'mid_price' ? 'Mid' : 'Ask') + ')';
+      document.getElementById('card-modal-count').textContent = count + ' contracts';
+      document.getElementById('card-modal-cost').textContent = '$' + Number(cost).toFixed(2) + ' + $' + Number(fee).toFixed(2) + ' = $' + (Number(cost) + Number(fee)).toFixed(2);
+      document.getElementById('card-modal-breakeven').textContent = Number(breakeven).toFixed(2) + '%';
+      document.getElementById('card-modal-prob').textContent = Number(prob).toFixed(1) + '%';
+      document.getElementById('card-modal-ev').textContent = (ev >= 0 ? '+' : '') + '$' + Number(ev).toFixed(2);
+      document.getElementById('card-modal-ev').style.color = ev >= 0 ? 'var(--green)' : 'var(--rose)';
+      document.getElementById('card-modal-oracle').textContent = oracle || 'CME CF BRTI 60s TWAP';
+      document.getElementById('card-modal-id').textContent = 'ID: ' + id;
+      document.getElementById('evidence-card-modal').style.display = 'flex';
+    }
+
+    function closeEvidenceCardModal() {
+      document.getElementById('evidence-card-modal').style.display = 'none';
+    }
 
     async function commitPendingCheck() {
       try {

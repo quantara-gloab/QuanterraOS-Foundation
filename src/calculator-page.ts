@@ -362,7 +362,15 @@ export function renderCalculatorPageHtml(): string {
             <span id="label-price" style="color:#DFB843; font-weight:700;">51¢ ($0.51)</span>
           </div>
           <div style="font-size:0.72rem; color:var(--muted); margin-bottom:6px;">Exchange purchase price. Determines maximum dollar loss and initial entry cost.</div>
-          <input type="range" id="slider-price" min="1" max="99" value="51" oninput="recalc()">
+          <input type="range" id="slider-price" min="1" max="99" value="51" oninput="handleSliderSnap('slider-price', [10,25,50,51,75,90]); recalc();">
+          <div style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;">
+            <button type="button" class="preset-btn" onclick="setPrice(10)">10¢</button>
+            <button type="button" class="preset-btn" onclick="setPrice(25)">25¢</button>
+            <button type="button" class="preset-btn" onclick="setPrice(50)">50¢</button>
+            <button type="button" class="preset-btn" onclick="setPrice(51)" style="border-color:#DFB843; color:#DFB843;">51¢ (Std)</button>
+            <button type="button" class="preset-btn" onclick="setPrice(75)">75¢</button>
+            <button type="button" class="preset-btn" onclick="setPrice(90)">90¢</button>
+          </div>
         </div>
 
         <div class="input-group">
@@ -374,7 +382,14 @@ export function renderCalculatorPageHtml(): string {
             <span id="label-prob" style="color:#38BDF8; font-weight:700;">55.0%</span>
           </div>
           <div style="font-size:0.72rem; color:var(--muted); margin-bottom:6px;">Your subjective assessment. This is your personal opinion, NOT an automated forecast.</div>
-          <input type="range" id="slider-prob" min="1" max="99" value="55" oninput="recalc()">
+          <input type="range" id="slider-prob" min="1" max="99" value="55" oninput="handleSliderSnap('slider-prob', [35,50,52.8,55,65,75]); recalc();">
+          <div style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;">
+            <button type="button" class="preset-btn" onclick="setProb(35)">35%</button>
+            <button type="button" class="preset-btn" onclick="setProb(50)">50% (Coin)</button>
+            <button type="button" class="preset-btn" onclick="setProb(55)" style="border-color:#38BDF8; color:#38BDF8;">55% (Std)</button>
+            <button type="button" class="preset-btn" onclick="setProb(65)">65%</button>
+            <button type="button" class="preset-btn" onclick="setProb(75)">75%</button>
+          </div>
         </div>
 
         <div class="input-group" id="group-spread" style="display:none;">
@@ -648,7 +663,41 @@ export function renderCalculatorPageHtml(): string {
       };
     }
 
+    function triggerHaptic() {
+      try {
+        if (navigator && typeof navigator.vibrate === 'function') {
+          navigator.vibrate(12);
+        }
+      } catch (_) {}
+    }
+
+    function handleSliderSnap(id, snapPoints) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const v = Number(el.value);
+      for (let i = 0; i < snapPoints.length; i++) {
+        if (Math.abs(v - snapPoints[i]) <= 0.8 && v !== snapPoints[i]) {
+          el.value = snapPoints[i];
+          triggerHaptic();
+          break;
+        }
+      }
+    }
+
+    function setPrice(p) {
+      triggerHaptic();
+      document.getElementById('slider-price').value = p;
+      recalc();
+    }
+
+    function setProb(pr) {
+      triggerHaptic();
+      document.getElementById('slider-prob').value = pr;
+      recalc();
+    }
+
     function setCount(n) {
+      triggerHaptic();
       document.getElementById('input-count').value = n;
       recalc();
     }
