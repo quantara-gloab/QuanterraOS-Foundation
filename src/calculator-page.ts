@@ -198,6 +198,23 @@ export function renderCalculatorPageHtml(): string {
       outline: none;
     }
 
+    .preset-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--panel-border);
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .preset-btn:hover {
+      background: rgba(223, 184, 67, 0.12);
+      border-color: rgba(223, 184, 67, 0.4);
+      color: #FFFFFF;
+    }
+
     .result-hero {
       background: linear-gradient(180deg, rgba(223, 184, 67, 0.08) 0%, rgba(14, 18, 27, 0.95) 100%);
       border: 1px solid rgba(223, 184, 67, 0.35);
@@ -332,8 +349,16 @@ export function renderCalculatorPageHtml(): string {
 
         <div class="input-row-flex">
           <div class="input-group">
-            <label style="font-size:0.8rem; color:var(--muted); display:block; margin-bottom:6px;">Contract Count (Order Size)</label>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <label style="font-size:0.8rem; color:var(--muted); margin:0;">Contract Count (Order Size)</label>
+              <span style="font-size:0.7rem; color:var(--accent); font-family:var(--font-mono);">Hold Price Constant</span>
+            </div>
             <input type="number" id="input-count" class="number-input" value="100" min="1" max="10000" oninput="recalc()">
+            <div style="display:flex; gap:6px; margin-top:6px; flex-wrap:wrap;">
+              <button type="button" class="preset-btn" onclick="setCount(1)" title="1 contract: ceil(1.75¢) = 2¢ fee (+0.25¢ rounding drag)">1 ct (2.0¢/ct)</button>
+              <button type="button" class="preset-btn" onclick="setCount(10)" title="10 contracts: ceil(17.5¢) = 18¢ fee (+0.05¢ rounding drag)">10 ct (1.8¢/ct)</button>
+              <button type="button" class="preset-btn" onclick="setCount(100)" title="100 contracts: ceil(175¢) = $1.75 fee (exact 1.75¢/ct)">100 ct (1.75¢/ct)</button>
+            </div>
           </div>
           <div class="input-group">
             <label style="font-size:0.8rem; color:var(--muted); display:block; margin-bottom:6px;">Contract Cadence &amp; Series</label>
@@ -556,6 +581,11 @@ export function renderCalculatorPageHtml(): string {
         netExpectedValue: Number(totalPnl.toFixed(2)),
         settlementSource: benchmark
       };
+    }
+
+    function setCount(n) {
+      document.getElementById('input-count').value = n;
+      recalc();
     }
 
     function saveCheckToJournal() {

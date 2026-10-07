@@ -1878,30 +1878,76 @@ app.get("/api/export/journal.csv", (req, res) => {
   res.send(headers + rows);
 });
 
-app.get("/api/analytics/funnel-summary", (_req, res) => {
+app.get("/api/analytics/funnel-summary", requireFounderAuth, (_req, res) => {
   const allEvents = db.select().from(events).all();
-  const counts: Record<string, number> = {
+  const allUsers = db.select().from(users).all();
+
+  // Identify internal/test user IDs
+  const internalUserIds = new Set<string>();
+  for (const u of allUsers) {
+    const email = (u.email || "").toLowerCase();
+    if (
+      email.includes("quanterraos.com") ||
+      email.includes("founder@") ||
+      email.includes("test@") ||
+      email.includes("operator@") ||
+      email.startsWith("internal_")
+    ) {
+      internalUserIds.add(u.id);
+    }
+  }
+
+  const customerCounts: Record<string, number> = {
     checks_completed: 0,
     signups: 0,
     checks_saved: 0,
     journal_views: 0,
     journal_exports: 0,
   };
+
+  const internalCounts: Record<string, number> = {
+    checks_completed: 0,
+    signups: 0,
+    checks_saved: 0,
+    journal_views: 0,
+    journal_exports: 0,
+  };
+
   for (const e of allEvents) {
-    if (e.eventName === "check_completed") counts.checks_completed++;
-    else if (e.eventName === "signup") counts.signups++;
-    else if (e.eventName === "check_saved") counts.checks_saved++;
-    else if (e.eventName === "journal_viewed") counts.journal_views++;
-    else if (e.eventName === "journal_exported") counts.journal_exports++;
+    let isInternal = false;
+    if (e.userId && internalUserIds.has(e.userId)) {
+      isInternal = true;
+    }
+    if (e.metadata) {
+      try {
+        const meta = JSON.parse(e.metadata);
+        if (meta.is_internal || meta.internal || meta.test || meta.source === "test_suite") {
+          isInternal = true;
+        }
+      } catch (_) {}
+    }
+
+    const bucket = isInternal ? internalCounts : customerCounts;
+    if (e.eventName === "check_completed") bucket.checks_completed++;
+    else if (e.eventName === "signup") bucket.signups++;
+    else if (e.eventName === "check_saved") bucket.checks_saved++;
+    else if (e.eventName === "journal_viewed") bucket.journal_views++;
+    else if (e.eventName === "journal_exported") bucket.journal_exports++;
   }
+
   res.json({
     success: true,
     timestamp: new Date().toISOString(),
-    funnel: counts,
-    conversionRates: {
-      checkToSave: counts.checks_completed > 0 ? Number(((counts.checks_saved / counts.checks_completed) * 100).toFixed(1)) + "%" : "0.0%",
-      signupToSave: counts.signups > 0 ? Number(((counts.checks_saved / counts.signups) * 100).toFixed(1)) + "%" : "0.0%",
-    }
+    customerFunnel: customerCounts,
+    internalFunnel: internalCounts,
+    customerConversionRates: {
+      checkToSave: customerCounts.checks_completed > 0 
+        ? Number(((customerCounts.checks_saved / customerCounts.checks_completed) * 100).toFixed(1)) + "%" 
+        : "0.0%",
+      signupToSave: customerCounts.signups > 0 
+        ? Number(((customerCounts.checks_saved / customerCounts.signups) * 100).toFixed(1)) + "%" 
+        : "0.0%",
+    },
   });
 });
 

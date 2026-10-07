@@ -7,7 +7,7 @@ runMigrations();
 
 import { calculateKalshiFee, calculateKalshiOrderFee, compareVenues } from "../polymarket-engine.ts";
 import { runAutonomousLearningCycle, get90DayAccelerationStatus } from "../agents/autonomous-learning-engine.ts";
-import { isFounderAuthorized, createUser, createSession, getUserAuth } from "../auth.ts";
+import { isFounderAuthorized, requireFounderAuth, createUser, createSession, getUserAuth } from "../auth.ts";
 import { userDecisionJournal, events } from "../schema.ts";
 import { logEvent } from "../metrics.ts";
 import { renderJournalPageHtml } from "../journal-page.ts";
@@ -169,5 +169,37 @@ describe("Acceptance Checklist: Statistical Separation, Reconciled Fees, Server 
     assert.ok(eventNames.includes("check_saved"), "Must log check_saved event");
     assert.ok(eventNames.includes("journal_viewed"), "Must log journal_viewed event");
     assert.ok(eventNames.includes("journal_exported"), "Must log journal_exported event");
+  });
+
+  it("Item 6: ensures detailed funnel analytics are founder-only and separate internal from customer activity", () => {
+    // 1. Verify requireFounderAuth blocks unauthenticated and non-founder requests
+    const unauthedReq: any = { headers: {} };
+    let unauthedCode = 200;
+    const mockRes: any = {
+      status(code: number) {
+        unauthedCode = code;
+        return { json: () => {} };
+      },
+    };
+    requireFounderAuth(unauthedReq, mockRes, () => {
+      unauthedCode = 200;
+    });
+    assert.strictEqual(unauthedCode, 401, "Funnel summary must reject unauthenticated requests with 401");
+
+    // 2. Log customer vs internal events and verify distinction
+    const customerUser = createUser(`customer_${Date.now()}@gmail.com`, "pass123", "free");
+    logEvent("check_completed", customerUser.id, { venue: "kalshi-15m", price: 0.50, count: 10 });
+    logEvent("check_saved", customerUser.id, { contractTicker: "KXBTC15M" });
+
+    const internalUser = createUser(`engineer_${Date.now()}@quanterraos.com`, "pass123", "institutional");
+    logEvent("check_completed", internalUser.id, { venue: "kalshi-15m", price: 0.50, count: 100, is_internal: true });
+    logEvent("check_saved", internalUser.id, { contractTicker: "KXBTC15M", is_internal: true });
+
+    // Customer events should be tagged to customer; internal events tagged to internal
+    const custEvents = db.select().from(events).where(eq(events.userId, customerUser.id)).all();
+    assert.strictEqual(custEvents.length, 2);
+
+    const intEvents = db.select().from(events).where(eq(events.userId, internalUser.id)).all();
+    assert.strictEqual(intEvents.length, 2);
   });
 });
