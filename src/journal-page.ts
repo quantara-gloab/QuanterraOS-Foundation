@@ -15,6 +15,7 @@ import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
 import { renderBetaFeedbackWidgetHtml } from "./feedback-widget.ts";
 import { renderSystemPulseHtml } from "./system-pulse.ts";
 import { renderMobileBottomNavHtml, getMobileAppRuntimeScript } from "./mobile-install.ts";
+import { renderDecisionCoachWidgetHtml } from "./decision-coach.ts";
 
 export interface DecisionJournalEntry {
   id: string;
@@ -571,6 +572,9 @@ export function renderJournalPageHtml(
         </p>
       </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button type="button" id="btn-open-decision-coach" onclick="openDecisionCoach()" class="btn-gold" style="background:rgba(223,184,67,0.18); color:#F7E7B4; border-color:var(--accent);">
+          ✦ Decision Coach
+        </button>
         <a href="/review" class="btn-gold" style="background:rgba(56,189,248,0.15); color:var(--cyan); border-color:var(--cyan);">
           📊 Personal Review &rarr;
         </a>
@@ -1700,6 +1704,7 @@ export function renderJournalPageHtml(
   ${getMobileAppRuntimeScript()}
   ${ASSISTANT_WIDGET_HTML}
   ${renderBetaFeedbackWidgetHtml()}
+  ${renderDecisionCoachWidgetHtml()}
 </body>
 </html>`;
 }

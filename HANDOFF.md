@@ -406,5 +406,40 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 - `npx tsc --noEmit` — 0 errors (clean exit 0).
 - `npm test` — 346/346 passing across 68 suites, 0 failures.
 
+---
+
+### Session: 2026-10-07 — Reliability Subsystems, INTELLARA Decision Coach & Founder Release-Quality Dashboard
+
+**Delivered Capabilities:**
+- **Isolated Backup & Recovery Engine (`src/backup-recovery.ts`)**:
+  - Full schema and state extraction across users, risk plans, decision journal checks, and imported statement records.
+  - Restoration into an isolated in-memory SQLite sandbox with deep checksum verification (`SHA-256`) and count matching (283 accounts, 35 checks).
+  - Wired to founder health reporting with zero disruption to active customer traffic.
+- **Draco Data-Quality Engine (`src/data-quality-engine.ts`)**:
+  - Stale Price Detection: Re-enforces 5.0s Draco gate, evaluating tick latency against incoming feeds.
+  - Missing Outcome Scanner: Detects closed 15m windows older than 30m lacking settlement.
+  - Duplicate Trade Scanner: Evaluates trade fingerprints across statement imports to guarantee idempotence.
+  - Contract Identifier Validation: Authoritative regex matching for Kalshi KXBTC15M contracts (`validateContractIdentifier`).
+  - Input Reliability Guard: Evaluates live inputs, returning `"Unavailable"` (`evaluateInputReliability`) with explicit reason strings when inputs are compromised.
+- **Fee & Settlement-Rule Monitor (`src/fee-rule-monitor.ts`)**:
+  - Tracks venue fee schedules (Kalshi non-linear formula, Polymarket gas drag) with source citations, effective dates, and versioning.
+  - Tracks settlement oracle rules (CME CF BRTI 60s TWAP) with fallback procedures.
+  - 90-day review cycle auditing: flags outdated information (`checkFeeAndSettlementRulesFreshness`) and blocks silent unreviewed algorithmic updates.
+- **INTELLARA Personal Decision Coach (`src/decision-coach.ts`)**:
+  - Gated behind `FEATURE_DECISION_COACH` / `?feature=coach` to keep active pilot flow rock-solid.
+  - Explains saved checks using unified calculator arithmetic (cost, fees, max loss, breakeven %).
+  - Answers user queries from database records with direct links to journal entries (`#jrn_...`).
+  - Guides 3-step decision reviews (Premise -> Reality -> Lesson) saving debrief notes to journal entries.
+  - Strictly isolates Paper vs Actual trades and isolates User A from User B with zero hallucinated trades or alpha claims (Rule B4 compliant).
+- **Founder Release-Quality Dashboard (`src/founder-release-dashboard.ts`, `/admin/release`)**:
+  - Founder-only command screen tracking customer flow (`check -> register -> save -> journal -> import -> reconcile`), system health (freshness, imports, backup recovery), and AI coach accuracy.
+  - Displays tri-state verification status (`Passed`, `Failed`, `Not checked`) with explicit missing evidence indicators.
+  - Deliberate Dependency Breaker Test Harness (`setSimulatedDependencyBroken`): verified that breaking a dependency immediately transitions status to `BLOCKED` and subsystem to `Failed` instead of staying falsely green.
+
+**Verification:**
+- `npx tsc --noEmit` — 0 errors (clean exit 0).
+- `npm test` — 353/353 passing across 69 suites, 0 failures.
+
+
 
 

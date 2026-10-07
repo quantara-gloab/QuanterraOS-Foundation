@@ -100,6 +100,19 @@ import {
   exportImportedStatementsCsv,
   deleteImportedStatements,
 } from "./statement-reconciliation.ts";
+import { runIsolatedBackupRecoveryCheck } from "./backup-recovery.ts";
+import { runDataQualityAudit, evaluateInputReliability } from "./data-quality-engine.ts";
+import { checkFeeAndSettlementRulesFreshness } from "./fee-rule-monitor.ts";
+import {
+  explainSavedCheck,
+  answerFromUserRecords,
+  recordDecisionReviewDebrief,
+} from "./decision-coach.ts";
+import {
+  getFounderReleaseDashboardData,
+  renderFounderReleaseDashboardHtml,
+  setSimulatedDependencyBroken,
+} from "./founder-release-dashboard.ts";
 import { startGrowthEngine } from "./growth/index.ts";
 import {
   getGtmSummary,
@@ -2307,6 +2320,103 @@ app.post("/api/statement/delete", (req, res) => {
   const { batchId } = req.body || {};
   const result = deleteImportedStatements(userId, batchId);
   res.json({ success: true, ...result });
+});
+
+// ---------------------------------------------------------------------------
+// INTELLARA Decision Coach APIs (Feature-Gated)
+// ---------------------------------------------------------------------------
+
+app.post("/api/coach/explain", (req, res) => {
+  const flags = getFeatureFlags(req.query);
+  if (!flags.decisionCoach) {
+    return res.status(403).json({ error: "Decision Coach is currently disabled behind feature flag" });
+  }
+  const auth = getUserAuth(req);
+  const userId = auth.user?.id || (process.env.NODE_ENV !== "production" ? "test-user-coach" : null);
+  if (!userId) {
+    return res.status(401).json({ error: "Authentication required" });
+  }
+  const { journalId } = req.body || {};
+  if (!journalId) {
+    return res.status(400).json({ error: "Missing required journalId" });
+  }
+  const explanation = explainSavedCheck(journalId, userId);
+  if (!explanation) {
+    return res.status(404).json({ error: "Journal entry not found or unauthorized" });
+  }
+  res.json({ success: true, explanation });
+});
+
+app.post("/api/coach/ask", (req, res) => {
+  const flags = getFeatureFlags(req.query);
+  if (!flags.decisionCoach) {
+    return res.status(403).json({ error: "Decision Coach is currently disabled behind feature flag" });
+  }
+  const auth = getUserAuth(req);
+  const userId = auth.user?.id || (process.env.NODE_ENV !== "production" ? "test-user-coach" : null);
+  if (!userId) {
+    return res.status(401).json({ error: "Authentication required" });
+  }
+  const { query } = req.body || {};
+  if (!query || typeof query !== "string") {
+    return res.status(400).json({ error: "Missing query in request body" });
+  }
+  const answer = answerFromUserRecords(query, userId);
+  res.json(answer);
+});
+
+app.post("/api/coach/debrief", (req, res) => {
+  const flags = getFeatureFlags(req.query);
+  if (!flags.decisionCoach) {
+    return res.status(403).json({ error: "Decision Coach is currently disabled behind feature flag" });
+  }
+  const auth = getUserAuth(req);
+  const userId = auth.user?.id || (process.env.NODE_ENV !== "production" ? "test-user-coach" : null);
+  if (!userId) {
+    return res.status(401).json({ error: "Authentication required" });
+  }
+  const { journalId, expectation, reality, lesson } = req.body || {};
+  if (!journalId) {
+    return res.status(400).json({ error: "Missing journalId" });
+  }
+  const result = recordDecisionReviewDebrief(journalId, userId, { expectation, reality, lesson });
+  res.json(result);
+});
+
+// ---------------------------------------------------------------------------
+// Founder Release-Quality Dashboard & Reliability Subsystems
+// ---------------------------------------------------------------------------
+
+app.get("/admin/release", requireFounderAuth, (_req, res) => {
+  const data = getFounderReleaseDashboardData();
+  res.type("html").send(renderFounderReleaseDashboardHtml(data));
+});
+
+app.get("/api/admin/release-status", requireFounderAuth, (req, res) => {
+  const broken = req.query.simulateBroken === "true";
+  const data = getFounderReleaseDashboardData({ brokenOverride: broken });
+  res.json(data);
+});
+
+app.post("/api/admin/backup-verify", requireFounderAuth, (_req, res) => {
+  const report = runIsolatedBackupRecoveryCheck();
+  res.json(report);
+});
+
+app.get("/api/admin/data-quality", requireFounderAuth, (_req, res) => {
+  const report = runDataQualityAudit();
+  res.json(report);
+});
+
+app.get("/api/admin/fee-rules", requireFounderAuth, (_req, res) => {
+  const report = checkFeeAndSettlementRulesFreshness();
+  res.json(report);
+});
+
+app.post("/api/admin/simulate-break-dependency", requireFounderAuth, (req, res) => {
+  const { broken } = req.body || {};
+  setSimulatedDependencyBroken(Boolean(broken));
+  res.json({ success: true, broken: Boolean(broken) });
 });
 
 app.get("/api/account/risk-plan", (req, res) => {
