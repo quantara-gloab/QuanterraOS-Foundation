@@ -684,8 +684,9 @@ export function renderCalculatorPageHtml(): string {
           var box = document.getElementById('risk-plan-advisory-box');
           var txt = document.getElementById('risk-plan-advisory-text');
           if (!box || !txt) return;
-          if (res && res.warnings && res.warnings.length > 0) {
-            txt.innerHTML = res.warnings.map(function(w) { return '&bull; ' + w; }).join('<br>');
+          var w = (res && res.warnings) || (res && res.advisory && res.advisory.warnings) || [];
+          if (w.length > 0) {
+            txt.innerHTML = w.map(function(item) { return '&bull; ' + item; }).join('<br>');
             box.style.display = 'block';
           } else {
             box.style.display = 'none';

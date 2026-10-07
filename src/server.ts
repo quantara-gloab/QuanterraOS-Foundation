@@ -2006,15 +2006,16 @@ app.post("/api/account/risk-plan", (req, res) => {
 app.post("/api/calculator/advisory-check", (req, res) => {
   const auth = getUserAuth(req);
   const userId = auth.user?.id || "demo-subscriber";
-  const { ticker, price, count, purchaseCost, exchangeFee } = req.body || {};
+  const { ticker, price, count, purchaseCost, outlay, exchangeFee } = req.body || {};
+  const cost = Number(purchaseCost) || Number(outlay) || (Number(price || 0.51) * Number(count || 10));
   const advisory = checkTradeAgainstRiskPlan(userId, {
     ticker: ticker || "KXBTC15M",
     price: Number(price) || 0.51,
     count: Number(count) || 10,
-    purchaseCost: Number(purchaseCost) || 5.10,
+    purchaseCost: cost,
     exchangeFee: Number(exchangeFee) || 0.18,
   });
-  res.json({ success: true, advisory });
+  res.json({ success: true, advisory, warnings: advisory.warnings, isExceeded: advisory.isExceeded });
 });
 
 app.get("/api/analytics/funnel-summary", requireFounderAuth, (_req, res) => {
