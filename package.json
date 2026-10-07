@@ -16,6 +16,7 @@
     "growth:import": "node --experimental-strip-types scripts/import-prospects.ts",
     "growth:verify": "node --experimental-strip-types scripts/verify-ledger.ts",
     "backtest:highlow": "node --experimental-strip-types src/highlow-backtest.ts",
+    "recovery:drill": "node --experimental-strip-types scripts/run-retained-recovery-drill.ts",
     "typecheck": "tsc --noEmit"
   },
   "engines": {

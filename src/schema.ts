@@ -831,5 +831,110 @@ export const userRiskPlans = sqliteTable(
   })
 );
 
+export const betaInvitations = sqliteTable(
+  "beta_invitations",
+  {
+    id: text("id").primaryKey(),
+    code: text("code").notNull().unique(),
+    source: text("source").notNull(),
+    targetAudience: text("target_audience"),
+    invitedCount: integer("invited_count").notNull().default(1),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => ({
+    sourceIdx: index("beta_invitations_source_idx").on(table.source),
+    codeIdx: index("beta_invitations_code_idx").on(table.code),
+  })
+);
+
+export const betaAttribution = sqliteTable(
+  "beta_attribution",
+  {
+    id: text("id").primaryKey(),
+    source: text("source").notNull(),
+    invitationCode: text("invitation_code"),
+    userHash: text("user_hash").notNull().unique(),
+    status: text("status").notNull().default("REGISTERED"), // 'REGISTERED' | 'OBSERVED'
+    registeredAt: text("registered_at").notNull(),
+    observedAt: text("observed_at"),
+    actionsCount: integer("actions_count").notNull().default(0),
+    deviceCategory: text("device_category"),
+    lastActiveAt: text("last_active_at"),
+  },
+  (table) => ({
+    sourceIdx: index("beta_attribution_source_idx").on(table.source),
+    statusIdx: index("beta_attribution_status_idx").on(table.status),
+  })
+);
+
+export const supportTickets = sqliteTable(
+  "support_tickets",
+  {
+    id: text("id").primaryKey(),
+    ticketNumber: integer("ticket_number").notNull(),
+    reporterRef: text("reporter_ref").notNull(),
+    source: text("source").notNull().default("mobile_app"),
+    severity: text("severity").notNull().default("P2_USABILITY"), // 'P0_BLOCKER' | 'P1_DEGRADED' | 'P2_USABILITY' | 'P3_FEEDBACK'
+    category: text("category").notNull().default("UI_MOBILE"), // 'DATA_FEED' | 'CALCULATION' | 'AUTH_PERSISTENCE' | 'UI_MOBILE' | 'OTHER'
+    summary: text("summary").notNull(),
+    details: text("details").notNull(),
+    deviceInfo: text("device_info"),
+    owner: text("owner").notNull().default("founder"),
+    status: text("status").notNull().default("OPEN"), // 'OPEN' | 'INVESTIGATING' | 'RESOLVED' | 'WONT_FIX'
+    resolutionNotes: text("resolution_notes"),
+    resolvedAt: text("resolved_at"),
+    createdAt: text("created_at").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (table) => ({
+    statusIdx: index("support_tickets_status_idx").on(table.status),
+    severityIdx: index("support_tickets_severity_idx").on(table.severity),
+    ownerIdx: index("support_tickets_owner_idx").on(table.owner),
+  })
+);
+
+export const firstSessionChecklists = sqliteTable(
+  "first_session_checklists",
+  {
+    id: text("id").primaryKey(),
+    bookingId: text("booking_id"),
+    participantRef: text("participant_ref").notNull(),
+    taskAssigned: text("task_assigned").notNull(),
+    taskCompleted: integer("task_completed").notNull().default(0),
+    assistanceLevel: text("assistance_level").notNull().default("NONE"), // 'NONE' | 'MINOR_HINT' | 'STEP_BY_STEP' | 'FAILED'
+    assistanceNotes: text("assistance_notes"),
+    comprehensionScore: integer("comprehension_score").notNull().default(3), // 1 to 5
+    comprehensionNotes: text("comprehension_notes"),
+    consentGiven: integer("consent_given").notNull().default(1),
+    consentTimestamp: text("consent_timestamp").notNull(),
+    feedbackText: text("feedback_text"),
+    deviceType: text("device_type").notNull().default("iPhone Safari"),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => ({
+    refIdx: index("first_session_checklists_ref_idx").on(table.participantRef),
+  })
+);
+
+export const retainedBackupDrills = sqliteTable(
+  "retained_backup_drills",
+  {
+    id: text("id").primaryKey(),
+    backupFilePath: text("backup_file_path").notNull(),
+    backupFileSizeBytes: integer("backup_file_size_bytes").notNull(),
+    backupHash: text("backup_hash").notNull(),
+    isolatedDbPath: text("isolated_db_path").notNull(),
+    status: text("status").notNull(), // 'PASSED' | 'FAILED'
+    recordsRestoredCount: integer("records_restored_count").notNull(),
+    verifiedAt: text("verified_at").notNull(),
+    durationMs: integer("duration_ms").notNull(),
+    details: text("details"),
+  },
+  (table) => ({
+    statusIdx: index("retained_backup_drills_status_idx").on(table.status),
+  })
+);
+
+
 
 

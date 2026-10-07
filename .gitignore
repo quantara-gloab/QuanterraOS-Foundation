@@ -28,6 +28,8 @@ coverage/
 *.db-wal
 *.sqlite
 *.sqlite3
+data/isolated_drills/
+backups/*.json
 
 # Scratch / debug files
 scratch/

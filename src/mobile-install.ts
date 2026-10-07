@@ -305,7 +305,15 @@ export function getMobileAppRuntimeScript(): string {
     // 4. Shared-Device Privacy: Clear Cached Private Records on Sign-Out
     function executeSignOutAndPurgeCache() {
       try {
-        // Clear all sensitive cached trade checks and risk data
+        // Sweep all QuanterraOS keys from localStorage
+        var keysToRemove = [];
+        for (var i = 0; i < localStorage.length; i++) {
+          var k = localStorage.key(i);
+          if (k && (k.indexOf('quanterraos_') === 0 || k.indexOf('user_') === 0 || k.indexOf('check_') === 0)) {
+            keysToRemove.push(k);
+          }
+        }
+        keysToRemove.forEach(function(k) { localStorage.removeItem(k); });
         localStorage.removeItem('quanterraos_pending_check');
         localStorage.removeItem('quanterraos_preserved_check_backup');
         localStorage.removeItem('quanterraos_offline_checks');
@@ -314,14 +322,12 @@ export function getMobileAppRuntimeScript(): string {
         localStorage.removeItem('quanterraos_last_active_tab');
         sessionStorage.clear();
 
-        // Clear dynamic private client caches
+        // Clear dynamic client caches
         if ('caches' in window) {
           caches.keys().then(function(names) {
-            names.forEach(function(name) {
-              if (name.includes('user') || name.includes('private') || name.includes('journal')) {
-                caches.delete(name);
-              }
-            });
+            return Promise.all(names.map(function(name) {
+              return caches.delete(name);
+            }));
           });
         }
       } catch (err) {
@@ -330,6 +336,7 @@ export function getMobileAppRuntimeScript(): string {
 
       window.location.href = '/logout';
     }
+    window.executeSignOutAndPurgeCache = executeSignOutAndPurgeCache;
 
     // Attach to sign out elements across pages
     document.addEventListener('DOMContentLoaded', function() {

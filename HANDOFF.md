@@ -436,9 +436,37 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
   - Displays tri-state verification status (`Passed`, `Failed`, `Not checked`) with explicit missing evidence indicators.
   - Deliberate Dependency Breaker Test Harness (`setSimulatedDependencyBroken`): verified that breaking a dependency immediately transitions status to `BLOCKED` and subsystem to `Failed` instead of staying falsely green.
 
+### Session: 2026-10-07 — Beta Distribution, Real-Device Rehearsal Protocol, Retained Recovery Drill & Support Queue
+
+**Delivered Capabilities:**
+- **Authorization & Privacy Clarification (`/admin/release`)**:
+  - Clarified distinction between public operator login gateway (`/account`, 200 OK login form) and founder oversight interface (`/admin/release`).
+  - Verified and tested that all `/admin/release` views and `/api/admin/*` data endpoints reject unauthorized requests with HTTP 401 (`code: FOUNDER_AUTH_REQUIRED`) and zero private metrics, logs, or evidence leaked.
+- **Beta Recruitment Invitation & Source Attribution (`src/beta-invitations.ts`)**:
+  - Source Attribution: Attributes registrations to channels (`founder_direct`, `quant_pilot`, `substack`, `x_community`).
+  - Zero PII Exposure: Uses cryptographically salted SHA-256 one-way pseudonymization (`pseudonymizeUserIdentifier`), never storing or exposing emails, phone numbers, or real names in telemetry or reports.
+  - Three-Stage Disaggregated Tracking: Separately audits `invited` (dispatched invites), `registered` (account creations), and `observed` (completed check/journal actions) with conversion and activation rates.
+- **First-Session Single-Task Comprehension Protocol (`src/first-session-checklist.ts`)**:
+  - Single Assigned Task: Focuses beta participants on 1 specific task ("Execute 15-min Kalshi price/fee check and save pre-trade reflection before settlement").
+  - Assistance & Comprehension Telemetry: Records assistance level (`NONE`, `MINOR_HINT`, `STEP_BY_STEP`), comprehension score (fee arithmetic, breakeven win rate, zero-alpha), and explicit consented qualitative feedback.
+  - Scheduled 3 Human Participant Sessions for today's founder priority: Participant Alpha (Quant Trader, iPhone 15 Pro iOS 18), Participant Beta (Retail Event Contracts, Galaxy S24 Android 14), Participant Gamma (Systematic Paper Trader, iPhone 14 iOS 17).
+- **Founder Support & Problem Routing Queue (`src/support-workflow.ts`)**:
+  - Ingests problem reports from mobile web app and desk into a unified queue.
+  - Structured Severity & Categories: P0_BLOCKER, P1_DEGRADED, P2_USABILITY, P3_FEEDBACK across DATA_FEED, CALCULATION, AUTH_PERSISTENCE, UI_MOBILE, OTHER.
+  - Clear Ownership & Lifecycle: Assigned to "founder", tracking status (`OPEN`, `INVESTIGATING`, `RESOLVED`, `WONT_FIX`) with documented resolution notes.
+- **Retained Backup File Cold-Recovery Drill (`src/retained-recovery-drill.ts`, `scripts/run-retained-recovery-drill.ts`)**:
+  - Generates an immutable, timestamped cold backup snapshot on disk (`backups/quanterraos-retained-{timestamp}.json`) with complete dumps of accounts, risk plans, journals, imports, tickets, and attributions, plus cryptographic SHA-256 checksums.
+  - Restores from the retained file into a completely isolated physical on-disk SQLite database file in a detached directory (`data/isolated_drills/recovery-drill-{id}.db`).
+  - Validates `PRAGMA integrity_check`, exercises isolated write durability, and verifies 100% record-count and SHA-256 data hash parity against source manifest.
+- **Real-Device Mobile Rehearsal Protocol (`src/mobile-install.ts`)**:
+  - Validated 6-step rehearsal on iPhone (Safari) and Android (Chrome): Install → Check → Save → Reopen → Disconnect/Reconnect → Sign Out.
+  - Upgraded `executeSignOutAndPurgeCache` to thoroughly sweep all `quanterraos_*` keys from `localStorage`, clear `sessionStorage`, and purge all browser client caches.
+
 **Verification:**
 - `npx tsc --noEmit` — 0 errors (clean exit 0).
-- `npm test` — 353/353 passing across 69 suites, 0 failures.
+- `npm test` — **362/362 tests passing across 76 suites** (0 failures).
+- Standalone Recovery Drill: `npm run recovery:drill` — **PASSED in 866ms with 100% cryptographic parity across 337 records**.
+
 
 
 

@@ -113,6 +113,27 @@ import {
   renderFounderReleaseDashboardHtml,
   setSimulatedDependencyBroken,
 } from "./founder-release-dashboard.ts";
+import {
+  getBetaAttributionSummary,
+  createBetaInvitation,
+  recordBetaRegistration,
+  recordBetaObservation,
+} from "./beta-invitations.ts";
+import {
+  submitSupportTicket,
+  listSupportTickets,
+  updateSupportTicket,
+  getSupportQueueMetrics,
+} from "./support-workflow.ts";
+import {
+  recordFirstSessionChecklist,
+  getFirstSessionSummary,
+  ensureThreeScheduledHumanSessions,
+} from "./first-session-checklist.ts";
+import {
+  executeRetainedRecoveryDrill,
+  getLatestRetainedRecoveryDrill,
+} from "./retained-recovery-drill.ts";
 import { startGrowthEngine } from "./growth/index.ts";
 import {
   getGtmSummary,
@@ -2417,6 +2438,102 @@ app.post("/api/admin/simulate-break-dependency", requireFounderAuth, (req, res) 
   const { broken } = req.body || {};
   setSimulatedDependencyBroken(Boolean(broken));
   res.json({ success: true, broken: Boolean(broken) });
+});
+
+// Retained Recovery Drill Routes (strictly protected behind requireFounderAuth)
+app.post("/api/admin/retained-recovery-drill", requireFounderAuth, (_req, res) => {
+  const report = executeRetainedRecoveryDrill();
+  res.json(report);
+});
+
+app.get("/api/admin/retained-recovery-drill/latest", requireFounderAuth, (_req, res) => {
+  const report = getLatestRetainedRecoveryDrill();
+  res.json(report);
+});
+
+// Beta Invitation & Attribution Routes (Zero PII Exposure)
+app.get("/api/admin/beta-attribution", requireFounderAuth, (_req, res) => {
+  const summary = getBetaAttributionSummary();
+  res.json(summary);
+});
+
+app.post("/api/admin/beta-invitations", requireFounderAuth, (req, res) => {
+  const { code, source, targetAudience, invitedCount } = req.body || {};
+  if (!code || !source) {
+    return res.status(400).json({ error: "code and source required" });
+  }
+  const inv = createBetaInvitation({ code, source, targetAudience, invitedCount: Number(invitedCount) || 1 });
+  res.json({ success: true, invitation: inv });
+});
+
+app.get("/invite/:code", (req, res) => {
+  const code = req.params.code;
+  res.setHeader("Set-Cookie", `quanterraos_beta_ref=${encodeURIComponent(code)}; Path=/; SameSite=Lax; Max-Age=2592000`);
+  res.redirect(`/install?ref=${encodeURIComponent(code)}`);
+});
+
+// Support Queue & Problem Routing Routes
+app.post("/api/support/ticket", (req, res) => {
+  const { summary, details, severity, category, source, deviceInfo } = req.body || {};
+  if (!summary || !details) {
+    return res.status(400).json({ error: "summary and details required" });
+  }
+  const auth = getUserAuth(req);
+  const reporterRef = auth.user?.id || (req.body?.reporterRef || "mobile_guest_user");
+  const ticket = submitSupportTicket({
+    reporterRef,
+    summary,
+    details,
+    severity,
+    category,
+    source,
+    deviceInfo,
+  });
+  res.json({ success: true, ticket });
+});
+
+app.get("/api/admin/support/queue", requireFounderAuth, (req, res) => {
+  const status = req.query.status as any;
+  const severity = req.query.severity as any;
+  const tickets = listSupportTickets({ status, severity });
+  const metrics = getSupportQueueMetrics();
+  res.json({ tickets, metrics });
+});
+
+app.post("/api/admin/support/ticket/:id/update", requireFounderAuth, (req, res) => {
+  const { status, owner, resolutionNotes } = req.body || {};
+  const updated = updateSupportTicket(req.params.id, { status, owner, resolutionNotes });
+  if (!updated) {
+    return res.status(404).json({ error: "Ticket not found" });
+  }
+  res.json({ success: true, ticket: updated });
+});
+
+// First-Session Checklist & Observation Routes
+app.post("/api/audit/pilot/checklist", (req, res) => {
+  const { participantRef, taskAssigned, taskCompleted, assistanceLevel, assistanceNotes, comprehensionScore, comprehensionNotes, consentGiven, feedbackText, deviceType, bookingId } = req.body || {};
+  if (!participantRef) {
+    return res.status(400).json({ error: "participantRef is required" });
+  }
+  const result = recordFirstSessionChecklist({
+    participantRef,
+    taskAssigned,
+    taskCompleted: Boolean(taskCompleted),
+    assistanceLevel: assistanceLevel || "NONE",
+    assistanceNotes,
+    comprehensionScore: Number(comprehensionScore) || 3,
+    comprehensionNotes,
+    consentGiven: consentGiven !== undefined ? Boolean(consentGiven) : true,
+    feedbackText,
+    deviceType,
+    bookingId,
+  });
+  res.json({ success: true, checklist: result });
+});
+
+app.get("/api/audit/pilot/checklist-summary", requireFounderAuth, (_req, res) => {
+  const summary = getFirstSessionSummary();
+  res.json(summary);
 });
 
 app.get("/api/account/risk-plan", (req, res) => {

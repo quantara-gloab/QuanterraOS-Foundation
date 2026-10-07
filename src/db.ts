@@ -51,6 +51,7 @@ export function runMigrations(): void {
     "0023_journal_details_and_feedback.sql",
     "0024_outcome_tracking_and_booking.sql",
     "0025_statement_import_and_reconciliation.sql",
+    "0026_beta_attribution_support_and_drills.sql",
   ]) {
     const migrationPath = path.join(migrationsDir, migration);
     if (migration === "0006_multi_asset.sql") {
