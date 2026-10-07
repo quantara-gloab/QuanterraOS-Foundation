@@ -355,3 +355,26 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 - `npx tsc --noEmit` — 0 errors (clean exit 0).
 - `npm test` — 236/236 passing across 47 suites, 0 failures (duration 38.3s).
 
+---
+
+### Session: 2026-10-06 — Strict Safety Hardening, Live Gating, Honest Quotes & Rule B11 Compliance
+
+**Delivered Improvements:**
+- **Live Kalshi Execution Lockdown (Rule B5)**:
+  - Enforced three-tier gate on `POST /api/kalshi/bid`: requires `KALSHI_LIVE=true`, signed-in operator email in `KALSHI_LIVE_OPERATOR_EMAILS`, and contract order size cap (`KALSHI_LIVE_MAX_CONTRACTS`, default 10).
+  - Fixed order status reporting: Kalshi accepted orders now report accurately as `PENDING` until executed, and only `FILLED` when Kalshi status explicitly returns `EXECUTED` or `FILLED`.
+- **Honest Quote Parsing & Strike Ladder Sanitization**:
+  - Empty books no longer fabricate 50¢ quotes; unquoted strikes without real liquidity are dropped cleanly from the ladder.
+  - Fixed price parsing in `kalshi-contracts.ts` and `kalshi-api.ts` to correctly handle both dollar floats and integer cents without multiplying cent values.
+  - Ladder filters strictly to the nearest active hourly expiry rather than mixing multiple expiries.
+- **Council Prompt Alignment**:
+  - Replaced fabricated latency (0.5ms) and RPM claims in `src/agents/council-chat.ts` with honest disclosures: the quantitative model does not beat Kalshi's market price (Brier 0.2001 Kalshi vs 0.2063 model), and live capital exposure is permanently locked at $0.00.
+- **Rule B11 Mobile Store & Association File Purge**:
+  - Removed placeholder `assetlinks.json` and Apple App Site Association (`apple-app-site-association`) files with fabricated certificates and team IDs.
+  - Purged fake App IDs and fictional store listings from `/api/mobile/config` and `/mobile` download portal. Real PWA install workflows remain fully operational.
+
+**Verification:**
+- `npx tsc --noEmit` — 0 errors (clean exit 0).
+- `npm test` — 293/293 passing across 56 suites, 0 failures (duration ~62s).
+
+
