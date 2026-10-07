@@ -496,6 +496,36 @@ export function renderCalculatorPageHtml(): string {
           <a href="/kalshi" class="btn-pricing" style="width:100%; text-align:center; padding:10px; font-size:0.8rem;">
             TEST AGAINST LIVE KALSHI BTC DESK &rarr;
           </a>
+          <button type="button" onclick="openEmbedModal()" class="preset-btn" style="width:100%; padding:8px 12px; font-size:0.75rem; text-align:center; color:var(--muted); border-color:rgba(212,175,55,0.25); display:flex; align-items:center; justify-content:center; gap:6px; cursor:pointer;">
+            <span>&lt;/&gt;</span> Embed Calculator Widget On Your Site / Newsletter
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Embed Snippet Generator Modal -->
+    <div id="embed-widget-modal" style="display:none; position:fixed; inset:0; background:rgba(4,6,10,0.85); backdrop-filter:blur(8px); z-index:1000; align-items:center; justify-content:center; padding:16px;">
+      <div style="background:#0E121B; border:1px solid rgba(212,175,55,0.3); border-radius:8px; max-width:540px; width:100%; padding:24px; box-shadow:0 20px 48px rgba(0,0,0,0.6);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid rgba(212,175,55,0.15); padding-bottom:10px;">
+          <div style="font-family:var(--font-mono); font-size:0.9rem; font-weight:700; color:var(--accent);">
+            &lt;/&gt; Embed QuanterraOS Calculator Widget
+          </div>
+          <button type="button" onclick="closeEmbedModal()" style="background:none; border:none; color:var(--muted); font-size:1.2rem; cursor:pointer;">&times;</button>
+        </div>
+        <p style="font-size:0.8rem; color:var(--muted); margin-bottom:14px;">
+          Embed our live taker-fee, spread-drag, and breakeven calculator directly on your blog, financial publication, research paper, or newsletter. Responsive, lightning-fast, and strictly compliant with independent auditing standards.
+        </p>
+        <div style="margin-bottom:12px;">
+          <div style="font-size:0.75rem; color:#FFFFFF; margin-bottom:6px; font-family:var(--font-mono);">Embed Code (HTML iFrame):</div>
+          <textarea id="embed-snippet-code" readonly style="width:100%; height:90px; background:#06080E; border:1px solid rgba(212,175,55,0.2); border-radius:4px; color:#F8FAFC; font-family:var(--font-mono); font-size:0.75rem; padding:8px; resize:none;">&lt;iframe src="https://quanterraos.com/embed/calculator" width="100%" height="480" frameborder="0" style="border:1px solid rgba(212,175,55,0.3); border-radius:8px; max-width:560px;" title="QuanterraOS Prediction Market Calculator"&gt;&lt;/iframe&gt;</textarea>
+        </div>
+        <div style="display:flex; gap:10px; justify-content:flex-end;">
+          <button type="button" onclick="copyEmbedSnippet()" id="btn-copy-embed" class="nav-cta" style="padding:8px 16px; font-size:0.75rem; cursor:pointer;">
+            Copy Embed Code
+          </button>
+          <button type="button" onclick="closeEmbedModal()" class="preset-btn" style="padding:8px 14px; font-size:0.75rem; cursor:pointer;">
+            Close
+          </button>
         </div>
       </div>
     </div>
@@ -746,6 +776,38 @@ export function renderCalculatorPageHtml(): string {
         }).catch(function() {});
       } catch (_) {}
       window.location.href = '/account?flow=save-check';
+    }
+
+    function openEmbedModal() {
+      const modal = document.getElementById('embed-widget-modal');
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closeEmbedModal() {
+      const modal = document.getElementById('embed-widget-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function copyEmbedSnippet() {
+      const el = document.getElementById('embed-snippet-code');
+      const btn = document.getElementById('btn-copy-embed');
+      if (!el) return;
+      el.select();
+      el.setSelectionRange(0, 99999);
+      try {
+        navigator.clipboard.writeText(el.value).then(function() {
+          if (btn) {
+            btn.textContent = '✓ Copied to Clipboard!';
+            setTimeout(function() { btn.textContent = 'Copy Embed Code'; }, 2500);
+          }
+        });
+      } catch (_) {
+        document.execCommand('copy');
+        if (btn) {
+          btn.textContent = '✓ Copied to Clipboard!';
+          setTimeout(function() { btn.textContent = 'Copy Embed Code'; }, 2500);
+        }
+      }
     }
 
     recalc();

@@ -60,6 +60,7 @@ import { renderPilotAuditPageHtml } from "./pilot-audit-page.ts";
 import { renderAccessTerminalPage } from "./access-terminal-page.ts";
 import { renderWalletPageHtml } from "./wallet-page.ts";
 import { renderCalculatorPageHtml } from "./calculator-page.ts";
+import { renderEmbedCalculatorHtml, renderEmbedCardHtml } from "./embed-widget.ts";
 import { renderLearnPageHtml } from "./learn-page.ts";
 import { renderVenueComparisonPageHtml } from "./venue-comparison-page.ts";
 import { renderCalibrationSurfacePageHtml } from "./calibration-surface-page.ts";
@@ -1753,6 +1754,18 @@ app.get("/signup", (_req, res) => {
 
 app.get("/calculator", (_req, res) => {
   res.type("html").send(renderCalculatorPageHtml());
+});
+
+app.get(["/embed/calculator", "/widget/calculator", "/embed"], (_req, res) => {
+  res.type("html").send(renderEmbedCalculatorHtml());
+});
+
+app.get(["/embed/card", "/widget/card"], (req, res) => {
+  const ticker = typeof req.query.ticker === "string" ? req.query.ticker : "KXBTC15M";
+  const venue = (typeof req.query.venue === "string" ? req.query.venue : "kalshi-15m") as any;
+  const currentAsk = typeof req.query.price === "string" ? parseFloat(req.query.price) : 0.51;
+  const contractCount = typeof req.query.count === "string" ? parseInt(req.query.count, 10) : 10;
+  res.type("html").send(renderEmbedCardHtml({ ticker, venue, currentAsk, contractCount }));
 });
 
 app.get(["/compare", "/venues"], (_req, res) => {
