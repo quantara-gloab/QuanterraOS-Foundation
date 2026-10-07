@@ -146,6 +146,25 @@ export function renderCalculatorPageHtml(): string {
       .calc-grid { grid-template-columns: 1fr; }
       .top-nav { padding: 14px 16px; flex-wrap: wrap; gap: 10px; }
       .nav-links { overflow-x: auto; white-space: nowrap; width: 100%; }
+      .mobile-sticky-bar { display: flex !important; }
+      body { padding-bottom: 74px; }
+    }
+
+    .mobile-sticky-bar {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(10, 14, 22, 0.96);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid var(--panel-border);
+      padding: 10px 16px;
+      z-index: 1000;
+      box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.7);
+      align-items: center;
+      justify-content: space-between;
     }
 
     .card {
@@ -180,6 +199,12 @@ export function renderCalculatorPageHtml(): string {
       outline: none;
       accent-color: var(--accent);
       cursor: pointer;
+    }
+    #slider-prob {
+      accent-color: #38BDF8 !important;
+    }
+    #slider-price {
+      accent-color: #DFB843 !important;
     }
     .input-row-flex {
       display: grid;
@@ -318,24 +343,35 @@ export function renderCalculatorPageHtml(): string {
         <div class="input-group">
           <label style="font-size:0.8rem; color:var(--muted); display:block; margin-bottom:6px;">Pricing Basis</label>
           <select id="select-pricing-mode" class="number-input" onchange="togglePricingMode()">
-            <option value="executable-ask" selected>Executable Ask Price (Spread Already Included)</option>
-            <option value="mid-price">Quoted Mid-Price (Add Half-Spread to Cross)</option>
+            <option value="executable-ask" selected>Executable Ask Price (Crossing Spread Already Included)</option>
+            <option value="mid-price">Quoted Mid-Price (Requires Half-Spread to Cross)</option>
           </select>
+          <div style="font-size:0.72rem; color:var(--muted); margin-top:5px; line-height:1.4;" id="pricing-mode-explainer">
+            <span style="color:var(--accent);">✓ Standard Ask:</span> Half-spread is already built into the market ask. No additional spread penalty is added.
+          </div>
         </div>
 
         <div class="input-group">
           <div class="input-label-row">
-            <label for="slider-price" id="label-price-title">Executable Ask Price</label>
-            <span id="label-price">51¢ ($0.51)</span>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="display:inline-block; width:8px; height:8px; border-radius:2px; background:#DFB843;"></span>
+              <label for="slider-price" id="label-price-title" style="color:#FFFFFF; font-weight:600;">Contract Ask Price (Cost to Enter)</label>
+            </div>
+            <span id="label-price" style="color:#DFB843; font-weight:700;">51¢ ($0.51)</span>
           </div>
+          <div style="font-size:0.72rem; color:var(--muted); margin-bottom:6px;">Exchange purchase price. Determines maximum dollar loss and initial entry cost.</div>
           <input type="range" id="slider-price" min="1" max="99" value="51" oninput="recalc()">
         </div>
 
         <div class="input-group">
           <div class="input-label-row">
-            <label for="slider-prob">Your Assessed Probability of Winning (p)</label>
-            <span id="label-prob">55.0%</span>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="display:inline-block; width:8px; height:8px; border-radius:2px; background:#38BDF8;"></span>
+              <label for="slider-prob" style="color:#FFFFFF; font-weight:600;">Your Assessed Win Probability (Subjective Thesis)</label>
+            </div>
+            <span id="label-prob" style="color:#38BDF8; font-weight:700;">55.0%</span>
           </div>
+          <div style="font-size:0.72rem; color:var(--muted); margin-bottom:6px;">Your subjective assessment. This is your personal opinion, NOT an automated forecast.</div>
           <input type="range" id="slider-prob" min="1" max="99" value="55" oninput="recalc()">
         </div>
 
@@ -344,6 +380,7 @@ export function renderCalculatorPageHtml(): string {
             <label for="slider-spread">Observed Bid-Ask Spread</label>
             <span id="label-spread">2.0¢</span>
           </div>
+          <div style="font-size:0.72rem; color:var(--muted); margin-bottom:6px;">Full spread between best bid and best ask. Half-spread is added to mid-price.</div>
           <input type="range" id="slider-spread" min="1" max="10" value="2" oninput="recalc()">
         </div>
 
@@ -442,6 +479,17 @@ export function renderCalculatorPageHtml(): string {
         </div>
       </div>
     </div>
+
+    <!-- Mobile Persistent Sticky Save Bar -->
+    <div class="mobile-sticky-bar">
+      <div>
+        <div style="font-family:var(--font-mono); font-size:0.65rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.04em;">Required Breakeven</div>
+        <div style="font-family:var(--font-mono); font-size:1.15rem; font-weight:700; color:var(--accent);" id="mobile-breakeven-val">52.80%</div>
+      </div>
+      <button type="button" onclick="saveCheckToJournal()" class="nav-cta" style="padding:10px 18px; font-size:0.8rem; font-weight:700; cursor:pointer;">
+        SAVE CHECK &amp; ACTIVATE &rarr;
+      </button>
+    </div>
   </main>
 
   <script>
@@ -451,12 +499,19 @@ export function renderCalculatorPageHtml(): string {
       const mode = document.getElementById('select-pricing-mode').value;
       const groupSpread = document.getElementById('group-spread');
       const labelPriceTitle = document.getElementById('label-price-title');
+      const explainer = document.getElementById('pricing-mode-explainer');
       if (mode === 'mid-price') {
         groupSpread.style.display = 'block';
         labelPriceTitle.textContent = 'Quoted Market Mid-Price';
+        if (explainer) {
+          explainer.innerHTML = '<span style="color:var(--rose);">▲ Mid-Price Reference:</span> Half the spread is added as slippage to model crossing the book.';
+        }
       } else {
         groupSpread.style.display = 'none';
-        labelPriceTitle.textContent = 'Executable Ask Price';
+        labelPriceTitle.textContent = 'Contract Ask Price (Cost to Enter)';
+        if (explainer) {
+          explainer.innerHTML = '<span style="color:var(--accent);">✓ Standard Ask:</span> Half-spread is already built into the market ask. No additional spread penalty is added.';
+        }
       }
       recalc();
     }
@@ -512,7 +567,7 @@ export function renderCalculatorPageHtml(): string {
       if (contractType === 'kalshi-15m' || contractType === 'kalshi-1h') {
         // Official Kalshi formula: ceil(0.07 * count * P * (1 - P) * 100) / 100
         const rawFee = 0.07 * count * effectiveAsk * (1 - effectiveAsk);
-        totalFee = Math.ceil(rawFee * 100) / 100;
+        totalFee = Math.ceil(Number((rawFee * 100).toFixed(6))) / 100;
         feePerContract = totalFee / count;
 
         if (contractType === 'kalshi-15m') {
@@ -557,6 +612,9 @@ export function renderCalculatorPageHtml(): string {
       document.getElementById('val-benchmark').textContent = benchmark;
       document.getElementById('val-cadence').textContent = cadence;
       document.getElementById('val-100-drag').textContent = '-$' + (totalDrag * count * 10).toFixed(2);
+
+      const mobileBreakeven = document.getElementById('mobile-breakeven-val');
+      if (mobileBreakeven) mobileBreakeven.textContent = (breakevenProb * 100).toFixed(2) + '%';
 
       const badge = document.getElementById('badge-verdict');
       badge.textContent = isPositive ? 'POSITIVE EDGE' : 'NEGATIVE DRAG';
