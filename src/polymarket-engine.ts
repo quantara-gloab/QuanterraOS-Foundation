@@ -94,11 +94,31 @@ export const VENUE_SPECS: Record<"kalshi" | "polymarket", VenueParameters> = {
 
 /**
  * Calculates Kalshi taker fee per contract based on contract price (0.01 - 0.99)
+ * for a single contract, rounding up to the nearest cent.
  */
 export function calculateKalshiFee(price: number): number {
   const p = Math.max(0.01, Math.min(0.99, price));
-  // Kalshi fee formula: ceil(0.07 * p * (1 - p) * 100) / 100
   return Math.ceil(0.07 * p * (1 - p) * 100) / 100;
+}
+
+/**
+ * Calculates official Kalshi taker fee for a specified order quantity and purchase price.
+ * Under Kalshi exchange rules, the fee is calculated on the aggregate order and rounded up to the nearest whole cent:
+ * totalFee = ceil(0.07 * count * price * (1 - price) * 100) / 100
+ */
+export function calculateKalshiOrderFee(price: number, count: number): {
+  totalFeeUsd: number;
+  feePerContractUsd: number;
+  rawFeeUsd: number;
+} {
+  const p = Math.max(0.01, Math.min(0.99, price));
+  const c = Math.max(1, count);
+  const rawFeeUsd = 0.07 * c * p * (1 - p);
+  // Protect against IEEE 754 precision drift (e.g. 175.00000000000003 cents) before ceil
+  const feeCents = Number((rawFeeUsd * 100).toFixed(6));
+  const totalFeeUsd = Math.ceil(feeCents) / 100;
+  const feePerContractUsd = Number((totalFeeUsd / c).toFixed(4));
+  return { totalFeeUsd, feePerContractUsd, rawFeeUsd };
 }
 
 /**
@@ -113,10 +133,9 @@ export function compareVenues(params: {
   const count = Math.max(1, params.count);
   const prob = Math.max(0.01, Math.min(0.99, params.userProb));
 
-  // 1. Kalshi Calculation
-  const kalshiFeePerCt = calculateKalshiFee(price);
+  // 1. Kalshi Calculation with exact order-level round-up rules
+  const { totalFeeUsd: kalshiTotalFee, feePerContractUsd: kalshiFeePerCt } = calculateKalshiOrderFee(price, count);
   const kalshiPurchaseCost = Number((price * count).toFixed(2));
-  const kalshiTotalFee = Number((kalshiFeePerCt * count).toFixed(2));
   const kalshiMaxLoss = Number((kalshiPurchaseCost + kalshiTotalFee).toFixed(2));
   const kalshiBreakevenProb = Number((price + kalshiFeePerCt).toFixed(4));
   const kalshiNetEv = Number(((prob - price - kalshiFeePerCt) * count).toFixed(2));

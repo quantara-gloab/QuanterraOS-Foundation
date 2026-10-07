@@ -299,22 +299,30 @@ export function renderCalculatorPageHtml(): string {
         </div>
 
         <div class="input-group">
-          <div class="input-label-row">
-            <label for="slider-price">Quoted Market Mid-Price</label>
-            <span id="label-price">50¢ ($0.50)</span>
-          </div>
-          <input type="range" id="slider-price" min="1" max="99" value="50" oninput="recalc()">
+          <label style="font-size:0.8rem; color:var(--muted); display:block; margin-bottom:6px;">Pricing Basis</label>
+          <select id="select-pricing-mode" class="number-input" onchange="togglePricingMode()">
+            <option value="executable-ask" selected>Executable Ask Price (Spread Already Included)</option>
+            <option value="mid-price">Quoted Mid-Price (Add Half-Spread to Cross)</option>
+          </select>
         </div>
 
         <div class="input-group">
           <div class="input-label-row">
-            <label for="slider-prob">Your Assessed Probability of Winning</label>
+            <label for="slider-price" id="label-price-title">Executable Ask Price</label>
+            <span id="label-price">51¢ ($0.51)</span>
+          </div>
+          <input type="range" id="slider-price" min="1" max="99" value="51" oninput="recalc()">
+        </div>
+
+        <div class="input-group">
+          <div class="input-label-row">
+            <label for="slider-prob">Your Assessed Probability of Winning (p)</label>
             <span id="label-prob">55.0%</span>
           </div>
           <input type="range" id="slider-prob" min="1" max="99" value="55" oninput="recalc()">
         </div>
 
-        <div class="input-group">
+        <div class="input-group" id="group-spread" style="display:none;">
           <div class="input-label-row">
             <label for="slider-spread">Observed Bid-Ask Spread</label>
             <span id="label-spread">2.0¢</span>
@@ -324,7 +332,7 @@ export function renderCalculatorPageHtml(): string {
 
         <div class="input-row-flex">
           <div class="input-group">
-            <label style="font-size:0.8rem; color:var(--muted); display:block; margin-bottom:6px;">Contract Count</label>
+            <label style="font-size:0.8rem; color:var(--muted); display:block; margin-bottom:6px;">Contract Count (Order Size)</label>
             <input type="number" id="input-count" class="number-input" value="100" min="1" max="10000" oninput="recalc()">
           </div>
           <div class="input-group">
@@ -346,7 +354,7 @@ export function renderCalculatorPageHtml(): string {
         </div>
 
         <div class="banner-note" id="contract-note">
-          <strong>Why this matters on Kalshi 15M &amp; 1H:</strong> At 50¢ on Kalshi, exchange taker fees peak at exactly <strong>1.75¢ per contract</strong> ($0.07 × P × (1 − P)). Combined with a typical 2¢ spread (1¢ half-spread drag), you sacrifice <strong>2.75¢ of edge</strong> on entry. Picking the winner 52% of the time still produces a guaranteed financial loss.
+          <strong>Why this matters on Kalshi 15M:</strong> Taker fees are calculated on the aggregate order using Kalshi's official round-up rule: <code>ceil(0.07 × Count × P × (1 − P))</code>. For an executable ask of 50¢, the 1.75¢ taker fee establishes a <strong>51.75% breakeven hurdle</strong> (or 52.00% on a single contract due to cent rounding). Crossing the spread is already incorporated in the ask price.
         </div>
       </div>
 
@@ -399,8 +407,13 @@ export function renderCalculatorPageHtml(): string {
           <span class="stat-val" style="color:var(--rose);" id="val-100-drag">-$275.00</span>
         </div>
 
-        <div style="margin-top:20px; text-align:center;">
-          <a href="/kalshi" class="nav-cta" style="width:100%; justify-content:center; padding:10px;">TEST AGAINST LIVE KALSHI BTC DESK &rarr;</a>
+        <div style="margin-top:20px; display:flex; flex-direction:column; gap:10px;">
+          <button type="button" id="btn-save-journal" onclick="saveCheckToJournal()" class="nav-cta" style="width:100%; justify-content:center; padding:12px; font-size:0.85rem; font-weight:700; background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%); color:#07080B; border:1px solid #DFB843; cursor:pointer;">
+            SAVE CHECK &amp; ACTIVATE JOURNAL &rarr;
+          </button>
+          <a href="/kalshi" class="btn-pricing" style="width:100%; text-align:center; padding:10px; font-size:0.8rem;">
+            TEST AGAINST LIVE KALSHI BTC DESK &rarr;
+          </a>
         </div>
       </div>
     </div>
@@ -408,6 +421,20 @@ export function renderCalculatorPageHtml(): string {
 
   <script>
     var currentSide = 'above';
+
+    function togglePricingMode() {
+      const mode = document.getElementById('select-pricing-mode').value;
+      const groupSpread = document.getElementById('group-spread');
+      const labelPriceTitle = document.getElementById('label-price-title');
+      if (mode === 'mid-price') {
+        groupSpread.style.display = 'block';
+        labelPriceTitle.textContent = 'Quoted Market Mid-Price';
+      } else {
+        groupSpread.style.display = 'none';
+        labelPriceTitle.textContent = 'Executable Ask Price';
+      }
+      recalc();
+    }
 
     function setSide(side) {
       currentSide = side;
@@ -432,6 +459,7 @@ export function renderCalculatorPageHtml(): string {
     }
 
     function recalc() {
+      const pricingMode = document.getElementById('select-pricing-mode').value;
       const price = Number(document.getElementById('slider-price').value) / 100;
       const prob = Number(document.getElementById('slider-prob').value) / 100;
       const spread = Number(document.getElementById('slider-spread').value) / 100;
@@ -442,34 +470,47 @@ export function renderCalculatorPageHtml(): string {
       document.getElementById('label-prob').textContent = (prob * 100).toFixed(1) + '%';
       document.getElementById('label-spread').textContent = (spread * 100).toFixed(1) + '¢';
 
+      // Spread drag is ONLY present when evaluating from mid-price reference.
+      // An executable ask price already incorporates the crossing cost.
+      let halfSpreadDrag = 0;
+      let effectiveAsk = price;
+      if (pricingMode === 'mid-price') {
+        halfSpreadDrag = spread / 2;
+        effectiveAsk = Math.min(0.99, price + halfSpreadDrag);
+      }
+
+      let totalFee = 0;
       let feePerContract = 0;
       let benchmark = "CME CF BRTI 60s TWAP";
       let cadence = "15-Minute Intraday (KXBTC15M)";
 
-      if (contractType === 'kalshi-15m') {
-        feePerContract = Math.ceil(0.07 * price * (1 - price) * 100) / 100;
-        benchmark = "CME CF BRTI 60s TWAP";
-        cadence = "15-Minute Intraday (KXBTC15M)";
-        document.getElementById('contract-note').innerHTML = "<strong>Why this matters on Kalshi 15M:</strong> At 50¢ on Kalshi, exchange taker fees peak at exactly <strong>1.75¢ per contract</strong> ($0.07 × P × (1 − P)). Combined with a typical 2¢ spread (1¢ half-spread drag), you sacrifice <strong>2.75¢ of edge</strong> on entry. Picking the winner 52% of the time still produces a guaranteed financial loss.";
-      } else if (contractType === 'kalshi-1h') {
-        feePerContract = Math.ceil(0.07 * price * (1 - price) * 100) / 100;
-        benchmark = "CME CF BRTI Hourly TWAP";
-        cadence = "1-Hour Fixed Strike (KXBTCD)";
-        document.getElementById('contract-note').innerHTML = "<strong>Why this matters on Kalshi 1H:</strong> On hourly fixed-strike contracts ($K or above), directional bets have a 60-minute drift horizon. At the 50¢ moneyness inflection, taker fee drag is <strong>1.75¢ per contract</strong>. Theta decay and fee friction require a strict >52.75% directional hit rate to break even.";
+      if (contractType === 'kalshi-15m' || contractType === 'kalshi-1h') {
+        // Official Kalshi formula: ceil(0.07 * count * P * (1 - P) * 100) / 100
+        const rawFee = 0.07 * count * effectiveAsk * (1 - effectiveAsk);
+        totalFee = Math.ceil(rawFee * 100) / 100;
+        feePerContract = totalFee / count;
+
+        if (contractType === 'kalshi-15m') {
+          benchmark = "CME CF BRTI 60s TWAP";
+          cadence = "15-Minute Intraday (KXBTC15M)";
+        } else {
+          benchmark = "CME CF BRTI Hourly TWAP";
+          cadence = "1-Hour Fixed Strike (KXBTCD)";
+        }
       } else {
-        // Polymarket ~2% of profit when won
-        feePerContract = prob * (1 - price) * 0.02;
+        // Polymarket fee (~2% on payout + amortized gas)
+        const polyGas = count >= 50 ? 0.08 : 0.15;
+        totalFee = (prob * (1 - effectiveAsk) * 0.02 * count) + polyGas;
+        feePerContract = totalFee / count;
         benchmark = "Chainlink / Binance Settlement";
         cadence = "15-Minute Polymarket";
-        document.getElementById('contract-note').innerHTML = "<strong>Polymarket Fee Structure:</strong> Dynamic ~2% winner fee on positive payout. Note that off-chain cross-venue basis risk between Binance/Chainlink and the CME CF BRTI reference can cause divergent settlement outcomes.";
       }
 
-      const halfSpreadDrag = spread / 2;
       const totalDrag = feePerContract + halfSpreadDrag;
-      const grossEdge = prob - price;
+      const grossEdge = prob - (pricingMode === 'mid-price' ? price : effectiveAsk);
       const netEvContract = grossEdge - totalDrag;
       const totalPnl = netEvContract * count;
-      const breakevenProb = price + totalDrag;
+      const breakevenProb = pricingMode === 'mid-price' ? (price + totalDrag) : (effectiveAsk + feePerContract);
 
       const isPositive = netEvContract > 0;
       const color = isPositive ? 'var(--green)' : 'var(--rose)';
@@ -483,8 +524,8 @@ export function renderCalculatorPageHtml(): string {
       totalPnlEl.textContent = sign + '$' + totalPnl.toFixed(2) + ' net expectancy on ' + count + ' contracts';
       totalPnlEl.style.color = isPositive ? 'var(--green)' : 'var(--muted)';
 
-      document.getElementById('val-fee').textContent = (feePerContract * 100).toFixed(2) + '¢';
-      document.getElementById('val-spread-drag').textContent = (halfSpreadDrag * 100).toFixed(2) + '¢';
+      document.getElementById('val-fee').textContent = (feePerContract * 100).toFixed(2) + '¢ ($' + totalFee.toFixed(2) + ' total)';
+      document.getElementById('val-spread-drag').textContent = (halfSpreadDrag * 100).toFixed(2) + '¢' + (pricingMode === 'executable-ask' ? ' (in price)' : '');
       document.getElementById('val-gross-edge').textContent = (grossEdge >= 0 ? '+' : '') + (grossEdge * 100).toFixed(2) + '¢';
       document.getElementById('val-total-drag').textContent = '-' + (totalDrag * 100).toFixed(2) + '¢';
       document.getElementById('val-breakeven').textContent = (breakevenProb * 100).toFixed(2) + '%';
@@ -497,6 +538,37 @@ export function renderCalculatorPageHtml(): string {
       badge.style.background = isPositive ? 'rgba(16,185,129,0.15)' : 'rgba(244,63,94,0.15)';
       badge.style.color = isPositive ? 'var(--green)' : 'var(--rose)';
       badge.style.border = '1px solid ' + (isPositive ? 'var(--green)' : 'var(--rose)');
+
+      // Store current check state for 1-click journal save
+      window.__latestCheck = {
+        venue: contractType,
+        pricingBasis: pricingMode,
+        contractTicker: contractType === 'kalshi-1h' ? 'KXBTCD' : contractType === 'polymarket-15m' ? 'POLY-BTC15M' : 'KXBTC15M',
+        side: currentSide,
+        price: effectiveAsk,
+        count: count,
+        purchaseCost: Number((effectiveAsk * count).toFixed(2)),
+        exchangeFee: Number(totalFee.toFixed(2)),
+        halfSpreadDrag: Number(halfSpreadDrag.toFixed(4)),
+        totalDrag: Number(totalDrag.toFixed(4)),
+        breakevenWinProb: Number((breakevenProb * 100).toFixed(2)),
+        assessedWinProb: Number((prob * 100).toFixed(2)),
+        netExpectedValue: Number(totalPnl.toFixed(2)),
+        settlementSource: benchmark
+      };
+    }
+
+    function saveCheckToJournal() {
+      if (!window.__latestCheck) recalc();
+      try {
+        localStorage.setItem('quanterraos_pending_check', JSON.stringify(window.__latestCheck));
+        fetch('/api/analytics/check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(window.__latestCheck)
+        }).catch(function() {});
+      } catch (_) {}
+      window.location.href = '/account?flow=save-check';
     }
 
     recalc();

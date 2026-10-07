@@ -288,6 +288,8 @@ export function renderAccountPageHtml(user: UserRecord | null, tier: UserTier, e
     </a>
     <div class="nav-links">
       <a href="/">Home</a>
+      <a href="/calculator">Calculator</a>
+      <a href="/journal">Journal</a>
       <a href="/research">Research</a>
       <a href="/predictions">Predictions</a>
       <a href="/autopilot">Autopilot</a>
@@ -428,6 +430,16 @@ export function renderAccountPageHtml(user: UserRecord | null, tier: UserTier, e
           </div>
         </div>
 
+        <!-- Pending Check Banner for Onboarding Flow -->
+        <div id="save-check-prompt" style="display:none; padding:14px 18px; margin-bottom:18px; background:linear-gradient(135deg, rgba(223,184,67,0.15) 0%, rgba(12,15,23,0.9) 100%); border:1px solid rgba(223,184,67,0.4); border-radius:6px;">
+          <div style="font-family:var(--font-mono); font-size:0.75rem; color:var(--accent); font-weight:700; margin-bottom:4px;">
+            ⚡ TRUE-COST CHECK READY TO COMMIT
+          </div>
+          <div style="font-size:0.84rem; color:#FFFFFF;" id="save-check-details">
+            Create your free account to activate your personal decision journal and preserve your calculations.
+          </div>
+        </div>
+
         <div class="tabs-header">
           <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Sign In</button>
           <button class="tab-btn" id="tab-register" onclick="switchTab('register')">Create Account</button>
@@ -435,6 +447,7 @@ export function renderAccountPageHtml(user: UserRecord | null, tier: UserTier, e
 
         <!-- Login Form -->
         <form id="form-login" action="/api/auth/login" method="POST">
+          <input type="hidden" name="redirectTo" id="login-redirect-to" value="/dashboard" />
           <div class="form-group">
             <label for="login-email">OPERATOR EMAIL</label>
             <input type="email" id="login-email" name="email" placeholder="operator@firm.com" required autocomplete="email" />
@@ -448,6 +461,7 @@ export function renderAccountPageHtml(user: UserRecord | null, tier: UserTier, e
 
         <!-- Register Form -->
         <form id="form-register" action="/api/auth/register" method="POST" style="display:none;">
+          <input type="hidden" name="redirectTo" id="reg-redirect-to" value="/journal" />
           <div class="form-group">
             <label for="reg-email">OPERATOR EMAIL</label>
             <input type="email" id="reg-email" name="email" placeholder="operator@firm.com" required autocomplete="email" />
@@ -488,6 +502,31 @@ export function renderAccountPageHtml(user: UserRecord | null, tier: UserTier, e
             regForm.style.display = 'block';
           }
         }
+
+        // Onboarding flow detection for saved check
+        window.addEventListener('DOMContentLoaded', function() {
+          const urlParams = new URLSearchParams(window.location.search);
+          const flow = urlParams.get('flow');
+          let pending = null;
+          try {
+            const raw = localStorage.getItem('quanterraos_pending_check');
+            if (raw) pending = JSON.parse(raw);
+          } catch (_) {}
+
+          if (flow === 'save-check' || pending) {
+            switchTab('register');
+            const promptBox = document.getElementById('save-check-prompt');
+            const detailsBox = document.getElementById('save-check-details');
+            if (promptBox && detailsBox && pending) {
+              detailsBox.innerHTML = 'Preserving check: <strong>' + (pending.contractTicker || 'KXBTC15M') + '</strong> at ' + (pending.price * 100).toFixed(0) + '¢. Breakeven: <strong style="color:var(--accent);">' + (pending.breakevenWinProb || 52.75) + '%</strong>. Create your account to enter your Decision Journal.';
+              promptBox.style.display = 'block';
+            }
+            const logRedirect = document.getElementById('login-redirect-to');
+            const regRedirect = document.getElementById('reg-redirect-to');
+            if (logRedirect) logRedirect.value = '/journal';
+            if (regRedirect) regRedirect.value = '/journal';
+          }
+        });
       </script>
     `}
   </main>

@@ -1094,7 +1094,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
 
             <div style="margin-top: 20px;">
               <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                <a href="/account?flow=sign-up&check=true" class="btn-primary" style="flex:1; text-align:center; padding:10px 14px; font-size:0.8rem; background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%); color:#07080B; border:1px solid #DFB843; font-weight:700;">
+                <a href="/account?flow=save-check" onclick="handleWedgeSaveCheck(event)" class="btn-primary" style="flex:1; text-align:center; padding:10px 14px; font-size:0.8rem; background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%); color:#07080B; border:1px solid #DFB843; font-weight:700;">
                   Save My Check &amp; Start Journal &rarr;
                 </a>
                 <button type="button" class="btn-secondary" onclick="openShareCardModal()" style="display:inline-flex; align-items:center; gap:6px; padding:10px 14px; font-size:0.8rem; font-weight:600; background:rgba(212,175,55,0.08); border-color:rgba(212,175,55,0.3); color:var(--accent-light);">
@@ -1721,20 +1721,22 @@ function recalcWedge() {
   const probVal = document.getElementById('wedge-prob-val');
   if (probVal) probVal.textContent = (prob * 100).toFixed(1) + '%';
 
-  let feePerContract = 0.0175;
+  let totalFee = 0;
+  let feePerContract = 0;
   let source = "CME CF BRTI 60s TWAP";
   if (venue.indexOf('kalshi') !== -1) {
-    feePerContract = Math.ceil(0.07 * price * (1 - price) * 100) / 100;
+    const rawFee = 0.07 * count * price * (1 - price);
+    totalFee = Math.ceil(rawFee * 100) / 100;
+    feePerContract = totalFee / count;
     source = venue === 'kalshi-1h' ? 'CME CF BRTI 60s TWAP (1H)' : 'CME CF BRTI 60s TWAP (15M)';
   } else {
     const gas = count >= 50 ? 0.08 : 0.15;
-    const amortizedGas = gas / count;
-    feePerContract = Number((0.005 + amortizedGas).toFixed(4));
+    totalFee = Number(((0.005 * count) + gas).toFixed(2));
+    feePerContract = totalFee / count;
     source = 'Polygon UMA Optimistic Oracle (2h Dispute Window)';
   }
 
   const purchaseCost = price * count;
-  const totalFee = feePerContract * count;
   const maxLoss = purchaseCost + totalFee;
   const breakevenPct = (price + feePerContract) * 100;
   const netEvPerContract = prob - price - feePerContract;
@@ -1760,11 +1762,43 @@ function recalcWedge() {
   const timeEl = document.getElementById('wedge-timestamp');
   if (timeEl) timeEl.textContent = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
 
+  // Store check state for journal onboarding
+  window.__wedgeCheck = {
+    venue: venue,
+    pricingBasis: 'executable_ask',
+    contractTicker: venue === 'kalshi-1h' ? 'KXBTCD' : venue === 'polymarket' ? 'POLY-BTC15M' : 'KXBTC15M',
+    side: 'yes',
+    price: price,
+    count: count,
+    purchaseCost: Number(purchaseCost.toFixed(2)),
+    exchangeFee: Number(totalFee.toFixed(2)),
+    halfSpreadDrag: 0.0,
+    totalDrag: Number(feePerContract.toFixed(4)),
+    breakevenWinProb: Number(breakevenPct.toFixed(2)),
+    assessedWinProb: Number((prob * 100).toFixed(2)),
+    netExpectedValue: Number(totalNetEv.toFixed(2)),
+    settlementSource: source
+  };
+
   // Redraw canvas if modal is open
   const modal = document.getElementById('share-card-modal');
   if (modal && modal.style.display === 'flex') {
     renderCardToCanvas();
   }
+}
+
+function handleWedgeSaveCheck(e) {
+  e.preventDefault();
+  if (!window.__wedgeCheck) recalcWedge();
+  try {
+    localStorage.setItem('quanterraos_pending_check', JSON.stringify(window.__wedgeCheck));
+    fetch('/api/analytics/check', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(window.__wedgeCheck)
+    }).catch(function() {});
+  } catch (_) {}
+  window.location.href = '/account?flow=save-check';
 }
 
 function renderCardToCanvas() {

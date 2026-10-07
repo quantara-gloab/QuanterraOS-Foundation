@@ -545,10 +545,9 @@ export function renderAccessTerminalPage(error?: string): string {
             id="operator-id" 
             name="email" 
             class="form-input" 
-            placeholder="commander@quanterraos.com" 
+            placeholder="operator@firm.com" 
             required 
-            autocomplete="username" 
-            value="commander@quanterraos.com"
+            autocomplete="username"
           >
         </div>
 
@@ -565,7 +564,6 @@ export function renderAccessTerminalPage(error?: string): string {
             placeholder="••••••••••••••••" 
             required 
             autocomplete="current-password"
-            value="quanterra-commander-2026"
           >
         </div>
 

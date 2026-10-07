@@ -13,8 +13,8 @@ import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { eq, and, gte, asc, desc, sql } from "drizzle-orm";
 import { db, runMigrations } from "./db.ts";
-import { getChatGPTUser } from "./auth.ts";
-import { researchObservations, researchResolutions, researchResolutionHistory, edgeScores, falconRecommendations, btcIndexTicks, users, sessions } from "./schema.ts";
+import { getChatGPTUser, requireFounderAuth } from "./auth.ts";
+import { researchObservations, researchResolutions, researchResolutionHistory, edgeScores, falconRecommendations, btcIndexTicks, users, sessions, events, userDecisionJournal } from "./schema.ts";
 import { buildPrediction, type LiveMarket } from "./btc15m-predictor.ts";
 import { handleResolve, handleEdgeScore, handleObserve } from "./routes/workspace.ts";
 import { handleFalconRecommend, handleFalconJevRecommend, handleFalconDecision, type FalconRecommendationRow } from "./routes/falcon.ts";
@@ -55,6 +55,7 @@ import { getAutopilotLedger } from "./autopilot-engine.ts";
 import { renderPricingPageHtml } from "./pricing-page.ts";
 import { renderTwoStrategiesLostPageHtml } from "./blog-page.ts";
 import { renderAccountPageHtml } from "./account-page.ts";
+import { renderJournalPageHtml } from "./journal-page.ts";
 import { renderAccessTerminalPage } from "./access-terminal-page.ts";
 import { renderWalletPageHtml } from "./wallet-page.ts";
 import { renderCalculatorPageHtml } from "./calculator-page.ts";
@@ -219,7 +220,7 @@ app.get("/api/gtm/drafts", (_req, res) => {
   res.json(listContentDrafts());
 });
 
-app.post("/api/gtm/drafts/new", (req, res) => {
+app.post("/api/gtm/drafts/new", requireFounderAuth, (req, res) => {
   try {
     const draft = draftContentPiece(req.body);
     res.json(draft);
@@ -228,7 +229,7 @@ app.post("/api/gtm/drafts/new", (req, res) => {
   }
 });
 
-app.post("/api/gtm/drafts/approve", (req, res) => {
+app.post("/api/gtm/drafts/approve", requireFounderAuth, (req, res) => {
   try {
     const result = approveContentDraft(req.body.draftId, req.body.approvedBy || "Michael Quantara");
     res.json(result);
@@ -241,7 +242,7 @@ app.get("/api/gtm/pipeline", (_req, res) => {
   res.json(listInstitutionalPipeline());
 });
 
-app.post("/api/gtm/pipeline/stage", (req, res) => {
+app.post("/api/gtm/pipeline/stage", requireFounderAuth, (req, res) => {
   try {
     const result = updatePipelineStage(req.body.opportunityId, req.body.stage);
     res.json(result);
@@ -1018,7 +1019,7 @@ app.get("/api/council/pipeline/latest", async (_req, res) => {
   }
 });
 
-app.post("/api/council/pipeline/run", async (_req, res) => {
+app.post("/api/council/pipeline/run", requireFounderAuth, async (_req, res) => {
   try {
     const run = await getLatestCouncilPipelineRun(15_000);
     res.json(run);
@@ -1744,6 +1745,166 @@ app.get("/calculator", (_req, res) => {
   res.type("html").send(renderCalculatorPageHtml());
 });
 
+app.get(["/journal", "/decisions"], (req, res) => {
+  const auth = getUserAuth(req);
+  let entries: any[] = [];
+  if (auth.user) {
+    entries = db
+      .select()
+      .from(userDecisionJournal)
+      .where(eq(userDecisionJournal.userId, auth.user.id))
+      .orderBy(desc(userDecisionJournal.createdAt))
+      .all();
+  }
+  logEvent("journal_viewed", auth.user?.id, { entryCount: entries.length });
+  res.type("html").send(renderJournalPageHtml(auth.user, auth.tier, entries));
+});
+
+app.post("/api/analytics/check", (req, res) => {
+  const auth = getUserAuth(req);
+  logEvent("check_completed", auth.user?.id, req.body);
+  res.json({ success: true });
+});
+
+app.post("/api/analytics/journal-viewed", (req, res) => {
+  const auth = getUserAuth(req);
+  logEvent("journal_viewed", auth.user?.id, { path: req.path });
+  res.json({ success: true });
+});
+
+app.post("/api/journal/save", (req, res) => {
+  const auth = getUserAuth(req);
+  let activeUser = auth.user;
+  if (!activeUser) {
+    const guestEmail = `operator_${randomUUID().slice(0, 8)}@quanterraos.local`;
+    activeUser = createUser(guestEmail, randomUUID(), "free");
+    logEvent("signup", activeUser.id, { email: guestEmail, tier: "free", guest: true, source: "journal_auto_provision" });
+    const { sessionId } = createSession(activeUser.id);
+    res.setHeader("Set-Cookie", `quanterraos_session=${sessionId}; Path=/; HttpOnly; SameSite=Lax`);
+  }
+
+  const b = req.body || {};
+  const id = `jrn_${randomUUID().slice(0, 16)}`;
+  const now = new Date().toISOString();
+
+  db.insert(userDecisionJournal)
+    .values({
+      id,
+      userId: activeUser.id,
+      venue: b.venue || "kalshi-15m",
+      contractTicker: b.contractTicker || "KXBTC15M",
+      contractType: b.contractType || "binary_above_below",
+      side: b.side || "yes",
+      pricingBasis: b.pricingBasis || "executable_ask",
+      contractPrice: typeof b.price === "number" ? b.price : 0.51,
+      contractCount: typeof b.count === "number" ? b.count : 10,
+      purchaseCost: typeof b.purchaseCost === "number" ? b.purchaseCost : 5.10,
+      exchangeFee: typeof b.exchangeFee === "number" ? b.exchangeFee : 0.18,
+      halfSpreadDrag: typeof b.halfSpreadDrag === "number" ? b.halfSpreadDrag : 0.0,
+      totalDrag: typeof b.totalDrag === "number" ? b.totalDrag : 0.0175,
+      breakevenWinProb: typeof b.breakevenWinProb === "number" ? b.breakevenWinProb : 52.75,
+      assessedWinProb: typeof b.assessedWinProb === "number" ? b.assessedWinProb : 55.0,
+      netExpectedValue: typeof b.netExpectedValue === "number" ? b.netExpectedValue : 0.22,
+      settlementSource: b.settlementSource || "CME CF BRTI 60s TWAP",
+      notes: b.notes || null,
+      status: "saved_check",
+      createdAt: now,
+      updatedAt: now,
+    })
+    .run();
+
+  logEvent("check_saved", activeUser.id, {
+    journalId: id,
+    contractTicker: b.contractTicker || "KXBTC15M",
+    breakevenWinProb: b.breakevenWinProb,
+    pricingBasis: b.pricingBasis,
+  });
+
+  res.json({ success: true, id, userId: activeUser.id });
+});
+
+app.get("/api/journal", (req, res) => {
+  const auth = getUserAuth(req);
+  if (!auth.user) {
+    return res.status(401).json({ error: "Authentication required to retrieve journal" });
+  }
+  const entries = db
+    .select()
+    .from(userDecisionJournal)
+    .where(eq(userDecisionJournal.userId, auth.user.id))
+    .orderBy(desc(userDecisionJournal.createdAt))
+    .all();
+  res.json({ success: true, count: entries.length, entries });
+});
+
+app.get("/api/export/journal.csv", (req, res) => {
+  const auth = getUserAuth(req);
+  let entries: any[] = [];
+  if (auth.user) {
+    entries = db
+      .select()
+      .from(userDecisionJournal)
+      .where(eq(userDecisionJournal.userId, auth.user.id))
+      .orderBy(desc(userDecisionJournal.createdAt))
+      .all();
+  }
+  logEvent("journal_exported", auth.user?.id, { count: entries.length });
+  const headers = "id,created_at,venue,contract,pricing_basis,side,price,count,purchase_cost,fee,half_spread_drag,total_drag,breakeven_pct,assessed_pct,net_ev,status,oracle\n";
+  const rows = entries
+    .map((e) =>
+      [
+        e.id,
+        e.createdAt,
+        e.venue,
+        e.contractTicker,
+        e.pricingBasis,
+        e.side,
+        e.contractPrice,
+        e.contractCount,
+        e.purchaseCost,
+        e.exchangeFee,
+        e.halfSpreadDrag,
+        e.totalDrag,
+        e.breakevenWinProb,
+        e.assessedWinProb,
+        e.netExpectedValue,
+        e.status,
+        `"${(e.settlementSource || "").replace(/"/g, '""')}"`,
+      ].join(",")
+    )
+    .join("\n");
+  res.setHeader("Content-Type", "text/csv");
+  res.setHeader("Content-Disposition", `attachment; filename="quanterraos-journal-${Date.now()}.csv"`);
+  res.send(headers + rows);
+});
+
+app.get("/api/analytics/funnel-summary", (_req, res) => {
+  const allEvents = db.select().from(events).all();
+  const counts: Record<string, number> = {
+    checks_completed: 0,
+    signups: 0,
+    checks_saved: 0,
+    journal_views: 0,
+    journal_exports: 0,
+  };
+  for (const e of allEvents) {
+    if (e.eventName === "check_completed") counts.checks_completed++;
+    else if (e.eventName === "signup") counts.signups++;
+    else if (e.eventName === "check_saved") counts.checks_saved++;
+    else if (e.eventName === "journal_viewed") counts.journal_views++;
+    else if (e.eventName === "journal_exported") counts.journal_exports++;
+  }
+  res.json({
+    success: true,
+    timestamp: new Date().toISOString(),
+    funnel: counts,
+    conversionRates: {
+      checkToSave: counts.checks_completed > 0 ? Number(((counts.checks_saved / counts.checks_completed) * 100).toFixed(1)) + "%" : "0.0%",
+      signupToSave: counts.signups > 0 ? Number(((counts.checks_saved / counts.signups) * 100).toFixed(1)) + "%" : "0.0%",
+    }
+  });
+});
+
 app.get(["/calibration/surface", "/surface"], (_req, res) => {
   res.type("html").send(renderCalibrationSurfacePageHtml());
 });
@@ -1815,7 +1976,7 @@ app.get("/api/agents/learning-summary", async (_req, res) => {
   }
 });
 
-app.post("/api/agents/autonomous-train", async (_req, res) => {
+app.post("/api/agents/autonomous-train", requireFounderAuth, async (_req, res) => {
   try {
     const cycle = await runAutonomousLearningCycle();
     const acceleration = get90DayAccelerationStatus();
@@ -1833,7 +1994,7 @@ app.get("/api/venues/compare", (req, res) => {
   res.json({ success: true, comparison });
 });
 
-app.post("/api/sms/dispatch-brief", async (req, res) => {
+app.post("/api/sms/dispatch-brief", requireFounderAuth, async (req, res) => {
   try {
     const targetPhone = req.body?.phone as string | undefined;
     const summary = await dispatchDailyIntelligenceBrief(targetPhone);

@@ -273,3 +273,63 @@ export function getUserAuth(req: IncomingMessage): UserAuthContext {
   // Default: Unauthenticated visitor has 'free' tier
   return { user: null, tier: "free", sessionId: null };
 }
+
+// ---------------------------------------------------------------------------
+// Founder Clearance & Elevated Privilege Protection
+// ---------------------------------------------------------------------------
+
+let activeFounderSecretKey: string = process.env.FOUNDER_SECRET_KEY || "";
+if (!activeFounderSecretKey) {
+  // Ephemeral, cryptographically rotated key generated on boot if not explicitly injected
+  activeFounderSecretKey = `qk_sec_${randomBytes(24).toString("hex")}`;
+}
+
+export function getActiveFounderSecretKeyPrefix(): string {
+  return activeFounderSecretKey.slice(0, 10) + "...";
+}
+
+export function isFounderAuthorized(req: IncomingMessage): boolean {
+  // 1. Direct header token check (x-founder-key)
+  const directKey = (req.headers["x-founder-key"] as string | undefined)?.trim();
+  if (directKey && directKey.length === activeFounderSecretKey.length) {
+    try {
+      const a = Buffer.from(directKey);
+      const b = Buffer.from(activeFounderSecretKey);
+      if (timingSafeEqual(a, b)) return true;
+    } catch (_) {}
+  }
+
+  // 2. Bearer token matching founder key
+  const authHeader = req.headers["authorization"];
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    const bearer = authHeader.slice(7).trim();
+    if (bearer.length === activeFounderSecretKey.length) {
+      try {
+        const a = Buffer.from(bearer);
+        const b = Buffer.from(activeFounderSecretKey);
+        if (timingSafeEqual(a, b)) return true;
+      } catch (_) {}
+    }
+  }
+
+  // 3. User session with founder email or institutional clearance
+  const auth = getUserAuth(req);
+  if (auth.user) {
+    const founderEmail = (process.env.FOUNDER_EMAIL || "founder@quanterraos.com").toLowerCase();
+    if (auth.user.email.toLowerCase() === founderEmail) return true;
+    if (auth.tier === "institutional") return true;
+  }
+
+  return false;
+}
+
+export function requireFounderAuth(req: any, res: any, next: any): void {
+  if (isFounderAuthorized(req)) {
+    return next();
+  }
+  res.status(401).json({
+    error: "Unauthorized: Founder or operator clearance required",
+    code: "FOUNDER_AUTH_REQUIRED",
+  });
+}
+

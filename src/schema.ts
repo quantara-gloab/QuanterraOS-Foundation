@@ -671,4 +671,37 @@ export const autonomousLearningCycles = sqliteTable(
   }),
 );
 
+export const userDecisionJournal = sqliteTable(
+  "user_decision_journal",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id").notNull(),
+    venue: text("venue").notNull(), // 'kalshi-15m' | 'kalshi-1h' | 'polymarket'
+    contractTicker: text("contract_ticker").notNull(), // e.g. 'KXBTC15M'
+    contractType: text("contract_type").notNull().default("binary_above_below"),
+    side: text("side").notNull().default("yes"),
+    pricingBasis: text("pricing_basis").notNull().default("executable_ask"), // 'executable_ask' | 'mid_price'
+    contractPrice: real("contract_price").notNull(),
+    contractCount: integer("contract_count").notNull().default(1),
+    purchaseCost: real("purchase_cost").notNull(),
+    exchangeFee: real("exchange_fee").notNull(),
+    halfSpreadDrag: real("half_spread_drag").notNull().default(0.0),
+    totalDrag: real("total_drag").notNull(),
+    breakevenWinProb: real("breakeven_win_prob").notNull(),
+    assessedWinProb: real("assessed_win_prob").notNull(),
+    netExpectedValue: real("net_expected_value").notNull(),
+    settlementSource: text("settlement_source").notNull(),
+    notes: text("notes"),
+    status: text("status").notNull().default("saved_check"), // 'saved_check' | 'paper_tracked' | 'executed_live'
+    outcome: text("outcome"), // 'WON' | 'LOST' | 'VOID' | 'PENDING'
+    realizedPnl: real("realized_pnl"),
+    createdAt: text("created_at").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (table) => ({
+    userIdIdx: index("user_decision_journal_user_id_idx").on(table.userId),
+    createdAtIdx: index("user_decision_journal_created_at_idx").on(table.createdAt),
+  })
+);
+
 
