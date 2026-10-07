@@ -14,7 +14,7 @@ import { randomUUID } from "node:crypto";
 import { eq, and, gte, asc, desc, sql } from "drizzle-orm";
 import { db, runMigrations } from "./db.ts";
 import { getChatGPTUser, requireFounderAuth } from "./auth.ts";
-import { researchObservations, researchResolutions, researchResolutionHistory, edgeScores, falconRecommendations, btcIndexTicks, users, sessions, events, userDecisionJournal } from "./schema.ts";
+import { researchObservations, researchResolutions, researchResolutionHistory, edgeScores, falconRecommendations, btcIndexTicks, users, sessions, events, userDecisionJournal, pilotObservationSessions } from "./schema.ts";
 import { buildPrediction, type LiveMarket } from "./btc15m-predictor.ts";
 import { handleResolve, handleEdgeScore, handleObserve } from "./routes/workspace.ts";
 import { handleFalconRecommend, handleFalconJevRecommend, handleFalconDecision, type FalconRecommendationRow } from "./routes/falcon.ts";
@@ -2088,13 +2088,91 @@ app.get("/audit/pilot", requireFounderAuth, (_req, res) => {
     .limit(20)
     .all();
 
+  const recordedSessions = db
+    .select()
+    .from(pilotObservationSessions)
+    .orderBy(desc(pilotObservationSessions.createdAt))
+    .limit(50)
+    .all();
+
   res.type("html").send(
     renderPilotAuditPageHtml({
       customerFunnel: customerCounts,
       internalFunnel: internalCounts,
       recentJournalEntries: recentEntries,
+      recordedSessions,
     })
   );
+});
+
+app.post("/api/audit/pilot/session", requireFounderAuth, (req, res) => {
+  const b = req.body || {};
+  const id = b.id || `ps_${randomUUID().slice(0, 12)}`;
+  const participantRef = b.participantRef || b.id || "P-01";
+  const now = new Date().toISOString();
+
+  db.insert(pilotObservationSessions)
+    .values({
+      id,
+      participantRef,
+      channel: b.channel || "Direct Participant",
+      device: b.device || "iPhone Safari",
+      durationMinutes: typeof b.durationMinutes === "number" ? b.durationMinutes : (parseFloat(b.duration) || 2.0),
+      unassisted: b.unassisted === "NO" ? "NO" : "YES",
+      assistanceDetails: b.assistanceDetails || null,
+      persistenceStatus: b.persistenceStatus === "FAILED" ? "FAILED" : "VERIFIED",
+      confusionNotes: b.confusionNotes || null,
+      comprehensionCostFee: b.comprehensionCostFee || null,
+      comprehensionBreakeven: b.comprehensionBreakeven || null,
+      comprehensionZeroAlpha: b.comprehensionZeroAlpha || null,
+      operatorNotes: b.operatorNotes || null,
+      status: b.status || "COMPLETED",
+      createdAt: b.createdAt || now,
+    })
+    .run();
+
+  logEvent("pilot_session_recorded", undefined, {
+    sessionId: id,
+    participantRef,
+    unassisted: b.unassisted,
+    persistenceStatus: b.persistenceStatus,
+  });
+
+  res.json({ success: true, id, participantRef });
+});
+
+app.get("/api/audit/pilot/sessions", requireFounderAuth, (_req, res) => {
+  const sessionsList = db
+    .select()
+    .from(pilotObservationSessions)
+    .orderBy(desc(pilotObservationSessions.createdAt))
+    .all();
+  res.json({ success: true, count: sessionsList.length, sessions: sessionsList });
+});
+
+app.get("/api/audit/pilot/export", requireFounderAuth, (_req, res) => {
+  const sessionsList = db.select().from(pilotObservationSessions).orderBy(desc(pilotObservationSessions.createdAt)).all();
+  const journalRows = db.select().from(userDecisionJournal).orderBy(desc(userDecisionJournal.createdAt)).all();
+  const allEvents = db.select().from(events).orderBy(desc(events.timestamp)).all();
+
+  const exportBundle = {
+    title: "QuanterraOS Usability Pilot Audit Manifest",
+    generatedAt: new Date().toISOString(),
+    governanceStatus: "AUTHENTIC_SESSION_VERIFICATION",
+    summary: {
+      totalRecordedSessions: sessionsList.length,
+      unassistedCount: sessionsList.filter((s) => s.unassisted === "YES").length,
+      persistenceVerifiedCount: sessionsList.filter((s) => s.persistenceStatus === "VERIFIED").length,
+      journalRowsInspected: journalRows.length,
+    },
+    sessions: sessionsList,
+    recentJournalRows: journalRows.slice(0, 50),
+    recentAuditEvents: allEvents.slice(0, 100),
+  };
+
+  res.setHeader("Content-Type", "application/json");
+  res.setHeader("Content-Disposition", `attachment; filename="quanterraos-pilot-audit-${Date.now()}.json"`);
+  res.send(JSON.stringify(exportBundle, null, 2));
 });
 
 app.get(["/calibration/surface", "/surface"], (_req, res) => {

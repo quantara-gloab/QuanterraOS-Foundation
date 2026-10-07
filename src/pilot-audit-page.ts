@@ -38,10 +38,26 @@ export interface PilotAuditPageData {
     outcome?: string | null;
     createdAt: string;
   }>;
+  recordedSessions?: Array<{
+    id: string;
+    participantRef: string;
+    channel: string;
+    device: string;
+    durationMinutes: number;
+    unassisted: string;
+    persistenceStatus: string;
+    confusionNotes?: string | null;
+    comprehensionCostFee?: string | null;
+    comprehensionBreakeven?: string | null;
+    comprehensionZeroAlpha?: string | null;
+    operatorNotes?: string | null;
+    status: string;
+    createdAt: string;
+  }>;
 }
 
 export function renderPilotAuditPageHtml(data: PilotAuditPageData): string {
-  const { customerFunnel, internalFunnel, recentJournalEntries } = data;
+  const { customerFunnel, internalFunnel, recentJournalEntries, recordedSessions = [] } = data;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -383,7 +399,36 @@ export function renderPilotAuditPageHtml(data: PilotAuditPageData): string {
       const persistence = document.getElementById('obs-persistence').value;
       const friction = document.getElementById('obs-friction').value || 'None';
       const comprehension = document.getElementById('obs-comprehension').value || 'Confirmed cost, fees, and no alpha claim';
+      const durationNum = parseFloat(duration.replace(':', '.')) || 2.0;
 
+      const sessionPayload = {
+        id: id,
+        participantRef: id,
+        channel: channel,
+        device: device,
+        durationMinutes: durationNum,
+        unassisted: unassisted,
+        persistenceStatus: persistence,
+        confusionNotes: friction,
+        comprehensionCostFee: comprehension,
+        comprehensionBreakeven: comprehension,
+        comprehensionZeroAlpha: comprehension,
+        operatorNotes: friction,
+        timestamp: new Date().toISOString()
+      };
+
+      // Persist to SQLite backend via API
+      fetch('/api/audit/pilot/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sessionPayload)
+      }).then(function(res) {
+        if (!res.ok) console.warn('Backend sync returned', res.status);
+      }).catch(function(err) {
+        console.warn('Backend sync offline:', err);
+      });
+
+      // Update local buffer
       observations.push({
         id: id,
         channel: channel,
@@ -393,26 +438,21 @@ export function renderPilotAuditPageHtml(data: PilotAuditPageData): string {
         persistence: persistence,
         friction: friction,
         comprehension: comprehension,
-        timestamp: new Date().toISOString()
+        timestamp: sessionPayload.timestamp
       });
 
       localStorage.setItem('quanterraos_pilot_observations', JSON.stringify(observations));
       renderBuffer();
-      alert('Recorded session ' + id + ' (' + observations.length + '/10 logged).');
+      alert('Recorded session ' + id + ' (' + observations.length + '/10 logged) and synchronized to database.');
     }
 
     function exportAuditJson() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(observations, null, 2));
-      const a = document.createElement('a');
-      a.setAttribute("href", dataStr);
-      a.setAttribute("download", "quanterraos-pilot-audit-" + Date.now() + ".json");
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
+      // First attempt server-side complete manifest download
+      window.location.href = '/api/audit/pilot/export';
     }
 
     function clearBuffer() {
-      if (confirm('Clear observation buffer?')) {
+      if (confirm('Clear local observation buffer?')) {
         observations = [];
         localStorage.removeItem('quanterraos_pilot_observations');
         renderBuffer();

@@ -704,4 +704,29 @@ export const userDecisionJournal = sqliteTable(
   })
 );
 
+export const pilotObservationSessions = sqliteTable(
+  "pilot_observation_sessions",
+  {
+    id: text("id").primaryKey(),
+    participantRef: text("participant_ref").notNull(),
+    channel: text("channel").notNull(),
+    device: text("device").notNull(),
+    durationMinutes: real("duration_minutes").notNull(),
+    unassisted: text("unassisted").notNull(),
+    assistanceDetails: text("assistance_details"),
+    persistenceStatus: text("persistence_status").notNull(),
+    confusionNotes: text("confusion_notes"),
+    comprehensionCostFee: text("comprehension_cost_fee"),
+    comprehensionBreakeven: text("comprehension_breakeven"),
+    comprehensionZeroAlpha: text("comprehension_zero_alpha"),
+    operatorNotes: text("operator_notes"),
+    status: text("status").notNull().default("COMPLETED"),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => ({
+    participantRefIdx: index("pilot_sessions_participant_ref_idx").on(table.participantRef),
+    createdAtIdx: index("pilot_sessions_created_at_idx").on(table.createdAt),
+  })
+);
+
 
