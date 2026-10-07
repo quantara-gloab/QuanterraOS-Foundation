@@ -48,6 +48,7 @@ import { getAutopilotLedger } from "./autopilot-engine.ts";
 import { renderPricingPageHtml } from "./pricing-page.ts";
 import { renderTwoStrategiesLostPageHtml } from "./blog-page.ts";
 import { renderAccountPageHtml } from "./account-page.ts";
+import { renderAccessTerminalPage } from "./access-terminal-page.ts";
 import { renderWalletPageHtml } from "./wallet-page.ts";
 import { renderCalculatorPageHtml } from "./calculator-page.ts";
 import { renderCalibrationSurfacePageHtml } from "./calibration-surface-page.ts";
@@ -1710,491 +1711,7 @@ window.addEventListener("load", async function () {
 // Landing page rendered via src/landing-page.ts
 
 
-const accessTerminalPage = `<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>QuanterraOS — Access Terminal</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-${clerkScripts}
-<style>
-  :root {
-    --bg: #060A12;
-    --panel: rgba(13,20,31,0.72);
-    --panel-line: rgba(79,224,255,0.16);
-    --text: #E7F6FB;
-    --text-dim: #7FA9B6;
-    --accent: #4FE0FF;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: "IBM Plex Mono", monospace;
-    min-height: 100vh;
-    overflow: hidden;
-    position: relative;
-  }
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: 
-      radial-gradient(circle at 50% 50%, rgba(79,224,255,0.03) 0%, transparent 60%),
-      repeating-radial-gradient(circle, rgba(79,224,255,0.02) 1px, transparent 1px);
-    pointer-events: none;
-    z-index: -1;
-  }
-
-  /* Top HUD */
-  .hud {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 32px;
-    border-bottom: 1px solid var(--panel-line);
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 0.8rem;
-    color: var(--text-dim);
-    height: 48px;
-  }
-  .hud .left span { display: flex; align-items: center; gap: 12px; }
-  .hud .center { position: absolute; left: 50%; transform: translateX(-50%); }
-  .hud .status-tag { color: var(--accent); }
-  .hud .right { color: var(--accent); }
-
-  /* Layout */
-  .main {
-    display: grid;
-    grid-template-columns: 1fr 1.2fr 1fr;
-    gap: 24px;
-    padding: 48px 32px;
-    max-width: 1400px;
-    margin: 0 auto;
-    height: calc(100vh - 48px);
-    align-items: center;
-  }
-  .column { display: flex; flex-direction: column; gap: 20px; }
-
-  /* Telemetry panel */
-  .telemetry-panel {
-    background: var(--panel);
-    border: 1px solid var(--panel-line);
-    border-radius: 12px;
-    padding: 18px;
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 0.75rem;
-  }
-  .telemetry-panel .panel-title {
-    color: var(--text-dim);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .telemetry-panel .panel-title .dot {
-    width: 6px;
-    height: 6px;
-    background: var(--accent);
-    border-radius: 50%;
-    box-shadow: 0 0 6px var(--accent);
-  }
-  .telemetry-panel .value {
-    color: var(--text);
-    font-size: 1.1rem;
-    font-weight: 500;
-    margin-bottom: 8px;
-  }
-  .telemetry-panel .bars {
-    display: flex;
-    align-items: flex-end;
-    gap: 2px;
-    height: 48px;
-    margin-top: 8px;
-  }
-  .telemetry-panel .bar {
-    flex: 1;
-    min-width: 2px;
-    background: var(--accent);
-    border-radius: 2px 2px 0 0;
-    opacity: 0.4;
-    transition: opacity 0.3s;
-  }
-  .telemetry-panel .bar.active { opacity: 1; }
-
-  /* Sparkline */
-  .sparkline {
-    width: 100%;
-    height: 40px;
-  }
-  .sparkline line {
-    stroke: var(--accent);
-    stroke-width: 1.5;
-    fill: none;
-  }
-
-  /* Gauge */
-  .gauge {
-    width: 100%;
-    text-align: center;
-  }
-  .gauge .track {
-    width: 100%;
-    height: 8px;
-    background: rgba(127,169,182,0.2);
-    border-radius: 4px;
-    overflow: hidden;
-    margin: 8px 0;
-  }
-  .gauge .fill {
-    height: 100%;
-    background: var(--accent);
-    width: 30%;
-  }
-  .gauge .label {
-    color: var(--text-dim);
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-  }
-
-  /* Signal map radar */
-  .radar {
-    width: 160px;
-    height: 160px;
-    margin: 0 auto;
-    position: relative;
-  }
-  .radar .rings {
-    position: absolute;
-    inset: 0;
-    border: 1px solid var(--panel-line);
-    border-radius: 50%;
-  }
-  .radar .rings:nth-child(1) { width: 100%; height: 100%; }
-  .radar .rings:nth-child(2) { width: 70%; height: 70%; top: 15%; left: 15%; }
-  .radar .rings:nth-child(3) { width: 40%; height: 40%; top: 30%; left: 30%; }
-  .radar .blip {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    background: var(--accent);
-    border-radius: 50%;
-    box-shadow: 0 0 8px var(--accent);
-    top: 25%;
-    left: 60%;
-  }
-  .radar .center {
-    position: absolute;
-    inset: 0;
-    margin: auto;
-    width: 6px;
-    height: 6px;
-    background: var(--accent);
-    border-radius: 50%;
-    box-shadow: 0 0 8px var(--accent);
-  }
-
-  /* Terminal card */
-  .terminal {
-    background: var(--panel);
-    border: 1px solid var(--panel-line);
-    border-radius: 16px;
-    padding: 32px;
-    position: relative;
-    backdrop-filter: blur(4px);
-  }
-  .terminal::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 20px;
-    background: rgba(0,0,0,0.2);
-    border-radius: 16px 16px 0 0;
-    display: flex;
-    gap: 6px;
-    padding: 0 8px;
-  }
-  .terminal::before {
-    content: "";
-  }
-  .terminal .corner-brackets {
-    position: absolute;
-    top: 32px;
-    left: 24px;
-    right: 24px;
-    display: flex;
-    justify-content: space-between;
-    pointer-events: none;
-  }
-  .terminal .corner-brackets .bracket {
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 0.8rem;
-    color: var(--accent);
-    opacity: 0.5;
-  }
-
-  .terminal .section-label {
-    font-size: 0.7rem;
-    color: var(--text-dim);
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    margin-bottom: 24px;
-  }
-
-  .terminal h1 {
-    font-family: "Fraunces", serif;
-    font-style: italic;
-    font-weight: 500;
-    font-size: 1.5rem;
-    color: var(--text);
-    margin-bottom: 32px;
-  }
-
-  .form-group {
-    margin-bottom: 24px;
-  }
-  .form-group label {
-    display: block;
-    font-size: 0.75rem;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    margin-bottom: 8px;
-  }
-  .form-group input {
-    width: 100%;
-    padding: 14px 16px;
-    background: rgba(0,0,0,0.2);
-    border: 1px solid var(--panel-line);
-    border-radius: 8px;
-    color: var(--text);
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 0.9rem;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  .form-group input:focus {
-    border-color: var(--accent);
-  }
-  .form-group input::placeholder {
-    color: var(--text-dim);
-  }
-
-  .submit-btn {
-    width: 100%;
-    background: var(--accent);
-    color: var(--bg);
-    border: none;
-    padding: 14px;
-    border-radius: 8px;
-    font-family: "IBM Plex Sans", sans-serif;
-    font-weight: 600;
-    font-size: 0.9rem;
-    cursor: pointer;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    transition: all 0.2s;
-  }
-  .submit-btn:hover {
-    box-shadow: 0 0 20px rgba(79,224,255,0.3);
-  }
-
-  .signup-link {
-    text-align: center;
-    margin-top: 20px;
-    font-size: 0.8rem;
-  }
-  .signup-link a {
-    color: var(--accent);
-    font-family: "IBM Plex Sans", sans-serif;
-    font-weight: 500;
-  }
-  .signup-link a:hover { text-decoration: underline; }
-
-  .session-clock {
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 0.85rem;
-    color: var(--accent);
-    font-variant-numeric: tabular-nums;
-  }
-
-  .footer-honesty {
-    position: fixed;
-    bottom: 16px;
-    left: 0;
-    right: 0;
-    text-align: center;
-    font-size: 0.7rem;
-    color: var(--text-dim);
-    font-family: "IBM Plex Mono", monospace;
-  }
-</style>
-</head>
-<body>
-  <div class="hud">
-    <div class="left">
-      <span><span class="status-tag">●</span> NODE US-WEST-1</span>
-      <span>· LINK SECURE</span>
-      <span>· STATUS NOMINAL</span>
-    </div>
-    <div class="center">QUANTERRAOS ACCESS TERMINAL v1.0</div>
-    <div class="right">
-      <span id="session-clock" class="session-clock">00:00:00</span>
-    </div>
-  </div>
-
-  <div class="main">
-    <!-- Left column: telemetry panels -->
-    <div class="column">
-      <div class="telemetry-panel">
-        <div class="panel-title"><span class="dot"></span> COUNCIL STATUS</div>
-        <div class="value">8/8 ONLINE</div>
-        <div class="bars">
-          ${Array.from({length: 8}, (_, i) => 
-            `<div class="bar${i < 8 ? ' active' : ''}" style="--delay:${i * 0.1}s"></div>`
-          ).join("")}
-        </div>
-      </div>
-
-      <div class="telemetry-panel">
-        <div class="panel-title"><span class="dot"></span> MARKET PULSE</div>
-        <div class="value" id="btc-price">83,013</div>
-        <svg class="sparkline" id="sparkline">
-          ${Array.from({length: 20}, (_, i) => 
-            `<line x1="${i * 12}" y1="${60 - Math.random() * 30}" x2="${(i + 1) * 12}" y2="${60 - Math.random() * 30}"></line>`
-          ).join("")}
-        </svg>
-      </div>
-
-      <div class="telemetry-panel">
-        <div class="panel-title">THREAT LEVEL</div>
-        <div class="gauge">
-          <div class="track"><div class="fill"></div></div>
-          <div class="value">NOMINAL</div>
-        </div>
-      </div>
-
-      <div class="telemetry-panel">
-        <div class="panel-title">DATA THROUGHPUT</div>
-        <div class="value" id="throughput">0</div>
-        <div class="bars" id="throughput-bars">
-          ${Array.from({length: 12}, (_, i) => 
-            `<div class="bar" style="--delay:${i * 0.05}s"></div>`
-          ).join("")}
-        </div>
-      </div>
-    </div>
-
-    <!-- Center: terminal card -->
-    <div class="terminal">
-      <div class="corner-brackets">
-        <span class="bracket">◐</span>
-        <span class="bracket">◓</span>
-      </div>
-      <div class="section-label">// ACCESS TERMINAL</div>
-      <h1>Identify yourself.</h1>
-      <div class="form-group">
-        <label for="operator-id">OPERATOR ID</label>
-        <input type="text" id="operator-id" name="operatorId" placeholder="alex@quanterraos.com" autocomplete="email" />
-      </div>
-      <div class="form-group">
-        <label for="access-key">ACCESS KEY</label>
-        <input type="password" id="access-key" name="accessKey" placeholder="••••••••••••••••" autocomplete="off" />
-      </div>
-      <button class="submit-btn" id="init-session">INITIALIZE SESSION →</button>
-      <div class="signup-link">
-        New operator? <a href="/signup">Request clearance →</a>
-      </div>
-
-      <div id="terminal-status" style="font-size:0.75rem; color: var(--text-dim); margin-top: 16px; min-height: 20px;"></div>
-    </div>
-
-    <!-- Right column: more telemetry -->
-    <div class="column">
-      <div class="telemetry-panel">
-        <div class="panel-title"><span class="dot"></span> SESSION CLOCK</div>
-        <div class="value session-clock" id="session-display">00:00:00</div>
-      </div>
-
-      <div class="telemetry-panel">
-        <div class="panel-title"><span class="dot"></span> SIGNAL MAP</div>
-        <div class="radar">
-          <div class="rings"></div>
-          <div class="rings"></div>
-          <div class="rings"></div>
-          <div class="center"></div>
-          <div class="blip"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="footer-honesty">ALL INDICATORS ARE ILLUSTRATIVE — LIVE TELEMETRY CONNECTS ON LAUNCH</div>
-
-<script>
-const clerkConfigured = ${clerkConfigured};
-
-// Session clock
-function updateClock() {
-  const now = new Date();
-  const h = String(now.getUTCHours()).padStart(2, '0');
-  const m = String(now.getUTCMinutes()).padStart(2, '0');
-  const s = String(now.getUTCSeconds()).padStart(2, '0');
-  const timeStr = h + ':' + m + ':' + s;
-  document.querySelectorAll('#session-clock, #session-display').forEach(el => {
-    if (el) el.textContent = timeStr;
-  });
-}
-updateClock();
-setInterval(updateClock, 1000);
-
-// Animate telemetry bars
-function animateBars() {
-  const bars = document.querySelectorAll('.telemetry-panel .bar');
-  bars.forEach((bar, i) => {
-    setTimeout(() => {
-      if (bar instanceof HTMLElement) {
-        const height = 10 + Math.random() * 30;
-        bar.style.height = height + 'px';
-        bar.classList.add('active');
-        setTimeout(() => bar.classList.remove('active'), 1000 + Math.random() * 500);
-      }
-    }, i * 100);
-  });
-}
-animateBars();
-setInterval(animateBars, 3000);
-
-// Update throughput counter
-let rate = 0;
-setInterval(() => {
-  rate = Math.floor(9000 + Math.random() * 12000);
-  if (document.getElementById('throughput')) {
-    document.getElementById('throughput').textContent = rate.toLocaleString();
-  }
-}, 1000);
-
-// Terminal form submission — uses Clerk via /account sign-up flow
-document.getElementById('init-session').addEventListener('click', async function() {
-  const status = document.getElementById('terminal-status');
-  if (!clerkConfigured) {
-    status.textContent = 'CLERK NOT CONFIGURED — add CLERK_PUBLISHABLE_KEY to server environment';
-    return;
-  }
-  status.textContent = 'INITIALIZING…';
-  window.location.href = '/account?flow=sign-up';
-});
-</script>
-</body>
-</html>`;
+// Exclusive Access Terminal rendered via src/access-terminal-page.ts
 
 app.get(["/", "/home"], async (_req, res) => {
   let report: MarketPriceCalibrationReport | null = null;
@@ -2206,7 +1723,12 @@ app.get(["/", "/home"], async (_req, res) => {
   res.type("html").send(renderLandingPage(report));
 });
 
-app.get(["/signup", "/login"], (_req, res) => {
+app.get(["/access", "/login", "/terminal", "/command", "/clearance"], (req, res) => {
+  const error = req.query.error ? String(req.query.error) : undefined;
+  res.type("html").send(renderAccessTerminalPage(error));
+});
+
+app.get("/signup", (_req, res) => {
   const auth = getUserAuth(_req);
   res.type("html").send(renderAccountPageHtml(auth.user, auth.tier));
 });
@@ -2732,25 +2254,27 @@ app.post("/api/auth/register", (req, res) => {
 app.post("/api/auth/login", (req, res) => {
   const email = (req.body.email ?? req.body.operatorId ?? "").trim();
   const password = (req.body.password ?? req.body.accessKey ?? "").trim();
+  const redirectTarget = req.body.redirectTo || req.query.redirectTo || "/dashboard";
+
   if (!email || !password) {
-    if (req.headers["accept"]?.includes("text/html") || req.body.redirect !== "false") {
-      return res.redirect("/account?error=" + encodeURIComponent("Email and password required"));
+    if (req.headers["accept"]?.includes("text/html") || (req.body.redirect !== "false" && !req.headers["accept"]?.includes("application/json"))) {
+      return res.redirect("/access?error=" + encodeURIComponent("Operator ID and Access Key required"));
     }
-    return res.status(400).json({ error: "Email and password required" });
+    return res.status(400).json({ error: "Operator ID and Access Key required" });
   }
   const user = authenticateUser(email, password);
   if (!user) {
-    if (req.headers["accept"]?.includes("text/html") || req.body.redirect !== "false") {
-      return res.redirect("/account?error=" + encodeURIComponent("Invalid credentials"));
+    if (req.headers["accept"]?.includes("text/html") || (req.body.redirect !== "false" && !req.headers["accept"]?.includes("application/json"))) {
+      return res.redirect("/access?error=" + encodeURIComponent("Invalid credentials. Try demo pass or request clearance."));
     }
     return res.status(401).json({ error: "Invalid credentials" });
   }
   const { sessionId } = createSession(user.id);
   res.setHeader("Set-Cookie", `quanterraos_session=${sessionId}; Path=/; HttpOnly; SameSite=Lax`);
-  if (req.headers["accept"]?.includes("text/html") || req.body.redirect !== "false") {
-    return res.redirect("/account");
+  if (req.headers["accept"]?.includes("text/html") || (req.body.redirect !== "false" && !req.headers["accept"]?.includes("application/json"))) {
+    return res.redirect(redirectTarget);
   }
-  res.json({ user, sessionId });
+  res.json({ user, sessionId, redirectTo: redirectTarget });
 });
 
 app.post("/api/auth/logout", (req, res) => {
@@ -2759,7 +2283,7 @@ app.post("/api/auth/logout", (req, res) => {
     deleteSession(auth.sessionId);
   }
   res.setHeader("Set-Cookie", `quanterraos_session=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly`);
-  res.redirect("/account");
+  res.redirect("/access");
 });
 
 app.get("/api/auth/me", (req, res) => {
@@ -2772,17 +2296,21 @@ app.get("/api/auth/me", (req, res) => {
 });
 
 app.post("/api/auth/demo-login", (req, res) => {
-  const demoEmail = "operator@quanterraos.com";
+  const demoEmail = "commander@quanterraos.com";
   let user = getUserByEmail(demoEmail);
   if (!user) {
-    user = createUser(demoEmail, "operator-pass-2026", "pro");
+    user = createUser(demoEmail, "quanterra-commander-2026", "pro");
   } else if (user.tier !== "pro") {
     updateUserTier(user.id, "pro");
     user.tier = "pro";
   }
   const { sessionId } = createSession(user.id);
   res.setHeader("Set-Cookie", `quanterraos_session=${sessionId}; Path=/; HttpOnly; SameSite=Lax; Max-Age=2592000`);
-  res.redirect("/kalshi?login=success");
+  const redirectTarget = req.body?.redirectTo || req.query?.redirectTo || "/dashboard";
+  if (req.headers["accept"]?.includes("application/json") || req.body?.redirectTo) {
+    return res.json({ success: true, redirectTo: redirectTarget });
+  }
+  res.redirect(redirectTarget);
 });
 
 // ---------------------------------------------------------------------------

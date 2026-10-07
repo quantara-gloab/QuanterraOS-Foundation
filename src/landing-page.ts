@@ -863,6 +863,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       </div>
     </div>
     <div class="nav-right" style="display:flex;gap:10px;align-items:center;">
+      <a href="/access" class="nav-cta" style="background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%);color:#07080B;border:1px solid rgba(255,248,220,0.8);box-shadow:0 4px 16px rgba(212,175,55,0.4), inset 0 1px 0 #FFF;font-weight:800;">OPERATOR ACCESS &rarr;</a>
       <a href="/calculator" class="nav-cta" style="background:linear-gradient(180deg, #10B981 0%, #047857 100%);color:#fff;border-color:rgba(52,211,153,0.5);box-shadow:0 4px 14px rgba(16,185,129,0.35);">TRUE COST CALC &rarr;</a>
       <a href="/council" class="nav-cta">COUNCIL CONSOLE</a>
     </div>
@@ -883,9 +884,10 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
           While broad calibration is commoditized, high-velocity short-duration crypto prediction markets (Kalshi KXBTC15M and Polymarket 5m/15m) require sub-second spot basis tracking, non-linear taker fee modeling, and sovereign AI agent governance.
         </p>
         <div class="hero-actions">
-          <a href="/calculator" class="btn-primary" style="background:linear-gradient(180deg, #10B981 0%, #059669 100%);border-color:#34D399;box-shadow:0 0 20px rgba(16,185,129,0.35);">True Cost &amp; Net EV Calc &rarr;</a>
-          <a href="/calibration/surface" class="btn-secondary">Calibration Surface (Min 1–14)</a>
-          <a href="/mcp" class="btn-secondary">Model Context Protocol (MCP)</a>
+          <a href="/access" class="btn-primary" style="background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%);color:#07080B;border-color:rgba(255,248,220,0.8);box-shadow:0 0 24px rgba(212,175,55,0.45);font-weight:700;">Board Command Spaceship &rarr;</a>
+          <a href="/calculator" class="btn-secondary" style="border-color:rgba(16,185,129,0.5);color:#34D399;">True Cost &amp; Net EV Calc</a>
+          <a href="/calibration/surface" class="btn-secondary">Calibration Surface</a>
+          <a href="/mcp" class="btn-secondary">Model Context Protocol</a>
         </div>
 
         <div style="background: rgba(14, 20, 30, 0.7); border: 1px solid rgba(212, 175, 55, 0.25); border-radius: 6px; padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 24px; width: 100%; font-family: var(--font-mono); font-size: 0.74rem;">
