@@ -1061,7 +1061,9 @@ ${clerkScripts}
       <a href="/">home</a>
       <a href="/calculator" style="color:var(--accent); font-weight:600;">calculator</a>
       <a href="/compare" style="color:#38BDF8; font-weight:600;">compare</a>
+      <a href="/learn" style="color:var(--accent-light); font-weight:600;">curriculum</a>
       <a href="/journal" style="color:#10B981; font-weight:600;">journal</a>
+      <a href="/pricing" style="color:var(--accent); font-weight:600;">pricing</a>
       <a href="/mobile">mobile</a>
       <a href="/calibration">calibration</a>
       <a href="/index">index</a>
@@ -1776,7 +1778,11 @@ function executeCommandLine() {
   const input = document.getElementById('terminal-cmd-input');
   if (!input) return;
   const val = input.value.trim().toLowerCase();
-  if (!val) return;
+  if (!val) {
+    // If command line is empty, trigger sovereign pipeline cycle
+    triggerPipelineCycle();
+    return;
+  }
 
   if (val === 'draco' || val === '01') {
     selectSpecialist('draco');
@@ -2316,57 +2322,13 @@ async function submitModalSpecQuery() {
   }
 }
 
-async function inspectSpecialist(agentId) {
+function inspectSpecialist(agentId) {
   selectSpecialist(agentId);
-  const stream = document.getElementById('chat-stream-box');
-  if (!stream) return;
-  
-  const waitingMsg = document.createElement('div');
-  waitingMsg.className = 'chat-msg specialist';
-  waitingMsg.id = 'chat-inspect-waiting';
-  waitingMsg.innerHTML = '<div class="chat-msg-header"><span>' + agentId + '</span><span>audit check</span></div><div>Auditing stored parameters...</div>';
-  stream.appendChild(waitingMsg);
-  stream.scrollTop = stream.scrollHeight;
-
-  try {
-    const res = await fetch('/api/executives/' + agentId + '/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: 'Audit your current telemetry and status against stored database records.' })
-    });
-    const data = await res.json();
-    const wait = document.getElementById('chat-inspect-waiting');
-    if (wait) wait.remove();
-
-    const specMsg = document.createElement('div');
-    specMsg.className = 'chat-msg specialist';
-    let citationsHtml = '';
-    if (Array.isArray(data.citations) && data.citations.length > 0) {
-      citationsHtml = '<div class="chat-citation">citations: ' + data.citations.map(c => escapeHtml(c)).join(', ') + '</div>';
-    }
-    let telemetryHtml = '';
-    if (data.telemetryCluster) {
-      telemetryHtml = '<div class="f1-chat-telemetry-cluster">' +
-        '<span>🏁 ' + escapeHtml(data.telemetryCluster.callSign) + '</span>' +
-        '<span>🔒 ' + escapeHtml(data.telemetryCluster.circuitStatus) + '</span>' +
-        '</div>';
-    }
-    specMsg.innerHTML = telemetryHtml + '<div class="chat-msg-header"><span>' + escapeHtml(data.agentName || agentId) + ' (Audited)</span><span>' + new Date().toLocaleTimeString() + '</span></div><div>' + escapeHtml(data.reply || '') + '</div>' + citationsHtml;
-    stream.appendChild(specMsg);
-    playPitRadioBeep();
-  } catch (_e) {
-    const wait = document.getElementById('chat-inspect-waiting');
-    if (wait) wait.remove();
-    const errMsg = document.createElement('div');
-    errMsg.className = 'chat-msg specialist';
-    errMsg.innerHTML = '<div style="color: var(--warning);">Audit line interrupted.</div>';
-    stream.appendChild(errMsg);
-  } finally {
-    stream.scrollTop = stream.scrollHeight;
-  }
+  openSpecialistDialogue(agentId, 'Audit your current telemetry and status against stored database records.');
 }
 
 function promptSpecialist(agentId) {
+  selectSpecialist(agentId);
   const presets = SPECIALIST_PRESETS[agentId];
   const query = presets && presets.length > 0 ? presets[0] : 'What are your latest audited telemetry metrics?';
   openSpecialistDialogue(agentId, query);

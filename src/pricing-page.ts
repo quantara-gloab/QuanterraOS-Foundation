@@ -401,6 +401,7 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
     <div class="nav-links">
       <a href="/">Home</a>
       <a href="/calculator">True Cost Calc</a>
+      <a href="/learn">Learn / Risk</a>
       <a href="/calibration/surface">Surface</a>
       <a href="/calibration">Calibration</a>
       <a href="/spread">Spread Monitor</a>

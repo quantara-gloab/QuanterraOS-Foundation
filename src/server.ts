@@ -60,6 +60,7 @@ import { renderPilotAuditPageHtml } from "./pilot-audit-page.ts";
 import { renderAccessTerminalPage } from "./access-terminal-page.ts";
 import { renderWalletPageHtml } from "./wallet-page.ts";
 import { renderCalculatorPageHtml } from "./calculator-page.ts";
+import { renderLearnPageHtml } from "./learn-page.ts";
 import { renderVenueComparisonPageHtml } from "./venue-comparison-page.ts";
 import { renderCalibrationSurfacePageHtml } from "./calibration-surface-page.ts";
 import { renderMcpPageHtml, MCP_SERVER_MANIFEST, executeMcpTool } from "./mcp-server.ts";
@@ -1751,6 +1752,11 @@ app.get(["/compare", "/venues"], (_req, res) => {
   res.type("html").send(renderVenueComparisonPageHtml());
 });
 
+app.get(["/learn", "/education", "/curriculum"], (req, res) => {
+  const auth = getUserAuth(req);
+  res.type("html").send(renderLearnPageHtml(auth.tier));
+});
+
 app.get("/api/venues/compare", (req, res) => {
   const price = typeof req.query.price === "string" ? parseFloat(req.query.price) : 0.51;
   const count = typeof req.query.count === "string" ? parseInt(req.query.count, 10) : 10;
@@ -2834,6 +2840,11 @@ app.post("/api/billing/checkout", async (req, res) => {
     res.setHeader("Set-Cookie", `quanterraos_session=${sessionId}; Path=/; HttpOnly; SameSite=Lax`);
   }
   try {
+    if (req.body.tier === "free") {
+      updateUserTier(activeUser.id, "free");
+      logEvent("tier_downgraded_free", activeUser.id, { tier: "free" });
+      return res.redirect("/account?checkout=success&tier=free");
+    }
     const tier: "plus" | "pro" | "institutional" = req.body.tier === "institutional"
       ? "institutional"
       : req.body.tier === "plus"
