@@ -353,6 +353,115 @@ export function renderAccountPageHtml(user: UserRecord | null, tier: UserTier, e
           </div>
         </div>
 
+        <!-- Tier Upgrade & Switcher Console -->
+        <div class="downloads-box" style="margin-top: 24px; border-color: rgba(212,175,55,0.3); background: linear-gradient(135deg, rgba(16,22,34,0.6) 0%, rgba(9,13,20,0.6) 100%);">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+            <div>
+              <h3 style="color:#FFFFFF; margin-bottom:2px; font-size:1rem; display:flex; align-items:center; gap:8px;">
+                <span>⚡</span> Subscription Tier &amp; Platform Access
+              </h3>
+              <p style="font-size:0.8rem; color:var(--text-dim);">
+                Select your operational tier to instantly unlock real-time streaming, CSV exports, or institutional WebSocket feeds.
+              </p>
+            </div>
+            <a href="/pricing" style="color:var(--accent); font-size:0.8rem; text-decoration:none;">View Full Feature Matrix →</a>
+          </div>
+
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+            <!-- Free Explorer -->
+            <div style="background:rgba(255,255,255,0.02); border:1px solid ${tier === 'free' ? 'var(--accent)' : 'rgba(255,255,255,0.08)'}; border-radius:6px; padding:14px; display:flex; flex-direction:column; justify-content:space-between;">
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px;">
+                  <span style="font-weight:700; color:#fff; font-size:0.9rem;">Free Explorer</span>
+                  <span style="font-family:var(--font-mono); font-size:0.85rem; color:var(--text-dim);">$0/mo</span>
+                </div>
+                <div style="font-size:0.75rem; color:var(--muted); line-height:1.4; margin-bottom:12px;">
+                  20-min delayed live feed · Full 1,316 historical replay · Basic risk calculators
+                </div>
+              </div>
+              ${tier === 'free' ? `
+                <div style="font-family:var(--font-mono); font-size:0.75rem; font-weight:700; color:var(--accent); background:rgba(223,184,67,0.12); padding:6px; text-align:center; border-radius:4px; border:1px solid rgba(223,184,67,0.3);">
+                  CURRENT PLAN
+                </div>
+              ` : `
+                <form action="/api/billing/checkout" method="POST" style="margin:0;">
+                  <input type="hidden" name="tier" value="free">
+                  <button type="submit" class="btn btn-secondary" style="width:100%; padding:6px 10px; font-size:0.75rem;">Switch to Free</button>
+                </form>
+              `}
+            </div>
+
+            <!-- Trader Plus -->
+            <div style="background:rgba(255,255,255,0.02); border:1px solid ${tier === 'plus' ? 'var(--accent)' : 'rgba(255,255,255,0.08)'}; border-radius:6px; padding:14px; display:flex; flex-direction:column; justify-content:space-between;">
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px;">
+                  <span style="font-weight:700; color:#fff; font-size:0.9rem;">Trader Plus</span>
+                  <span style="font-family:var(--font-mono); font-size:0.85rem; color:var(--accent); font-weight:700;">$15/mo</span>
+                </div>
+                <div style="font-size:0.75rem; color:var(--muted); line-height:1.4; margin-bottom:12px;">
+                  Personal decision &amp; outcome journal · Weekly fee drag audits · Advisory risk limits
+                </div>
+              </div>
+              ${tier === 'plus' ? `
+                <div style="font-family:var(--font-mono); font-size:0.75rem; font-weight:700; color:var(--accent); background:rgba(223,184,67,0.12); padding:6px; text-align:center; border-radius:4px; border:1px solid rgba(223,184,67,0.3);">
+                  CURRENT PLAN
+                </div>
+              ` : `
+                <form action="/api/billing/checkout" method="POST" style="margin:0;">
+                  <input type="hidden" name="tier" value="plus">
+                  <button type="submit" class="btn btn-primary" style="width:100%; padding:6px 10px; font-size:0.75rem; font-weight:700; background:linear-gradient(180deg, #FAF1D4 0%, #DFB843 100%); color:#000;">Upgrade to Plus →</button>
+                </form>
+              `}
+            </div>
+
+            <!-- Pro Terminal -->
+            <div style="background:rgba(223,184,67,0.04); border:1px solid ${tier === 'pro' ? 'var(--accent)' : 'rgba(223,184,67,0.3)'}; border-radius:6px; padding:14px; display:flex; flex-direction:column; justify-content:space-between;">
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px;">
+                  <span style="font-weight:700; color:#fff; font-size:0.9rem;">Pro Terminal</span>
+                  <span style="font-family:var(--font-mono); font-size:0.85rem; color:var(--accent); font-weight:700;">$39/mo</span>
+                </div>
+                <div style="font-size:0.75rem; color:var(--muted); line-height:1.4; margin-bottom:12px;">
+                  Sub-second live feed · Calibration surface (min 1–14) · Full CSV exports · Autopilot telemetry
+                </div>
+              </div>
+              ${tier === 'pro' ? `
+                <div style="font-family:var(--font-mono); font-size:0.75rem; font-weight:700; color:var(--accent); background:rgba(223,184,67,0.12); padding:6px; text-align:center; border-radius:4px; border:1px solid rgba(223,184,67,0.3);">
+                  CURRENT PLAN
+                </div>
+              ` : `
+                <form action="/api/billing/checkout" method="POST" style="margin:0;">
+                  <input type="hidden" name="tier" value="pro">
+                  <button type="submit" class="btn btn-primary" style="width:100%; padding:6px 10px; font-size:0.75rem; font-weight:700; background:linear-gradient(180deg, #FAF1D4 0%, #DFB843 100%); color:#000;">Upgrade to Pro →</button>
+                </form>
+              `}
+            </div>
+
+            <!-- Institutional API -->
+            <div style="background:rgba(255,255,255,0.02); border:1px solid ${tier === 'institutional' ? 'var(--accent)' : 'rgba(255,255,255,0.08)'}; border-radius:6px; padding:14px; display:flex; flex-direction:column; justify-content:space-between;">
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px;">
+                  <span style="font-weight:700; color:#fff; font-size:0.9rem;">Institutional API</span>
+                  <span style="font-family:var(--font-mono); font-size:0.85rem; color:#A78BFA; font-weight:700;">$750/mo</span>
+                </div>
+                <div style="font-size:0.75rem; color:var(--muted); line-height:1.4; margin-bottom:12px;">
+                  Raw tick data (19,740 rows) · WebSocket feed · Unmetered API key · Quant desk support
+                </div>
+              </div>
+              ${tier === 'institutional' ? `
+                <div style="font-family:var(--font-mono); font-size:0.75rem; font-weight:700; color:#A78BFA; background:rgba(167,139,250,0.12); padding:6px; text-align:center; border-radius:4px; border:1px solid rgba(167,139,250,0.3);">
+                  CURRENT PLAN
+                </div>
+              ` : `
+                <form action="/api/billing/checkout" method="POST" style="margin:0;">
+                  <input type="hidden" name="tier" value="institutional">
+                  <button type="submit" class="btn btn-primary" style="width:100%; padding:6px 10px; font-size:0.75rem; font-weight:700; background:linear-gradient(180deg, #DDD6FE 0%, #8B5CF6 100%); color:#000;">Get Institutional →</button>
+                </form>
+              `}
+            </div>
+          </div>
+        </div>
+
         <!-- Growth Engine Card -->
         <div class="downloads-box" style="margin-top: 16px; border-color: rgba(94,234,212,0.35); background: linear-gradient(135deg, rgba(14,21,38,0.7) 0%, rgba(7,11,22,0.7) 100%);">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">

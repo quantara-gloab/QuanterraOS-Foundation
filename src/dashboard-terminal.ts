@@ -372,24 +372,68 @@ ${clerkScripts}
 
   .specialist-actions {
     display: flex;
-    gap: 12px;
-    margin-top: 4px;
-    font-size: 0.72rem;
+    gap: 6px;
+    margin-top: 6px;
+    flex-wrap: wrap;
   }
 
-  .action-text-btn {
-    color: var(--muted);
-    background: none;
-    border: none;
+  .spec-live-btn {
+    background: linear-gradient(180deg, #FBF4DC 0%, #DFB843 100%);
+    color: #07080B;
+    border: 1px solid #DFB843;
+    font-weight: 700;
+    font-size: 0.68rem;
+    padding: 3px 8px;
+    border-radius: 3px;
     cursor: pointer;
-    padding: 0;
     font-family: var(--font-sans);
-    font-size: 0.72rem;
-    text-align: left;
+    transition: transform 0.1s, box-shadow 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
   }
-  .action-text-btn:hover {
-    color: var(--text);
-    text-decoration: underline;
+  .spec-live-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(223, 184, 67, 0.4);
+  }
+
+  .spec-audit-btn, .spec-query-btn {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-dim);
+    border: 1px solid var(--panel-border);
+    font-size: 0.68rem;
+    padding: 3px 7px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .spec-audit-btn:hover, .spec-query-btn:hover {
+    background: rgba(223, 184, 67, 0.12);
+    color: var(--accent);
+    border-color: rgba(223, 184, 67, 0.35);
+  }
+
+  .spec-dialogue-chip {
+    background: rgba(223, 184, 67, 0.08);
+    color: var(--accent-light);
+    border: 1px solid rgba(223, 184, 67, 0.25);
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    font-family: var(--font-mono);
+  }
+  .spec-dialogue-chip:hover {
+    background: rgba(223, 184, 67, 0.2);
+    border-color: var(--accent);
+    color: #FFF;
+    transform: translateY(-1px);
   }
 
   /* Center Column Panels */
@@ -1026,6 +1070,7 @@ ${clerkScripts}
       <a href="/status">status</a>
     </div>
     <div class="nav-right" style="display:flex; align-items:center; gap:8px;">
+      <button type="button" class="spec-live-btn" onclick="openSpecialistDialogue(currentAgentId || 'quantum-fox');" style="padding:4px 10px; font-size:0.72rem;">🤖 CONSULT AI TEAM</button>
       <a href="/pricing" id="hud-tier-badge" style="font-family:var(--font-mono); font-size:0.68rem; color:#07080B; background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%); padding:3px 8px; border-radius:3px; font-weight:700; text-decoration:none; border:1px solid #DFB843;">TIER: PRO TERMINAL</a>
       <button type="button" id="pwa-install-nav-btn" style="display:none; font-family:var(--font-mono); font-size:0.68rem; color:var(--accent); background:rgba(223,184,67,0.12); border:1px solid rgba(223,184,67,0.3); padding:3px 8px; border-radius:3px; cursor:pointer;" onclick="installPwaApp()">INSTALL PWA ⤓</button>
       <span class="gate-badge-locked">Rule B5 locked</span>
@@ -1142,8 +1187,9 @@ ${clerkScripts}
               </div>
             </div>
             <div class="specialist-actions">
-              <button type="button" class="action-text-btn" onclick="event.stopPropagation(); inspectSpecialist('falcon');">inspect</button>
-              <button type="button" class="action-text-btn" onclick="event.stopPropagation(); promptSpecialist('falcon');">query</button>
+              <button type="button" class="spec-live-btn" onclick="event.stopPropagation(); openSpecialistDialogue('falcon');">⚡ Talk Live</button>
+              <button type="button" class="spec-audit-btn" onclick="event.stopPropagation(); inspectSpecialist('falcon');">🔬 Audit</button>
+              <button type="button" class="spec-query-btn" onclick="event.stopPropagation(); promptSpecialist('falcon');">💬 Presets</button>
             </div>
           </div>
 
@@ -1160,8 +1206,9 @@ ${clerkScripts}
               </div>
             </div>
             <div class="specialist-actions">
-              <button type="button" class="action-text-btn" onclick="event.stopPropagation(); inspectSpecialist('quantum-fox');">inspect</button>
-              <button type="button" class="action-text-btn" onclick="event.stopPropagation(); promptSpecialist('quantum-fox');">query</button>
+              <button type="button" class="spec-live-btn" onclick="event.stopPropagation(); openSpecialistDialogue('quantum-fox');">⚡ Talk Live</button>
+              <button type="button" class="spec-audit-btn" onclick="event.stopPropagation(); inspectSpecialist('quantum-fox');">🔬 Audit</button>
+              <button type="button" class="spec-query-btn" onclick="event.stopPropagation(); promptSpecialist('quantum-fox');">💬 Presets</button>
             </div>
           </div>
 
@@ -1178,8 +1225,9 @@ ${clerkScripts}
               </div>
             </div>
             <div class="specialist-actions">
-              <button type="button" class="action-text-btn" onclick="event.stopPropagation(); inspectSpecialist('phoenix');">inspect</button>
-              <button type="button" class="action-text-btn" onclick="event.stopPropagation(); promptSpecialist('phoenix');">query</button>
+              <button type="button" class="spec-live-btn" onclick="event.stopPropagation(); openSpecialistDialogue('phoenix');">⚡ Talk Live</button>
+              <button type="button" class="spec-audit-btn" onclick="event.stopPropagation(); inspectSpecialist('phoenix');">🔬 Audit</button>
+              <button type="button" class="spec-query-btn" onclick="event.stopPropagation(); promptSpecialist('phoenix');">💬 Presets</button>
             </div>
           </div>
 
@@ -1196,8 +1244,9 @@ ${clerkScripts}
               </div>
             </div>
             <div class="specialist-actions">
-              <button type="button" class="action-text-btn" onclick="event.stopPropagation(); inspectSpecialist('draco');">inspect</button>
-              <button type="button" class="action-text-btn" onclick="event.stopPropagation(); promptSpecialist('draco');">query</button>
+              <button type="button" class="spec-live-btn" onclick="event.stopPropagation(); openSpecialistDialogue('draco');">⚡ Talk Live</button>
+              <button type="button" class="spec-audit-btn" onclick="event.stopPropagation(); inspectSpecialist('draco');">🔬 Audit</button>
+              <button type="button" class="spec-query-btn" onclick="event.stopPropagation(); promptSpecialist('draco');">💬 Presets</button>
             </div>
           </div>
 
@@ -1214,8 +1263,9 @@ ${clerkScripts}
               </div>
             </div>
             <div class="specialist-actions">
-              <button type="button" class="action-text-btn" onclick="event.stopPropagation(); inspectSpecialist('sentinel');">inspect</button>
-              <button type="button" class="action-text-btn" onclick="event.stopPropagation(); promptSpecialist('sentinel');">query</button>
+              <button type="button" class="spec-live-btn" onclick="event.stopPropagation(); openSpecialistDialogue('sentinel');">⚡ Talk Live</button>
+              <button type="button" class="spec-audit-btn" onclick="event.stopPropagation(); inspectSpecialist('sentinel');">🔬 Audit</button>
+              <button type="button" class="spec-query-btn" onclick="event.stopPropagation(); promptSpecialist('sentinel');">💬 Presets</button>
             </div>
           </div>
 
@@ -1232,8 +1282,9 @@ ${clerkScripts}
               </div>
             </div>
             <div class="specialist-actions">
-              <button type="button" class="action-text-btn" onclick="event.stopPropagation(); inspectSpecialist('wolf');">inspect</button>
-              <button type="button" class="action-text-btn" onclick="event.stopPropagation(); promptSpecialist('wolf');">query</button>
+              <button type="button" class="spec-live-btn" onclick="event.stopPropagation(); openSpecialistDialogue('wolf');">⚡ Talk Live</button>
+              <button type="button" class="spec-audit-btn" onclick="event.stopPropagation(); inspectSpecialist('wolf');">🔬 Audit</button>
+              <button type="button" class="spec-query-btn" onclick="event.stopPropagation(); promptSpecialist('wolf');">💬 Presets</button>
             </div>
           </div>
 
@@ -1250,8 +1301,9 @@ ${clerkScripts}
               </div>
             </div>
             <div class="specialist-actions">
-              <button type="button" class="action-text-btn" onclick="event.stopPropagation(); inspectSpecialist('kraken');">inspect</button>
-              <button type="button" class="action-text-btn" onclick="event.stopPropagation(); promptSpecialist('kraken');">query</button>
+              <button type="button" class="spec-live-btn" onclick="event.stopPropagation(); openSpecialistDialogue('kraken');">⚡ Talk Live</button>
+              <button type="button" class="spec-audit-btn" onclick="event.stopPropagation(); inspectSpecialist('kraken');">🔬 Audit</button>
+              <button type="button" class="spec-query-btn" onclick="event.stopPropagation(); promptSpecialist('kraken');">💬 Presets</button>
             </div>
           </div>
 
@@ -1268,8 +1320,9 @@ ${clerkScripts}
               </div>
             </div>
             <div class="specialist-actions">
-              <button type="button" class="action-text-btn" onclick="event.stopPropagation(); inspectSpecialist('lion');">inspect</button>
-              <button type="button" class="action-text-btn" onclick="event.stopPropagation(); promptSpecialist('lion');">query</button>
+              <button type="button" class="spec-live-btn" onclick="event.stopPropagation(); openSpecialistDialogue('lion');">⚡ Talk Live</button>
+              <button type="button" class="spec-audit-btn" onclick="event.stopPropagation(); inspectSpecialist('lion');">🔬 Audit</button>
+              <button type="button" class="spec-query-btn" onclick="event.stopPropagation(); promptSpecialist('lion');">💬 Presets</button>
             </div>
           </div>
         </div>
@@ -1981,45 +2034,342 @@ function renderLiveInspector(agentId, record, isRunning, stepNumber) {
     '</div>';
 }
 
-function inspectSpecialist(agentId) {
+let isSpecVoiceEnabled = false;
+
+function toggleSpecialistVoice() {
+  isSpecVoiceEnabled = !isSpecVoiceEnabled;
+  const btn = document.getElementById('spec-voice-toggle-btn');
+  if (btn) {
+    btn.textContent = isSpecVoiceEnabled ? '🔊 Voice ON' : '🔇 Voice OFF';
+    btn.style.color = isSpecVoiceEnabled ? '#10B981' : 'var(--muted)';
+  }
+  if (!isSpecVoiceEnabled && 'speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+}
+
+function speakSpecialistVoice(text, agentId) {
+  if (!isSpecVoiceEnabled || !('speechSynthesis' in window)) return;
+  try {
+    window.speechSynthesis.cancel();
+    const clean = String(text || '').replace(/<[^>]*>/g, ' ').replace(/[*_#\x60~]/g, '').trim();
+    if (!clean) return;
+    const utter = new SpeechSynthesisUtterance(clean);
+    
+    // Character voice profiling
+    if (agentId === 'phoenix' || agentId === 'kraken') {
+      utter.pitch = 0.85;
+      utter.rate = 0.98;
+    } else if (agentId === 'quantum-fox') {
+      utter.pitch = 1.15;
+      utter.rate = 1.05;
+    } else if (agentId === 'lion') {
+      utter.pitch = 0.92;
+      utter.rate = 0.95;
+    } else {
+      utter.pitch = 1.0;
+      utter.rate = 1.02;
+    }
+    window.speechSynthesis.speak(utter);
+  } catch (e) {
+    console.warn('Voice error:', e);
+  }
+}
+
+const SPECIALIST_PRESETS = {
+  'falcon': [
+    'Show order-book depth imbalance',
+    'Audit Brier score vs coin-flip (0.2736 vs 0.2500)',
+    'Why is Falcon strictly exploratory research?',
+    'Show n=31 out-of-sample test proof'
+  ],
+  'quantum-fox': [
+    'How does market-mid compare to model?',
+    'Audit 1,316 canonical baseline Brier (0.2001)',
+    'What is the minute-4 predictor fair value?',
+    'Why does the model have zero tradable edge?'
+  ],
+  'phoenix': [
+    'Verify Rule B5 circuit breaker safety lock',
+    'What is current live capital exposure ($0.00)?',
+    'Why is live execution permanently blocked?',
+    'Show execution readiness checklist'
+  ],
+  'draco': [
+    'Verify 19,740 candle dataset integrity',
+    'Audit 1,316 timestamp quality gate',
+    'Check corrupted timestamp count (0)',
+    'Show collector log verification'
+  ],
+  'sentinel': [
+    'Surveil 4 upstream pipeline stages',
+    'Show active surveillance alert count (0)',
+    'Audit pipeline uptime metrics (100%)',
+    'Show swing event monitor logs'
+  ],
+  'wolf': [
+    'Analyze L2 order-book spread ($0.01)',
+    'Evaluate queue depth imbalance (+0.0350)',
+    'Show valid cutoff timestamp',
+    'Explain microstructure compression'
+  ],
+  'kraken': [
+    'Track CME CF BRTI basis divergence (+1.4 bps)',
+    'Simulate UMA 72h dispute freeze shock',
+    'Simulate flash spread vacuum to 18¢',
+    'Enforce $0.00 capital boundary'
+  ],
+  'lion': [
+    'Synthesize 10-decile consensus verdict',
+    'Deliver Chief Council final declaration',
+    'Review 32-day engineering acceleration',
+    'Show executive brief summary'
+  ]
+};
+
+function openSpecialistDialogue(agentId, initialQuery) {
+  selectSpecialist(agentId);
+  let modal = document.getElementById('specialist-dialogue-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'specialist-dialogue-modal';
+    modal.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; z-index:350; padding:16px;';
+    modal.innerHTML = '<div style="background:#0A0E14; border:1px solid rgba(212,175,55,0.4); border-radius:8px; max-width:760px; width:100%; max-height:90vh; display:flex; flex-direction:column; box-shadow:0 30px 80px rgba(0,0,0,0.9); overflow:hidden;">' +
+      '<div style="display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-bottom:1px solid rgba(212,175,55,0.2); background:rgba(16,22,34,0.7);">' +
+      '<div style="display:flex; align-items:center; gap:12px;">' +
+      '<div id="modal-spec-icon-wrap" style="width:36px; height:36px;"></div>' +
+      '<div>' +
+      '<div style="display:flex; align-items:center; gap:8px;">' +
+      '<span class="f1-callsign-tag" id="modal-spec-callsign">F1</span>' +
+      '<span style="font-weight:700; color:#fff; font-size:0.95rem;" id="modal-spec-name">Specialist</span>' +
+      '<span style="font-size:0.68rem; color:#10B981; background:rgba(16,185,129,0.12); padding:2px 6px; border-radius:3px; border:1px solid rgba(16,185,129,0.3);">ONLINE · VERIFIED</span>' +
+      '</div>' +
+      '<div style="font-size:0.75rem; color:var(--muted);" id="modal-spec-role">Role Description</div>' +
+      '</div>' +
+      '</div>' +
+      '<div style="display:flex; align-items:center; gap:10px;">' +
+      '<button type="button" id="spec-voice-toggle-btn" onclick="toggleSpecialistVoice()" style="background:rgba(255,255,255,0.06); border:1px solid var(--panel-border); color:var(--muted); font-family:var(--font-mono); font-size:0.7rem; padding:4px 10px; border-radius:3px; cursor:pointer;">🔇 Voice OFF</button>' +
+      '<button type="button" onclick="closeSpecialistDialogue()" style="background:none; border:none; color:var(--muted); font-size:1.4rem; cursor:pointer;">&times;</button>' +
+      '</div>' +
+      '</div>' +
+      '<div style="padding:10px 18px; background:rgba(10,14,20,0.9); border-bottom:1px solid rgba(212,175,55,0.12); display:flex; gap:8px; overflow-x:auto;" id="modal-spec-chips"></div>' +
+      '<div id="modal-spec-chat-stream" style="padding:18px; flex:1; overflow-y:auto; font-family:var(--font-sans); font-size:0.82rem; line-height:1.6; display:flex; flex-direction:column; gap:12px; min-height:280px; max-height:50vh;"></div>' +
+      '<form id="modal-spec-form" onsubmit="event.preventDefault(); submitModalSpecQuery();" style="display:flex; gap:8px; padding:12px 18px; border-top:1px solid rgba(212,175,55,0.2); background:rgba(12,16,24,0.9);">' +
+      '<input type="text" id="modal-spec-input" placeholder="Ask this specialist..." autocomplete="off" style="flex:1; background:rgba(6,7,10,0.8); border:1px solid rgba(212,175,55,0.3); color:#fff; padding:10px 14px; font-family:var(--font-mono); font-size:0.8rem; border-radius:4px; outline:none;">' +
+      '<button type="submit" id="modal-spec-send-btn" class="spec-live-btn" style="padding:0 18px; font-size:0.78rem;">SEND &lt;GO&gt;</button>' +
+      '</form>' +
+      '</div>';
+    document.body.appendChild(modal);
+  }
+
+  // Update modal header elements
+  const iconWrap = document.getElementById('modal-spec-icon-wrap');
+  if (iconWrap) iconWrap.innerHTML = SPECIALIST_ICONS[agentId] || '';
+  
+  const callsigns = {
+    'falcon': 'F1-TEST-04',
+    'quantum-fox': 'F1-POWER-05',
+    'phoenix': 'F1-BRAKE-08',
+    'draco': 'F1-ECU-02',
+    'sentinel': 'F1-RADIO-06',
+    'wolf': 'F1-AERO-03',
+    'kraken': 'F1-SAFETY-07',
+    'lion': 'F1-CHIEF-01'
+  };
+  const names = {
+    'falcon': 'Falcon',
+    'quantum-fox': 'Quantum Fox',
+    'phoenix': 'Phoenix',
+    'draco': 'Draco',
+    'sentinel': 'Sentinel',
+    'wolf': 'Wolf',
+    'kraken': 'Kraken',
+    'lion': 'Lion'
+  };
+  const roles = {
+    'falcon': 'Order-Book Depth Monitoring & Exploratory Research',
+    'quantum-fox': 'Market Baseline & Quantitative Volatility Validation',
+    'phoenix': 'Execution Circuit Breaker & Rule B5 Safety Gate',
+    'draco': 'Candle Dataset Integrity & Tick Quality Gate',
+    'sentinel': 'Continuous Surveillance & Calibration Drift Watchdog',
+    'wolf': 'Order-Book Dynamics & Microstructure Imbalance',
+    'kraken': 'Risk Governance & CME CF BRTI Basis Tracking',
+    'lion': 'Consensus Synthesis & Chief Council Verdict'
+  };
+
+  const cEl = document.getElementById('modal-spec-callsign');
+  if (cEl) cEl.textContent = callsigns[agentId] || 'F1';
+  const nEl = document.getElementById('modal-spec-name');
+  if (nEl) nEl.textContent = names[agentId] || agentId;
+  const rEl = document.getElementById('modal-spec-role');
+  if (rEl) rEl.textContent = roles[agentId] || 'Council Specialist';
+
+  // Render Preset Prompt Chips
+  const chipsContainer = document.getElementById('modal-spec-chips');
+  if (chipsContainer) {
+    chipsContainer.innerHTML = '';
+    const presets = SPECIALIST_PRESETS[agentId] || [];
+    presets.forEach(p => {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'spec-dialogue-chip';
+      chip.textContent = p;
+      chip.onclick = () => {
+        const inp = document.getElementById('modal-spec-input');
+        if (inp) {
+          inp.value = p;
+          submitModalSpecQuery();
+        }
+      };
+      chipsContainer.appendChild(chip);
+    });
+  }
+
+  // Clear or set greeting in chat stream
+  const stream = document.getElementById('modal-spec-chat-stream');
+  if (stream && stream.children.length === 0) {
+    const greetingMsg = document.createElement('div');
+    greetingMsg.className = 'chat-msg specialist';
+    greetingMsg.innerHTML = '<div class="chat-msg-header"><span>' + (names[agentId] || agentId) + '</span><span>' + new Date().toLocaleTimeString() + '</span></div><div>' +
+      'Greetings. I am ' + (names[agentId] || agentId) + ', ' + (roles[agentId] || 'Specialist') + '. All responses are grounded in repository records and verified telemetry under Rule B5 ($0.00 capital risk). How can I assist?</div>';
+    stream.appendChild(greetingMsg);
+  }
+
+  modal.style.display = 'flex';
+  const inp = document.getElementById('modal-spec-input');
+  if (inp) {
+    if (initialQuery) {
+      inp.value = initialQuery;
+      submitModalSpecQuery();
+    } else {
+      inp.focus();
+    }
+  }
+}
+
+function closeSpecialistDialogue() {
+  const modal = document.getElementById('specialist-dialogue-modal');
+  if (modal) modal.style.display = 'none';
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+}
+
+async function submitModalSpecQuery() {
+  const input = document.getElementById('modal-spec-input');
+  const btn = document.getElementById('modal-spec-send-btn');
+  const stream = document.getElementById('modal-spec-chat-stream');
+  if (!input || !stream) return;
+  const text = input.value.trim();
+  if (!text) return;
+
+  const userMsg = document.createElement('div');
+  userMsg.className = 'chat-msg user';
+  userMsg.innerHTML = '<div class="chat-msg-header"><span>You</span><span>' + new Date().toLocaleTimeString() + '</span></div><div>' + escapeHtml(text) + '</div>';
+  stream.appendChild(userMsg);
+  input.value = '';
+  if (btn) btn.disabled = true;
+
+  const waitingMsg = document.createElement('div');
+  waitingMsg.className = 'chat-msg specialist';
+  waitingMsg.id = 'modal-spec-waiting';
+  waitingMsg.innerHTML = '<div class="chat-msg-header"><span>' + currentAgentId + '</span><span>querying</span></div><div>Auditing repository records &amp; telemetry...</div>';
+  stream.appendChild(waitingMsg);
+  stream.scrollTop = stream.scrollHeight;
+
+  try {
+    const res = await fetch('/api/executives/' + currentAgentId + '/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text })
+    });
+    const data = await res.json();
+    const wait = document.getElementById('modal-spec-waiting');
+    if (wait) wait.remove();
+
+    const specMsg = document.createElement('div');
+    specMsg.className = 'chat-msg specialist';
+    let citationsHtml = '';
+    if (Array.isArray(data.citations) && data.citations.length > 0) {
+      citationsHtml = '<div class="chat-citation">citations: ' + data.citations.map(c => escapeHtml(c)).join(', ') + '</div>';
+    }
+    let telemetryHtml = '';
+    if (data.telemetryCluster) {
+      telemetryHtml = '<div class="f1-chat-telemetry-cluster">' +
+        '<span>🏁 ' + escapeHtml(data.telemetryCluster.callSign) + '</span>' +
+        '<span>🔒 ' + escapeHtml(data.telemetryCluster.circuitStatus) + '</span>' +
+        '</div>';
+    }
+    const replyText = data.reply || '';
+    specMsg.innerHTML = telemetryHtml + '<div class="chat-msg-header"><span>' + escapeHtml(data.agentName || currentAgentId) + '</span><span>' + new Date().toLocaleTimeString() + '</span></div><div>' + escapeHtml(replyText) + '</div>' + citationsHtml;
+    stream.appendChild(specMsg);
+    playPitRadioBeep();
+    speakSpecialistVoice(replyText, currentAgentId);
+  } catch (_e) {
+    const wait = document.getElementById('modal-spec-waiting');
+    if (wait) wait.remove();
+    const errMsg = document.createElement('div');
+    errMsg.className = 'chat-msg specialist';
+    errMsg.innerHTML = '<div style="color: var(--warning);">Audit line interrupted. Please retry.</div>';
+    stream.appendChild(errMsg);
+  } finally {
+    if (btn) btn.disabled = false;
+    stream.scrollTop = stream.scrollHeight;
+  }
+}
+
+async function inspectSpecialist(agentId) {
   selectSpecialist(agentId);
   const stream = document.getElementById('chat-stream-box');
   if (!stream) return;
-  const msg = document.createElement('div');
-  msg.className = 'chat-msg specialist';
   
-  let content = '';
-  if (agentId === 'falcon') {
-    content = 'Falcon telemetry audit: Out-of-sample Brier score 0.2736 across n=31 markets (reports/falcon-backtest-2026-10-03.txt). Underperforms both 50/50 baseline (0.2500) and entry-price (0.2106). Strict research designation.';
-  } else if (agentId === 'quantum-fox') {
-    content = 'Quantum Fox telemetry audit: Canonical 1,316-market baseline Brier 0.2001. Kalshi market mid-price outperforms quantitative fair-value model at all checkpoints (minutes 4, 7, 10, 13).';
-  } else if (agentId === 'phoenix') {
-    content = 'Phoenix safety status: Rule B5 locked. Zero live capital deployed ($0.00). Live execution disabled by circuit breaker.';
-  } else if (agentId === 'wolf') {
-    content = 'Wolf microstructure audit: Order-book snapshot valid-from cutoff at 2026-09-26 13:10:27 UTC. Descriptive queue imbalance profiling active.';
-  } else if (agentId === 'kraken') {
-    content = 'Kraken risk governance audit: Capital exposure strictly $0.00. Cross-venue basis tracking against CME CF BRTI active. Zero risk alerts.';
-  } else {
-    content = agentId + ' telemetry verified against stored database records. All checks passing.';
-  }
-  
-  msg.innerHTML = '<div class="chat-msg-header"><span>' + agentId + '</span><span>' + new Date().toLocaleTimeString() + '</span></div><div>' + content + '</div>';
-  stream.appendChild(msg);
+  const waitingMsg = document.createElement('div');
+  waitingMsg.className = 'chat-msg specialist';
+  waitingMsg.id = 'chat-inspect-waiting';
+  waitingMsg.innerHTML = '<div class="chat-msg-header"><span>' + agentId + '</span><span>audit check</span></div><div>Auditing stored parameters...</div>';
+  stream.appendChild(waitingMsg);
   stream.scrollTop = stream.scrollHeight;
+
+  try {
+    const res = await fetch('/api/executives/' + agentId + '/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: 'Audit your current telemetry and status against stored database records.' })
+    });
+    const data = await res.json();
+    const wait = document.getElementById('chat-inspect-waiting');
+    if (wait) wait.remove();
+
+    const specMsg = document.createElement('div');
+    specMsg.className = 'chat-msg specialist';
+    let citationsHtml = '';
+    if (Array.isArray(data.citations) && data.citations.length > 0) {
+      citationsHtml = '<div class="chat-citation">citations: ' + data.citations.map(c => escapeHtml(c)).join(', ') + '</div>';
+    }
+    let telemetryHtml = '';
+    if (data.telemetryCluster) {
+      telemetryHtml = '<div class="f1-chat-telemetry-cluster">' +
+        '<span>🏁 ' + escapeHtml(data.telemetryCluster.callSign) + '</span>' +
+        '<span>🔒 ' + escapeHtml(data.telemetryCluster.circuitStatus) + '</span>' +
+        '</div>';
+    }
+    specMsg.innerHTML = telemetryHtml + '<div class="chat-msg-header"><span>' + escapeHtml(data.agentName || agentId) + ' (Audited)</span><span>' + new Date().toLocaleTimeString() + '</span></div><div>' + escapeHtml(data.reply || '') + '</div>' + citationsHtml;
+    stream.appendChild(specMsg);
+    playPitRadioBeep();
+  } catch (_e) {
+    const wait = document.getElementById('chat-inspect-waiting');
+    if (wait) wait.remove();
+    const errMsg = document.createElement('div');
+    errMsg.className = 'chat-msg specialist';
+    errMsg.innerHTML = '<div style="color: var(--warning);">Audit line interrupted.</div>';
+    stream.appendChild(errMsg);
+  } finally {
+    stream.scrollTop = stream.scrollHeight;
+  }
 }
 
 function promptSpecialist(agentId) {
-  selectSpecialist(agentId);
-  const input = document.getElementById('chat-input-field');
-  if (input) {
-    if (agentId === 'falcon') input.value = 'What is Falcon\'s out-of-sample Brier score and sample size?';
-    else if (agentId === 'quantum-fox') input.value = 'How does the market mid-price compare to our quantitative model?';
-    else if (agentId === 'phoenix') input.value = 'What is the current capital status under Rule B5?';
-    else if (agentId === 'wolf') input.value = 'What is the clean cutoff timestamp for order-book data?';
-    else if (agentId === 'kraken') input.value = 'What is the current capital exposure of the platform?';
-    else input.value = 'What are your latest audited telemetry metrics?';
-    input.focus();
-  }
+  const presets = SPECIALIST_PRESETS[agentId];
+  const query = presets && presets.length > 0 ? presets[0] : 'What are your latest audited telemetry metrics?';
+  openSpecialistDialogue(agentId, query);
 }
 
 async function submitQuery() {

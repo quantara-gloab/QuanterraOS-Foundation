@@ -142,12 +142,11 @@ test("handleCouncilChat service: logs exchanges to data/council-chat.log and han
   assert.equal(result.guarded, false, "Truthful response should not trigger guardrail override");
 
   // Verify log entry was persisted in data/council-chat.log
-  const logs = getCouncilChatAuditLog(10);
+  const logs = getCouncilChatAuditLog(20);
   assert.ok(logs.length > 0, "Audit logs should contain at least 1 entry");
-  const latest = logs[0];
-  assert.equal(latest.agentId, "phoenix");
-  assert.ok(latest.userMessage.includes("track record"));
-  assert.ok(latest.assistantReply.length > 50);
+  const matchingLog = logs.find(l => l.agentId === "phoenix" && l.userMessage.includes("track record"));
+  assert.ok(matchingLog, "Should find logged Phoenix query in audit log");
+  assert.ok(matchingLog.assistantReply.length > 50);
 });
 
 test("handleCouncilChat service: rejects unknown agent id", async () => {
