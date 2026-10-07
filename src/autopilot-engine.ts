@@ -197,7 +197,7 @@ export function resolveAutopilotTrade(
 /**
  * Retrieve the full autopilot paper ledger and cumulative performance stats.
  */
-export function getAutopilotLedger(limit = 100, tier: "free" | "pro" | "institutional" = "free"): AutopilotSummary {
+export function getAutopilotLedger(limit = 100, tier: "free" | "plus" | "pro" | "institutional" = "free"): AutopilotSummary {
   const isPaid = tier === "pro" || tier === "institutional";
   let rows = db
     .select()

@@ -2329,7 +2329,11 @@ app.post("/api/billing/checkout", async (req, res) => {
     res.setHeader("Set-Cookie", `quanterraos_session=${sessionId}; Path=/; HttpOnly; SameSite=Lax`);
   }
   try {
-    const tier = req.body.tier === "institutional" ? "institutional" : "pro";
+    const tier: "plus" | "pro" | "institutional" = req.body.tier === "institutional"
+      ? "institutional"
+      : req.body.tier === "plus"
+      ? "plus"
+      : "pro";
     logEvent("checkout_started", activeUser.id, { tier, protocol: req.protocol });
     const session = await createCheckoutSession({
       userId: activeUser.id,

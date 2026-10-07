@@ -316,7 +316,7 @@ export function renderAccountPageHtml(user: UserRecord | null, tier: UserTier, e
           <div class="grid-label">ACTIVE TIER</div>
           <div class="grid-val">
             <span class="status-badge badge-${tier}">
-              ${tier === "institutional" ? "INSTITUTIONAL API" : tier === "pro" ? "PRO TERMINAL" : "FREE EXPLORER"}
+              ${tier === "institutional" ? "INSTITUTIONAL API" : tier === "pro" ? "PRO TERMINAL" : tier === "plus" ? "TRADER PLUS" : "FREE EXPLORER"}
             </span>
           </div>
         </div>

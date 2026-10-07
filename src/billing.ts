@@ -16,6 +16,7 @@ import { updateUserTier, getUserById, type UserTier } from "./auth.ts";
 import { logEvent } from "./metrics.ts";
 
 export interface CheckoutConfig {
+  plusPriceId: string;
   proPriceId: string;
   institutionalPriceId: string;
   secretKey?: string;
@@ -24,7 +25,8 @@ export interface CheckoutConfig {
 }
 
 export const BILLING_CONFIG: CheckoutConfig = {
-  proPriceId: process.env.STRIPE_PRO_PRICE_ID ?? "price_pro_199_monthly",
+  plusPriceId: process.env.STRIPE_PLUS_PRICE_ID ?? "price_plus_15_monthly",
+  proPriceId: process.env.STRIPE_PRO_PRICE_ID ?? "price_pro_39_monthly",
   institutionalPriceId: process.env.STRIPE_INSTITUTIONAL_PRICE_ID ?? "price_inst_750_monthly",
   secretKey: process.env.STRIPE_SECRET_KEY,
   webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
@@ -33,7 +35,7 @@ export const BILLING_CONFIG: CheckoutConfig = {
 
 export interface CreateCheckoutParams {
   userId: string;
-  tier: "pro" | "institutional";
+  tier: "plus" | "pro" | "institutional";
   successUrl: string;
   cancelUrl: string;
 }
@@ -42,7 +44,11 @@ export async function createCheckoutSession(params: CreateCheckoutParams): Promi
   const user = getUserById(params.userId);
   if (!user) throw new Error("User not found");
 
-  const priceId = params.tier === "institutional" ? BILLING_CONFIG.institutionalPriceId : BILLING_CONFIG.proPriceId;
+  const priceId = params.tier === "institutional"
+    ? BILLING_CONFIG.institutionalPriceId
+    : params.tier === "plus"
+    ? BILLING_CONFIG.plusPriceId
+    : BILLING_CONFIG.proPriceId;
 
   // Real Stripe Integration if API key is present
   if (BILLING_CONFIG.secretKey && !BILLING_CONFIG.secretKey.startsWith("mock_")) {

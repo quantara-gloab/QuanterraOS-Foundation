@@ -103,7 +103,7 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
     }
 
     .container {
-      max-width: 1100px;
+      max-width: 1200px;
       margin: 48px auto 0;
       padding: 0 24px;
     }
@@ -155,11 +155,14 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
     /* Pricing Grid */
     .pricing-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
       margin-top: 40px;
     }
-    @media (max-width: 860px) {
+    @media (max-width: 1080px) {
+      .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
       .pricing-grid { grid-template-columns: 1fr; }
     }
 
@@ -280,6 +283,17 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
     .btn-free:hover {
       background: rgba(212, 175, 55, 0.08);
       border-color: rgba(212, 175, 55, 0.3);
+    }
+    .btn-plus {
+      background: linear-gradient(180deg, rgba(223, 184, 67, 0.22) 0%, rgba(163, 125, 36, 0.12) 100%);
+      border: 1px solid rgba(223, 184, 67, 0.55);
+      color: var(--accent-light);
+      box-shadow: inset 0 1px 0 rgba(247, 231, 180, 0.25);
+    }
+    .btn-plus:hover {
+      background: linear-gradient(180deg, rgba(223, 184, 67, 0.32) 0%, rgba(163, 125, 36, 0.22) 100%);
+      border-color: var(--accent);
+      color: #FFFFFF;
     }
     /* Gold Bullion Gloss Action Button */
     .btn-pro {
@@ -412,18 +426,19 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
       <!-- Free Explorer -->
       <div class="pricing-card">
         <div class="tier-name">Free Explorer</div>
-        <div class="tier-desc">Open research & complete verification for curious quants and students.</div>
+        <div class="tier-desc">Open research &amp; complete verification for curious quants and students.</div>
         <div class="price-box">
           <div class="price-amount">$0</div>
           <div class="price-period">Free forever · No card required</div>
         </div>
         <ul class="features-list">
+          <li><span class="check-icon">✓</span> <span><strong>Real-time True-Cost check</strong> (fee &amp; breakeven)</span></li>
+          <li><span class="check-icon">✓</span> <span><strong>Essential risk education</strong> &amp; settlement explainers</span></li>
           <li><span class="check-icon">✓</span> <span><strong>/predictions</strong>: 20-min delayed live feed</span></li>
           <li><span class="check-icon">✓</span> <span><strong>1,316 settled markets</strong> full historical replay</span></li>
-          <li><span class="check-icon">✓</span> <span><strong>/autopilot</strong>: Daily paper P&L snapshot</span></li>
+          <li><span class="check-icon">✓</span> <span><strong>/autopilot</strong>: Daily paper snapshot</span></li>
           <li><span class="check-icon">✓</span> <span><strong>/calibration</strong>: Daily refreshed Brier audit</span></li>
-          <li><span class="check-icon">✓</span> <span>Full methodology & research access</span></li>
-          <li><span class="dash-icon">—</span> <span style="color:var(--muted);">No real-time WebSocket stream</span></li>
+          <li><span class="dash-icon">—</span> <span style="color:var(--muted);">No saved decision journal</span></li>
           <li><span class="dash-icon">—</span> <span style="color:var(--muted);">No automated CSV exports</span></li>
         </ul>
         <a href="/account?flow=sign-up&tier=free" class="action-btn btn-free">
@@ -431,22 +446,47 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
         </a>
       </div>
 
+      <!-- Trader Plus -->
+      <div class="pricing-card">
+        <div class="tier-name">Trader Plus</div>
+        <div class="tier-desc">Personal decision journal, fee drag audits, and voluntary advisory risk limits.</div>
+        <div class="price-box">
+          <div class="price-amount">$15<span style="font-size:1rem; font-weight:400; color:var(--muted);"> / mo</span></div>
+          <div class="price-period">Billed monthly · Self-serve cancellation</div>
+        </div>
+        <ul class="features-list">
+          <li><span class="check-icon">✓</span> <span><strong>Everything in Free Explorer</strong></span></li>
+          <li><span class="check-icon">✓</span> <span><strong>Personal decision &amp; outcome journal</strong></span></li>
+          <li><span class="check-icon">✓</span> <span><strong>Weekly fee drag audits</strong> &amp; friction attribution</span></li>
+          <li><span class="check-icon">✓</span> <span><strong>Voluntary advisory risk plans</strong> (correlated caps)</span></li>
+          <li><span class="check-icon">✓</span> <span><strong>Wallet &amp; CSV trade analytics</strong> (Kalshi &amp; Polymarket)</span></li>
+          <li><span class="check-icon">✓</span> <span><strong>Settlement source &amp; rule explainers</strong></span></li>
+          <li><span class="dash-icon">—</span> <span style="color:var(--muted);">Live sub-second feeds reserved for Pro</span></li>
+        </ul>
+        <form action="/api/billing/checkout" method="POST">
+          <input type="hidden" name="tier" value="plus" />
+          <button type="submit" class="action-btn btn-plus">
+            ${userTier === "plus" ? "Current Plan (Manage)" : "Upgrade to Plus →"}
+          </button>
+        </form>
+      </div>
+
       <!-- Pro Terminal -->
       <div class="pricing-card featured">
         <div class="featured-badge">Active Quantitative Traders</div>
         <div class="tier-name">Pro Terminal</div>
-        <div class="tier-desc">Sub-second live prediction feed and continuous simulated P&L telemetry.</div>
+        <div class="tier-desc">Sub-second live prediction feed and continuous simulated telemetry.</div>
         <div class="price-box">
-          <div class="price-amount">$199<span style="font-size:1rem; font-weight:400; color:var(--muted);"> / mo</span></div>
+          <div class="price-amount">$39<span style="font-size:1rem; font-weight:400; color:var(--muted);"> / mo</span></div>
           <div class="price-period">Billed monthly · Self-serve cancellation</div>
         </div>
         <ul class="features-list">
+          <li><span class="check-icon">✓</span> <span><strong>Everything in Trader Plus</strong></span></li>
           <li><span class="check-icon">✓</span> <span><strong>Minute-by-minute calibration surface</strong> (min 1–14)</span></li>
-          <li><span class="check-icon">✓</span> <span><strong>Live settlement basis & spread monitor</strong> (multi-venue)</span></li>
-          <li><span class="check-icon">✓</span> <span><strong>Real-time True Cost & EV calculator</strong> (taker fee drag)</span></li>
+          <li><span class="check-icon">✓</span> <span><strong>Live settlement basis &amp; spread monitor</strong> (multi-venue)</span></li>
           <li><span class="check-icon">✓</span> <span><strong>Model Context Protocol (MCP)</strong> agent access</span></li>
           <li><span class="check-icon">✓</span> <span><strong>Real-time /predictions feed</strong> (sub-second telemetry)</span></li>
-          <li><span class="check-icon">✓</span> <span><strong>Automated CSV export</strong> (predictions & autopilot)</span></li>
+          <li><span class="check-icon">✓</span> <span><strong>Automated CSV export</strong> (predictions &amp; telemetry)</span></li>
           <li><span class="dash-icon">—</span> <span style="color:var(--muted);">Raw tick exports reserved for Institutional</span></li>
         </ul>
         <form action="/api/billing/checkout" method="POST">
@@ -469,9 +509,9 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
           <li><span class="check-icon">✓</span> <span><strong>Everything in Pro Terminal</strong></span></li>
           <li><span class="check-icon">✓</span> <span><strong>Raw tick data exports</strong> (19,740 candle rows)</span></li>
           <li><span class="check-icon">✓</span> <span><strong>Sovereign container deployment</strong> (air-gapped ready)</span></li>
-          <li><span class="check-icon">✓</span> <span><strong>Unmetered MCP server & REST/WS API keys</strong></span></li>
-          <li><span class="check-icon">✓</span> <span>Full order-book depth JSON snapshots & settlement logs</span></li>
-          <li><span class="check-icon">✓</span> <span>Pre-registration datasets & JEV protocol feeds</span></li>
+          <li><span class="check-icon">✓</span> <span><strong>Unmetered MCP server &amp; REST/WS API keys</strong></span></li>
+          <li><span class="check-icon">✓</span> <span>Full order-book depth JSON snapshots &amp; settlement logs</span></li>
+          <li><span class="check-icon">✓</span> <span>Pre-registration datasets &amp; JEV protocol feeds</span></li>
           <li><span class="check-icon">✓</span> <span>Dedicated institutional quant desk support</span></li>
         </ul>
         <form action="/api/billing/checkout" method="POST">
@@ -490,14 +530,37 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
         <thead>
           <tr>
             <th>Feature</th>
-            <th>Free Explorer</th>
-            <th>Pro Terminal ($199/mo)</th>
+            <th>Free Explorer ($0)</th>
+            <th>Trader Plus ($15/mo)</th>
+            <th>Pro Terminal ($39/mo)</th>
             <th>Institutional ($750/mo)</th>
           </tr>
         </thead>
         <tbody>
           <tr>
+            <td>True-Cost &amp; Breakeven Calculator</td>
+            <td>Yes</td>
+            <td>Yes</td>
+            <td>Yes</td>
+            <td>Yes</td>
+          </tr>
+          <tr>
+            <td>Personal Decision &amp; Outcome Journal</td>
+            <td>—</td>
+            <td style="color:var(--accent);">Yes (Weekly Audit)</td>
+            <td style="color:var(--accent);">Yes (Unlimited)</td>
+            <td style="color:var(--accent);">Yes (Team Audit)</td>
+          </tr>
+          <tr>
+            <td>Voluntary Advisory Risk Limits</td>
+            <td>—</td>
+            <td style="color:var(--accent);">Yes</td>
+            <td style="color:var(--accent);">Yes</td>
+            <td style="color:var(--accent);">Yes</td>
+          </tr>
+          <tr>
             <td>/predictions live ledger</td>
+            <td>Delayed 20 min</td>
             <td>Delayed 20 min</td>
             <td style="color:var(--accent);">Real-time</td>
             <td style="color:var(--accent);">Real-time</td>
@@ -507,42 +570,56 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
             <td>Full access</td>
             <td>Full access</td>
             <td>Full access</td>
+            <td>Full access</td>
           </tr>
           <tr>
-            <td>/autopilot simulated P&L</td>
+            <td>/autopilot simulated telemetry</td>
+            <td>Daily snapshot</td>
             <td>Daily snapshot</td>
             <td style="color:var(--accent);">Live, continuous</td>
             <td style="color:var(--accent);">Live, continuous</td>
           </tr>
           <tr>
-            <td>/calibration audit charts</td>
-            <td>Daily refresh</td>
+            <td>Minute-by-minute calibration surface</td>
+            <td>—</td>
+            <td>—</td>
             <td style="color:var(--accent);">Real-time</td>
             <td style="color:var(--accent);">Real-time</td>
           </tr>
           <tr>
-            <td>Swing-event alerts</td>
+            <td>Live basis &amp; spread monitor</td>
             <td>—</td>
-            <td>Yes</td>
-            <td>Yes</td>
+            <td>—</td>
+            <td style="color:var(--accent);">Real-time</td>
+            <td style="color:var(--accent);">Real-time</td>
+          </tr>
+          <tr>
+            <td>MCP / AI Agent access</td>
+            <td>—</td>
+            <td>—</td>
+            <td style="color:var(--accent);">Yes</td>
+            <td style="color:var(--accent);">Yes (Unmetered)</td>
           </tr>
           <tr>
             <td>CSV export</td>
             <td>—</td>
-            <td>Predictions + Autopilot</td>
+            <td>Trades &amp; Journal</td>
+            <td>Predictions + Telemetry</td>
             <td>Full + Raw tick data</td>
           </tr>
           <tr>
             <td>API access keys</td>
             <td>—</td>
             <td>—</td>
-            <td style="color:var(--accent);">Yes (Rate-limited)</td>
+            <td>—</td>
+            <td style="color:var(--accent);">Yes (Dedicated quota)</td>
           </tr>
           <tr>
-            <td>Empirical findings & methodology</td>
-            <td>Full access</td>
-            <td>Full access</td>
-            <td>Full access</td>
+            <td>Sovereign container deployment</td>
+            <td>—</td>
+            <td>—</td>
+            <td>—</td>
+            <td style="color:var(--accent);">Yes (Air-gapped ready)</td>
           </tr>
         </tbody>
       </table>

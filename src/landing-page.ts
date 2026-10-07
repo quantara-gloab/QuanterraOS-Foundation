@@ -821,11 +821,87 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
   .footer-links a:hover {
     color: var(--text);
   }
-  .footer-disclaimer {
-    font-size: 0.75rem;
-    line-height: 1.6;
-    color: rgba(143, 154, 168, 0.7);
+  /* True Cost Check Wedge */
+  .wedge-container {
+    background: linear-gradient(180deg, rgba(17, 23, 34, 0.88) 0%, rgba(10, 14, 20, 0.96) 100%);
+    border: 1px solid rgba(212, 175, 55, 0.28);
+    border-radius: 8px;
+    padding: 32px;
+    box-shadow: inset 0 1px 0 rgba(255, 245, 215, 0.12), 0 20px 40px -15px rgba(0, 0, 0, 0.7);
   }
+  .wedge-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-top: 24px;
+  }
+  @media (max-width: 860px) {
+    .wedge-grid { grid-template-columns: 1fr; gap: 24px; }
+  }
+  .wedge-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .wedge-field label {
+    font-size: 0.8rem;
+    font-family: var(--font-mono);
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+  }
+  .wedge-input {
+    background: #06090E;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    color: var(--text);
+    padding: 9px 12px;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    border-radius: 4px;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .wedge-input:focus { border-color: var(--accent); }
+  .wedge-slider {
+    width: 100%;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+  .wedge-decision-card {
+    background: rgba(6, 9, 14, 0.88);
+    border: 1px solid rgba(212, 175, 55, 0.22);
+    border-radius: 6px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .wedge-badge-neutral {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #FBBF24;
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    padding: 3px 10px;
+    border-radius: 4px;
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .wedge-metric-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+  }
+  .wedge-metric-key { color: var(--muted); }
+  .wedge-metric-val { color: var(--text); font-weight: 600; }
 </style>
 </head>
 <body>
@@ -875,19 +951,18 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     <section class="hero-section">
       <div class="hero-left">
         <div class="hero-badge">
-          <span class="pulse-beacon"></span> Sovereign Intelligence for Short-Duration Prediction Markets
+          <span class="pulse-beacon"></span> Independent Decision &amp; Risk Companion
         </div>
         <h1 class="hero-heading">
-          Independent pricing, settlement &amp; friction intelligence.
+          Understand the real cost. Control your risk. Learn from every decision.
         </h1>
         <p class="hero-subhead">
-          While broad calibration is commoditized, high-velocity short-duration crypto prediction markets (Kalshi KXBTC15M and Polymarket 5m/15m) require sub-second spot basis tracking, non-linear taker fee modeling, and sovereign AI agent governance.
+          The independent companion you consult before entering any prediction-market position. Verify executable taker fees, true breakeven odds, and settlement friction across Kalshi and Polymarket before risking capital.
         </p>
         <div class="hero-actions">
-          <a href="/access" class="btn-primary" style="background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%);color:#07080B;border-color:rgba(255,248,220,0.8);box-shadow:0 0 24px rgba(212,175,55,0.45);font-weight:700;">Board Command Spaceship &rarr;</a>
-          <a href="/calculator" class="btn-secondary" style="border-color:rgba(16,185,129,0.5);color:#34D399;">True Cost &amp; Net EV Calc</a>
+          <a href="/calculator" class="btn-primary" style="background:linear-gradient(180deg, #10B981 0%, #059669 100%);border-color:#34D399;box-shadow:0 0 20px rgba(16,185,129,0.35);font-weight:700;">Free True-Cost &amp; Breakeven Check &rarr;</a>
+          <a href="/access" class="btn-secondary" style="border-color:rgba(212,175,55,0.4);color:var(--accent-light);">Board Command Spaceship</a>
           <a href="/calibration/surface" class="btn-secondary">Calibration Surface</a>
-          <a href="/mcp" class="btn-secondary">Model Context Protocol</a>
         </div>
 
         <div style="background: rgba(14, 20, 30, 0.7); border: 1px solid rgba(212, 175, 55, 0.25); border-radius: 6px; padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 24px; width: 100%; font-family: var(--font-mono); font-size: 0.74rem;">
@@ -917,6 +992,120 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
         <div style="border-top: 1px solid var(--panel-border); padding-top: 14px; display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.72rem;">
           <span style="color: var(--muted);">Random Baseline: 0.2500</span>
           <span style="color: var(--warning);">Market Baseline: 0.2001 (Model: 0.2063)</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Acquisition Wedge: Free True-Cost & Breakeven Check -->
+    <section class="section-block" id="true-cost-check" style="margin-top: 8px;">
+      <div class="wedge-container">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
+          <div>
+            <div class="section-eyebrow">The Acquisition Wedge · Free Prior to Registration</div>
+            <h2 class="section-heading" style="margin-top: 4px;">True-Cost &amp; Breakeven Check</h2>
+            <p style="font-size: 0.9rem; color: var(--muted); max-width: 680px; margin-top: 6px;">
+              Understand the hurdle to profitability before risking capital. Compute executable purchase cost, venue taker fees, slippage, and true breakeven odds for any prediction-market contract.
+            </p>
+          </div>
+          <div style="text-align: right;">
+            <span class="wedge-badge-neutral" id="wedge-status-badge">Costs Checked · Uncertainty High</span>
+          </div>
+        </div>
+
+        <div class="wedge-grid">
+          <!-- Left: Contract Inputs -->
+          <div style="background: rgba(12, 16, 24, 0.7); border: 1px solid rgba(212, 175, 55, 0.16); border-radius: 6px; padding: 22px;">
+            <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent-light); font-weight: 600; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.05em;">
+              Contract Parameters
+            </div>
+
+            <div class="wedge-field">
+              <label>Market Venue &amp; Series</label>
+              <select class="wedge-input" id="wedge-venue" onchange="recalcWedge()">
+                <option value="kalshi-15m" selected>Kalshi — 15-Minute Above/Below (KXBTC15M)</option>
+                <option value="kalshi-1h">Kalshi — 1-Hour Above/Below (KXBTCD)</option>
+                <option value="polymarket">Polymarket — Binary 15-Minute (USDC)</option>
+              </select>
+            </div>
+
+            <div class="wedge-field">
+              <label>
+                <span>Executable Ask Price</span>
+                <span id="wedge-price-val" style="color:var(--text); font-weight:600;">51¢ ($0.51)</span>
+              </label>
+              <input type="range" class="wedge-slider" id="wedge-price" min="1" max="99" value="51" oninput="recalcWedge()">
+            </div>
+
+            <div class="wedge-field">
+              <label>
+                <span>Your Assessed Win Probability (p)</span>
+                <span id="wedge-prob-val" style="color:var(--text); font-weight:600;">55.0%</span>
+              </label>
+              <input type="range" class="wedge-slider" id="wedge-prob" min="1" max="99" value="55" oninput="recalcWedge()">
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+              <div class="wedge-field">
+                <label>Contract Count</label>
+                <input type="number" class="wedge-input" id="wedge-count" value="10" min="1" max="5000" oninput="recalcWedge()">
+              </div>
+              <div class="wedge-field">
+                <label>Estimated Slippage</label>
+                <input type="text" class="wedge-input" id="wedge-slippage" value="0.0¢" readonly style="color:var(--muted);">
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Neutral Decision Card -->
+          <div class="wedge-decision-card">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 14px;">
+                <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent-light); font-weight: 600; text-transform: uppercase;">
+                  Decision &amp; Exposure Audit
+                </span>
+                <span style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted);" id="wedge-timestamp">TIMESTAMP</span>
+              </div>
+
+              <div class="wedge-metric-row">
+                <span class="wedge-metric-key">Executable Purchase Cost:</span>
+                <span class="wedge-metric-val" id="wedge-out-purchase">$5.10</span>
+              </div>
+              <div class="wedge-metric-row">
+                <span class="wedge-metric-key">Exchange Taker Fee:</span>
+                <span class="wedge-metric-val" style="color:var(--warning);" id="wedge-out-fee">+$0.18 (1.75¢/ct)</span>
+              </div>
+              <div class="wedge-metric-row">
+                <span class="wedge-metric-key">Maximum Potential Loss:</span>
+                <span class="wedge-metric-val" style="color:var(--warning);" id="wedge-out-maxloss">$5.28</span>
+              </div>
+              <div class="wedge-metric-row">
+                <span class="wedge-metric-key">Required Breakeven Win Probability:</span>
+                <span class="wedge-metric-val" style="color:var(--accent);" id="wedge-out-breakeven">52.75%</span>
+              </div>
+              <div class="wedge-metric-row">
+                <span class="wedge-metric-key">Net Arithmetic EV (at Assessed p):</span>
+                <span class="wedge-metric-val" style="color:#10B981;" id="wedge-out-ev">+$0.22 total</span>
+              </div>
+              <div class="wedge-metric-row">
+                <span class="wedge-metric-key">Settlement Reference Source:</span>
+                <span class="wedge-metric-val" style="color:var(--text-dim);" id="wedge-out-source">CME CF BRTI 60s TWAP</span>
+              </div>
+            </div>
+
+            <div style="margin-top: 20px;">
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <a href="/account?flow=sign-up&check=true" class="btn-primary" style="flex:1; text-align:center; padding:10px 14px; font-size:0.8rem; background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%); color:#07080B; border:1px solid #DFB843; font-weight:700;">
+                  Save My Check &amp; Start Journal &rarr;
+                </a>
+                <a href="/calculator" class="btn-secondary" style="padding:10px 14px; font-size:0.8rem;">
+                  Full Calculator &rarr;
+                </a>
+              </div>
+              <div style="font-size: 0.72rem; color: var(--muted); margin-top: 10px; line-height: 1.45;">
+                <strong>Advisory Notice:</strong> Expected profit is pure arithmetic ($p - P_{ask} - fee$), not an established QuanterraOS edge. User-entered probabilities are personal assumptions, never validated forecasts.
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -1508,6 +1697,68 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
+}
+
+function recalcWedge() {
+  const priceSlider = document.getElementById('wedge-price');
+  const probSlider = document.getElementById('wedge-prob');
+  const countInput = document.getElementById('wedge-count');
+  const venueSelect = document.getElementById('wedge-venue');
+  if (!priceSlider || !probSlider || !countInput || !venueSelect) return;
+
+  const priceCents = Number(priceSlider.value);
+  const price = priceCents / 100;
+  const prob = Number(probSlider.value) / 100;
+  const count = Math.max(1, Number(countInput.value) || 1);
+  const venue = venueSelect.value;
+
+  const priceVal = document.getElementById('wedge-price-val');
+  if (priceVal) priceVal.textContent = priceCents + '¢ ($' + price.toFixed(2) + ')';
+  const probVal = document.getElementById('wedge-prob-val');
+  if (probVal) probVal.textContent = (prob * 100).toFixed(1) + '%';
+
+  let feePerContract = 0.0175;
+  let source = "CME CF BRTI 60s TWAP";
+  if (venue.indexOf('kalshi') !== -1) {
+    feePerContract = Math.ceil(0.07 * price * (1 - price) * 100) / 100;
+    source = venue === 'kalshi-1h' ? 'CME CF BRTI 60s TWAP (1H)' : 'CME CF BRTI 60s TWAP (15M)';
+  } else {
+    feePerContract = 0.005;
+    source = 'Chainlink UMA Dispute Protocol';
+  }
+
+  const purchaseCost = price * count;
+  const totalFee = feePerContract * count;
+  const maxLoss = purchaseCost + totalFee;
+  const breakevenPct = (price + feePerContract) * 100;
+  const netEvPerContract = prob - price - feePerContract;
+  const totalNetEv = netEvPerContract * count;
+
+  const outPurchase = document.getElementById('wedge-out-purchase');
+  if (outPurchase) outPurchase.textContent = '$' + purchaseCost.toFixed(2);
+  const outFee = document.getElementById('wedge-out-fee');
+  if (outFee) outFee.textContent = '+$' + totalFee.toFixed(2) + ' (' + (feePerContract * 100).toFixed(2) + '¢/ct)';
+  const outMaxLoss = document.getElementById('wedge-out-maxloss');
+  if (outMaxLoss) outMaxLoss.textContent = '$' + maxLoss.toFixed(2);
+  const outBreakeven = document.getElementById('wedge-out-breakeven');
+  if (outBreakeven) outBreakeven.textContent = breakevenPct.toFixed(2) + '%';
+  const outEv = document.getElementById('wedge-out-ev');
+  if (outEv) {
+    const sign = totalNetEv >= 0 ? '+' : '-';
+    outEv.textContent = sign + '$' + Math.abs(totalNetEv).toFixed(2) + ' total';
+    outEv.style.color = totalNetEv >= 0 ? '#10B981' : 'var(--warning)';
+  }
+  const outSource = document.getElementById('wedge-out-source');
+  if (outSource) outSource.textContent = source;
+
+  const timeEl = document.getElementById('wedge-timestamp');
+  if (timeEl) timeEl.textContent = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', recalcWedge);
+} else {
+  recalcWedge();
 }
 </script>
 ${ASSISTANT_WIDGET_HTML}

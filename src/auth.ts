@@ -10,7 +10,7 @@ import { eq, and } from "drizzle-orm";
 import { db } from "./db.ts";
 import { users, sessions, apiKeys } from "./schema.ts";
 
-export type UserTier = "free" | "pro" | "institutional";
+export type UserTier = "free" | "plus" | "pro" | "institutional";
 
 export interface UserRecord {
   id: string;

@@ -308,7 +308,7 @@ export interface IngestLeadInput {
   company?: string;
   title?: string;
   source?: string;
-  tierInterest?: "free" | "pro" | "institutional" | "pilot";
+  tierInterest?: "free" | "plus" | "pro" | "institutional" | "pilot";
   notes?: string;
 }
 

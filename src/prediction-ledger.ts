@@ -244,7 +244,7 @@ export async function seedHistoricalReplay(
 export function getPredictionsLedger(options?: {
   isReplay?: boolean;
   limit?: number;
-  tier?: "free" | "pro" | "institutional";
+  tier?: "free" | "plus" | "pro" | "institutional";
 }): PredictionLedgerSummary & { tier: string; feedMode: string; delayMinutes: number } {
   const isReplayVal = options?.isReplay ? 1 : 0;
   const limitVal = options?.limit ?? 50;
