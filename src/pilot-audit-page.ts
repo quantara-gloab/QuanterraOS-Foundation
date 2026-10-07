@@ -12,6 +12,17 @@
 
 import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
 
+export interface PilotBookingItem {
+  id: string;
+  contact: string;
+  deviceType: string;
+  availability: string;
+  status: "INTERESTED" | "SCHEDULED" | "OBSERVED";
+  scheduledAt?: string | null;
+  operatorNotes?: string | null;
+  createdAt: string;
+}
+
 export interface PilotAuditPageData {
   customerFunnel: {
     checks_completed: number;
@@ -55,13 +66,18 @@ export interface PilotAuditPageData {
     status: string;
     createdAt: string;
   }>;
+  bookingRequests?: PilotBookingItem[];
 }
 
 export function renderPilotAuditPageHtml(data: PilotAuditPageData): string {
-  const { recordedSessions = [] } = data;
+  const { recordedSessions = [], bookingRequests = [] } = data;
   const recentJournalEntries = data.recentJournalEntries ?? [];
-  const customerFunnel = data.customerFunnel ?? { checks_completed: 0, signups: 0, checks_saved: 0, journal_views: 0 };
-  const internalFunnel = data.internalFunnel ?? { internal_checks: 0, example_previews: 0, audit_views: 0 };
+  const customerFunnel = data.customerFunnel ?? { checks_completed: 0, signups: 0, checks_saved: 0, journal_views: 0, journal_exports: 0 };
+  const internalFunnel = data.internalFunnel ?? { checks_completed: 0, signups: 0, checks_saved: 0, journal_views: 0, journal_exports: 0 };
+
+  const interestedList = bookingRequests.filter(b => b.status === "INTERESTED");
+  const scheduledList = bookingRequests.filter(b => b.status === "SCHEDULED");
+  const observedCount = recordedSessions.length;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -239,6 +255,88 @@ export function renderPilotAuditPageHtml(data: PilotAuditPageData): string {
           <span style="color:var(--muted);">4. Test Journal Views</span>
           <span class="mono">${internalFunnel.journal_views}</span>
         </div>
+      </div>
+    </div>
+
+    <!-- Pilot Participant Pipeline: Interested -> Scheduled -> Observed -->
+    <div class="card" style="margin-bottom:32px;">
+      <div class="card-title">
+        <span>Pilot Participant Pipeline (15-Minute Observation Sessions)</span>
+        <span class="mono" style="font-size:0.75rem; color:var(--accent);">STRICT HUMAN GOVERNANCE</span>
+      </div>
+      <p style="font-size:0.8rem; color:var(--muted); margin-bottom:16px;">
+        Distinguishes participants across <strong>Interested &rarr; Scheduled &rarr; Observed</strong>.
+        Strict audit rule: Zero automatic completion claims. Sessions advance to Observed only when authentic observation notes and defect logs are recorded.
+      </p>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:20px;">
+        <div style="background:rgba(6,9,14,0.7); border:1px solid var(--border-subtle); border-radius:6px; padding:14px;">
+          <div style="font-family:var(--font-mono); font-size:0.7rem; color:var(--muted); text-transform:uppercase;">1. Interested</div>
+          <div style="font-family:var(--font-mono); font-size:1.5rem; font-weight:700; color:#FFFFFF; margin-top:2px;">${interestedList.length}</div>
+          <div style="font-size:0.72rem; color:var(--text-dim); margin-top:2px;">User requested session via booking flow</div>
+        </div>
+        <div style="background:rgba(6,9,14,0.7); border:1px solid var(--border-subtle); border-radius:6px; padding:14px;">
+          <div style="font-family:var(--font-mono); font-size:0.7rem; color:var(--cyan); text-transform:uppercase;">2. Scheduled</div>
+          <div style="font-family:var(--font-mono); font-size:1.5rem; font-weight:700; color:var(--cyan); margin-top:2px;">${scheduledList.length}</div>
+          <div style="font-size:0.72rem; color:var(--text-dim); margin-top:2px;">Founder confirmed date &amp; time</div>
+        </div>
+        <div style="background:rgba(6,9,14,0.7); border:1px solid var(--border-subtle); border-radius:6px; padding:14px;">
+          <div style="font-family:var(--font-mono); font-size:0.7rem; color:var(--accent); text-transform:uppercase;">3. Observed</div>
+          <div style="font-family:var(--font-mono); font-size:1.5rem; font-weight:700; color:var(--accent); margin-top:2px;">${observedCount} / 10</div>
+          <div style="font-size:0.72rem; color:var(--text-dim); margin-top:2px;">Real uncoached sessions completed</div>
+        </div>
+      </div>
+
+      <!-- Booking Requests Table -->
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Request Date</th>
+              <th>Contact</th>
+              <th>Device</th>
+              <th>Availability</th>
+              <th>Status</th>
+              <th>Scheduled Time</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${bookingRequests.length === 0 ? `
+              <tr>
+                <td colspan="7" style="text-align:center; padding:20px; color:var(--muted);">
+                  No booking requests received yet. Direct users to <a href="/beta/book" style="color:var(--accent);">/beta/book</a> to request a 15-minute observation session.
+                </td>
+              </tr>
+            ` : bookingRequests.map(b => `
+              <tr>
+                <td class="mono" style="color:var(--muted); font-size:0.75rem;">${(b.createdAt || '').slice(0, 16).replace('T', ' ')}</td>
+                <td class="mono" style="color:#FFF; font-weight:600;">${b.contact}</td>
+                <td style="font-size:0.78rem;">${b.deviceType}</td>
+                <td style="font-size:0.78rem; color:var(--text-dim);">${b.availability}</td>
+                <td>
+                  <span class="mono" style="display:inline-block; padding:2px 6px; border-radius:3px; font-size:0.7rem; font-weight:700; ${b.status === 'OBSERVED' ? 'background:rgba(16,185,129,0.15); color:var(--green); border:1px solid rgba(16,185,129,0.3);' : b.status === 'SCHEDULED' ? 'background:rgba(56,189,248,0.15); color:var(--cyan); border:1px solid rgba(56,189,248,0.3);' : 'background:rgba(223,184,67,0.15); color:var(--accent); border:1px solid rgba(223,184,67,0.3);'}">
+                    ${b.status}
+                  </span>
+                </td>
+                <td class="mono" style="font-size:0.75rem; color:var(--muted);">${b.scheduledAt || 'Unscheduled'}</td>
+                <td>
+                  ${b.status === 'INTERESTED' ? `
+                    <button type="button" class="btn-gold" style="padding:4px 8px; font-size:0.7rem;" onclick="scheduleBookingPrompt('${b.id}')">
+                      Schedule &rarr;
+                    </button>
+                  ` : b.status === 'SCHEDULED' ? `
+                    <button type="button" class="btn-gold" style="padding:4px 8px; font-size:0.7rem; background:rgba(56,189,248,0.2); color:var(--cyan); border-color:var(--cyan);" onclick="prefillObservationForm('${b.contact}', '${b.deviceType}')">
+                      Log Observation &rarr;
+                    </button>
+                  ` : `
+                    <span style="color:var(--green); font-size:0.75rem; font-weight:700;">✓ Observed</span>
+                  `}
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -423,6 +521,33 @@ export function renderPilotAuditPageHtml(data: PilotAuditPageData): string {
     function toggleAssistanceField(val) {
       const grp = document.getElementById('group-assistance');
       if (grp) grp.style.display = val === 'NO' ? 'block' : 'none';
+    }
+
+    async function scheduleBookingPrompt(bookingId) {
+      const time = prompt('Enter scheduled UTC date & time (YYYY-MM-DD HH:MM UTC):', new Date().toISOString().slice(0, 16).replace('T', ' ') + ' UTC');
+      if (!time) return;
+      try {
+        const res = await fetch('/api/audit/pilot/update-booking-status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: bookingId, status: 'SCHEDULED', scheduledAt: time })
+        });
+        const d = await res.json();
+        if (d.success) window.location.reload();
+        else alert('Error updating status: ' + (d.error || 'Failed'));
+      } catch (e) {
+        alert('Network error updating status');
+      }
+    }
+
+    function prefillObservationForm(contact, device) {
+      const idEl = document.getElementById('obs-id');
+      const devEl = document.getElementById('obs-device');
+      const chanEl = document.getElementById('obs-channel');
+      if (idEl) idEl.value = contact;
+      if (devEl) devEl.value = device;
+      if (chanEl) chanEl.value = 'Beta Booking Request';
+      document.getElementById('obs-id').scrollIntoView({ behavior: 'smooth' });
     }
 
     async function recordObservation() {

@@ -37,6 +37,12 @@ export interface DecisionJournalEntry {
   outcome?: string | null;
   realizedPnl?: number | null;
   decisionAction?: string | null; // 'skipped' | 'paper_trade' | 'actual_trade'
+  actualQuantity?: number | null;
+  actualFillPrice?: number | null;
+  actualFees?: number | null;
+  exitProceeds?: number | null;
+  outcomeStatus?: string | null;
+  outcomeNotes?: string | null;
   reasoning?: string | null;
   isExample?: boolean;
   createdAt: string;
@@ -508,6 +514,7 @@ export function renderJournalPageHtml(
       <div class="nav-links">
         <a href="/calculator">Check</a>
         <a href="/journal" class="active" style="color:var(--accent); font-weight:700;">Journal</a>
+        <a href="/review" style="color:var(--cyan); font-weight:600;">Review</a>
         <a href="/calibration">Learn</a>
         <a href="/account">Sign in</a>
       </div>
@@ -554,6 +561,9 @@ export function renderJournalPageHtml(
         </p>
       </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <a href="/review" class="btn-gold" style="background:rgba(56,189,248,0.15); color:var(--cyan); border-color:var(--cyan);">
+          📊 Personal Review &rarr;
+        </a>
         <button type="button" onclick="openImportModal()" class="btn-gold" style="background:rgba(223,184,67,0.12); color:var(--accent-light); border-color:var(--accent);">
           ↑ Import Statement CSV
         </button>
@@ -761,20 +771,65 @@ export function renderJournalPageHtml(
                   </td>
                   <td>
                     <div style="display:flex; flex-direction:column; gap:4px;">
-                      ${e.outcome ? `
-                        <span class="badge-status ${e.outcome === 'WON' ? 'badge-won' : e.outcome === 'LOST' ? 'badge-lost' : 'badge-void'}">
-                          ${e.outcome}
-                        </span>
-                        ${e.realizedPnl !== null && e.realizedPnl !== undefined ? `
-                          <span class="mono" style="font-size:0.72rem; font-weight:700; color:${e.realizedPnl >= 0 ? 'var(--green)' : 'var(--rose)'};">
-                            ${e.realizedPnl >= 0 ? '+' : ''}$${e.realizedPnl.toFixed(2)}
-                          </span>
-                        ` : ''}
-                      ` : `
-                        <button type="button" class="btn-settle" onclick="openSettleModal('${e.id}', '${e.contractTicker}', ${e.contractCount || 10}, ${e.contractPrice || 0.51}, ${e.exchangeFee || 0.18})">
-                          Log Outcome &rarr;
-                        </button>
-                      `}
+                      ${(() => {
+                        const action = (e.decisionAction || 'paper_trade').toLowerCase();
+                        if (action === 'skipped') {
+                          return `
+                            <span class="badge-status" style="background:rgba(212,175,55,0.15); color:var(--accent); border:1px solid rgba(212,175,55,0.3); font-size:0.68rem; font-weight:700;">
+                              SKIPPED
+                            </span>
+                            <span class="mono" style="font-size:0.7rem; color:var(--green); font-weight:600;">$0 Loss · Preserved</span>
+                          `;
+                        }
+                        if (action === 'actual_trade') {
+                          const isComplete = e.actualQuantity !== null && e.actualQuantity !== undefined &&
+                            e.actualFillPrice !== null && e.actualFillPrice !== undefined &&
+                            e.actualFees !== null && e.actualFees !== undefined &&
+                            e.exitProceeds !== null && e.exitProceeds !== undefined &&
+                            e.realizedPnl !== null && e.realizedPnl !== undefined;
+
+                          if (isComplete) {
+                            return `
+                              <span class="badge-status ${e.outcome === 'WON' ? 'badge-won' : e.outcome === 'LOST' ? 'badge-lost' : 'badge-void'}">
+                                ${e.outcome || 'SETTLED'}
+                              </span>
+                              <span class="mono" style="font-size:0.72rem; font-weight:700; color:${(e.realizedPnl || 0) >= 0 ? 'var(--green)' : 'var(--rose)'};">
+                                ${(e.realizedPnl || 0) >= 0 ? '+' : ''}$${(e.realizedPnl || 0).toFixed(2)}
+                              </span>
+                              <div style="font-size:0.65rem; color:var(--muted);">${e.actualQuantity}ct @ $${(e.actualFillPrice || 0).toFixed(2)} · Fee: $${(e.actualFees || 0).toFixed(2)}</div>
+                            `;
+                          } else {
+                            return `
+                              <span class="badge-status badge-incomplete" style="background:rgba(244,63,94,0.15); color:var(--rose); border:1px solid rgba(244,63,94,0.3); font-size:0.68rem; font-weight:700;">
+                                INCOMPLETE
+                              </span>
+                              <div style="font-size:0.68rem; color:var(--rose); margin-top:1px;">Missing trade details</div>
+                              <button type="button" class="btn-settle" onclick="openActualTradeModal('${e.id}', '${e.contractTicker}', ${e.actualQuantity || e.contractCount || 10}, ${e.actualFillPrice || e.contractPrice || 0.51}, ${e.actualFees || e.exchangeFee || 0.18})">
+                                Record Outcome &rarr;
+                              </button>
+                            `;
+                          }
+                        }
+                        // Default / Paper trade
+                        if (e.outcome) {
+                          return `
+                            <span class="badge-status ${e.outcome === 'WON' ? 'badge-won' : e.outcome === 'LOST' ? 'badge-lost' : 'badge-void'}">
+                              ${e.outcome}
+                            </span>
+                            ${e.realizedPnl !== null && e.realizedPnl !== undefined ? `
+                              <span class="mono" style="font-size:0.72rem; font-weight:700; color:${e.realizedPnl >= 0 ? 'var(--green)' : 'var(--rose)'};">
+                                ${e.realizedPnl >= 0 ? '+' : ''}$${e.realizedPnl.toFixed(2)}
+                              </span>
+                            ` : ''}
+                          `;
+                        } else {
+                          return `
+                            <button type="button" class="btn-settle" onclick="openSettleModal('${e.id}', '${e.contractTicker}', ${e.contractCount || 10}, ${e.contractPrice || 0.51}, ${e.exchangeFee || 0.18})">
+                              Log Outcome &rarr;
+                            </button>
+                          `;
+                        }
+                      })()}
                     </div>
                   </td>
                   <td>
@@ -836,6 +891,66 @@ export function renderJournalPageHtml(
         <div style="display:flex; justify-content:flex-end; gap:10px;">
           <button type="button" onclick="closeSettleModal()" class="btn-gold" style="background:rgba(255,255,255,0.06); color:var(--text); border-color:var(--border);">Cancel</button>
           <button type="button" onclick="submitSettlement()" class="btn-gold" id="btn-submit-settle">Commit Settlement &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actual Trade Outcome Logging Modal -->
+    <div id="actual-trade-modal" class="modal-overlay">
+      <div class="modal-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid var(--border-subtle); padding-bottom:10px;">
+          <div>
+            <div style="font-size:0.7rem; color:var(--accent); font-family:var(--font-mono); font-weight:700;">ACTUAL LIVE EXECUTION OUTCOME</div>
+            <div style="font-weight:700; font-size:1.05rem; color:#FFFFFF;" id="actual-modal-title">Record Actual Trade Outcome</div>
+          </div>
+          <button type="button" onclick="closeActualTradeModal()" style="background:none; border:none; color:var(--muted); font-size:1.4rem; cursor:pointer;">&times;</button>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px;">
+          <div>
+            <label style="font-size:0.75rem; color:var(--text-dim); display:block; margin-bottom:4px; font-family:var(--font-mono);">Actual Filled Quantity</label>
+            <input type="number" id="actual-input-qty" min="1" class="form-input" style="width:100%; padding:8px 10px; background:rgba(6,9,14,0.9); border:1px solid var(--border); color:#FFF;" oninput="recalcActualPnl()">
+          </div>
+          <div>
+            <label style="font-size:0.75rem; color:var(--text-dim); display:block; margin-bottom:4px; font-family:var(--font-mono);">Actual Fill Price ($)</label>
+            <input type="number" id="actual-input-fill" step="0.01" min="0.01" max="0.99" class="form-input" style="width:100%; padding:8px 10px; background:rgba(6,9,14,0.9); border:1px solid var(--border); color:#FFF;" oninput="recalcActualPnl()">
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px;">
+          <div>
+            <label style="font-size:0.75rem; color:var(--text-dim); display:block; margin-bottom:4px; font-family:var(--font-mono);">Actual Exchange Fees ($)</label>
+            <input type="number" id="actual-input-fees" step="0.01" min="0.00" class="form-input" style="width:100%; padding:8px 10px; background:rgba(6,9,14,0.9); border:1px solid var(--border); color:#FFF;" oninput="recalcActualPnl()">
+          </div>
+          <div>
+            <label style="font-size:0.75rem; color:var(--text-dim); display:block; margin-bottom:4px; font-family:var(--font-mono);">Exit / Settlement Proceeds ($)</label>
+            <input type="number" id="actual-input-proceeds" step="0.01" min="0.00" class="form-input" style="width:100%; padding:8px 10px; background:rgba(6,9,14,0.9); border:1px solid var(--border); color:#FFF;" oninput="recalcActualPnl()">
+          </div>
+        </div>
+
+        <div style="background:rgba(6,9,14,0.8); border:1px solid var(--border-subtle); border-radius:6px; padding:12px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:0.8rem; color:var(--text-dim);">Net Realized Profit / Loss:</span>
+          <span id="actual-calculated-pnl" class="mono" style="font-weight:700; font-size:1.1rem; color:var(--green);">$0.00</span>
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="font-size:0.75rem; color:var(--text-dim); display:block; margin-bottom:4px; font-family:var(--font-mono);">Outcome Category</label>
+          <select id="actual-select-outcome" class="form-input" style="width:100%; padding:8px 10px; background:rgba(6,9,14,0.9); border:1px solid var(--border); color:#FFF;">
+            <option value="WON">WON (Settled at $1.00 full value)</option>
+            <option value="LOST">LOST (Settled at $0.00 total loss)</option>
+            <option value="EARLY_EXIT">EARLY_EXIT (Exited before settlement)</option>
+            <option value="VOID">VOID (Market canceled / refunded)</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom:18px;">
+          <label style="font-size:0.75rem; color:var(--text-dim); display:block; margin-bottom:4px; font-family:var(--font-mono);">Execution &amp; Post-Mortem Notes</label>
+          <input type="text" id="actual-input-notes" placeholder="e.g. Executed on Kalshi mobile app, fee matched calculated estimate" style="width:100%; background:rgba(6,9,14,0.9); border:1px solid var(--border); color:#FFFFFF; padding:8px 12px; border-radius:4px; font-size:0.82rem; outline:none;">
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px;">
+          <button type="button" onclick="closeActualTradeModal()" class="btn-gold" style="background:rgba(255,255,255,0.06); color:var(--text); border-color:var(--border);">Cancel</button>
+          <button type="button" onclick="submitActualTradeOutcome()" class="btn-gold" id="btn-submit-actual-outcome">Save Actual Outcome &rarr;</button>
         </div>
       </div>
     </div>
@@ -1044,6 +1159,80 @@ export function renderJournalPageHtml(
         alert('Network error settling decision.');
         btn.textContent = 'Commit Settlement →';
         btn.disabled = false;
+      }
+    }
+
+    let activeActualId = null;
+
+    function openActualTradeModal(id, ticker, qty, price, fee) {
+      activeActualId = id;
+      document.getElementById('actual-modal-title').textContent = 'Record Actual Outcome: ' + ticker;
+      document.getElementById('actual-input-qty').value = qty || 10;
+      document.getElementById('actual-input-fill').value = (price !== undefined && price !== null) ? price : 0.51;
+      document.getElementById('actual-input-fees').value = (fee !== undefined && fee !== null) ? fee : 0.18;
+      document.getElementById('actual-input-proceeds').value = ((qty || 10) * 1.00).toFixed(2);
+      document.getElementById('actual-input-notes').value = '';
+      recalcActualPnl();
+      document.getElementById('actual-trade-modal').style.display = 'flex';
+    }
+
+    function closeActualTradeModal() {
+      document.getElementById('actual-trade-modal').style.display = 'none';
+      activeActualId = null;
+    }
+
+    function recalcActualPnl() {
+      const qty = parseFloat(document.getElementById('actual-input-qty').value) || 0;
+      const fill = parseFloat(document.getElementById('actual-input-fill').value) || 0;
+      const fees = parseFloat(document.getElementById('actual-input-fees').value) || 0;
+      const proceeds = parseFloat(document.getElementById('actual-input-proceeds').value) || 0;
+      const cost = qty * fill;
+      const pnl = proceeds - cost - fees;
+      const el = document.getElementById('actual-calculated-pnl');
+      if (el) {
+        el.textContent = (pnl >= 0 ? '+' : '') + '$' + pnl.toFixed(2);
+        el.style.color = pnl >= 0 ? 'var(--green)' : 'var(--rose)';
+      }
+    }
+
+    async function submitActualTradeOutcome() {
+      if (!activeActualId) return;
+      const btn = document.getElementById('btn-submit-actual-outcome');
+      btn.disabled = true;
+      btn.textContent = 'Saving to journal...';
+
+      const qty = document.getElementById('actual-input-qty').value;
+      const fill = document.getElementById('actual-input-fill').value;
+      const fees = document.getElementById('actual-input-fees').value;
+      const proceeds = document.getElementById('actual-input-proceeds').value;
+      const outcome = document.getElementById('actual-select-outcome').value;
+      const notes = document.getElementById('actual-input-notes').value;
+
+      try {
+        const res = await fetch('/api/journal/record-actual-outcome', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: activeActualId,
+            actualQuantity: qty !== '' ? parseInt(qty, 10) : null,
+            actualFillPrice: fill !== '' ? parseFloat(fill) : null,
+            actualFees: fees !== '' ? parseFloat(fees) : null,
+            exitProceeds: proceeds !== '' ? parseFloat(proceeds) : null,
+            outcome: outcome,
+            notes: notes
+          })
+        });
+        if (res.ok) {
+          window.location.reload();
+        } else {
+          alert('Error recording outcome. Please try again.');
+          btn.disabled = false;
+          btn.textContent = 'Save Actual Outcome →';
+        }
+      } catch (err) {
+        alert('Network error recording outcome.');
+        btn.disabled = false;
+        btn.textContent = 'Save Actual Outcome →';
       }
     }
 

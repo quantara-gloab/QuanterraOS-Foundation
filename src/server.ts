@@ -14,7 +14,7 @@ import { randomUUID } from "node:crypto";
 import { eq, and, gte, asc, desc, sql } from "drizzle-orm";
 import { db, runMigrations } from "./db.ts";
 import { getChatGPTUser, requireFounderAuth } from "./auth.ts";
-import { researchObservations, researchResolutions, researchResolutionHistory, edgeScores, falconRecommendations, btcIndexTicks, users, sessions, events, userDecisionJournal, pilotObservationSessions, betaFeedback } from "./schema.ts";
+import { researchObservations, researchResolutions, researchResolutionHistory, edgeScores, falconRecommendations, btcIndexTicks, users, sessions, events, userDecisionJournal, pilotObservationSessions, betaFeedback, pilotBookingRequests } from "./schema.ts";
 import { buildPrediction, type LiveMarket } from "./btc15m-predictor.ts";
 import { handleResolve, handleEdgeScore, handleObserve } from "./routes/workspace.ts";
 import { handleFalconRecommend, handleFalconJevRecommend, handleFalconDecision, type FalconRecommendationRow } from "./routes/falcon.ts";
@@ -56,6 +56,9 @@ import { renderPricingPageHtml } from "./pricing-page.ts";
 import { renderTwoStrategiesLostPageHtml } from "./blog-page.ts";
 import { renderAccountPageHtml } from "./account-page.ts";
 import { renderJournalPageHtml } from "./journal-page.ts";
+import { renderReviewPageHtml } from "./review-page.ts";
+import { renderBetaBookingPageHtml } from "./booking-page.ts";
+import { getFeatureFlags } from "./feature-flags.ts";
 import { renderPilotAuditPageHtml } from "./pilot-audit-page.ts";
 import { renderAccessTerminalPage } from "./access-terminal-page.ts";
 import { renderWalletPageHtml } from "./wallet-page.ts";
@@ -1800,6 +1803,21 @@ app.get(["/journal", "/decisions"], (req, res) => {
   res.type("html").send(renderJournalPageHtml(auth.user, auth.tier, entries));
 });
 
+app.get(["/review", "/journal/review"], (req, res) => {
+  const auth = getUserAuth(req);
+  let entries: any[] = [];
+  if (auth.user) {
+    entries = db
+      .select()
+      .from(userDecisionJournal)
+      .where(eq(userDecisionJournal.userId, auth.user.id))
+      .orderBy(desc(userDecisionJournal.createdAt))
+      .all();
+  }
+  logEvent("review_viewed", auth.user?.id, { entryCount: entries.length });
+  res.type("html").send(renderReviewPageHtml(auth.user, auth.tier, entries as any));
+});
+
 app.post("/api/analytics/check", (req, res) => {
   const auth = getUserAuth(req);
   const isExample = req.body?.isExample === true || req.body?.preview === true;
@@ -2018,6 +2036,140 @@ app.post("/api/journal/resolve", (req, res) => {
     outcome,
     realizedPnl,
   });
+});
+
+app.post("/api/journal/record-actual-outcome", (req, res) => {
+  const auth = getUserAuth(req);
+  if (!auth.user) {
+    return res.status(401).json({ error: "Authentication required to record actual outcome" });
+  }
+
+  const { id, actualQuantity, actualFillPrice, actualFees, exitProceeds, outcome, notes } = req.body || {};
+  if (!id) {
+    return res.status(400).json({ error: "id required" });
+  }
+
+  const existing = db
+    .select()
+    .from(userDecisionJournal)
+    .where(and(eq(userDecisionJournal.id, id), eq(userDecisionJournal.userId, auth.user.id)))
+    .all();
+
+  if (existing.length === 0) {
+    return res.status(404).json({ error: "Journal entry not found" });
+  }
+
+  const entry = existing[0];
+  const isComplete = (
+    actualQuantity !== null && actualQuantity !== undefined && actualQuantity !== "" &&
+    actualFillPrice !== null && actualFillPrice !== undefined && actualFillPrice !== "" &&
+    actualFees !== null && actualFees !== undefined && actualFees !== "" &&
+    exitProceeds !== null && exitProceeds !== undefined && exitProceeds !== ""
+  );
+
+  let realizedPnl: number | null = null;
+  const numQty = Number(actualQuantity);
+  const numFill = Number(actualFillPrice);
+  const numFees = Number(actualFees);
+  const numProceeds = Number(exitProceeds);
+
+  if (isComplete && !isNaN(numQty) && !isNaN(numFill) && !isNaN(numFees) && !isNaN(numProceeds)) {
+    realizedPnl = Number((numProceeds - (numQty * numFill) - numFees).toFixed(2));
+  }
+
+  const outcomeStatus = isComplete ? "settled" : "incomplete";
+  const now = new Date().toISOString();
+
+  db.update(userDecisionJournal)
+    .set({
+      decisionAction: "actual_trade",
+      actualQuantity: !isNaN(numQty) && actualQuantity !== null && actualQuantity !== "" ? numQty : null,
+      actualFillPrice: !isNaN(numFill) && actualFillPrice !== null && actualFillPrice !== "" ? numFill : null,
+      actualFees: !isNaN(numFees) && actualFees !== null && actualFees !== "" ? numFees : null,
+      exitProceeds: !isNaN(numProceeds) && exitProceeds !== null && exitProceeds !== "" ? numProceeds : null,
+      realizedPnl,
+      outcome: outcome || entry.outcome || (realizedPnl !== null ? (realizedPnl >= 0 ? "WON" : "LOST") : null),
+      outcomeStatus,
+      status: outcomeStatus,
+      outcomeNotes: notes ? String(notes).slice(0, 1000) : entry.outcomeNotes,
+      updatedAt: now,
+    })
+    .where(eq(userDecisionJournal.id, id))
+    .run();
+
+  logEvent("actual_outcome_recorded", auth.user.id, {
+    journalId: id,
+    outcomeStatus,
+    realizedPnl,
+    isComplete,
+  });
+
+  res.json({
+    success: true,
+    id,
+    realizedPnl,
+    outcomeStatus,
+    isComplete,
+  });
+});
+
+app.get(["/beta/book", "/book-session"], (_req, res) => {
+  res.type("html").send(renderBetaBookingPageHtml());
+});
+
+app.post("/api/pilot/booking-request", (req, res) => {
+  const { contact, deviceType, availability, consentGiven } = req.body || {};
+  if (!contact || !deviceType || !availability) {
+    return res.status(400).json({ error: "Missing required fields: contact, deviceType, availability" });
+  }
+  if (!consentGiven) {
+    return res.status(400).json({ error: "Explicit consent is required to request an observation session" });
+  }
+
+  const id = `book_${randomUUID().slice(0, 16)}`;
+  const now = new Date().toISOString();
+
+  db.insert(pilotBookingRequests)
+    .values({
+      id,
+      contact: String(contact).slice(0, 150),
+      deviceType: String(deviceType).slice(0, 100),
+      availability: String(availability).slice(0, 255),
+      consentGiven: 1,
+      status: "INTERESTED",
+      createdAt: now,
+      updatedAt: now,
+    })
+    .run();
+
+  logEvent("pilot_booking_requested", null, { bookingId: id, deviceType });
+
+  res.json({
+    success: true,
+    bookingId: id,
+    status: "INTERESTED",
+    message: "15-minute observation session requested successfully."
+  });
+});
+
+app.post("/api/audit/pilot/update-booking-status", (req, res) => {
+  const { id, status, scheduledAt, operatorNotes } = req.body || {};
+  if (!id || !["INTERESTED", "SCHEDULED", "OBSERVED"].includes(status)) {
+    return res.status(400).json({ error: "id and status (INTERESTED|SCHEDULED|OBSERVED) required" });
+  }
+
+  const now = new Date().toISOString();
+  db.update(pilotBookingRequests)
+    .set({
+      status,
+      scheduledAt: scheduledAt ? String(scheduledAt).slice(0, 100) : null,
+      operatorNotes: operatorNotes ? String(operatorNotes).slice(0, 500) : null,
+      updatedAt: now,
+    })
+    .where(eq(pilotBookingRequests.id, id))
+    .run();
+
+  res.json({ success: true, id, status });
 });
 
 app.get("/api/export/journal.csv", (req, res) => {
@@ -2265,12 +2417,20 @@ app.get("/audit/pilot", requireFounderAuth, (_req, res) => {
     .limit(50)
     .all();
 
+  const bookingRequests = db
+    .select()
+    .from(pilotBookingRequests)
+    .orderBy(desc(pilotBookingRequests.createdAt))
+    .limit(100)
+    .all();
+
   res.type("html").send(
     renderPilotAuditPageHtml({
       customerFunnel: customerCounts,
       internalFunnel: internalCounts,
       recentJournalEntries: recentEntries,
       recordedSessions,
+      bookingRequests: bookingRequests as any,
     })
   );
 });
@@ -2280,6 +2440,14 @@ app.post("/api/audit/pilot/session", requireFounderAuth, (req, res) => {
   const id = b.id || `ps_${randomUUID().slice(0, 12)}`;
   const participantRef = b.participantRef || b.id || "P-01";
   const now = new Date().toISOString();
+
+  // If a booking request matches this participant, update to OBSERVED (strictly with authentic session telemetry)
+  try {
+    db.update(pilotBookingRequests)
+      .set({ status: "OBSERVED", updatedAt: now })
+      .where(eq(pilotBookingRequests.contact, participantRef))
+      .run();
+  } catch (_) {}
 
   db.insert(pilotObservationSessions)
     .values({

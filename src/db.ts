@@ -105,6 +105,44 @@ export function runMigrations(): void {
       `);
       continue;
     }
+    if (migration === "0024_outcome_tracking_and_booking.sql") {
+      const journalCols = sqlite.prepare("PRAGMA table_info(user_decision_journal)").all() as Array<{ name: string }>;
+      if (!journalCols.some((col) => col.name === "actual_quantity")) {
+        sqlite.exec("ALTER TABLE user_decision_journal ADD COLUMN actual_quantity INTEGER");
+      }
+      if (!journalCols.some((col) => col.name === "actual_fill_price")) {
+        sqlite.exec("ALTER TABLE user_decision_journal ADD COLUMN actual_fill_price REAL");
+      }
+      if (!journalCols.some((col) => col.name === "actual_fees")) {
+        sqlite.exec("ALTER TABLE user_decision_journal ADD COLUMN actual_fees REAL");
+      }
+      if (!journalCols.some((col) => col.name === "exit_proceeds")) {
+        sqlite.exec("ALTER TABLE user_decision_journal ADD COLUMN exit_proceeds REAL");
+      }
+      if (!journalCols.some((col) => col.name === "outcome_status")) {
+        sqlite.exec("ALTER TABLE user_decision_journal ADD COLUMN outcome_status TEXT DEFAULT 'pending'");
+      }
+      if (!journalCols.some((col) => col.name === "outcome_notes")) {
+        sqlite.exec("ALTER TABLE user_decision_journal ADD COLUMN outcome_notes TEXT");
+      }
+      sqlite.exec(`
+        CREATE TABLE IF NOT EXISTS pilot_booking_requests (
+          id TEXT PRIMARY KEY,
+          contact TEXT NOT NULL,
+          device_type TEXT NOT NULL,
+          availability TEXT NOT NULL,
+          consent_given INTEGER NOT NULL DEFAULT 1,
+          status TEXT NOT NULL DEFAULT 'INTERESTED',
+          scheduled_at TEXT,
+          operator_notes TEXT,
+          created_at TEXT NOT NULL,
+          updated_at TEXT NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS pilot_booking_status_idx ON pilot_booking_requests (status);
+        CREATE INDEX IF NOT EXISTS pilot_booking_created_at_idx ON pilot_booking_requests (created_at);
+      `);
+      continue;
+    }
     sqlite.exec(readFileSync(migrationPath, "utf-8"));
   }
 }

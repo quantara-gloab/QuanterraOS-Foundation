@@ -698,6 +698,12 @@ export const userDecisionJournal = sqliteTable(
     status: text("status").notNull().default("saved_check"), // 'saved_check' | 'paper_tracked' | 'executed_live'
     outcome: text("outcome"), // 'WON' | 'LOST' | 'VOID' | 'PENDING'
     realizedPnl: real("realized_pnl"),
+    actualQuantity: integer("actual_quantity"),
+    actualFillPrice: real("actual_fill_price"),
+    actualFees: real("actual_fees"),
+    exitProceeds: real("exit_proceeds"),
+    outcomeStatus: text("outcome_status").default("pending"), // 'pending' | 'settled' | 'incomplete'
+    outcomeNotes: text("outcome_notes"),
     createdAt: text("created_at").notNull(),
     updatedAt: text("updated_at").notNull(),
   },
@@ -746,6 +752,26 @@ export const pilotObservationSessions = sqliteTable(
   (table) => ({
     participantRefIdx: index("pilot_sessions_participant_ref_idx").on(table.participantRef),
     createdAtIdx: index("pilot_sessions_created_at_idx").on(table.createdAt),
+  })
+);
+
+export const pilotBookingRequests = sqliteTable(
+  "pilot_booking_requests",
+  {
+    id: text("id").primaryKey(),
+    contact: text("contact").notNull(),
+    deviceType: text("device_type").notNull(),
+    availability: text("availability").notNull(),
+    consentGiven: integer("consent_given").notNull().default(1),
+    status: text("status").notNull().default("INTERESTED"), // 'INTERESTED' | 'SCHEDULED' | 'OBSERVED'
+    scheduledAt: text("scheduled_at"),
+    operatorNotes: text("operator_notes"),
+    createdAt: text("created_at").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (table) => ({
+    statusIdx: index("pilot_booking_status_idx").on(table.status),
+    createdAtIdx: index("pilot_booking_created_at_idx").on(table.createdAt),
   })
 );
 
