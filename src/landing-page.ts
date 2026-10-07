@@ -1097,6 +1097,10 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
                 <a href="/account?flow=sign-up&check=true" class="btn-primary" style="flex:1; text-align:center; padding:10px 14px; font-size:0.8rem; background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%); color:#07080B; border:1px solid #DFB843; font-weight:700;">
                   Save My Check &amp; Start Journal &rarr;
                 </a>
+                <button type="button" class="btn-secondary" onclick="openShareCardModal()" style="display:inline-flex; align-items:center; gap:6px; padding:10px 14px; font-size:0.8rem; font-weight:600; background:rgba(212,175,55,0.08); border-color:rgba(212,175,55,0.3); color:var(--accent-light);">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                  Export Decision Card
+                </button>
                 <a href="/calculator" class="btn-secondary" style="padding:10px 14px; font-size:0.8rem;">
                   Full Calculator &rarr;
                 </a>
@@ -1723,8 +1727,10 @@ function recalcWedge() {
     feePerContract = Math.ceil(0.07 * price * (1 - price) * 100) / 100;
     source = venue === 'kalshi-1h' ? 'CME CF BRTI 60s TWAP (1H)' : 'CME CF BRTI 60s TWAP (15M)';
   } else {
-    feePerContract = 0.005;
-    source = 'Chainlink UMA Dispute Protocol';
+    const gas = count >= 50 ? 0.08 : 0.15;
+    const amortizedGas = gas / count;
+    feePerContract = Number((0.005 + amortizedGas).toFixed(4));
+    source = 'Polygon UMA Optimistic Oracle (2h Dispute Window)';
   }
 
   const purchaseCost = price * count;
@@ -1753,12 +1759,187 @@ function recalcWedge() {
 
   const timeEl = document.getElementById('wedge-timestamp');
   if (timeEl) timeEl.textContent = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
+
+  // Redraw canvas if modal is open
+  const modal = document.getElementById('share-card-modal');
+  if (modal && modal.style.display === 'flex') {
+    renderCardToCanvas();
+  }
+}
+
+function renderCardToCanvas() {
+  const canvas = document.getElementById('decision-card-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const venueSelect = document.getElementById('wedge-venue');
+  const venueText = venueSelect ? venueSelect.options[venueSelect.selectedIndex].text.split('—')[0].trim() : 'Kalshi';
+  const priceVal = (document.getElementById('wedge-price') ? Number(document.getElementById('wedge-price').value) : 51) + '¢';
+  const breakevenVal = document.getElementById('wedge-out-breakeven') ? document.getElementById('wedge-out-breakeven').textContent : '52.75%';
+  const feeVal = document.getElementById('wedge-out-fee') ? document.getElementById('wedge-out-fee').textContent : '+$0.18';
+  const sourceVal = document.getElementById('wedge-out-source') ? document.getElementById('wedge-out-source').textContent : 'CME CF BRTI TWAP';
+
+  // 1. Background
+  ctx.fillStyle = '#06070A';
+  ctx.fillRect(0, 0, 1200, 630);
+
+  // Subtle grid lines
+  ctx.strokeStyle = 'rgba(212, 175, 55, 0.08)';
+  ctx.lineWidth = 1;
+  for (let x = 40; x < 1200; x += 60) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 630); ctx.stroke();
+  }
+  for (let y = 40; y < 630; y += 60) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(1200, y); ctx.stroke();
+  }
+
+  // Border with gold accent
+  ctx.strokeStyle = '#D4AF37';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(30, 30, 1140, 570);
+
+  // 2. Top Header
+  ctx.fillStyle = '#10B981';
+  ctx.beginPath();
+  ctx.arc(65, 75, 8, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = '#FBF4DC';
+  ctx.font = 'bold 22px "SF Mono", monospace, Courier';
+  ctx.fillText('QUANTERRAOS // VERIFIED DECISION & RISK AUDIT', 88, 82);
+
+  ctx.fillStyle = '#8E9AA8';
+  ctx.font = '16px "SF Mono", monospace, Courier';
+  ctx.fillText('TIMESTAMP: ' + new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC', 780, 82);
+
+  // Divider
+  ctx.strokeStyle = 'rgba(212, 175, 55, 0.25)';
+  ctx.beginPath(); ctx.moveTo(60, 115); ctx.lineTo(1140, 115); ctx.stroke();
+
+  // 3. Central Focal Metric
+  ctx.fillStyle = '#8E9AA8';
+  ctx.font = '18px "SF Mono", monospace, Courier';
+  ctx.fillText('REQUIRED BREAKEVEN WIN RATE HURDLE', 60, 170);
+
+  ctx.fillStyle = '#DFB843';
+  ctx.font = 'bold 74px "SF Mono", monospace, Courier';
+  ctx.fillText(breakevenVal, 60, 245);
+
+  ctx.fillStyle = '#CBD5E1';
+  ctx.font = '18px sans-serif';
+  ctx.fillText('Directional edge must clear this hurdle after taker fees before producing net positive return.', 60, 280);
+
+  // 4. Metric Tiles
+  const tiles = [
+    { label: 'MARKET VENUE', val: venueText },
+    { label: 'CONTRACT ASK', val: priceVal },
+    { label: 'FEE FRICTION', val: feeVal },
+    { label: 'SETTLEMENT ORACLE', val: sourceVal.length > 25 ? sourceVal.slice(0, 24) + '...' : sourceVal },
+  ];
+
+  tiles.forEach((t, i) => {
+    const x = 60 + i * 270;
+    const y = 320;
+    ctx.fillStyle = 'rgba(16, 22, 34, 0.85)';
+    ctx.fillRect(x, y, 250, 130);
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.3)';
+    ctx.strokeRect(x, y, 250, 130);
+
+    ctx.fillStyle = '#8E9AA8';
+    ctx.font = '13px "SF Mono", monospace, Courier';
+    ctx.fillText(t.label, x + 16, y + 36);
+
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold 22px "SF Mono", monospace, Courier';
+    ctx.fillText(t.val, x + 16, y + 80);
+  });
+
+  // 5. Footer & Guardrail
+  ctx.fillStyle = 'rgba(212, 175, 55, 0.1)';
+  ctx.fillRect(60, 480, 1080, 85);
+  ctx.strokeStyle = 'rgba(212, 175, 55, 0.25)';
+  ctx.strokeRect(60, 480, 1080, 85);
+
+  ctx.fillStyle = '#F59E0B';
+  ctx.font = 'bold 15px "SF Mono", monospace, Courier';
+  ctx.fillText('RULE B5 STANDBY LOCK: $0.00 CAPITAL RISK // ARITHMETIC COST COMPANION', 80, 515);
+
+  ctx.fillStyle = '#8E9AA8';
+  ctx.font = '13px sans-serif';
+  ctx.fillText('Independent cost & exposure companion. Not financial advice. Calculate your true hurdle before trading: quanterraos.com', 80, 545);
+}
+
+function openShareCardModal() {
+  let modal = document.getElementById('share-card-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'share-card-modal';
+    modal.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; z-index:400; padding:20px;';
+    modal.innerHTML = '<div style="background:#0A0E14; border:1px solid rgba(212,175,55,0.4); border-radius:8px; max-width:860px; width:100%; box-shadow:0 30px 80px rgba(0,0,0,0.9); overflow:hidden;">' +
+      '<div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid rgba(212,175,55,0.2);">' +
+      '<div style="font-family:var(--font-mono); font-size:0.85rem; font-weight:700; color:var(--accent-light);">EXPORT VERIFIED DECISION &amp; RISK CARD</div>' +
+      '<button type="button" onclick="closeShareCardModal()" style="background:none; border:none; color:var(--muted); font-size:1.4rem; cursor:pointer;">&times;</button>' +
+      '</div><div style="padding:20px; text-align:center;">' +
+      '<canvas id="decision-card-canvas" width="1200" height="630" style="width:100%; max-width:800px; height:auto; border-radius:4px; border:1px solid rgba(212,175,55,0.2); box-shadow:0 10px 30px rgba(0,0,0,0.5);"></canvas>' +
+      '</div><div style="padding:14px 20px; border-top:1px solid rgba(212,175,55,0.15); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">' +
+      '<div style="font-family:var(--font-mono); font-size:0.75rem; color:var(--muted);">Format: 1200&times;630 (X / Twitter / Reddit preview ready)</div>' +
+      '<div style="display:flex; gap:8px;">' +
+      '<button type="button" class="btn-primary" onclick="downloadDecisionCard()" style="padding:8px 14px; font-size:0.78rem; font-weight:700;">Download PNG</button>' +
+      '<button type="button" class="btn-secondary" onclick="tweetDecisionCard()" style="padding:8px 14px; font-size:0.78rem; font-weight:600; background:#1DA1F2; color:#fff; border-color:#1DA1F2;">Share to X</button>' +
+      '<button type="button" class="btn-secondary" onclick="closeShareCardModal()" style="padding:8px 14px; font-size:0.78rem;">Close</button>' +
+      '</div></div></div>';
+    document.body.appendChild(modal);
+  }
+  modal.style.display = 'flex';
+  renderCardToCanvas();
+}
+
+function closeShareCardModal() {
+  const modal = document.getElementById('share-card-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function downloadDecisionCard() {
+  const canvas = document.getElementById('decision-card-canvas');
+  if (!canvas) return;
+  const link = document.createElement('a');
+  link.download = 'quanterraos-decision-card-' + Date.now() + '.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+function tweetDecisionCard() {
+  const breakeven = document.getElementById('wedge-out-breakeven') ? document.getElementById('wedge-out-breakeven').textContent : '52.75%';
+  const text = encodeURIComponent('Checked contract friction on @QuanterraOS: 50¢ contracts require a ' + breakeven + ' win rate just to break even after taker fees. Know your true costs before trading:');
+  const url = encodeURIComponent('https://quanterraos.com/#true-cost-check');
+  window.open('https://twitter.com/intent/tweet?text=' + text + '&url=' + url, '_blank');
+}
+
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  deferredPrompt = e;
+  const btn = document.getElementById('pwa-install-btn');
+  if (btn) btn.style.display = 'inline-flex';
+});
+
+function installPwaApp() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function() { deferredPrompt = null; });
+  } else {
+    alert('To install QuanterraOS on iOS: Tap Share then "Add to Home Screen". On desktop: Click the install icon in your browser address bar.');
+  }
 }
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', recalcWedge);
 } else {
   recalcWedge();
+}
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js').catch(function() {});
 }
 </script>
 ${ASSISTANT_WIDGET_HTML}

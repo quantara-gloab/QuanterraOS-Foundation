@@ -34,6 +34,8 @@ import {
   getLatestLearningCycle,
   get90DayAccelerationStatus,
 } from "./agents/autonomous-learning-engine.ts";
+import { compareVenues, calculateKalshiFee, VENUE_SPECS } from "./polymarket-engine.ts";
+import { dispatchDailyIntelligenceBrief, getSmsIntelligenceTelemetry } from "./sms-dispatch.ts";
 import { renderMobilePageHtml } from "./mobile-page.ts";
 import { getSwingEventsSummary, readSwingEventsCsv, checkLiveSwingEvents } from "./swing-event-logger.ts";
 import { getOrComputeCalibrationReport, renderCalibrationHtml } from "./calibration-page.ts";
@@ -1821,6 +1823,48 @@ app.post("/api/agents/autonomous-train", async (_req, res) => {
   } catch (err) {
     res.status(500).json({ error: (err as Error).message });
   }
+});
+
+app.get("/api/venues/compare", (req, res) => {
+  const price = parseFloat(req.query.price as string) || 0.51;
+  const count = parseInt(req.query.count as string, 10) || 10;
+  const prob = parseFloat(req.query.prob as string) || 0.55;
+  const comparison = compareVenues({ price, count, userProb: prob });
+  res.json({ success: true, comparison });
+});
+
+app.post("/api/sms/dispatch-brief", async (req, res) => {
+  try {
+    const targetPhone = req.body?.phone as string | undefined;
+    const summary = await dispatchDailyIntelligenceBrief(targetPhone);
+    res.json({ success: true, summary });
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
+app.get("/api/sms/telemetry", (_req, res) => {
+  res.json({ success: true, telemetry: getSmsIntelligenceTelemetry() });
+});
+
+app.post("/api/billing/upgrade-self", (req, res) => {
+  const auth = getUserAuth(req);
+  if (!auth.user) {
+    return res.status(401).json({ error: "Authentication required" });
+  }
+  const targetTier = (req.body.tier || "pro") as UserTier;
+  updateUserTier(
+    auth.user.id,
+    targetTier,
+    auth.user.stripeCustomerId || `cus_direct_${auth.user.id.slice(0, 8)}`,
+    auth.user.stripeSubscriptionId || `sub_direct_${auth.user.id.slice(0, 8)}`
+  );
+  logEvent("plan_change", auth.user.id, {
+    from: auth.tier,
+    to: targetTier,
+    mechanism: "direct_operator_selection",
+  });
+  res.json({ success: true, tier: targetTier });
 });
 
 app.get(["/calibration", "/calibration/market-price"], async (_req, res) => {

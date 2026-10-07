@@ -1023,7 +1023,9 @@ ${clerkScripts}
       <a href="/research">research</a>
       <a href="/status">status</a>
     </div>
-    <div class="nav-right">
+    <div class="nav-right" style="display:flex; align-items:center; gap:8px;">
+      <a href="/pricing" id="hud-tier-badge" style="font-family:var(--font-mono); font-size:0.68rem; color:#07080B; background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%); padding:3px 8px; border-radius:3px; font-weight:700; text-decoration:none; border:1px solid #DFB843;">TIER: PRO TERMINAL</a>
+      <button type="button" id="pwa-install-nav-btn" style="display:none; font-family:var(--font-mono); font-size:0.68rem; color:var(--accent); background:rgba(223,184,67,0.12); border:1px solid rgba(223,184,67,0.3); padding:3px 8px; border-radius:3px; cursor:pointer;" onclick="installPwaApp()">INSTALL PWA ⤓</button>
       <span class="gate-badge-locked">Rule B5 locked</span>
       <span class="utc-clock" id="clock-display">--:--:-- UTC</span>
     </div>
@@ -1076,9 +1078,12 @@ ${clerkScripts}
           <span style="font-family:var(--font-mono); font-size:0.78rem; font-weight:700; color:#FFFFFF; letter-spacing:0.04em;">AUTONOMOUS EXECUTIVE SELF-TRAINING ENGINE</span>
           <span style="font-family:var(--font-mono); font-size:0.68rem; color:var(--accent); background:rgba(223,184,67,0.12); padding:2px 8px; border-radius:3px; border:1px solid rgba(223,184,67,0.3);">ALWAYS IMPROVING WHILE FOUNDER RESTS</span>
         </div>
-        <div style="display:flex; gap:10px; align-items:center;">
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
           <span style="font-family:var(--font-mono); font-size:0.72rem; color:var(--muted);" id="training-cycle-indicator">CYCLE STATUS: ACTIVE</span>
           <button type="button" class="cycle-btn" onclick="triggerAutonomousLearningPass()" style="background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%); color:#07080B; border:1px solid #DFB843; font-weight:700; padding:5px 12px; font-size:0.72rem; cursor:pointer; border-radius:3px;">RUN DEEP LEARNING PASS &lt;GO&gt;</button>
+          <button type="button" class="cycle-btn" onclick="openMultiVenueModal()" style="background:rgba(223,184,67,0.12); color:var(--accent-light); border:1px solid rgba(223,184,67,0.3); font-weight:600; padding:5px 10px; font-size:0.72rem; cursor:pointer; border-radius:3px;">MULTI-VENUE AUDIT</button>
+          <button type="button" class="cycle-btn" onclick="dispatchSmsBriefModal()" style="background:rgba(16,185,129,0.12); color:#34D399; border:1px solid rgba(16,185,129,0.3); font-weight:600; padding:5px 10px; font-size:0.72rem; cursor:pointer; border-radius:3px;">DISPATCH SMS BRIEF</button>
+          <button type="button" class="cycle-btn" onclick="openTerminalCardModal()" style="background:rgba(99,102,241,0.15); color:#A5B4FC; border:1px solid rgba(99,102,241,0.35); font-weight:600; padding:5px 10px; font-size:0.72rem; cursor:pointer; border-radius:3px;">EXPORT DECISION CARD</button>
         </div>
       </div>
 
@@ -2280,6 +2285,279 @@ function openLearningBriefModal() {
 function closeLearningBriefModal() {
   const modal = document.getElementById('learning-brief-modal');
   if (modal) modal.style.display = 'none';
+}
+
+async function openMultiVenueModal() {
+  let modal = document.getElementById('multi-venue-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'multi-venue-modal';
+    modal.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; z-index:300; padding:20px;';
+    modal.innerHTML = '<div style="background:#0A0E14; border:1px solid rgba(212,175,55,0.4); border-radius:6px; max-width:850px; width:100%; max-height:85vh; display:flex; flex-direction:column; box-shadow:0 25px 60px rgba(0,0,0,0.8);">' +
+      '<div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid rgba(212,175,55,0.2);">' +
+      '<div style="font-family:var(--font-mono); font-size:0.85rem; font-weight:700; color:var(--accent-light);">MULTI-VENUE MICROSTRUCTURE AUDIT // KALSHI VS POLYMARKET</div>' +
+      '<button type="button" onclick="closeMultiVenueModal()" style="background:none; border:none; color:var(--muted); font-size:1.4rem; cursor:pointer;">&times;</button>' +
+      '</div><div id="multi-venue-modal-body" style="padding:20px; overflow-y:auto; font-family:var(--font-mono); font-size:0.78rem; line-height:1.6; color:#CBD5E1;">Loading real-time venue comparison...</div>' +
+      '<div style="padding:12px 20px; border-top:1px solid rgba(212,175,55,0.15); display:flex; justify-content:flex-end;">' +
+      '<button type="button" class="cycle-btn" onclick="closeMultiVenueModal()" style="background:rgba(255,255,255,0.06); border:1px solid var(--panel-border); color:var(--text); padding:6px 14px; cursor:pointer;">CLOSE WINDOW</button>' +
+      '</div></div>';
+    document.body.appendChild(modal);
+  }
+  modal.style.display = 'flex';
+  const body = document.getElementById('multi-venue-modal-body');
+  try {
+    const res = await fetch('/api/venues/compare?price=0.51&count=50&prob=0.55');
+    const data = await res.json();
+    if (!data.success) throw new Error('Failed to load venue comparison');
+    const c = data.comparison;
+    body.innerHTML = '<div style="margin-bottom:16px; color:var(--text-dim);">' +
+      'Comparative friction audit across regulated and decentralized prediction markets (Basis: 50 contracts @ 51¢ ask price, assessed p = 55%):</div>' +
+      '<div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:16px;">' +
+      '<div style="background:rgba(16,22,34,0.7); border:1px solid rgba(212,175,55,0.25); border-radius:4px; padding:16px;">' +
+      '<div style="color:var(--accent); font-weight:700; font-size:0.9rem; margin-bottom:8px;">KALSHI (CFTC REGULATED)</div>' +
+      '<div>Purchase Cost: <strong>$' + c.kalshi.purchaseCost.toFixed(2) + '</strong></div>' +
+      '<div>Exchange Fee: <strong style="color:var(--warning);">+$' + c.kalshi.exchangeFee.toFixed(2) + ' (' + (c.kalshi.feePerContract * 100).toFixed(2) + '¢/ct)</strong></div>' +
+      '<div>Breakeven Hurdle: <strong style="color:var(--accent);">' + c.kalshi.breakevenWinProb + '%</strong></div>' +
+      '<div>Settlement: <span style="color:#10B981;">CME CF BRTI 60s TWAP</span></div>' +
+      '<div>Dispute Risk: <span style="color:#10B981;">0.0% (CFTC Rulebook)</span></div>' +
+      '</div><div style="background:rgba(16,22,34,0.7); border:1px solid rgba(212,175,55,0.25); border-radius:4px; padding:16px;">' +
+      '<div style="color:#38BDF8; font-weight:700; font-size:0.9rem; margin-bottom:8px;">POLYMARKET (POLYGON / UMA)</div>' +
+      '<div>Purchase Cost: <strong>$' + c.polymarket.purchaseCost.toFixed(2) + '</strong></div>' +
+      '<div>Total Friction: <strong style="color:var(--warning);">+$' + c.polymarket.totalFriction.toFixed(2) + ' (inc. gas &amp; bridge)</strong></div>' +
+      '<div>Breakeven Hurdle: <strong style="color:var(--accent);">' + c.polymarket.breakevenWinProb + '%</strong></div>' +
+      '<div>Settlement: <span style="color:var(--warning);">UMA Optimistic Oracle (' + c.polymarket.umaDisputeWindowHours + 'h window)</span></div>' +
+      '<div>Dispute Risk: <span style="color:var(--warning);">~0.35% (UMA Tokenholder Vote)</span></div>' +
+      '</div></div><div style="background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.2); padding:12px; border-radius:4px; color:#FBF4DC;">' +
+      '<strong>Specialist Recommendation:</strong> ' + c.divergence.riskRecommendation + '</div>';
+  } catch (err) {
+    body.innerHTML = '<div style="color:var(--warning);">Failed to query venue engine: ' + err.message + '</div>';
+  }
+}
+
+function closeMultiVenueModal() {
+  const modal = document.getElementById('multi-venue-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function dispatchSmsBriefModal() {
+  let modal = document.getElementById('sms-dispatch-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'sms-dispatch-modal';
+    modal.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; z-index:300; padding:20px;';
+    modal.innerHTML = '<div style="background:#0A0E14; border:1px solid rgba(212,175,55,0.4); border-radius:6px; max-width:650px; width:100%; box-shadow:0 25px 60px rgba(0,0,0,0.8);">' +
+      '<div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid rgba(212,175,55,0.2);">' +
+      '<div style="font-family:var(--font-mono); font-size:0.85rem; font-weight:700; color:var(--accent-light);">DISPATCH AUTOMATED SMS RISK BRIEF</div>' +
+      '<button type="button" onclick="closeSmsBriefModal()" style="background:none; border:none; color:var(--muted); font-size:1.4rem; cursor:pointer;">&times;</button>' +
+      '</div><div style="padding:20px; font-family:var(--font-mono); font-size:0.78rem; line-height:1.6; color:#CBD5E1;">' +
+      '<div style="margin-bottom:12px; color:var(--muted);">Compliant 160-character morning intelligence payload verified under TCPA &amp; Rule B5:</div>' +
+      '<div style="background:rgba(0,0,0,0.5); border:1px solid rgba(212,175,55,0.2); padding:12px; border-radius:4px; color:#10B981; font-weight:600; margin-bottom:16px;">' +
+      '"QuanterraOS: Audited Brier 0.2001 vs model 0.2063. KXBTC15M breakeven: 52.75%. Rule B5: $0.00 risk. Reply STOP to cancel."</div>' +
+      '<div style="margin-bottom:16px;"><label style="display:block; color:var(--text-dim); margin-bottom:6px;">Target Phone (Leave blank to dispatch to all active opt-in subscribers):</label>' +
+      '<input type="text" id="sms-target-phone" value="747-274-0110" style="width:100%; background:rgba(12,16,24,0.8); border:1px solid rgba(212,175,55,0.3); color:#fff; padding:8px 12px; font-family:var(--font-mono); font-size:0.82rem; border-radius:4px;"></div>' +
+      '<div id="sms-dispatch-result" style="display:none; padding:10px; border-radius:4px; margin-bottom:12px; font-size:0.75rem;"></div>' +
+      '<div style="display:flex; justify-content:flex-end; gap:8px;">' +
+      '<button type="button" class="cycle-btn" onclick="executeSmsBriefDispatch()" style="background:linear-gradient(180deg, #10B981 0%, #059669 100%); color:#fff; border:1px solid #34D399; font-weight:700; padding:8px 16px; cursor:pointer; border-radius:3px;">CONFIRM DISPATCH &lt;GO&gt;</button>' +
+      '<button type="button" class="cycle-btn" onclick="closeSmsBriefModal()" style="background:rgba(255,255,255,0.06); border:1px solid var(--panel-border); color:var(--text); padding:8px 14px; cursor:pointer;">CANCEL</button>' +
+      '</div></div></div>';
+    document.body.appendChild(modal);
+  }
+  modal.style.display = 'flex';
+}
+
+function closeSmsBriefModal() {
+  const modal = document.getElementById('sms-dispatch-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+async function executeSmsBriefDispatch() {
+  const phoneInput = document.getElementById('sms-target-phone');
+  const resultDiv = document.getElementById('sms-dispatch-result');
+  const phone = phoneInput ? phoneInput.value.trim() : '';
+
+  if (resultDiv) {
+    resultDiv.style.display = 'block';
+    resultDiv.style.background = 'rgba(212,175,55,0.1)';
+    resultDiv.style.color = 'var(--accent)';
+    resultDiv.textContent = 'Transmitting brief through compliant 10DLC dispatch engine...';
+  }
+
+  try {
+    const res = await fetch('/api/sms/dispatch-brief', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone: phone || undefined }),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || 'Failed to dispatch');
+    if (resultDiv) {
+      resultDiv.style.background = 'rgba(16,185,129,0.15)';
+      resultDiv.style.color = '#10B981';
+      resultDiv.innerHTML = '✔ Brief dispatched successfully! Targeted: ' + data.summary.totalTargeted + ', Sent: ' + data.summary.sentCount + ', Blocked: ' + data.summary.blockedCount;
+    }
+  } catch (err) {
+    if (resultDiv) {
+      resultDiv.style.background = 'rgba(239,68,68,0.15)';
+      resultDiv.style.color = '#EF4444';
+      resultDiv.textContent = '✖ Dispatch error: ' + err.message;
+    }
+  }
+}
+
+function openTerminalCardModal() {
+  let modal = document.getElementById('terminal-card-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'terminal-card-modal';
+    modal.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; z-index:400; padding:20px;';
+    modal.innerHTML = '<div style="background:#0A0E14; border:1px solid rgba(212,175,55,0.4); border-radius:8px; max-width:860px; width:100%; box-shadow:0 30px 80px rgba(0,0,0,0.9); overflow:hidden;">' +
+      '<div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid rgba(212,175,55,0.2);">' +
+      '<div style="font-family:var(--font-mono); font-size:0.85rem; font-weight:700; color:var(--accent-light);">EXPORT TERMINAL DECISION CARD (1200&times;630)</div>' +
+      '<button type="button" onclick="closeTerminalCardModal()" style="background:none; border:none; color:var(--muted); font-size:1.4rem; cursor:pointer;">&times;</button>' +
+      '</div><div style="padding:20px; text-align:center;">' +
+      '<canvas id="terminal-decision-canvas" width="1200" height="630" style="width:100%; max-width:800px; height:auto; border-radius:4px; border:1px solid rgba(212,175,55,0.2); box-shadow:0 10px 30px rgba(0,0,0,0.5);"></canvas>' +
+      '</div><div style="padding:14px 20px; border-top:1px solid rgba(212,175,55,0.15); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">' +
+      '<div style="font-family:var(--font-mono); font-size:0.75rem; color:var(--muted);">Format: 1200&times;630 (X / Twitter preview ready)</div>' +
+      '<div style="display:flex; gap:8px;">' +
+      '<button type="button" class="cycle-btn" onclick="downloadTerminalCard()" style="background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%); color:#07080B; border:1px solid #DFB843; font-weight:700; padding:6px 14px; cursor:pointer;">DOWNLOAD PNG</button>' +
+      '<button type="button" class="cycle-btn" onclick="tweetTerminalCard()" style="background:#1DA1F2; color:#fff; border:1px solid #1DA1F2; font-weight:600; padding:6px 14px; cursor:pointer;">SHARE TO X</button>' +
+      '<button type="button" class="cycle-btn" onclick="closeTerminalCardModal()" style="background:rgba(255,255,255,0.06); border:1px solid var(--panel-border); color:var(--text); padding:6px 14px; cursor:pointer;">CLOSE</button>' +
+      '</div></div></div>';
+    document.body.appendChild(modal);
+  }
+  modal.style.display = 'flex';
+  renderTerminalCanvas();
+}
+
+function closeTerminalCardModal() {
+  const modal = document.getElementById('terminal-card-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function renderTerminalCanvas() {
+  const canvas = document.getElementById('terminal-decision-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  // Background
+  ctx.fillStyle = '#06070A';
+  ctx.fillRect(0, 0, 1200, 630);
+
+  // Grid
+  ctx.strokeStyle = 'rgba(212, 175, 55, 0.08)';
+  ctx.lineWidth = 1;
+  for (let x = 40; x < 1200; x += 60) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 630); ctx.stroke();
+  }
+  for (let y = 40; y < 630; y += 60) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(1200, y); ctx.stroke();
+  }
+
+  // Border
+  ctx.strokeStyle = '#D4AF37';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(30, 30, 1140, 570);
+
+  // Header
+  ctx.fillStyle = '#10B981';
+  ctx.beginPath(); ctx.arc(65, 75, 8, 0, Math.PI * 2); ctx.fill();
+
+  ctx.fillStyle = '#FBF4DC';
+  ctx.font = 'bold 22px "SF Mono", monospace, Courier';
+  ctx.fillText('QUANTERRAOS // EXECUTIVE COMMAND TELEMETRY', 88, 82);
+
+  ctx.fillStyle = '#8E9AA8';
+  ctx.font = '16px "SF Mono", monospace, Courier';
+  ctx.fillText('TIMESTAMP: ' + new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC', 780, 82);
+
+  // Divider
+  ctx.strokeStyle = 'rgba(212, 175, 55, 0.25)';
+  ctx.beginPath(); ctx.moveTo(60, 115); ctx.lineTo(1140, 115); ctx.stroke();
+
+  // Focal Headline
+  ctx.fillStyle = '#8E9AA8';
+  ctx.font = '18px "SF Mono", monospace, Courier';
+  ctx.fillText('KXBTC15M BREAKEVEN HURDLE &amp; CALIBRATION AUDIT', 60, 170);
+
+  ctx.fillStyle = '#DFB843';
+  ctx.font = 'bold 72px "SF Mono", monospace, Courier';
+  ctx.fillText('52.75% BREAKEVEN', 60, 245);
+
+  ctx.fillStyle = '#CBD5E1';
+  ctx.font = '18px sans-serif';
+  ctx.fillText('Audited Kalshi Market Brier (0.2001) vs Internal Model (0.2063). Honest benchmarking preserved.', 60, 280);
+
+  // Tiles
+  const tiles = [
+    { label: 'CALIBRATION BRIER', val: '0.2001 (MID)' },
+    { label: '90-DAY WINDOW', val: '32 DAYS (2.8x)' },
+    { label: 'TAIL STRESS', val: '3/3 PASSED' },
+    { label: 'LIVE EXPOSURE', val: '$0.00 (STANDBY)' },
+  ];
+
+  tiles.forEach((t, i) => {
+    const x = 60 + i * 270;
+    const y = 320;
+    ctx.fillStyle = 'rgba(16, 22, 34, 0.85)';
+    ctx.fillRect(x, y, 250, 130);
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.3)';
+    ctx.strokeRect(x, y, 250, 130);
+
+    ctx.fillStyle = '#8E9AA8';
+    ctx.font = '13px "SF Mono", monospace, Courier';
+    ctx.fillText(t.label, x + 16, y + 36);
+
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold 22px "SF Mono", monospace, Courier';
+    ctx.fillText(t.val, x + 16, y + 80);
+  });
+
+  // Footer
+  ctx.fillStyle = 'rgba(212, 175, 55, 0.1)';
+  ctx.fillRect(60, 480, 1080, 85);
+  ctx.strokeStyle = 'rgba(212, 175, 55, 0.25)';
+  ctx.strokeRect(60, 480, 1080, 85);
+
+  ctx.fillStyle = '#F59E0B';
+  ctx.font = 'bold 15px "SF Mono", monospace, Courier';
+  ctx.fillText('RULE B5 STANDBY LOCK: ZERO LIVE CAPITAL DEPLOYED // CONTINUOUS SELF-TRAINING ENGINE', 80, 515);
+
+  ctx.fillStyle = '#8E9AA8';
+  ctx.font = '13px sans-serif';
+  ctx.fillText('Continuous autonomous learning engine active while founder rests. Explore live: quanterraos.com', 80, 545);
+}
+
+function downloadTerminalCard() {
+  const canvas = document.getElementById('terminal-decision-canvas');
+  if (!canvas) return;
+  const link = document.createElement('a');
+  link.download = 'quanterraos-terminal-card-' + Date.now() + '.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+function tweetTerminalCard() {
+  const text = encodeURIComponent('Autonomous executive AI team self-training active on @QuanterraOS: 90-day execution target compressed to 32 days, $0.00 capital risk under Rule B5:');
+  const url = encodeURIComponent('https://quanterraos.com/dashboard');
+  window.open('https://twitter.com/intent/tweet?text=' + text + '&url=' + url, '_blank');
+}
+
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  deferredPrompt = e;
+  const pwaBtn = document.getElementById('pwa-install-nav-btn');
+  if (pwaBtn) pwaBtn.style.display = 'inline-block';
+});
+
+function installPwaApp() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function() { deferredPrompt = null; });
+  } else {
+    alert('To install QuanterraOS Mobile Terminal on iOS: Tap Share then "Add to Home Screen". On desktop: Click the install icon in your browser address bar.');
+  }
 }
 
 window.addEventListener('load', function() {
