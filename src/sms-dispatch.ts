@@ -36,7 +36,7 @@ export const DEFAULT_BRIEF_DATA: DailySmsBriefData = {
  * Builds compliant, concise SMS intelligence brief text (<= 160 characters)
  */
 export function buildDailySmsBriefText(data: DailySmsBriefData = DEFAULT_BRIEF_DATA): string {
-  const text = `QuanterraOS: Audited Brier ${data.brierBaseline} vs model ${data.internalModelBrier}. KXBTC15M breakeven: ${data.breakevenHurdlePct}%. Rule B5: $0.00 risk. Reply STOP to cancel.`;
+  const text = `QuanterraOS: Audited Brier ${data.brierBaseline} vs model ${data.internalModelBrier}. KXBTC15M 51¢ breakeven: ${data.breakevenHurdlePct}%. Rule B5: $0.00 risk. Reply STOP to cancel.`;
 
   const copyCheck = validateSmsCopy(text);
   if (!copyCheck.valid) {

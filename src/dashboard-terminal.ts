@@ -1075,8 +1075,8 @@ ${clerkScripts}
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:12px;">
         <div style="display:flex; align-items:center; gap:10px;">
           <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#10B981; box-shadow:0 0 10px #10B981;"></span>
-          <span style="font-family:var(--font-mono); font-size:0.78rem; font-weight:700; color:#FFFFFF; letter-spacing:0.04em;">AUTONOMOUS EXECUTIVE SELF-TRAINING ENGINE</span>
-          <span style="font-family:var(--font-mono); font-size:0.68rem; color:var(--accent); background:rgba(223,184,67,0.12); padding:2px 8px; border-radius:3px; border:1px solid rgba(223,184,67,0.3);">ALWAYS IMPROVING WHILE FOUNDER RESTS</span>
+          <span style="font-family:var(--font-mono); font-size:0.78rem; font-weight:700; color:#FFFFFF; letter-spacing:0.04em;">AUTONOMOUS EXECUTIVE ENGINE</span>
+          <span style="font-family:var(--font-mono); font-size:0.68rem; color:var(--accent); background:rgba(223,184,67,0.12); padding:2px 8px; border-radius:3px; border:1px solid rgba(223,184,67,0.3);">ENGINEERING MILESTONE DELIVERED · CUSTOMER VALIDATION UNDERWAY</span>
         </div>
         <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
           <span style="font-family:var(--font-mono); font-size:0.72rem; color:var(--muted);" id="training-cycle-indicator">CYCLE STATUS: ACTIVE</span>
@@ -1089,29 +1089,29 @@ ${clerkScripts}
 
       <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:16px; border-top:1px solid rgba(212,175,55,0.14); padding-top:12px; font-family:var(--font-mono); font-size:0.75rem;">
         <div>
-          <div style="color:var(--muted); font-size:0.68rem; text-transform:uppercase;">90-Day Execution Target</div>
-          <div style="color:#10B981; font-weight:700; font-size:1.1rem; margin-top:2px;" id="hud-accel-factor">2.8x FASTER</div>
-          <div style="color:var(--text-dim); font-size:0.68rem;">Target compressed to 32 days</div>
+          <div style="color:var(--muted); font-size:0.68rem; text-transform:uppercase;">Projected Engineering Schedule</div>
+          <div style="color:#10B981; font-weight:700; font-size:1.1rem; margin-top:2px;" id="hud-accel-factor">32 DAYS (2.8x ACCEL)</div>
+          <div style="color:var(--text-dim); font-size:0.68rem;">Software &amp; test cycles automated</div>
         </div>
         <div>
-          <div style="color:var(--muted); font-size:0.68rem; text-transform:uppercase;">Days Saved via Self-Training</div>
+          <div style="color:var(--muted); font-size:0.68rem; text-transform:uppercase;">Engineering Days Saved</div>
           <div style="color:var(--accent-light); font-weight:700; font-size:1.1rem; margin-top:2px;" id="hud-days-saved">58 DAYS SAVED</div>
-          <div style="color:var(--text-dim); font-size:0.68rem;">Automated fee &amp; risk gates</div>
+          <div style="color:var(--text-dim); font-size:0.68rem;">Human observation requires elapsed time</div>
         </div>
         <div>
-          <div style="color:var(--muted); font-size:0.68rem; text-transform:uppercase;">Continuous Hypotheses</div>
-          <div style="color:var(--text); font-weight:700; font-size:1.1rem; margin-top:2px;" id="hud-hypotheses">3 EVALUATED / 2 PASSED</div>
-          <div style="color:var(--text-dim); font-size:0.68rem;">Zero lookahead leakage verified</div>
+          <div style="color:var(--muted); font-size:0.68rem; text-transform:uppercase;">Hypothesis Formulations</div>
+          <div style="color:var(--text); font-weight:700; font-size:1.1rem; margin-top:2px;" id="hud-hypotheses">3 TESTED / 2 PASSED</div>
+          <div style="color:var(--text-dim); font-size:0.68rem;">50¢+1.75¢=51.75% · 51¢+1.75¢=52.75%</div>
         </div>
         <div>
-          <div style="color:var(--muted); font-size:0.68rem; text-transform:uppercase;">Adversarial Tail Stress</div>
-          <div style="color:#10B981; font-weight:700; font-size:1.1rem; margin-top:2px;" id="hud-stress-status">3/3 SHOCKS PASSED</div>
-          <div style="color:var(--warning); font-size:0.68rem;">Rule B5 $0.00 capital held</div>
+          <div style="color:var(--muted); font-size:0.68rem; text-transform:uppercase;">Adversarial Synthetic Shocks</div>
+          <div style="color:#10B981; font-weight:700; font-size:1.1rem; margin-top:2px;" id="hud-stress-status">3/3 ASSERTIONS VERIFIED</div>
+          <div style="color:var(--warning); font-size:0.68rem;">Rule B5 $0.00 exposure (Not trade return)</div>
         </div>
       </div>
 
       <div id="learning-live-banner" style="margin-top:10px; padding:8px 12px; background:rgba(0,0,0,0.4); border:1px solid rgba(212,175,55,0.12); border-radius:4px; font-family:var(--font-mono); font-size:0.72rem; color:var(--muted); display:flex; justify-content:space-between; align-items:center;">
-        <span id="learning-banner-text">Lion Executive Brief: Breakeven hurdle of 52.75% verified on Kalshi KXBTC15M. Autonomous calibration surveillance active.</span>
+        <span id="learning-banner-text">Lion Executive Brief: Engineering milestone delivered. Breakeven hurdles confirmed: 50¢ ask = 51.75%, 51¢ ask = 52.75%. Rule B5 $0.00 capital exposure locked. Customer retention cohorts tracking.</span>
         <button type="button" style="background:none; border:none; color:var(--accent); cursor:pointer; text-decoration:underline; font-family:var(--font-mono); font-size:0.72rem;" onclick="openLearningBriefModal()">View Executive Brief &rarr;</button>
       </div>
     </section>
