@@ -1015,11 +1015,13 @@ ${clerkScripts}
     </div>
     <div class="nav-links">
       <a href="/">home</a>
-      <a href="/mobile" style="color:var(--accent); font-weight:600;">mobile</a>
+      <a href="/calculator" style="color:var(--accent); font-weight:600;">calculator</a>
+      <a href="/compare" style="color:#38BDF8; font-weight:600;">compare</a>
+      <a href="/journal" style="color:#10B981; font-weight:600;">journal</a>
+      <a href="/mobile">mobile</a>
       <a href="/calibration">calibration</a>
       <a href="/index">index</a>
       <a href="/spread">spread</a>
-      <a href="/methodology">methodology</a>
       <a href="/research">research</a>
       <a href="/status">status</a>
     </div>
@@ -1063,7 +1065,7 @@ ${clerkScripts}
         <span class="cmd-prompt-symbol">QUANTERRA:&gt;</span>
         <span class="cmd-context-tag" id="cmd-active-context">COUNCIL.ORCHESTRATOR</span>
       </div>
-      <input type="text" id="terminal-cmd-input" class="cmd-input" placeholder="Type a specialist (DRACO, WOLF, FALCON, FOX, SENTINEL, KRAKEN, LION, PHOENIX) or command (L2, CALIBRATION, SWINGS, CYCLE, EXPORT)..." autocomplete="off" onkeydown="handleCommandKey(event)">
+      <input type="text" id="terminal-cmd-input" class="cmd-input" placeholder="Type a specialist (DRACO, WOLF, FALCON, FOX, SENTINEL, KRAKEN, LION, PHOENIX) or command (CALC, COMPARE, JOURNAL, L2, CALIBRATION, SWINGS, CYCLE, EXPORT)..." autocomplete="off" onkeydown="handleCommandKey(event)">
       <div class="cmd-actions">
         <button type="button" class="cmd-exec-btn" onclick="executeCommandLine()">EXECUTE &lt;GO&gt;</button>
         <button type="button" class="cmd-quick-btn" title="Export audit manifest" onclick="exportAuditBundle()">EXPORT JSON</button>
@@ -1750,6 +1752,12 @@ function executeCommandLine() {
     switchWorkspace('swings');
   } else if (val === 'cycle' || val === 'run' || val === 'execute') {
     triggerPipelineCycle();
+  } else if (val === 'calc' || val === 'calculator') {
+    window.location.href = '/calculator';
+  } else if (val === 'compare' || val === 'venues') {
+    window.location.href = '/compare';
+  } else if (val === 'journal') {
+    window.location.href = '/journal';
   } else if (val === 'export' || val === 'manifest') {
     exportAuditBundle();
   } else {

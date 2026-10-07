@@ -491,12 +491,14 @@ export function renderStatusPageHtml(dbPath = process.env.DB_PATH || "quanterrao
         </div>
       </a>
       <div class="nav-links">
-        <a href="/calibration">Calibration Proof</a>
+        <a href="/calculator">Calculator</a>
+        <a href="/compare">Compare Venues</a>
+        <a href="/journal">Journal</a>
+        <a href="/calibration">Calibration</a>
         <a href="/council">Council Terminal</a>
         <a href="/index">Composite Index</a>
         <a href="/spread">Spread Monitor</a>
         <a href="/status" class="active">System Status</a>
-        <a href="/methodology">Methodology</a>
         <a href="/research">Research</a>
       </div>
     </div>

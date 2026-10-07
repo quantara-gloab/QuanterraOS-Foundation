@@ -185,13 +185,12 @@ export function renderCalibrationSurfacePageHtml(): string {
   <nav class="top-nav">
     <div class="nav-left">
       <a href="/" class="nav-brand"><span class="brand-dot"></span> quanterraos</a>
-      <div class="nav-links">
-        <a href="/kalshi">kalshi 15m</a>
-        <a href="/calculator">ev calculator</a>
-        <a href="/calibration">calibration proof</a>
+        <a href="/calculator">calculator</a>
+        <a href="/compare" style="color:#38BDF8;font-weight:600;">compare venues</a>
+        <a href="/journal" style="color:#10B981;font-weight:600;">decision journal</a>
+        <a href="/calibration">calibration</a>
         <a href="/calibration/surface" class="active" style="color:var(--accent);font-weight:600;">calibration surface</a>
         <a href="/index">composite index</a>
-        <a href="/spread">spread monitor</a>
         <a href="/research">research</a>
       </div>
     </div>
