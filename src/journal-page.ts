@@ -460,6 +460,12 @@ export function renderJournalPageHtml(
         </p>
       </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button type="button" onclick="openImportModal()" class="btn-gold" style="background:rgba(223,184,67,0.12); color:var(--accent-light); border-color:var(--accent);">
+          ↑ Import Statement CSV
+        </button>
+        <button type="button" onclick="openRiskPlanModal()" class="btn-gold" style="background:rgba(56,189,248,0.12); color:#38BDF8; border-color:rgba(56,189,248,0.4);">
+          ⚙️ Advisory Risk Plan
+        </button>
         <a href="/api/export/journal.csv" class="btn-gold" style="background:rgba(255,255,255,0.06); color:var(--text); border-color:var(--border);">
           ↓ Export Journal CSV
         </a>
@@ -689,6 +695,81 @@ export function renderJournalPageHtml(
         </div>
       </div>
     </div>
+
+    <!-- Import CSV Modal -->
+    <div id="import-csv-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); z-index:200; align-items:center; justify-content:center; padding:16px;">
+      <div style="background:#0C0F17; border:1px solid rgba(223,184,67,0.4); border-radius:8px; max-width:640px; width:100%; padding:24px; box-shadow:0 25px 60px rgba(0,0,0,0.9);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid var(--border-subtle); padding-bottom:12px;">
+          <div style="font-family:var(--font-mono); font-size:0.95rem; font-weight:700; color:#FFFFFF;">
+            📥 Import Prediction Market Statement (CSV)
+          </div>
+          <button type="button" onclick="closeImportModal()" style="background:none; border:none; color:var(--muted); font-size:1.4rem; cursor:pointer;">&times;</button>
+        </div>
+        
+        <p style="font-size:0.82rem; color:var(--text-dim); margin-bottom:16px; line-height:1.5;">
+          Upload or paste statements from <strong>Kalshi</strong>, <strong>Polymarket</strong>, or standard <strong>QuanterraOS</strong> exports. All entries will be checked and populated into your personal outcome journal.
+        </p>
+
+        <div style="margin-bottom:16px;">
+          <label style="display:block; font-family:var(--font-mono); font-size:0.75rem; color:var(--muted); margin-bottom:6px;">Select .CSV File:</label>
+          <input type="file" id="csv-file-input" accept=".csv,text/csv" onchange="handleCsvFileSelect(event)" style="width:100%; font-family:var(--font-mono); font-size:0.8rem; background:#06080C; border:1px solid var(--border); padding:8px; border-radius:4px; color:#fff;">
+        </div>
+
+        <div style="margin-bottom:20px;">
+          <label style="display:block; font-family:var(--font-mono); font-size:0.75rem; color:var(--muted); margin-bottom:6px;">Or Paste CSV Raw Content:</label>
+          <textarea id="csv-raw-textarea" rows="6" placeholder="ticker,price,count,fee,outcome&#10;KXBTC15M,0.51,10,0.18,WON" style="width:100%; font-family:var(--font-mono); font-size:0.78rem; background:#06080C; border:1px solid var(--border); padding:10px; border-radius:4px; color:#fff; resize:vertical;"></textarea>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px;">
+          <button type="button" onclick="closeImportModal()" class="btn-gold" style="background:rgba(255,255,255,0.06); color:var(--text); border-color:var(--border);">Cancel</button>
+          <button type="button" id="btn-submit-csv-import" onclick="submitCsvImport()" class="btn-gold">Import Checks &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Advisory Risk Plan Modal -->
+    <div id="risk-plan-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); z-index:200; align-items:center; justify-content:center; padding:16px;">
+      <div style="background:#0C0F17; border:1px solid rgba(56,189,248,0.4); border-radius:8px; max-width:580px; width:100%; padding:24px; box-shadow:0 25px 60px rgba(0,0,0,0.9);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid var(--border-subtle); padding-bottom:12px;">
+          <div style="font-family:var(--font-mono); font-size:0.95rem; font-weight:700; color:#38BDF8;">
+            ⚙️ Personal Advisory Risk Plan
+          </div>
+          <button type="button" onclick="closeRiskPlanModal()" style="background:none; border:none; color:var(--muted); font-size:1.4rem; cursor:pointer;">&times;</button>
+        </div>
+
+        <p style="font-size:0.82rem; color:var(--text-dim); margin-bottom:16px; line-height:1.5;">
+          Configure your voluntary spending caps and correlated risk alerts. QuanterraOS will advise you whenever an evaluated position exceeds your configured thresholds.
+        </p>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
+          <div>
+            <label style="display:block; font-family:var(--font-mono); font-size:0.75rem; color:var(--muted); margin-bottom:6px;">Daily Max Outlay ($):</label>
+            <input type="number" id="risk-daily-max" min="1" step="1" value="50" style="width:100%; font-family:var(--font-mono); font-size:0.85rem; background:#06080C; border:1px solid var(--border); padding:8px 12px; border-radius:4px; color:#fff;">
+          </div>
+          <div>
+            <label style="display:block; font-family:var(--font-mono); font-size:0.75rem; color:var(--muted); margin-bottom:6px;">Single Trade Cap ($):</label>
+            <input type="number" id="risk-trade-max" min="1" step="1" value="25" style="width:100%; font-family:var(--font-mono); font-size:0.85rem; background:#06080C; border:1px solid var(--border); padding:8px 12px; border-radius:4px; color:#fff;">
+          </div>
+        </div>
+
+        <div style="margin-bottom:16px;">
+          <label style="display:block; font-family:var(--font-mono); font-size:0.75rem; color:var(--muted); margin-bottom:6px;">Max Concurrent Open Positions:</label>
+          <input type="number" id="risk-max-positions" min="1" max="50" value="3" style="width:100%; font-family:var(--font-mono); font-size:0.85rem; background:#06080C; border:1px solid var(--border); padding:8px 12px; border-radius:4px; color:#fff;">
+        </div>
+
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:24px; background:rgba(56,189,248,0.06); border:1px solid rgba(56,189,248,0.2); padding:10px 14px; border-radius:4px;">
+          <input type="checkbox" id="risk-correlated-alert" checked style="width:16px; height:16px; accent-color:#38BDF8;">
+          <label for="risk-correlated-alert" style="font-size:0.8rem; color:#E2E8F0; cursor:pointer;">
+            Alert on correlated short-duration positions (e.g. concurrent BTC &amp; ETH intraday contracts)
+          </label>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px;">
+          <button type="button" onclick="closeRiskPlanModal()" class="btn-gold" style="background:rgba(255,255,255,0.06); color:var(--text); border-color:var(--border);">Cancel</button>
+          <button type="button" id="btn-save-risk-plan" onclick="submitRiskPlan()" class="btn-gold">Save Advisory Plan &rarr;</button>
+        </div>
+      </div>
+    </div>
   </main>
 
   <script>
@@ -819,6 +900,111 @@ export function renderJournalPageHtml(
         }
       } catch (err) {
         alert('Network error saving check.');
+      }
+    }
+
+    function openImportModal() {
+      document.getElementById('import-csv-modal').style.display = 'flex';
+    }
+
+    function closeImportModal() {
+      document.getElementById('import-csv-modal').style.display = 'none';
+    }
+
+    function handleCsvFileSelect(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const text = e.target.result;
+        document.getElementById('csv-raw-textarea').value = text;
+      };
+      reader.readAsText(file);
+    }
+
+    async function submitCsvImport() {
+      const textarea = document.getElementById('csv-raw-textarea');
+      const btn = document.getElementById('btn-submit-csv-import');
+      const text = textarea ? textarea.value.trim() : '';
+      if (!text) {
+        alert('Please choose a .csv file or paste CSV content.');
+        return;
+      }
+      btn.disabled = true;
+      btn.textContent = 'Importing...';
+      try {
+        const res = await fetch('/api/journal/import-csv', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ csvText: text })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          alert('Success: ' + data.message + (data.errors && data.errors.length ? '\\n(' + data.errors.length + ' row(s) skipped)' : ''));
+          window.location.reload();
+        } else {
+          alert('Import failed: ' + (data.error || 'Unknown error'));
+          btn.disabled = false;
+          btn.textContent = 'Import Checks →';
+        }
+      } catch (err) {
+        alert('Network error importing CSV.');
+        btn.disabled = false;
+        btn.textContent = 'Import Checks →';
+      }
+    }
+
+    async function openRiskPlanModal() {
+      document.getElementById('risk-plan-modal').style.display = 'flex';
+      try {
+        const res = await fetch('/api/account/risk-plan');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.plan) {
+            document.getElementById('risk-daily-max').value = data.plan.dailyMaxOutlay || 50;
+            document.getElementById('risk-trade-max').value = data.plan.singleTradeMaxOutlay || 25;
+            document.getElementById('risk-max-positions').value = data.plan.maxConcurrentPositions || 3;
+            document.getElementById('risk-correlated-alert').checked = data.plan.correlatedMarketAlert !== false;
+          }
+        }
+      } catch (_) {}
+    }
+
+    function closeRiskPlanModal() {
+      document.getElementById('risk-plan-modal').style.display = 'none';
+    }
+
+    async function submitRiskPlan() {
+      const btn = document.getElementById('btn-save-risk-plan');
+      const daily = parseFloat(document.getElementById('risk-daily-max').value) || 50;
+      const trade = parseFloat(document.getElementById('risk-trade-max').value) || 25;
+      const maxPos = parseInt(document.getElementById('risk-max-positions').value, 10) || 3;
+      const corr = document.getElementById('risk-correlated-alert').checked;
+
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+      try {
+        const res = await fetch('/api/account/risk-plan', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            dailyMaxOutlay: daily,
+            singleTradeMaxOutlay: trade,
+            maxConcurrentPositions: maxPos,
+            correlatedMarketAlert: corr
+          })
+        });
+        if (res.ok) {
+          closeRiskPlanModal();
+          alert('Personal advisory risk caps updated successfully.');
+        } else {
+          alert('Could not update risk plan. Please ensure you are logged in.');
+        }
+      } catch (_) {
+        alert('Network error saving risk caps.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save Advisory Plan →';
       }
     }
   </script>

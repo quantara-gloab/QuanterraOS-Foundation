@@ -80,6 +80,13 @@ import {
   executeSimulatedWithdrawal,
   resetSubscriberWallet,
 } from "./wallet-engine.ts";
+import {
+  parseJournalCsv,
+  exportJournalCsv,
+  getUserRiskPlan,
+  saveUserRiskPlan,
+  checkTradeAgainstRiskPlan,
+} from "./journal-import.ts";
 import { startGrowthEngine } from "./growth/index.ts";
 import {
   getGtmSummary,
@@ -1958,6 +1965,56 @@ app.get("/api/export/journal.csv", (req, res) => {
   res.setHeader("Content-Type", "text/csv");
   res.setHeader("Content-Disposition", `attachment; filename="quanterraos-journal-${Date.now()}.csv"`);
   res.send(headers + rows);
+});
+
+app.post("/api/journal/import-csv", (req, res) => {
+  const auth = getUserAuth(req);
+  if (!auth.user) {
+    return res.status(401).json({ error: "Authentication required to import CSV statements" });
+  }
+
+  const csvText = typeof req.body === "string" ? req.body : req.body.csvText;
+  if (!csvText || typeof csvText !== "string") {
+    return res.status(400).json({ error: "No CSV content provided in request body" });
+  }
+
+  const result = parseJournalCsv(csvText, auth.user.id);
+  res.json({
+    success: true,
+    importedCount: result.importedCount,
+    errors: result.errors,
+    message: `Successfully imported ${result.importedCount} decision check(s) into your personal journal.`,
+  });
+});
+
+app.get("/api/account/risk-plan", (req, res) => {
+  const auth = getUserAuth(req);
+  const userId = auth.user?.id || "demo-subscriber";
+  const plan = getUserRiskPlan(userId);
+  res.json({ success: true, plan });
+});
+
+app.post("/api/account/risk-plan", (req, res) => {
+  const auth = getUserAuth(req);
+  if (!auth.user) {
+    return res.status(401).json({ error: "Authentication required to update advisory risk plan" });
+  }
+  const updated = saveUserRiskPlan(auth.user.id, req.body || {});
+  res.json({ success: true, plan: updated });
+});
+
+app.post("/api/calculator/advisory-check", (req, res) => {
+  const auth = getUserAuth(req);
+  const userId = auth.user?.id || "demo-subscriber";
+  const { ticker, price, count, purchaseCost, exchangeFee } = req.body || {};
+  const advisory = checkTradeAgainstRiskPlan(userId, {
+    ticker: ticker || "KXBTC15M",
+    price: Number(price) || 0.51,
+    count: Number(count) || 10,
+    purchaseCost: Number(purchaseCost) || 5.10,
+    exchangeFee: Number(exchangeFee) || 0.18,
+  });
+  res.json({ success: true, advisory });
 });
 
 app.get("/api/analytics/funnel-summary", requireFounderAuth, (_req, res) => {

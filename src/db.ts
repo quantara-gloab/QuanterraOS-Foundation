@@ -47,6 +47,7 @@ export function runMigrations(): void {
     "0019_autonomous_learning.sql",
     "0020_decision_journal.sql",
     "0021_pilot_observation_sessions.sql",
+    "0022_user_risk_plans.sql",
   ]) {
     const migrationPath = path.join(migrationsDir, migration);
     if (migration === "0006_multi_asset.sql") {

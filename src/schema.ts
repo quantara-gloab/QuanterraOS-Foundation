@@ -729,4 +729,21 @@ export const pilotObservationSessions = sqliteTable(
   })
 );
 
+export const userRiskPlans = sqliteTable(
+  "user_risk_plans",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id").notNull().unique(),
+    dailyMaxOutlay: real("daily_max_outlay").notNull().default(50.0),
+    singleTradeMaxOutlay: real("single_trade_max_outlay").notNull().default(25.0),
+    maxConcurrentPositions: integer("max_concurrent_positions").notNull().default(3),
+    correlatedMarketAlert: integer("correlated_market_alert").notNull().default(1),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (table) => ({
+    userIdIdx: index("user_risk_plans_user_id_idx").on(table.userId),
+  })
+);
+
+
 

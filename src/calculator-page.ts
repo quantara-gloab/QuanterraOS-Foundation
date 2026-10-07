@@ -481,9 +481,12 @@ export function renderCalculatorPageHtml(): string {
           <span class="stat-label">Contract Cadence &amp; Horizon</span>
           <span class="stat-val mono" style="color:var(--accent-light);" id="val-cadence">15-Minute Intraday (KXBTC15M)</span>
         </div>
-        <div class="stat-row">
-          <span class="stat-label">Expected Drag over 100 trades</span>
-          <span class="stat-val" style="color:var(--rose);" id="val-100-drag">-$275.00</span>
+        <div id="risk-plan-advisory-box" style="display:none; margin-top:14px; padding:10px 14px; background:rgba(244,63,94,0.08); border:1px solid rgba(244,63,94,0.25); border-radius:4px; font-size:0.75rem;">
+          <div style="display:flex; align-items:center; gap:6px; color:var(--rose); font-weight:700; margin-bottom:4px;">
+            <span>⚠️ VOLUNTARY RISK PLAN ADVISORY</span>
+          </div>
+          <div id="risk-plan-advisory-text" style="color:var(--text); line-height:1.4;"></div>
+          <div style="margin-top:6px;"><a href="/journal" style="color:var(--accent); text-decoration:underline; font-size:0.7rem;">Configure Voluntary Spending Caps in Journal &rarr;</a></div>
         </div>
 
         <div style="margin-top:20px; display:flex; flex-direction:column; gap:10px;">
@@ -661,6 +664,35 @@ export function renderCalculatorPageHtml(): string {
         netExpectedValue: Number(totalPnl.toFixed(2)),
         settlementSource: benchmark
       };
+
+      // Check voluntary risk plan thresholds
+      if (window.__riskCheckTimer) clearTimeout(window.__riskCheckTimer);
+      window.__riskCheckTimer = setTimeout(function() {
+        if (!window.__latestCheck) return;
+        fetch('/api/calculator/advisory-check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ticker: window.__latestCheck.contractTicker,
+            venue: window.__latestCheck.venue,
+            outlay: window.__latestCheck.purchaseCost,
+            count: window.__latestCheck.count
+          })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+          var box = document.getElementById('risk-plan-advisory-box');
+          var txt = document.getElementById('risk-plan-advisory-text');
+          if (!box || !txt) return;
+          if (res && res.warnings && res.warnings.length > 0) {
+            txt.innerHTML = res.warnings.map(function(w) { return '&bull; ' + w; }).join('<br>');
+            box.style.display = 'block';
+          } else {
+            box.style.display = 'none';
+          }
+        })
+        .catch(function() {});
+      }, 250);
     }
 
     function triggerHaptic() {
