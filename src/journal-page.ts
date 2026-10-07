@@ -13,6 +13,8 @@
 import type { UserRecord, UserTier } from "./auth.ts";
 import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
 import { renderBetaFeedbackWidgetHtml } from "./feedback-widget.ts";
+import { renderSystemPulseHtml } from "./system-pulse.ts";
+import { renderMobileBottomNavHtml, getMobileAppRuntimeScript } from "./mobile-install.ts";
 
 export interface DecisionJournalEntry {
   id: string;
@@ -44,6 +46,12 @@ export interface DecisionJournalEntry {
   outcomeStatus?: string | null;
   outcomeNotes?: string | null;
   reasoning?: string | null;
+  reconciliationStatus?: string | null; // 'user_entered' | 'imported' | 'reconciled'
+  matchedStatementId?: string | null;
+  statementReconciledAt?: string | null;
+  originalContractPrice?: number | null;
+  originalContractCount?: number | null;
+  originalExchangeFee?: number | null;
   isExample?: boolean;
   createdAt: string;
 }
@@ -529,6 +537,8 @@ export function renderJournalPageHtml(
     </div>
   </nav>
 
+  ${renderSystemPulseHtml({ page: "journal" })}
+
   <main class="container">
     ${error ? `<div class="alert alert-error">${error}</div>` : ""}
     ${success ? `<div class="alert alert-success">${success}</div>` : ""}
@@ -747,7 +757,29 @@ export function renderJournalPageHtml(
               ${entries.map(e => `
                 <tr>
                   <td class="mono" style="color:var(--text-dim); font-size:0.75rem;">${e.createdAt ? e.createdAt.slice(0, 16).replace('T', ' ') : '—'}</td>
-                  <td><strong style="color:#FFFFFF;">${e.contractTicker}</strong> <span style="font-size:0.72rem; color:var(--muted);">(${e.venue})</span></td>
+                  <td>
+                    <strong style="color:#FFFFFF;">${e.contractTicker}</strong> <span style="font-size:0.72rem; color:var(--muted);">(${e.venue})</span>
+                    <div style="margin-top:4px;">
+                      ${e.reconciliationStatus === 'reconciled' ? `
+                        <span class="badge-status" style="background:rgba(16,185,129,0.15); color:var(--green); border:1px solid rgba(16,185,129,0.3); font-size:0.65rem; font-weight:700;" title="Reconciled to statement: Verified against Kalshi trade fill">
+                          ✓ Reconciled to statement
+                        </span>
+                        ${e.originalContractPrice !== undefined && e.originalContractPrice !== null ? `
+                          <div style="font-size:0.68rem; color:var(--text-dim); margin-top:2px;">
+                            Planned: ${e.originalContractCount || e.contractCount} @ $${Number(e.originalContractPrice).toFixed(2)} (fee: $${Number(e.originalExchangeFee || 0).toFixed(2)})
+                          </div>
+                        ` : ''}
+                      ` : e.reconciliationStatus === 'imported' ? `
+                        <span class="badge-status" style="background:rgba(168,85,247,0.15); color:#C084FC; border:1px solid rgba(168,85,247,0.3); font-size:0.65rem; font-weight:700;" title="Imported directly from statement">
+                          Imported
+                        </span>
+                      ` : `
+                        <span class="badge-status" style="background:rgba(100,116,139,0.15); color:var(--muted); border:1px solid rgba(100,116,139,0.3); font-size:0.65rem; font-weight:600;" title="Entered manually before statement import">
+                          User-entered
+                        </span>
+                      `}
+                    </div>
+                  </td>
                   <td class="mono" style="font-size:0.75rem;">${e.pricingBasis === 'mid_price' ? 'Mid' : 'Ask'} · <span style="color:${e.side === 'yes' ? 'var(--green)' : 'var(--rose)'};">${e.side.toUpperCase()}</span></td>
                   <td class="mono" style="font-size:0.75rem;">
                     $${(e.purchaseCost || 0).toFixed(2)}
@@ -1014,33 +1046,68 @@ export function renderJournalPageHtml(
       </div>
     </div>
 
-    <!-- Import CSV Modal -->
+    <!-- Kalshi Statement CSV Import & Reconciliation Modal -->
     <div id="import-csv-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); z-index:200; align-items:center; justify-content:center; padding:16px;">
-      <div style="background:#0C0F17; border:1px solid rgba(223,184,67,0.4); border-radius:8px; max-width:640px; width:100%; padding:24px; box-shadow:0 25px 60px rgba(0,0,0,0.9);">
+      <div style="background:#0C0F17; border:1px solid rgba(223,184,67,0.4); border-radius:8px; max-width:760px; width:100%; max-height:90vh; overflow-y:auto; padding:24px; box-shadow:0 25px 60px rgba(0,0,0,0.9);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid var(--border-subtle); padding-bottom:12px;">
-          <div style="font-family:var(--font-mono); font-size:0.95rem; font-weight:700; color:#FFFFFF;">
-            📥 Import Prediction Market Statement (CSV)
+          <div style="font-family:var(--font-mono); font-size:0.95rem; font-weight:700; color:#FFFFFF; display:flex; align-items:center; gap:8px;">
+            <span>📥</span> Statement Import &amp; Reconciliation
+            <span class="mono" style="font-size:0.7rem; color:var(--accent); font-weight:600; background:rgba(223,184,67,0.12); padding:2px 6px; border-radius:3px;">KALSHI SUPPORTED</span>
           </div>
           <button type="button" onclick="closeImportModal()" style="background:none; border:none; color:var(--muted); font-size:1.4rem; cursor:pointer;">&times;</button>
         </div>
         
-        <p style="font-size:0.82rem; color:var(--text-dim); margin-bottom:16px; line-height:1.5;">
-          Upload or paste statements from <strong>Kalshi</strong>, <strong>Polymarket</strong>, or standard <strong>QuanterraOS</strong> exports. All entries will be checked and populated into your personal outcome journal.
-        </p>
+        <div id="import-step-input">
+          <p style="font-size:0.82rem; color:var(--text-dim); margin-bottom:14px; line-height:1.5;">
+            Import your official <strong>Kalshi fills or settlements export CSV</strong>. We will map your fields, detect duplicates, and suggest matches with your pre-trade saved checks.
+          </p>
 
-        <div style="margin-bottom:16px;">
-          <label style="display:block; font-family:var(--font-mono); font-size:0.75rem; color:var(--muted); margin-bottom:6px;">Select .CSV File:</label>
-          <input type="file" id="csv-file-input" accept=".csv,text/csv" onchange="handleCsvFileSelect(event)" style="width:100%; font-family:var(--font-mono); font-size:0.8rem; background:#06080C; border:1px solid var(--border); padding:8px; border-radius:4px; color:#fff;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <label style="font-family:var(--font-mono); font-size:0.75rem; color:var(--muted);">Select .CSV File:</label>
+            <button type="button" onclick="loadKalshiSample()" style="background:none; border:none; color:var(--accent); font-size:0.75rem; cursor:pointer; text-decoration:underline;">
+              ⚡ Load Redacted Kalshi Sample
+            </button>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <input type="file" id="csv-file-input" accept=".csv,text/csv" onchange="handleCsvFileSelect(event)" style="width:100%; font-family:var(--font-mono); font-size:0.8rem; background:#06080C; border:1px solid var(--border); padding:8px; border-radius:4px; color:#fff;">
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <label style="display:block; font-family:var(--font-mono); font-size:0.75rem; color:var(--muted); margin-bottom:6px;">Or Paste CSV Raw Content:</label>
+            <textarea id="csv-raw-textarea" rows="6" placeholder="Trade ID,Market Ticker,Side,Action,Count,Price,Fees,Total Cost,Settlement Value,Realized P&L,Executed At&#10;kt_849201,KXBTC15M,yes,buy,10,0.51,0.18,5.10,10.00,4.72,2026-10-06T14:30:00Z" style="width:100%; font-family:var(--font-mono); font-size:0.78rem; background:#06080C; border:1px solid var(--border); padding:10px; border-radius:4px; color:#fff; resize:vertical;"></textarea>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border-subtle); padding-top:14px;">
+            <div style="font-size:0.72rem; color:var(--muted);">
+              🔒 Duplicate prevention active: identical trades won't be re-added.
+            </div>
+            <div style="display:flex; gap:10px;">
+              <button type="button" onclick="closeImportModal()" class="btn-gold" style="background:rgba(255,255,255,0.06); color:var(--text); border-color:var(--border);">Cancel</button>
+              <button type="button" id="btn-preview-csv" onclick="previewCsvStatement()" class="btn-gold">
+                Preview &amp; Map Fields &rarr;
+              </button>
+            </div>
+          </div>
         </div>
 
-        <div style="margin-bottom:20px;">
-          <label style="display:block; font-family:var(--font-mono); font-size:0.75rem; color:var(--muted); margin-bottom:6px;">Or Paste CSV Raw Content:</label>
-          <textarea id="csv-raw-textarea" rows="6" placeholder="ticker,price,count,fee,outcome&#10;KXBTC15M,0.51,10,0.18,WON" style="width:100%; font-family:var(--font-mono); font-size:0.78rem; background:#06080C; border:1px solid var(--border); padding:10px; border-radius:4px; color:#fff; resize:vertical;"></textarea>
+        <div id="import-step-preview" style="display:none;">
+          <div id="preview-content"></div>
         </div>
 
-        <div style="display:flex; justify-content:flex-end; gap:10px;">
-          <button type="button" onclick="closeImportModal()" class="btn-gold" style="background:rgba(255,255,255,0.06); color:var(--text); border-color:var(--border);">Cancel</button>
-          <button type="button" id="btn-submit-csv-import" onclick="submitCsvImport()" class="btn-gold">Import Checks &rarr;</button>
+        <!-- Data Controls Section -->
+        <div style="margin-top:20px; padding-top:16px; border-top:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div style="font-size:0.75rem; color:var(--muted);">
+            <strong>Data Controls:</strong>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <a href="/api/statement/export.csv" class="btn-gold" style="padding:4px 10px; font-size:0.72rem; background:rgba(255,255,255,0.06); color:var(--text); border-color:var(--border); text-decoration:none;">
+              ↓ Export Statement CSV
+            </a>
+            <button type="button" onclick="deleteImportedStatements()" class="btn-gold" style="padding:4px 10px; font-size:0.72rem; background:rgba(244,63,94,0.12); color:var(--rose); border-color:rgba(244,63,94,0.3);">
+              🗑 Delete Imported Records
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1314,35 +1381,203 @@ export function renderJournalPageHtml(
       reader.readAsText(file);
     }
 
-    async function submitCsvImport() {
+    let currentPreviewBatchId = null;
+    let currentPreviewRows = [];
+
+    function loadKalshiSample() {
+      const sample = [
+        'Trade ID,Market Ticker,Side,Action,Count,Price,Fees,Total Cost,Settlement Value,Realized P&L,Executed At',
+        'kt_849201,KXBTC15M,yes,buy,10,0.51,0.18,5.10,10.00,4.72,2026-10-06T14:30:00Z',
+        'kt_849202,KXBTC15M,no,buy,5,0.48,0.09,2.40,0.00,-2.49,2026-10-06T15:15:00Z',
+        'kt_849203,KXINX15M,yes,buy,10,0.52,0.18,5.20,10.00,4.62,2026-10-06T16:00:00Z'
+      ].join('\n');
       const textarea = document.getElementById('csv-raw-textarea');
-      const btn = document.getElementById('btn-submit-csv-import');
+      if (textarea) textarea.value = sample;
+    }
+
+    async function previewCsvStatement() {
+      const textarea = document.getElementById('csv-raw-textarea');
+      const btn = document.getElementById('btn-preview-csv');
       const text = textarea ? textarea.value.trim() : '';
       if (!text) {
-        alert('Please choose a .csv file or paste CSV content.');
+        alert('Please select a .csv file or paste CSV statement content.');
         return;
       }
       btn.disabled = true;
-      btn.textContent = 'Importing...';
+      btn.textContent = 'Analyzing & Mapping...';
+
       try {
-        const res = await fetch('/api/journal/import-csv', {
+        const res = await fetch('/api/statement/preview', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ csvText: text })
         });
         const data = await res.json();
+        btn.disabled = false;
+        btn.textContent = 'Preview & Map Fields →';
+
+        if (!res.ok || !data.success) {
+          alert('Preview failed: ' + (data.errors ? data.errors.join('\n') : (data.error || 'Unknown error')));
+          return;
+        }
+
+        currentPreviewBatchId = data.batchId;
+        currentPreviewRows = data.validRows || [];
+
+        renderPreviewUi(data);
+      } catch (err) {
+        alert('Network error analyzing CSV: ' + err.message);
+        btn.disabled = false;
+        btn.textContent = 'Preview & Map Fields →';
+      }
+    }
+
+    function renderPreviewUi(data) {
+      document.getElementById('import-step-input').style.display = 'none';
+      var container = document.getElementById('preview-content');
+      document.getElementById('import-step-preview').style.display = 'block';
+
+      var validCount = data.newRowsCount || 0;
+      var dupCount = data.duplicateCount || 0;
+      var totalFees = data.totalFees ? data.totalFees.toFixed(2) : '0.00';
+
+      var mappedList = (data.mappedHeaders || []).map(function(m) {
+        return '<span style="background:rgba(255,255,255,0.06); padding:2px 6px; border-radius:3px; font-family:var(--font-mono); font-size:0.7rem; color:var(--accent);">' + m.original + ' &rarr; ' + m.mappedTo + '</span>';
+      }).join(' ');
+
+      var rowsHtml = (data.validRows || []).map(function(r) {
+        var sideColor = r.side === 'yes' ? 'var(--green)' : 'var(--rose)';
+        var pnlText = r.realizedPnl !== null && r.realizedPnl !== undefined ? ((r.realizedPnl >= 0 ? '+' : '') + '$' + r.realizedPnl.toFixed(2)) : '—';
+        var pnlColor = (r.realizedPnl || 0) >= 0 ? 'var(--green)' : 'var(--rose)';
+        var statusCell = '';
+        if (r.isDuplicate) {
+          statusCell = '<span class="mono" style="font-size:0.68rem; color:var(--rose); font-weight:700;">DUPLICATE (SKIPPED)</span>';
+        } else if (r.suggestedMatch) {
+          statusCell = '<label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.72rem; color:var(--cyan); background:rgba(56,189,248,0.1); padding:3px 6px; border-radius:4px; border:1px solid rgba(56,189,248,0.3);">' +
+            '<input type="checkbox" class="reconcile-checkbox" data-trade-id="' + r.externalTradeId + '" data-journal-id="' + r.suggestedMatch.journalId + '" checked>' +
+            '<span>Reconcile to saved check (' + r.suggestedMatch.plannedCount + ' @ $' + r.suggestedMatch.plannedPrice.toFixed(2) + ')</span>' +
+          '</label>';
+        } else {
+          statusCell = '<span class="mono" style="font-size:0.68rem; color:var(--muted);">New Trade (Unmatched)</span>';
+        }
+
+        return '<tr style="' + (r.isDuplicate ? 'opacity:0.45; background:rgba(244,63,94,0.05);' : '') + '">' +
+          '<td class="mono" style="font-size:0.75rem;">' + r.externalTradeId + '</td>' +
+          '<td class="mono" style="font-weight:700; color:#FFFFFF;">' + r.contractTicker + '</td>' +
+          '<td class="mono" style="font-size:0.72rem; color:' + sideColor + ';">' + r.side.toUpperCase() + '</td>' +
+          '<td class="mono">' + r.quantity + '</td>' +
+          '<td class="mono">$' + r.fillPrice.toFixed(2) + '</td>' +
+          '<td class="mono" style="color:var(--rose);">-$' + r.fees.toFixed(2) + '</td>' +
+          '<td class="mono" style="font-weight:700; color:' + pnlColor + ';">' + pnlText + '</td>' +
+          '<td>' + statusCell + '</td>' +
+        '</tr>';
+      }).join('');
+
+      var dupWarning = dupCount > 0
+        ? '<div style="font-size:0.72rem; color:var(--rose); margin-top:4px;">⚠️ Duplicate Prevention: ' + dupCount + ' trade(s) match previously imported records and will be skipped to protect your journal from double-counting.</div>'
+        : '';
+
+      var disabledAttr = validCount === 0 ? 'disabled style="opacity:0.5;"' : '';
+
+      container.innerHTML =
+        '<div style="background:rgba(223,184,67,0.08); border:1px solid rgba(223,184,67,0.3); border-radius:6px; padding:12px 16px; margin-bottom:16px;">' +
+          '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">' +
+            '<div style="font-family:var(--font-mono); font-size:0.75rem; font-weight:700; color:var(--accent);">PARSED STATEMENT PREVIEW</div>' +
+            '<div class="mono" style="font-size:0.75rem; color:#FFFFFF;">' + validCount + ' new trade(s) · ' + dupCount + ' duplicate(s) · $' + totalFees + ' total fees</div>' +
+          '</div>' +
+          '<div style="font-size:0.72rem; color:var(--text-dim); margin-bottom:4px;">Field Mappings: ' + (mappedList || 'Automatic standard headers matched') + '</div>' +
+          dupWarning +
+        '</div>' +
+        '<div style="max-height:280px; overflow-y:auto; margin-bottom:16px; border:1px solid var(--border-subtle); border-radius:6px;">' +
+          '<table style="width:100%; border-collapse:collapse;">' +
+            '<thead>' +
+              '<tr style="background:rgba(255,255,255,0.03); text-align:left; font-size:0.72rem; color:var(--muted); font-family:var(--font-mono);">' +
+                '<th style="padding:8px 10px;">Trade ID</th>' +
+                '<th style="padding:8px 10px;">Contract</th>' +
+                '<th style="padding:8px 10px;">Side</th>' +
+                '<th style="padding:8px 10px;">Qty</th>' +
+                '<th style="padding:8px 10px;">Price</th>' +
+                '<th style="padding:8px 10px;">Fee</th>' +
+                '<th style="padding:8px 10px;">P&amp;L</th>' +
+                '<th style="padding:8px 10px;">Match / Status</th>' +
+              '</tr>' +
+            '</thead>' +
+            '<tbody>' + rowsHtml + '</tbody>' +
+          '</table>' +
+        '</div>' +
+        '<div style="display:flex; justify-content:space-between; align-items:center;">' +
+          '<button type="button" onclick="backToImportInput()" class="btn-gold" style="background:rgba(255,255,255,0.06); color:var(--text); border-color:var(--border);">&larr; Back / Edit CSV</button>' +
+          '<button type="button" id="btn-commit-import" onclick="confirmCsvCommit()" class="btn-gold" ' + disabledAttr + '>Confirm Import &amp; Reconcile (' + validCount + ' trades) &rarr;</button>' +
+        '</div>';
+    }
+
+    function backToImportInput() {
+      document.getElementById('import-step-preview').style.display = 'none';
+      document.getElementById('import-step-input').style.display = 'block';
+    }
+
+    async function confirmCsvCommit() {
+      const btn = document.getElementById('btn-commit-import');
+      if (!btn) return;
+      btn.disabled = true;
+      btn.textContent = 'Saving & Reconciling...';
+
+      const checkboxes = document.querySelectorAll('.reconcile-checkbox:checked');
+      const reconcileMap = {};
+      checkboxes.forEach(cb => {
+        const tradeId = cb.getAttribute('data-trade-id');
+        const journalId = cb.getAttribute('data-journal-id');
+        if (tradeId && journalId) {
+          reconcileMap[tradeId] = journalId;
+        }
+      });
+
+      try {
+        const res = await fetch('/api/statement/commit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            batchId: currentPreviewBatchId,
+            rows: currentPreviewRows,
+            reconcileMap
+          })
+        });
+        const data = await res.json();
         if (res.ok && data.success) {
-          alert('Success: ' + data.message + (data.errors && data.errors.length ? '\\n(' + data.errors.length + ' row(s) skipped)' : ''));
+          alert('Import successful!\\n• ' + data.reconciledCount + ' saved check(s) reconciled to statement\\n• ' + data.importedCount + ' new trade(s) added\\n• ' + data.skippedDuplicates + ' duplicate(s) skipped');
           window.location.reload();
         } else {
-          alert('Import failed: ' + (data.error || 'Unknown error'));
+          alert('Import failed: ' + (data.errors ? data.errors.join('\\n') : (data.error || 'Unknown error')));
           btn.disabled = false;
-          btn.textContent = 'Import Checks →';
+          btn.textContent = 'Confirm Import & Reconcile';
         }
       } catch (err) {
-        alert('Network error importing CSV.');
+        alert('Network error committing statement: ' + err.message);
         btn.disabled = false;
-        btn.textContent = 'Import Checks →';
+        btn.textContent = 'Confirm Import & Reconcile';
+      }
+    }
+
+    async function deleteImportedStatements() {
+      if (!confirm('Are you sure you want to delete your imported statement records?\\n\\nAny checks that were reconciled against statement fills will be safely reverted to "User-entered" with their original planned figures preserved.')) {
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/statement/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          alert('Successfully deleted ' + data.deletedCount + ' statement record(s) and reverted ' + data.revertedChecksCount + ' reconciled check(s) to User-entered.');
+          window.location.reload();
+        } else {
+          alert('Deletion failed: ' + (data.error || 'Unknown error'));
+        }
+      } catch (err) {
+        alert('Network error deleting statements: ' + err.message);
       }
     }
 
@@ -1461,6 +1696,8 @@ export function renderJournalPageHtml(
       }
     }
   </script>
+  ${renderMobileBottomNavHtml("journal")}
+  ${getMobileAppRuntimeScript()}
   ${ASSISTANT_WIDGET_HTML}
   ${renderBetaFeedbackWidgetHtml()}
 </body>

@@ -6,6 +6,7 @@
  */
 import type { UserRecord, UserTier } from "./auth.ts";
 import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
+import { renderMobileBottomNavHtml, getMobileAppRuntimeScript } from "./mobile-install.ts";
 
 export function renderAccountPageHtml(user: UserRecord | null, tier: UserTier, error?: string, success?: string): string {
   const isAuth = user !== null;
@@ -645,6 +646,8 @@ export function renderAccountPageHtml(user: UserRecord | null, tier: UserTier, e
     <div><a href="/pricing">Pricing</a> · <a href="/legal">Legal</a></div>
   </footer>
 
+  ${renderMobileBottomNavHtml("account")}
+  ${getMobileAppRuntimeScript()}
 ${ASSISTANT_WIDGET_HTML}
 </body>
 </html>`;

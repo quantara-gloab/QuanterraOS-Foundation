@@ -1,6 +1,8 @@
 import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
 import { renderMarketEvidenceCardHtml } from "./market-evidence-card.ts";
 import { renderBetaFeedbackWidgetHtml } from "./feedback-widget.ts";
+import { renderSystemPulseHtml } from "./system-pulse.ts";
+import { renderMobileBottomNavHtml, getMobileAppRuntimeScript } from "./mobile-install.ts";
 
 /**
  * True Cost & Expected Value Calculator for Short-Duration Prediction Markets
@@ -340,29 +342,33 @@ export function renderCalculatorPageHtml(): string {
     </div>
   </nav>
 
-  <main class="container">
-    <div class="eyebrow">Pre-Trade True-Cost Verification · Level 1 Consumer Tool</div>
-    <h1>True Cost &amp; Net EV Check</h1>
-    <p class="lead">
-      Short-duration prediction markets are zero-sum before fees, and strictly negative-sum after exchange fees and spreads. Enter your price and quantity to verify exact fee drag and your true breakeven hurdle before entering any contract.
-    </p>
+  ${renderSystemPulseHtml({ page: "calculator" })}
 
-    <!-- First-Use Example Preview Banner -->
-    <div style="background:linear-gradient(135deg, rgba(223,184,67,0.12) 0%, rgba(14,18,27,0.9) 100%); border:1px solid rgba(223,184,67,0.35); border-radius:6px; padding:12px 16px; margin-bottom:24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-      <div style="font-size:0.82rem; color:var(--text);">
-        <strong style="color:var(--accent);">⚡ First-Use Preview:</strong> Try an unauthenticated example check (10 contracts @ 51¢) and preview your personal outcome journal with zero sign-up friction.
-      </div>
-      <div style="display:flex; gap:8px;">
-        <button type="button" onclick="loadExampleCheck()" class="preset-btn" style="border-color:var(--accent); color:var(--accent-light); padding:5px 12px; font-weight:600;">
-          Load Example Check
-        </button>
-        <button type="button" onclick="previewExampleInJournal()" class="preset-btn" style="background:rgba(16,185,129,0.15); border-color:var(--green); color:var(--green); padding:5px 12px; font-weight:600;">
-          Preview in Journal &rarr;
-        </button>
+  <main class="container">
+    <div class="focus-mode-peripheral">
+      <div class="eyebrow">Pre-Trade True-Cost Verification · Level 1 Consumer Tool</div>
+      <h1>True Cost &amp; Net EV Check</h1>
+      <p class="lead">
+        Short-duration prediction markets are zero-sum before fees, and strictly negative-sum after exchange fees and spreads. Enter your price and quantity to verify exact fee drag and your true breakeven hurdle before entering any contract.
+      </p>
+
+      <!-- First-Use Example Preview Banner -->
+      <div style="background:linear-gradient(135deg, rgba(223,184,67,0.12) 0%, rgba(14,18,27,0.9) 100%); border:1px solid rgba(223,184,67,0.35); border-radius:6px; padding:12px 16px; margin-bottom:24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div style="font-size:0.82rem; color:var(--text);">
+          <strong style="color:var(--accent);">⚡ First-Use Preview:</strong> Try an unauthenticated example check (10 contracts @ 51¢) and preview your personal outcome journal with zero sign-up friction.
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button type="button" onclick="loadExampleCheck()" class="preset-btn" style="border-color:var(--accent); color:var(--accent-light); padding:5px 12px; font-weight:600;">
+            Load Example Check
+          </button>
+          <button type="button" onclick="previewExampleInJournal()" class="preset-btn" style="background:rgba(16,185,129,0.15); border-color:var(--green); color:var(--green); padding:5px 12px; font-weight:600;">
+            Preview in Journal &rarr;
+          </button>
+        </div>
       </div>
     </div>
 
-    <div class="calc-grid">
+    <div class="calc-grid focus-mode-core">
       <!-- Left Column: Primary Order Inputs First -->
       <div class="card">
         <div class="card-title">
@@ -447,6 +453,17 @@ export function renderCalculatorPageHtml(): string {
           <div class="stat-row" style="padding:4px 0; border-bottom:none;">
             <span class="stat-label"><strong>Required Breakeven:</strong></span>
             <span class="stat-val" style="color:var(--accent); font-weight:700;" id="val-summary-breakeven">52.80%</span>
+          </div>
+        </div>
+
+        <!-- Stated Reason / Premise (Focus Mode Core Requirement) -->
+        <div style="margin-bottom:14px; background:rgba(6,9,14,0.7); border:1px solid var(--panel-border-subtle); border-radius:6px; padding:12px;">
+          <label for="calc-stated-reason" style="font-size:0.75rem; font-family:var(--font-mono); color:var(--accent); font-weight:600; display:block; margin-bottom:4px;">
+            ✦ Stated Reason / Premise (Focus Mode Anchor):
+          </label>
+          <input type="text" id="calc-stated-reason" class="number-input" placeholder="e.g. Faded short-term breakout; volatility compression at strike" style="width:100%; font-size:0.8rem; padding:8px 10px;" oninput="if(window.__latestCheck) window.__latestCheck.reason = this.value;">
+          <div style="font-size:0.68rem; color:var(--muted); margin-top:4px;">
+            A verified premise ensures conscious adherence to your voluntary risk plan.
           </div>
         </div>
 
@@ -613,7 +630,7 @@ export function renderCalculatorPageHtml(): string {
     </div>
 
     <!-- Standardized Market Evidence Card -->
-    <div style="margin-bottom: 48px;">
+    <div class="focus-mode-peripheral" style="margin-bottom: 48px;">
       ${renderMarketEvidenceCardHtml({ ticker: "KXBTC15M", venue: "kalshi-15m", currentAsk: 0.51, contractCount: 10 })}
     </div>
 
@@ -919,15 +936,31 @@ export function renderCalculatorPageHtml(): string {
 
     function saveCheckToJournal() {
       if (!window.__latestCheck) recalc();
-      try {
-        localStorage.setItem('quanterraos_pending_check', JSON.stringify(window.__latestCheck));
-        fetch('/api/analytics/check', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(window.__latestCheck)
-        }).catch(function() {});
-      } catch (_) {}
-      window.location.href = '/account?flow=save-check';
+      var reasonInput = document.getElementById('calc-stated-reason');
+      var statedReason = reasonInput ? reasonInput.value.trim() : '';
+      if (window.__latestCheck) {
+        window.__latestCheck.reason = statedReason;
+      }
+      var lossEl = document.getElementById('val-summary-loss');
+      var breakevenEl = document.getElementById('val-summary-breakeven');
+
+      var checkDetails = {
+        maxLoss: lossEl ? lossEl.innerText : '$5.28',
+        breakeven: breakevenEl ? breakevenEl.innerText : '52.80%',
+        reason: statedReason,
+      };
+
+      executeReflectivePause(checkDetails, function() {
+        try {
+          localStorage.setItem('quanterraos_pending_check', JSON.stringify(window.__latestCheck));
+          fetch('/api/analytics/check', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(window.__latestCheck)
+          }).catch(function() {});
+        } catch (_) {}
+        window.location.href = '/account?flow=save-check';
+      });
     }
 
     function openEmbedModal() {
@@ -964,6 +997,8 @@ export function renderCalculatorPageHtml(): string {
 
     recalc();
   </script>
+  ${renderMobileBottomNavHtml("check")}
+  ${getMobileAppRuntimeScript()}
   ${ASSISTANT_WIDGET_HTML}
   ${renderBetaFeedbackWidgetHtml()}
 </body>

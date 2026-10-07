@@ -1,10 +1,10 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { renderJournalPageHtml } from '../journal-page.js';
-import { renderReviewPageHtml } from '../review-page.js';
-import { renderBetaBookingPageHtml } from '../booking-page.js';
-import { renderPilotAuditPageHtml } from '../pilot-audit-page.js';
-import { getFeatureFlags } from '../feature-flags.js';
+import { renderJournalPageHtml } from '../journal-page.ts';
+import { renderReviewPageHtml } from '../review-page.ts';
+import { renderBetaBookingPageHtml } from '../booking-page.ts';
+import { renderPilotAuditPageHtml } from '../pilot-audit-page.ts';
+import { getFeatureFlags } from '../feature-flags.ts';
 
 describe('Outcome Tracking, Personal Review & Beta Booking Flow', () => {
   it('Task 1: labels incomplete actual trades and renders actual trade outcome controls', () => {

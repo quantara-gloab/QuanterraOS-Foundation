@@ -373,6 +373,20 @@ export function renderResearchPageHtml(): string {
       </div>
     </div>
 
+    <div class="paper-card" style="border-color: rgba(223, 184, 67, 0.35); background: linear-gradient(180deg, rgba(20, 26, 38, 0.85) 0%, rgba(12, 15, 23, 0.95) 100%);">
+      <div class="paper-meta">// Research Paper · 7 October 2026 · Frequency &amp; Vibration</div>
+      <a href="/research/market-rhythm" class="paper-title" style="color: var(--accent);">Market Rhythm: Fourier Frequency Analysis, Welch’s PSD &amp; Fee-Adjusted Baselines</a>
+      <p class="paper-summary">
+        An empirical examination of cyclical oscillation in short-duration BTC prediction markets using Welch’s Power Spectral Density method. While spectral decomposition measures historical frequency concentration across price returns, volume, and spread dynamics, walk-forward testing against the market-price baseline confirms that cyclical patterns do not produce exploitable trading alpha after Kalshi exchange taker fees (1.80¢/contract) and bid-ask slippage.
+      </p>
+      <div class="paper-tags-row">
+        <span class="paper-tag tag-negative">NEGATIVE RESULT</span>
+        <span class="paper-tag tag-research">FOURIER &amp; WELCH PSD</span>
+        <span class="paper-tag tag-calibration">FEE-ADJUSTED</span>
+        <a href="/research/market-rhythm" class="read-paper-link">Read Full Paper &rarr;</a>
+      </div>
+    </div>
+
     <div class="paper-card">
       <div class="paper-meta">// Working Paper · 4 October 2026</div>
       <a href="/research/kalshi-calibration-response" class="paper-title">Is Kalshi's BTC Market Actually Calibrated? We Checked.</a>

@@ -1,9 +1,9 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { renderLandingPage } from '../landing-page.js';
-import { renderCalculatorPageHtml } from '../calculator-page.js';
-import { renderJournalPageHtml } from '../journal-page.js';
-import { renderPilotAuditPageHtml } from '../pilot-audit-page.js';
+import { renderLandingPage } from '../landing-page.ts';
+import { renderCalculatorPageHtml } from '../calculator-page.ts';
+import { renderJournalPageHtml } from '../journal-page.ts';
+import { renderPilotAuditPageHtml } from '../pilot-audit-page.ts';
 
 describe('Pilot Onboarding Tools & Arithmetic Unification', () => {
   it('unifies arithmetic across static and dynamic displays', () => {

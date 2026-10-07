@@ -10,6 +10,7 @@
 
 import type { UserRecord, UserTier } from "./auth.ts";
 import { renderBetaFeedbackWidgetHtml } from "./feedback-widget.ts";
+import { renderMobileBottomNavHtml, getMobileAppRuntimeScript } from "./mobile-install.ts";
 
 export interface ReviewEntry {
   id: string;
@@ -37,6 +38,7 @@ export interface ReviewEntry {
   exitProceeds?: number | null;
   outcomeStatus?: string | null;
   outcomeNotes?: string | null;
+  reconciliationStatus?: string | null; // 'user_entered' | 'imported' | 'reconciled'
   isExample?: boolean | number;
   createdAt: string;
 }
@@ -534,6 +536,7 @@ export function renderReviewPageHtml(
                 <tr>
                   <th>Date</th>
                   <th>Contract</th>
+                  <th>Source</th>
                   <th>Qty</th>
                   <th>Fill Price</th>
                   <th>Fees Paid</th>
@@ -545,10 +548,16 @@ export function renderReviewPageHtml(
               <tbody>
                 ${actualEntries.map(e => {
                   const complete = isActualComplete(e);
+                  const sourceLabel = e.reconciliationStatus === 'reconciled'
+                    ? '<span class="mono" style="color:var(--green); font-size:0.7rem; font-weight:700;">✓ Reconciled to statement</span>'
+                    : e.reconciliationStatus === 'imported'
+                    ? '<span class="mono" style="color:#C084FC; font-size:0.7rem; font-weight:600;">Imported</span>'
+                    : '<span class="mono" style="color:var(--muted); font-size:0.7rem;">User-entered</span>';
                   return `
                     <tr>
                       <td class="mono" style="color:var(--muted); font-size:0.75rem;">${(e.createdAt || '').slice(0, 10)}</td>
                       <td class="mono" style="color:var(--accent); font-weight:700;">${e.contractTicker}</td>
+                      <td>${sourceLabel}</td>
                       <td class="mono">${e.actualQuantity ?? e.contractCount ?? '—'}</td>
                       <td class="mono">${e.actualFillPrice !== null && e.actualFillPrice !== undefined ? `$${e.actualFillPrice.toFixed(2)}` : '—'}</td>
                       <td class="mono" style="color:var(--rose);">${e.actualFees !== null && e.actualFees !== undefined ? `-$${e.actualFees.toFixed(2)}` : '—'}</td>
@@ -576,6 +585,8 @@ export function renderReviewPageHtml(
     `}
   </main>
 
+  ${renderMobileBottomNavHtml("review")}
+  ${getMobileAppRuntimeScript()}
   ${renderBetaFeedbackWidgetHtml()}
 </body>
 </html>`;

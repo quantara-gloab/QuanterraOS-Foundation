@@ -377,4 +377,34 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 - `npx tsc --noEmit` — 0 errors (clean exit 0).
 - `npm test` — 293/293 passing across 56 suites, 0 failures (duration ~62s).
 
+---
+
+### Session: 2026-10-07 — Statement Import & Reconciliation, System Pulse, Focus Mode, Market Rhythm & PWA Runtime
+
+**Delivered Capabilities:**
+- **Statement Import & Reconciliation Engine (`src/statement-reconciliation.ts`, `migrations/0025_statement_import_and_reconciliation.sql`)**:
+  - CSV Import Preview: Standardizes and maps Kalshi trade export headers, calculating new trades, duplicates, and total fees prior to persistent commit (`POST /api/statement/preview`).
+  - Deterministic Duplicate Prevention: Computes SHA256 trade fingerprints (`userId:venue:ticker:side:time:qty:price:fee`) to block double-counting on repeated file imports.
+  - Record Matching & Reconcile: Suggests matches with existing saved checks, allowing users to confirm and update checks to "Reconciled to statement" while strictly preserving original planned contract price, quantity, and fees.
+  - Data Controls & Isolation: Full RFC 4180 CSV export (`GET /api/statement/export.csv`) and safe deletion (`POST /api/statement/delete`) reverting reconciled checks back to "User-entered" with original values restored. Incomplete/unsettled records are quarantined out of finalized performance totals.
+  - Fully tested in `src/__tests__/statement-import-and-reconciliation.test.ts`.
+- **System Pulse & Focus Mode (`src/system-pulse.ts`)**:
+  - System Pulse: Real-time telemetry bar monitoring feed freshness (<1s vs >5s Draco stale alert), connection latency, 3/3 venue synchronization, and voluntary risk plan budget outlay. Features an accessible harmonic waveform canvas respecting `prefers-reduced-motion`.
+  - Focus Mode: Distraction-free interface dimming peripheral chrome to emphasize Total Cost, Max Loss, Breakeven %, and a mandatory Stated Reason hypothesis with an enforced 3-second reflective confirmation pause before saving decisions.
+  - Web Audio Acoustics: Zero-dependency synthesizer supporting 432 Hz (Verdi A) and 528 Hz harmonics; starts MUTED by default with prominent scientific disclosure modal strictly disclaiming healing or predictive edge claims (Rule B4).
+  - Fully tested in `src/__tests__/system-pulse-and-focus-mode.test.ts`.
+- **Market Rhythm Research Module (`src/research/market-rhythm.ts`, `/research/market-rhythm`)**:
+  - Implements Welch's Power Spectral Density (PSD) estimation using overlapping Hann-windowed segments over returns, volume, and spread.
+  - Strictly past-only rolling window avoiding lookahead bias, with robust missing observation handling and continuity scoring.
+  - Out-of-sample empirical benchmark confirms that after Kalshi non-linear taker fees (1.80¢/contract) and bid-ask spread friction, cyclical frequency signals do not outperform the naive market baseline. Negative finding preserved per Rule B4.
+- **Mobile Installation & Web App Runtime (`src/mobile-install.ts`, `/install`, `/app`)**:
+  - Honest PWA installation guidance for Apple iPhone (iOS Safari) and Android/Samsung (Chrome/Samsung Internet) with official gold icon, without fictional app store links (Rule B11).
+  - App-style bottom navigation (Check, Journal, Review, Account) with automatic restoration of last visited screen on reopening.
+  - Offline connection monitor banner disabling calculations requiring unavailable live inputs, service worker update protection safeguarding unsaved checks, and shared-device privacy cache purge on sign-out.
+
+**Verification:**
+- `npx tsc --noEmit` — 0 errors (clean exit 0).
+- `npm test` — 346/346 passing across 68 suites, 0 failures.
+
+
 

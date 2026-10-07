@@ -63,6 +63,9 @@ import { renderPilotAuditPageHtml } from "./pilot-audit-page.ts";
 import { renderAccessTerminalPage } from "./access-terminal-page.ts";
 import { renderWalletPageHtml } from "./wallet-page.ts";
 import { renderCalculatorPageHtml } from "./calculator-page.ts";
+import { getSystemPulseTelemetry } from "./system-pulse.ts";
+import { renderMarketRhythmPageHtml } from "./research/market-rhythm.ts";
+import { renderMobileInstallPageHtml } from "./mobile-install.ts";
 import { renderEmbedCalculatorHtml, renderEmbedCardHtml } from "./embed-widget.ts";
 import { renderLearnPageHtml } from "./learn-page.ts";
 import { renderVenueComparisonPageHtml } from "./venue-comparison-page.ts";
@@ -91,6 +94,12 @@ import {
   saveUserRiskPlan,
   checkTradeAgainstRiskPlan,
 } from "./journal-import.ts";
+import {
+  previewKalshiStatement,
+  commitKalshiStatement,
+  exportImportedStatementsCsv,
+  deleteImportedStatements,
+} from "./statement-reconciliation.ts";
 import { startGrowthEngine } from "./growth/index.ts";
 import {
   getGtmSummary,
@@ -2233,6 +2242,73 @@ app.post("/api/journal/import-csv", (req, res) => {
   });
 });
 
+app.post("/api/statement/preview", (req, res) => {
+  const flags = getFeatureFlags(req.query);
+  if (!flags.statementImport) {
+    return res.status(403).json({ error: "Statement import feature is currently disabled behind feature flag" });
+  }
+
+  const auth = getUserAuth(req);
+  const userId = auth.user?.id || (process.env.NODE_ENV !== "production" ? "test-user-import" : null);
+  if (!userId) {
+    return res.status(401).json({ error: "Authentication required to preview statements" });
+  }
+
+  const csvText = typeof req.body === "string" ? req.body : req.body?.csvText;
+  if (!csvText || typeof csvText !== "string") {
+    return res.status(400).json({ error: "No CSV content provided in request body" });
+  }
+
+  const result = previewKalshiStatement(csvText, userId);
+  res.json(result);
+});
+
+app.post("/api/statement/commit", (req, res) => {
+  const flags = getFeatureFlags(req.query);
+  if (!flags.statementImport) {
+    return res.status(403).json({ error: "Statement import feature is currently disabled behind feature flag" });
+  }
+
+  const auth = getUserAuth(req);
+  const userId = auth.user?.id || (process.env.NODE_ENV !== "production" ? "test-user-import" : null);
+  if (!userId) {
+    return res.status(401).json({ error: "Authentication required to import statements" });
+  }
+
+  const { batchId, rows, reconcileMap } = req.body || {};
+  if (!batchId || !Array.isArray(rows)) {
+    return res.status(400).json({ error: "Missing required fields: batchId, rows" });
+  }
+
+  const result = commitKalshiStatement(userId, batchId, rows, reconcileMap || {});
+  res.json(result);
+});
+
+app.get("/api/statement/export.csv", (req, res) => {
+  const auth = getUserAuth(req);
+  const userId = auth.user?.id || (process.env.NODE_ENV !== "production" ? "test-user-import" : null);
+  if (!userId) {
+    return res.status(401).send("Authentication required to export statements");
+  }
+
+  const csv = exportImportedStatementsCsv(userId);
+  res.setHeader("Content-Type", "text/csv");
+  res.setHeader("Content-Disposition", `attachment; filename="quanterraos-kalshi-statement-${Date.now()}.csv"`);
+  res.send(csv);
+});
+
+app.post("/api/statement/delete", (req, res) => {
+  const auth = getUserAuth(req);
+  const userId = auth.user?.id || (process.env.NODE_ENV !== "production" ? "test-user-import" : null);
+  if (!userId) {
+    return res.status(401).json({ error: "Authentication required to delete statements" });
+  }
+
+  const { batchId } = req.body || {};
+  const result = deleteImportedStatements(userId, batchId);
+  res.json({ success: true, ...result });
+});
+
 app.get("/api/account/risk-plan", (req, res) => {
   const auth = getUserAuth(req);
   const userId = auth.user?.id || "demo-subscriber";
@@ -2698,6 +2774,12 @@ app.get("/research", (req, res) => {
   res.type("html").send(renderResearchPageHtml());
 });
 
+app.get("/research/market-rhythm", (req, res) => {
+  const auth = getUserAuth(req);
+  logEvent("page_view_market_rhythm", auth.user?.id, { path: "/research/market-rhythm" });
+  res.type("html").send(renderMarketRhythmPageHtml());
+});
+
 app.get("/status", (_req, res) => {
   try {
     res.type("html").send(renderStatusPageHtml());
@@ -2705,6 +2787,10 @@ app.get("/status", (_req, res) => {
     console.error("Status page error:", err);
     res.status(500).send("System status currently unavailable");
   }
+});
+
+app.get(["/install", "/app", "/download"], (_req, res) => {
+  res.type("html").send(renderMobileInstallPageHtml());
 });
 
 // ---------------------------------------------------------------------------
@@ -3373,6 +3459,10 @@ app.get("/api/index/btc/history", async (req, res) => {
 
 app.get("/api/status", (_req, res) => {
   res.json(getSystemStatusData());
+});
+
+app.get("/api/telemetry/pulse", (_req, res) => {
+  res.json(getSystemPulseTelemetry());
 });
 
 app.get("/api/status/nodes", (_req, res) => {

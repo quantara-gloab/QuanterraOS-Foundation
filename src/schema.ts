@@ -704,12 +704,52 @@ export const userDecisionJournal = sqliteTable(
     exitProceeds: real("exit_proceeds"),
     outcomeStatus: text("outcome_status").default("pending"), // 'pending' | 'settled' | 'incomplete'
     outcomeNotes: text("outcome_notes"),
+    reconciliationStatus: text("reconciliation_status").default("user_entered"), // 'user_entered' | 'imported' | 'reconciled'
+    matchedStatementId: text("matched_statement_id"),
+    statementReconciledAt: text("statement_reconciled_at"),
+    originalContractPrice: real("original_contract_price"),
+    originalContractCount: integer("original_contract_count"),
+    originalExchangeFee: real("original_exchange_fee"),
     createdAt: text("created_at").notNull(),
     updatedAt: text("updated_at").notNull(),
   },
   (table) => ({
     userIdIdx: index("user_decision_journal_user_id_idx").on(table.userId),
     createdAtIdx: index("user_decision_journal_created_at_idx").on(table.createdAt),
+    reconciliationStatusIdx: index("user_decision_journal_reconciliation_status_idx").on(table.reconciliationStatus),
+  })
+);
+
+export const importedStatementRecords = sqliteTable(
+  "imported_statement_records",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id").notNull(),
+    batchId: text("batch_id").notNull(),
+    externalTradeId: text("external_trade_id"),
+    fingerprint: text("fingerprint").notNull(),
+    venue: text("venue").notNull().default("kalshi"),
+    contractTicker: text("contract_ticker").notNull(),
+    side: text("side").notNull().default("yes"),
+    action: text("action").notNull().default("buy"),
+    quantity: integer("quantity").notNull(),
+    fillPrice: real("fill_price").notNull(),
+    fees: real("fees").notNull(),
+    totalCost: real("total_cost").notNull(),
+    exitProceeds: real("exit_proceeds"),
+    realizedPnl: real("realized_pnl"),
+    settled: integer("settled").notNull().default(1),
+    executedAt: text("executed_at").notNull(),
+    matchedJournalId: text("matched_journal_id"),
+    reconciliationStatus: text("reconciliation_status").notNull().default("imported"), // 'imported' | 'reconciled'
+    rawCsvRow: text("raw_csv_row"),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => ({
+    userIdIdx: index("imported_stmt_user_id_idx").on(table.userId),
+    fingerprintIdx: index("imported_stmt_fingerprint_idx").on(table.fingerprint),
+    batchIdIdx: index("imported_stmt_batch_id_idx").on(table.batchId),
+    matchedJournalIdx: index("imported_stmt_matched_journal_idx").on(table.matchedJournalId),
   })
 );
 

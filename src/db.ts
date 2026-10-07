@@ -50,6 +50,7 @@ export function runMigrations(): void {
     "0022_user_risk_plans.sql",
     "0023_journal_details_and_feedback.sql",
     "0024_outcome_tracking_and_booking.sql",
+    "0025_statement_import_and_reconciliation.sql",
   ]) {
     const migrationPath = path.join(migrationsDir, migration);
     if (migration === "0006_multi_asset.sql") {
@@ -141,6 +142,57 @@ export function runMigrations(): void {
         );
         CREATE INDEX IF NOT EXISTS pilot_booking_status_idx ON pilot_booking_requests (status);
         CREATE INDEX IF NOT EXISTS pilot_booking_created_at_idx ON pilot_booking_requests (created_at);
+      `);
+      continue;
+    }
+    if (migration === "0025_statement_import_and_reconciliation.sql") {
+      const journalCols = sqlite.prepare("PRAGMA table_info(user_decision_journal)").all() as Array<{ name: string }>;
+      if (!journalCols.some((col) => col.name === "reconciliation_status")) {
+        sqlite.exec("ALTER TABLE user_decision_journal ADD COLUMN reconciliation_status TEXT DEFAULT 'user_entered'");
+      }
+      if (!journalCols.some((col) => col.name === "matched_statement_id")) {
+        sqlite.exec("ALTER TABLE user_decision_journal ADD COLUMN matched_statement_id TEXT");
+      }
+      if (!journalCols.some((col) => col.name === "statement_reconciled_at")) {
+        sqlite.exec("ALTER TABLE user_decision_journal ADD COLUMN statement_reconciled_at TEXT");
+      }
+      if (!journalCols.some((col) => col.name === "original_contract_price")) {
+        sqlite.exec("ALTER TABLE user_decision_journal ADD COLUMN original_contract_price REAL");
+      }
+      if (!journalCols.some((col) => col.name === "original_contract_count")) {
+        sqlite.exec("ALTER TABLE user_decision_journal ADD COLUMN original_contract_count INTEGER");
+      }
+      if (!journalCols.some((col) => col.name === "original_exchange_fee")) {
+        sqlite.exec("ALTER TABLE user_decision_journal ADD COLUMN original_exchange_fee REAL");
+      }
+      sqlite.exec(`
+        CREATE TABLE IF NOT EXISTS imported_statement_records (
+          id TEXT PRIMARY KEY,
+          user_id TEXT NOT NULL,
+          batch_id TEXT NOT NULL,
+          external_trade_id TEXT,
+          fingerprint TEXT NOT NULL,
+          venue TEXT NOT NULL DEFAULT 'kalshi',
+          contract_ticker TEXT NOT NULL,
+          side TEXT NOT NULL DEFAULT 'yes',
+          action TEXT NOT NULL DEFAULT 'buy',
+          quantity INTEGER NOT NULL,
+          fill_price REAL NOT NULL,
+          fees REAL NOT NULL,
+          total_cost REAL NOT NULL,
+          exit_proceeds REAL,
+          realized_pnl REAL,
+          settled INTEGER NOT NULL DEFAULT 1,
+          executed_at TEXT NOT NULL,
+          matched_journal_id TEXT,
+          reconciliation_status TEXT NOT NULL DEFAULT 'imported',
+          raw_csv_row TEXT,
+          created_at TEXT NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS imported_stmt_user_id_idx ON imported_statement_records (user_id);
+        CREATE INDEX IF NOT EXISTS imported_stmt_fingerprint_idx ON imported_statement_records (fingerprint);
+        CREATE INDEX IF NOT EXISTS imported_stmt_batch_id_idx ON imported_statement_records (batch_id);
+        CREATE INDEX IF NOT EXISTS imported_stmt_matched_journal_idx ON imported_statement_records (matched_journal_id);
       `);
       continue;
     }
