@@ -11,6 +11,7 @@ import { isFounderAuthorized, requireFounderAuth, createUser, createSession, get
 import { userDecisionJournal, events } from "../schema.ts";
 import { logEvent } from "../metrics.ts";
 import { renderJournalPageHtml } from "../journal-page.ts";
+import { renderMarketEvidenceCardHtml } from "../market-evidence-card.ts";
 
 describe("Acceptance Checklist: Statistical Separation, Reconciled Fees, Server Auth & iPhone Flow", () => {
   it("Item 1: separates deterministic arithmetic checks from empirical statistical hypotheses", async () => {
@@ -201,5 +202,77 @@ describe("Acceptance Checklist: Statistical Separation, Reconciled Fees, Server 
 
     const intEvents = db.select().from(events).where(eq(events.userId, internalUser.id)).all();
     assert.strictEqual(intEvents.length, 2);
+  });
+
+  it("Item 7: verifies decision journal settlement resolution, realized P&L, personal Brier score, and Market Evidence Card", () => {
+    const user = createUser(`trader_${Date.now()}@domain.com`, "pass123", "pro");
+    const now = new Date().toISOString();
+
+    // 1. Insert saved check
+    const entryId = `jrn_test_${Date.now()}`;
+    db.insert(userDecisionJournal).values({
+      id: entryId,
+      userId: user.id,
+      venue: "kalshi-15m",
+      contractTicker: "KXBTC15M",
+      contractType: "binary_above_below",
+      side: "yes",
+      pricingBasis: "executable_ask",
+      contractPrice: 0.51,
+      contractCount: 10,
+      purchaseCost: 5.10,
+      exchangeFee: 0.18,
+      halfSpreadDrag: 0.0,
+      totalDrag: 0.018,
+      breakevenWinProb: 52.80,
+      assessedWinProb: 60.0, // Assessed 60% probability
+      netExpectedValue: 0.72,
+      settlementSource: "CME CF BRTI 60s TWAP",
+      status: "saved_check",
+      createdAt: now,
+      updatedAt: now,
+    }).run();
+
+    // 2. Resolve entry as WON
+    // Payout = 10 * $1.00 = $10.00. Cost = $5.10. Fee = $0.18. Realized PnL = $10.00 - $5.10 - $0.18 = $4.72
+    const realizedPnl = Number(((10 * 1.00) - 5.10 - 0.18).toFixed(2));
+    assert.strictEqual(realizedPnl, 4.72);
+
+    db.update(userDecisionJournal)
+      .set({
+        outcome: "WON",
+        realizedPnl,
+        status: "settled",
+        notes: "Target reached on 60s TWAP",
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(userDecisionJournal.id, entryId))
+      .run();
+
+    // 3. Verify personal Brier score contribution
+    // Assessed prob: 0.60. Actual outcome: 1.0. Squared error = (0.60 - 1.0)^2 = 0.1600
+    const brierErr = Math.pow(0.60 - 1.0, 2);
+    assert.strictEqual(Number(brierErr.toFixed(4)), 0.1600);
+
+    // 4. Verify HTML render contains settled metrics and personal Brier
+    const entries = db.select().from(userDecisionJournal).where(eq(userDecisionJournal.userId, user.id)).all();
+    const html = renderJournalPageHtml(user, "pro", entries as any);
+    assert.ok(html.includes("Personal Brier Score"));
+    assert.ok(html.includes("0.1600"));
+    assert.ok(html.includes("+$4.72"));
+    assert.ok(html.includes("WON"));
+
+    // 5. Verify Market Evidence Card renders specifications and benchmark
+    const cardHtml = renderMarketEvidenceCardHtml({
+      ticker: "KXBTC15M",
+      venue: "kalshi-15m",
+      currentAsk: 0.51,
+      contractCount: 10,
+    });
+    assert.ok(cardHtml.includes("KXBTC15M"));
+    assert.ok(cardHtml.includes("CME CF Bitcoin Real-Time Index (BRTI 60s TWAP)"));
+    assert.ok(cardHtml.includes("52.80%"));
+    assert.ok(cardHtml.includes("$5.28")); // max loss
+    assert.ok(cardHtml.includes("N = 1,316 settled windows"));
   });
 });

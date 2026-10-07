@@ -1,4 +1,5 @@
 import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
+import { renderMarketEvidenceCardHtml } from "./market-evidence-card.ts";
 
 /**
  * True Cost & Expected Value Calculator for Short-Duration Prediction Markets
@@ -478,6 +479,11 @@ export function renderCalculatorPageHtml(): string {
           </a>
         </div>
       </div>
+    </div>
+
+    <!-- Standardized Market Evidence Card -->
+    <div style="margin-bottom: 48px;">
+      ${renderMarketEvidenceCardHtml({ ticker: "KXBTC15M", venue: "kalshi-15m", currentAsk: 0.51, contractCount: 10 })}
     </div>
 
     <!-- Mobile Persistent Sticky Save Bar -->

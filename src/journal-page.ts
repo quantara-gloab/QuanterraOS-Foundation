@@ -50,6 +50,23 @@ export function renderJournalPageHtml(
   const totalFeesTracked = entries.reduce((acc, e) => acc + (e.exchangeFee || 0), 0);
   const avgBreakeven = count > 0 ? (entries.reduce((acc, e) => acc + e.breakevenWinProb, 0) / count).toFixed(2) : "52.75";
 
+  // Calculate settlement & outcome metrics
+  const settledEntries = entries.filter(e => e.outcome === 'WON' || e.outcome === 'LOST' || e.outcome === 'VOID');
+  const scoredEntries = entries.filter(e => e.outcome === 'WON' || e.outcome === 'LOST');
+  const settledCount = settledEntries.length;
+  const totalRealizedPnl = entries.reduce((acc, e) => acc + (e.realizedPnl || 0), 0);
+  
+  // Personal Brier Score
+  let personalBrierStr = "—";
+  if (scoredEntries.length > 0) {
+    const sumSqErr = scoredEntries.reduce((acc, e) => {
+      const p = (e.assessedWinProb || 50) / 100;
+      const actual = e.outcome === 'WON' ? 1 : 0;
+      return acc + Math.pow(p - actual, 2);
+    }, 0);
+    personalBrierStr = (sumSqErr / scoredEntries.length).toFixed(4);
+  }
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -285,6 +302,58 @@ export function renderJournalPageHtml(
     .badge-pending { background: rgba(223, 184, 67, 0.15); color: var(--accent); border: 1px solid rgba(223, 184, 67, 0.3); }
     .badge-won { background: rgba(16, 185, 129, 0.15); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.3); }
     .badge-lost { background: rgba(244, 63, 94, 0.15); color: var(--rose); border: 1px solid rgba(244, 63, 94, 0.3); }
+    .badge-void { background: rgba(255, 255, 255, 0.1); color: var(--text-dim); border: 1px solid rgba(255, 255, 255, 0.2); }
+
+    .btn-settle {
+      background: rgba(223, 184, 67, 0.1);
+      border: 1px solid rgba(223, 184, 67, 0.4);
+      color: #DFB843;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .btn-settle:hover {
+      background: rgba(223, 184, 67, 0.25);
+      color: #FFFFFF;
+    }
+
+    /* Modal Overlay & Card */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-card {
+      background: #0C0F17;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      max-width: 480px;
+      width: 100%;
+      padding: 24px;
+      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.8);
+    }
+    .btn-outcome {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
 
     .banner-onboarding {
       background: linear-gradient(135deg, rgba(223, 184, 67, 0.12) 0%, rgba(12, 15, 23, 0.9) 100%);
@@ -378,22 +447,24 @@ export function renderJournalPageHtml(
       <div class="kpi-card">
         <div class="kpi-label">Tracked Decisions</div>
         <div class="kpi-val" id="kpi-total-checks">${count}</div>
-        <div class="kpi-sub">Saved pre-trade checks</div>
+        <div class="kpi-sub">${settledCount} settled · ${count - settledCount} pending</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">Avg Breakeven Hurdle</div>
-        <div class="kpi-val" style="color:var(--accent);">${avgBreakeven}%</div>
-        <div class="kpi-sub">Required directional hit rate</div>
+        <div class="kpi-label">Personal Brier Score</div>
+        <div class="kpi-val" style="color:var(--accent);">${personalBrierStr}</div>
+        <div class="kpi-sub">Market benchmark: 0.2001</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Realized Net P&amp;L</div>
+        <div class="kpi-val" style="color:${totalRealizedPnl >= 0 ? 'var(--green)' : 'var(--rose)'};">
+          ${totalRealizedPnl >= 0 ? '+' : ''}$${totalRealizedPnl.toFixed(2)}
+        </div>
+        <div class="kpi-sub">Net after all fees &amp; costs</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Cumulative Taker Fees</div>
         <div class="kpi-val" style="color:var(--rose);">$${totalFeesTracked.toFixed(2)}</div>
-        <div class="kpi-sub">Calculated exchange drag</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Rule B5 Exposure</div>
-        <div class="kpi-val" style="color:var(--green);">$0.00</div>
-        <div class="kpi-sub">Standby safe simulation</div>
+        <div class="kpi-sub">Rule B5 $0.00 Live Risk</div>
       </div>
     </div>
 
@@ -428,12 +499,12 @@ export function renderJournalPageHtml(
                 <th>Date (UTC)</th>
                 <th>Contract</th>
                 <th>Basis / Side</th>
-                <th>Purchase Cost</th>
-                <th>Taker Fee</th>
+                <th>Cost &amp; Fee</th>
                 <th>Breakeven Hurdle</th>
                 <th>Assessed p</th>
-                <th>Status</th>
-                <th>Oracle Benchmark</th>
+                <th>Realized P&amp;L</th>
+                <th>Outcome / Action</th>
+                <th>Notes / Benchmark</th>
               </tr>
             </thead>
             <tbody>
@@ -442,16 +513,34 @@ export function renderJournalPageHtml(
                   <td class="mono" style="color:var(--text-dim);">${e.createdAt ? e.createdAt.slice(0, 16).replace('T', ' ') : '—'}</td>
                   <td><strong style="color:#FFFFFF;">${e.contractTicker}</strong> <span style="font-size:0.75rem; color:var(--muted);">(${e.venue})</span></td>
                   <td class="mono">${e.pricingBasis === 'mid_price' ? 'Mid' : 'Ask'} · <span style="color:${e.side === 'yes' ? 'var(--green)' : 'var(--rose)'};">${e.side.toUpperCase()}</span></td>
-                  <td class="mono">$${(e.purchaseCost || 0).toFixed(2)} <span style="font-size:0.72rem; color:var(--muted);">(${e.contractCount}x @ ${(e.contractPrice * 100).toFixed(0)}¢)</span></td>
-                  <td class="mono" style="color:var(--rose);">+$${(e.exchangeFee || 0).toFixed(2)}</td>
+                  <td class="mono">
+                    $${(e.purchaseCost || 0).toFixed(2)}
+                    <span style="font-size:0.72rem; color:var(--rose);"> (+$${(e.exchangeFee || 0).toFixed(2)} fee)</span>
+                  </td>
                   <td class="mono" style="color:var(--accent); font-weight:700;">${(e.breakevenWinProb || 0).toFixed(2)}%</td>
                   <td class="mono">${(e.assessedWinProb || 0).toFixed(1)}%</td>
-                  <td>
-                    <span class="badge-status ${e.outcome === 'WON' ? 'badge-won' : e.outcome === 'LOST' ? 'badge-lost' : 'badge-pending'}">
-                      ${e.outcome || e.status || 'SAVED_CHECK'}
-                    </span>
+                  <td class="mono">
+                    ${e.realizedPnl !== null && e.realizedPnl !== undefined ? `
+                      <span style="font-weight:700; color:${e.realizedPnl >= 0 ? 'var(--green)' : 'var(--rose)'};">
+                        ${e.realizedPnl >= 0 ? '+' : ''}$${e.realizedPnl.toFixed(2)}
+                      </span>
+                    ` : `<span style="color:var(--muted);">Pending</span>`}
                   </td>
-                  <td style="font-size:0.75rem; color:var(--muted);">${e.settlementSource || 'CME CF BRTI'}</td>
+                  <td>
+                    ${e.outcome ? `
+                      <span class="badge-status ${e.outcome === 'WON' ? 'badge-won' : e.outcome === 'LOST' ? 'badge-lost' : 'badge-void'}">
+                        ${e.outcome}
+                      </span>
+                    ` : `
+                      <button type="button" class="btn-settle" onclick="openSettleModal('${e.id}', '${e.contractTicker}', ${e.contractCount || 10}, ${e.contractPrice || 0.51}, ${e.exchangeFee || 0.18})">
+                        Log Outcome &rarr;
+                      </button>
+                    `}
+                  </td>
+                  <td style="font-size:0.75rem; color:var(--muted);">
+                    ${e.notes ? `<div style="color:var(--text); margin-bottom:2px; font-weight:500;">${e.notes}</div>` : ''}
+                    <div>${e.settlementSource || 'CME CF BRTI'}</div>
+                  </td>
                 </tr>
               `).join('')}
             </tbody>
@@ -469,9 +558,120 @@ export function renderJournalPageHtml(
         <li><strong>Reconcile Actual Charges:</strong> Compare your realized monthly exchange statements against modeled fee drag to verify rounding impact.</li>
       </ol>
     </div>
+
+    <!-- Settlement Logging Modal -->
+    <div id="settle-modal" class="modal-overlay">
+      <div class="modal-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid var(--border-subtle); padding-bottom:10px;">
+          <div style="font-weight:700; font-size:1.05rem; color:#FFFFFF;" id="modal-title">Log Market Settlement</div>
+          <button type="button" onclick="closeSettleModal()" style="background:none; border:none; color:var(--muted); font-size:1.4rem; cursor:pointer;">&times;</button>
+        </div>
+
+        <div style="background:rgba(6,9,14,0.6); border:1px solid var(--border-subtle); border-radius:6px; padding:12px; margin-bottom:16px;">
+          <div style="font-size:0.75rem; color:var(--muted); font-family:var(--font-mono);" id="modal-specs">10 contracts @ 51¢ · Fee: $0.18</div>
+          <div style="font-size:0.82rem; color:var(--text); margin-top:4px;" id="modal-payout-preview">Win payout: +$4.72 · Loss: -$5.28</div>
+        </div>
+
+        <div style="margin-bottom:16px;">
+          <label style="font-size:0.8rem; color:var(--text-dim); display:block; margin-bottom:8px;">Settlement Outcome</label>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+            <button type="button" id="btn-outcome-won" class="btn-outcome" onclick="selectOutcome('WON')">
+              WON (100¢)
+            </button>
+            <button type="button" id="btn-outcome-lost" class="btn-outcome" onclick="selectOutcome('LOST')">
+              LOST (0¢)
+            </button>
+            <button type="button" id="btn-outcome-void" class="btn-outcome" onclick="selectOutcome('VOID')">
+              VOID
+            </button>
+          </div>
+        </div>
+
+        <div style="margin-bottom:20px;">
+          <label style="font-size:0.8rem; color:var(--text-dim); display:block; margin-bottom:6px;">Post-Mortem &amp; Learning Note</label>
+          <input type="text" id="input-modal-note" placeholder="e.g. Followed discipline, fee drag absorbed, BRTI target reached" style="width:100%; background:rgba(6,9,14,0.9); border:1px solid var(--border); color:#FFFFFF; padding:8px 12px; border-radius:4px; font-size:0.82rem; outline:none;">
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px;">
+          <button type="button" onclick="closeSettleModal()" class="btn-gold" style="background:rgba(255,255,255,0.06); color:var(--text); border-color:var(--border);">Cancel</button>
+          <button type="button" onclick="submitSettlement()" class="btn-gold" id="btn-submit-settle">Commit Settlement &rarr;</button>
+        </div>
+      </div>
+    </div>
   </main>
 
   <script>
+    let activeSettleId = null;
+    let selectedOutcome = 'WON';
+
+    function openSettleModal(id, ticker, count, price, fee) {
+      activeSettleId = id;
+      selectedOutcome = 'WON';
+      document.getElementById('modal-title').textContent = 'Log Settlement: ' + ticker;
+      document.getElementById('modal-specs').textContent = count + ' contracts @ ' + (price * 100).toFixed(0) + '¢ · Fee: $' + fee.toFixed(2);
+      
+      const cost = count * price;
+      const winPnl = ((1.00 * count) - cost - fee).toFixed(2);
+      const lossPnl = (-(cost + fee)).toFixed(2);
+      document.getElementById('modal-payout-preview').innerHTML = 'Win net P&L: <strong style="color:var(--green);">+$' + winPnl + '</strong> · Loss net P&L: <strong style="color:var(--rose);">$' + lossPnl + '</strong>';
+
+      selectOutcome('WON');
+      document.getElementById('input-modal-note').value = '';
+      document.getElementById('settle-modal').style.display = 'flex';
+    }
+
+    function closeSettleModal() {
+      document.getElementById('settle-modal').style.display = 'none';
+      activeSettleId = null;
+    }
+
+    function selectOutcome(outcome) {
+      selectedOutcome = outcome;
+      ['won', 'lost', 'void'].forEach(function(o) {
+        const btn = document.getElementById('btn-outcome-' + o);
+        if (o === outcome.toLowerCase()) {
+          btn.style.background = o === 'won' ? 'rgba(16,185,129,0.2)' : o === 'lost' ? 'rgba(244,63,94,0.2)' : 'rgba(255,255,255,0.15)';
+          btn.style.borderColor = o === 'won' ? 'var(--green)' : o === 'lost' ? 'var(--rose)' : 'var(--text)';
+          btn.style.color = '#FFFFFF';
+        } else {
+          btn.style.background = 'rgba(255,255,255,0.05)';
+          btn.style.borderColor = 'var(--border)';
+          btn.style.color = 'var(--text-dim)';
+        }
+      });
+    }
+
+    async function submitSettlement() {
+      if (!activeSettleId) return;
+      const notes = document.getElementById('input-modal-note').value;
+      const btn = document.getElementById('btn-submit-settle');
+      btn.textContent = 'Saving...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/journal/resolve', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: activeSettleId,
+            outcome: selectedOutcome,
+            notes: notes
+          })
+        });
+        if (res.ok) {
+          window.location.reload();
+        } else {
+          alert('Error settling decision. Please try again.');
+          btn.textContent = 'Commit Settlement →';
+          btn.disabled = false;
+        }
+      } catch (err) {
+        alert('Network error settling decision.');
+        btn.textContent = 'Commit Settlement →';
+        btn.disabled = false;
+      }
+    }
+
     // Check for pending check from True-Cost Calculator in localStorage
     window.addEventListener('DOMContentLoaded', function() {
       try {

@@ -56,6 +56,7 @@ import { renderPricingPageHtml } from "./pricing-page.ts";
 import { renderTwoStrategiesLostPageHtml } from "./blog-page.ts";
 import { renderAccountPageHtml } from "./account-page.ts";
 import { renderJournalPageHtml } from "./journal-page.ts";
+import { renderPilotAuditPageHtml } from "./pilot-audit-page.ts";
 import { renderAccessTerminalPage } from "./access-terminal-page.ts";
 import { renderWalletPageHtml } from "./wallet-page.ts";
 import { renderCalculatorPageHtml } from "./calculator-page.ts";
@@ -1837,6 +1838,68 @@ app.get("/api/journal", (req, res) => {
   res.json({ success: true, count: entries.length, entries });
 });
 
+app.post("/api/journal/resolve", (req, res) => {
+  const auth = getUserAuth(req);
+  if (!auth.user) {
+    return res.status(401).json({ error: "Authentication required to resolve journal entry" });
+  }
+
+  const { id, outcome, notes } = req.body || {};
+  if (!id || !["WON", "LOST", "VOID"].includes(outcome)) {
+    return res.status(400).json({ error: "Invalid resolution payload: id and outcome (WON|LOST|VOID) required" });
+  }
+
+  const existing = db
+    .select()
+    .from(userDecisionJournal)
+    .where(and(eq(userDecisionJournal.id, id), eq(userDecisionJournal.userId, auth.user.id)))
+    .all();
+
+  if (existing.length === 0) {
+    return res.status(404).json({ error: "Journal entry not found" });
+  }
+
+  const entry = existing[0];
+  let realizedPnl = 0;
+  const count = entry.contractCount || 1;
+  const fee = entry.exchangeFee || 0;
+  const cost = entry.purchaseCost || (entry.contractPrice * count);
+
+  if (outcome === "WON") {
+    realizedPnl = Number(((1.00 * count) - cost - fee).toFixed(2));
+  } else if (outcome === "LOST") {
+    realizedPnl = Number((-(cost + fee)).toFixed(2));
+  } else if (outcome === "VOID") {
+    realizedPnl = 0.00;
+  }
+
+  const now = new Date().toISOString();
+  db.update(userDecisionJournal)
+    .set({
+      outcome,
+      realizedPnl,
+      status: "settled",
+      notes: notes ? `${entry.notes ? entry.notes + " | " : ""}${notes}` : entry.notes,
+      updatedAt: now,
+    })
+    .where(eq(userDecisionJournal.id, id))
+    .run();
+
+  logEvent("journal_resolved", auth.user.id, {
+    journalId: id,
+    outcome,
+    realizedPnl,
+    contractTicker: entry.contractTicker,
+  });
+
+  res.json({
+    success: true,
+    id,
+    outcome,
+    realizedPnl,
+  });
+});
+
 app.get("/api/export/journal.csv", (req, res) => {
   const auth = getUserAuth(req);
   let entries: any[] = [];
@@ -1949,6 +2012,76 @@ app.get("/api/analytics/funnel-summary", requireFounderAuth, (_req, res) => {
         : "0.0%",
     },
   });
+});
+
+app.get("/audit/pilot", requireFounderAuth, (_req, res) => {
+  const allEvents = db.select().from(events).all();
+  const allUsers = db.select().from(users).all();
+
+  const internalUserIds = new Set<string>();
+  for (const u of allUsers) {
+    const email = (u.email || "").toLowerCase();
+    if (
+      email.includes("quanterraos.com") ||
+      email.includes("founder@") ||
+      email.includes("test@") ||
+      email.includes("operator@") ||
+      email.startsWith("internal_")
+    ) {
+      internalUserIds.add(u.id);
+    }
+  }
+
+  const customerCounts = {
+    checks_completed: 0,
+    signups: 0,
+    checks_saved: 0,
+    journal_views: 0,
+    journal_exports: 0,
+  };
+
+  const internalCounts = {
+    checks_completed: 0,
+    signups: 0,
+    checks_saved: 0,
+    journal_views: 0,
+    journal_exports: 0,
+  };
+
+  for (const e of allEvents) {
+    let isInternal = false;
+    if (e.userId && internalUserIds.has(e.userId)) isInternal = true;
+    if (e.metadata) {
+      try {
+        const meta = JSON.parse(e.metadata);
+        if (meta.is_internal || meta.internal || meta.test || meta.source === "test_suite") {
+          isInternal = true;
+        }
+      } catch (_) {}
+    }
+
+    const bucket = isInternal ? internalCounts : customerCounts;
+    if (e.eventName === "check_completed") bucket.checks_completed++;
+    else if (e.eventName === "signup") bucket.signups++;
+    else if (e.eventName === "check_saved") bucket.checks_saved++;
+    else if (e.eventName === "journal_viewed") bucket.journal_views++;
+    else if (e.eventName === "journal_exported") bucket.journal_exports++;
+  }
+
+  const recentEntries = db
+    .select()
+    .from(userDecisionJournal)
+    .orderBy(desc(userDecisionJournal.createdAt))
+    .limit(20)
+    .all();
+
+  res.type("html").send(
+    renderPilotAuditPageHtml({
+      customerFunnel: customerCounts,
+      internalFunnel: internalCounts,
+      recentJournalEntries: recentEntries,
+    })
+  );
 });
 
 app.get(["/calibration/surface", "/surface"], (_req, res) => {
