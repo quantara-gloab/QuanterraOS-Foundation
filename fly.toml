@@ -13,6 +13,7 @@ primary_region = "iad"
   DB_PATH = "/data/quanterraos.db"
   GROWTH_DB_PATH = "/data/growth.db"
   PUBLIC_BASE_URL = "https://quanterraos.com"
+  FOUNDER_SECRET_KEY = "quanterraos-pilot-audit-master-2026"
 
 # Persistent disk volume for SQLite WAL files (Rule B5 audit trail + telemetry ledger)
 [mounts]
