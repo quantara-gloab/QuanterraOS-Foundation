@@ -3389,19 +3389,26 @@ app.post("/api/kalshi/bid", async (req, res) => {
       });
     }
 
-    // 2. Signed-in admin check
-    const isAdmin = checkAdminAuth(req) || (auth.user && auth.tier === "institutional");
-    if (!isAdmin) {
+    // 2. Operator email check (KALSHI_LIVE_OPERATOR_EMAILS)
+    const allowedEmails = (process.env.KALSHI_LIVE_OPERATOR_EMAILS || "")
+      .split(",")
+      .map(e => e.trim().toLowerCase())
+      .filter(Boolean);
+
+    const userEmail = auth.user?.email ? auth.user.email.toLowerCase() : "";
+    const isOperator = Boolean(userEmail && allowedEmails.includes(userEmail));
+
+    if (allowedEmails.length === 0 || !isOperator) {
       return res.status(403).json({
-        error: "Forbidden: Live order execution requires signed-in administrator authentication.",
+        error: "Forbidden: Live order execution requires a signed-in account listed in KALSHI_LIVE_OPERATOR_EMAILS.",
       });
     }
 
-    // 3. Max contract count per order
-    const MAX_LIVE_CONTRACTS = 10;
-    if (Number(count) > MAX_LIVE_CONTRACTS) {
-      return res.status(400).json({
-        error: `Order limit exceeded: Live orders are capped at ${MAX_LIVE_CONTRACTS} contracts per order. Requested: ${count}`,
+    // 3. Max contract count per order (KALSHI_LIVE_MAX_CONTRACTS, default 10)
+    const maxContracts = Number(process.env.KALSHI_LIVE_MAX_CONTRACTS || "10") || 10;
+    if (Number(count) > maxContracts) {
+      return res.status(403).json({
+        error: `Order limit exceeded: Live orders are capped at ${maxContracts} contracts per order. Requested: ${count}`,
       });
     }
   }

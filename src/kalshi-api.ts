@@ -308,9 +308,9 @@ export async function placeKalshi15mBid(input: PlaceBidInput): Promise<BidResult
       throw new Error(`Kalshi API rejected order: ${errMsg}`);
     }
 
-    const kalshiStatus = (data.order?.status || "resting").toUpperCase();
-    const orderStatus: "FILLED" | "RESTING" | "ACCEPTED" | "CANCELLED" =
-      kalshiStatus === "EXECUTED" ? "FILLED" : (kalshiStatus as any) || "RESTING";
+    const kalshiStatus = (data.order?.status || "").toUpperCase();
+    const orderStatus: "FILLED" | "PENDING" =
+      kalshiStatus === "EXECUTED" || kalshiStatus === "FILLED" ? "FILLED" : "PENDING";
 
     return {
       success: true,

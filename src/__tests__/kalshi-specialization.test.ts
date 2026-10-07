@@ -186,24 +186,21 @@ describe("Kalshi Specialization Engine: 15-Minute & 1-Hour Above/Below", () => {
     assert.ok(ladder.every(entry => entry.ticker.startsWith("KXBTCD-NEAR")));
   });
 
-  it("preserves null for empty orderbook quotes instead of fabricating 0.50 / 0.48", () => {
+  it("drops strikes that have no real quote and preserves null for one-sided quotes instead of fabricating 0.50 / 0.48", () => {
     const now = Date.now();
     const futureClose = new Date(now + 30 * 60000).toISOString();
 
     const emptyBookMarkets = [
-      { ticker: "KXBTCD-EMPTY", floor_strike: 85000, close_time: futureClose }, // no quotes at all
-      { ticker: "KXBTCD-BID-ONLY", floor_strike: 85500, yes_bid: 40, close_time: futureClose }, // bid only (cents)
+      { ticker: "KXBTCD-EMPTY", floor_strike: 85000, close_time: futureClose }, // no quotes at all -> dropped
+      { ticker: "KXBTCD-BID-ONLY", floor_strike: 85500, yes_bid: 40, close_time: futureClose }, // bid only (cents) -> kept
     ];
 
     const ladder = buildStrikeLadder(emptyBookMarkets, 85200);
-    assert.strictEqual(ladder.length, 2);
+    // Unquoted strike is dropped to ensure only real liquidity is displayed
+    assert.strictEqual(ladder.length, 1);
 
     const emptyEntry = ladder.find(e => e.ticker === "KXBTCD-EMPTY");
-    assert.ok(emptyEntry);
-    assert.strictEqual(emptyEntry.yesBid, null, "empty book must have null bid");
-    assert.strictEqual(emptyEntry.yesAsk, null, "empty book must have null ask");
-    assert.strictEqual(emptyEntry.takerFee, null, "empty book must have null taker fee");
-    assert.strictEqual(emptyEntry.netEvAtFiftyPctWin, null, "empty book must have null EV");
+    assert.strictEqual(emptyEntry, undefined, "unquoted strike must be dropped from ladder");
 
     const bidOnlyEntry = ladder.find(e => e.ticker === "KXBTCD-BID-ONLY");
     assert.ok(bidOnlyEntry);

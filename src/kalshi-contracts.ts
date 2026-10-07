@@ -222,45 +222,52 @@ export function buildStrikeLadder(markets: any[], currentSpot: number): KalshiSt
     (a, b) => (b.floor_strike ?? b.cap_strike ?? 0) - (a.floor_strike ?? a.cap_strike ?? 0)
   );
 
-  return sorted.map(m => {
-    const strike = m.floor_strike ?? m.cap_strike ?? 0;
-    const yesAsk = parseQuotePrice(m.yes_ask_dollars, m.yes_ask);
-    const yesBid = parseQuotePrice(m.yes_bid_dollars, m.yes_bid);
+  return sorted
+    .map((m): KalshiStrikeLadderEntry | null => {
+      const strike = m.floor_strike ?? m.cap_strike ?? 0;
+      const yesAsk = parseQuotePrice(m.yes_ask_dollars, m.yes_ask);
+      const yesBid = parseQuotePrice(m.yes_bid_dollars, m.yes_bid);
 
-    const hasAsk = yesAsk !== null && yesAsk > 0;
-    const hasBid = yesBid !== null && yesBid > 0;
+      const hasAsk = yesAsk !== null && yesAsk > 0;
+      const hasBid = yesBid !== null && yesBid > 0;
 
-    let impliedProb: number | null = null;
-    if (hasAsk && hasBid) {
-      impliedProb = Math.round(((yesAsk! + yesBid!) / 2) * 100) / 100;
-    } else if (hasAsk) {
-      impliedProb = yesAsk;
-    } else if (hasBid) {
-      impliedProb = yesBid;
-    }
+      // Drop strikes that have no real quotes (no liquidity)
+      if (!hasAsk && !hasBid) {
+        return null;
+      }
 
-    const takerFee = hasAsk ? calculateKalshiTakerFee(yesAsk!) : null;
-    const dist = Math.round((currentSpot - strike) * 100) / 100;
-    const distBps = currentSpot > 0 ? Math.round((dist / currentSpot) * 10000 * 10) / 10 : 0;
+      let impliedProb: number | null = null;
+      if (hasAsk && hasBid) {
+        impliedProb = Math.round(((yesAsk! + yesBid!) / 2) * 100) / 100;
+      } else if (hasAsk) {
+        impliedProb = yesAsk;
+      } else if (hasBid) {
+        impliedProb = yesBid;
+      }
 
-    // EV of a trade with an assumed 50% true win rate: 0.50 * $1.00 - (yesAsk + fee)
-    const netEvAtFiftyPctWin =
-      hasAsk && takerFee !== null
-        ? Math.round((0.50 - (yesAsk! + takerFee)) * 10000) / 10000
-        : null;
+      const takerFee = hasAsk ? calculateKalshiTakerFee(yesAsk!) : null;
+      const dist = Math.round((currentSpot - strike) * 100) / 100;
+      const distBps = currentSpot > 0 ? Math.round((dist / currentSpot) * 10000 * 10) / 10 : 0;
 
-    return {
-      ticker: m.ticker,
-      strike,
-      subtitle: m.subtitle || `$${strike.toLocaleString()} or above`,
-      distanceFromSpot: dist,
-      distanceBps: distBps,
-      yesBid,
-      yesAsk,
-      impliedProb,
-      takerFee,
-      netEvAtFiftyPctWin,
-      closeTime: m.close_time,
-    };
-  });
+      // EV of a trade with an assumed 50% true win rate: 0.50 * $1.00 - (yesAsk + fee)
+      const netEvAtFiftyPctWin =
+        hasAsk && takerFee !== null
+          ? Math.round((0.50 - (yesAsk! + takerFee)) * 10000) / 10000
+          : null;
+
+      return {
+        ticker: m.ticker,
+        strike,
+        subtitle: m.subtitle || `$${strike.toLocaleString()} or above`,
+        distanceFromSpot: dist,
+        distanceBps: distBps,
+        yesBid,
+        yesAsk,
+        impliedProb,
+        takerFee,
+        netEvAtFiftyPctWin,
+        closeTime: m.close_time || undefined,
+      };
+    })
+    .filter((entry): entry is KalshiStrikeLadderEntry => entry !== null);
 }

@@ -674,9 +674,10 @@ Explore our TrustOS pilot at **/trustos** or read our full analysis in docs/comp
     citations.push("src/agents/council-pipeline.ts", "Rule B5 Circuit Lock");
     return {
       reply: `The QuanterraOS Executive Council operates with continuous coordination:
-- **Periodic Verification Pipeline**: Evaluates incoming L2 order books, tick events, and settlement indices across venues every 30 seconds.
+- **Model vs Market Reality**: Our quantitative model does not beat Kalshi's market prices (canonical Brier score 0.2001 for Kalshi market mid vs. 0.2063 for model at minute 4).
+- **Periodic Verification Pipeline**: Evaluates incoming L2 order books, tick events, and settlement indices across venues on a scheduled cadence.
 - **Specialist Roles**: Team Principal Lion synthesizes verdicts, Draco monitors data quality, Wolf tracks order-book depth, Falcon conducts research, Quantum Fox evaluates baselines, Sentinel checks pipeline uptime, Kraken enforces safety boundaries, Phoenix governs circuit breakers, and Aria provides conversational assistance.
-- **Strict Risk Governance (Rule B5)**: Regardless of analysis tempo, live capital exposure remains strictly $0.00 with the execution circuit breaker permanently locked.`,
+- **Strict Risk Governance (Rule B5)**: Live trading is locked down and strictly gated (requiring KALSHI_LIVE=true, operator email listed in KALSHI_LIVE_OPERATOR_EMAILS, and strict contract caps). Live capital exposure remains strictly $0.00.`,
       citations
     };
   }
