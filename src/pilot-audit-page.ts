@@ -45,6 +45,7 @@ export interface PilotAuditPageData {
     device: string;
     durationMinutes: number;
     unassisted: string;
+    assistanceDetails?: string | null;
     persistenceStatus: string;
     confusionNotes?: string | null;
     comprehensionCostFee?: string | null;
@@ -57,7 +58,10 @@ export interface PilotAuditPageData {
 }
 
 export function renderPilotAuditPageHtml(data: PilotAuditPageData): string {
-  const { customerFunnel, internalFunnel, recentJournalEntries, recordedSessions = [] } = data;
+  const { recordedSessions = [] } = data;
+  const recentJournalEntries = data.recentJournalEntries ?? [];
+  const customerFunnel = data.customerFunnel ?? { checks_completed: 0, signups: 0, checks_saved: 0, journal_views: 0 };
+  const internalFunnel = data.internalFunnel ?? { internal_checks: 0, example_previews: 0, audit_views: 0 };
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -282,13 +286,72 @@ export function renderPilotAuditPageHtml(data: PilotAuditPageData): string {
       `}
     </div>
 
+    <!-- Verified Pilot Observation Sessions in Database -->
+    <div class="card" style="margin-bottom:32px;">
+      <div class="card-title">
+        <span>Verified Usability Pilot Observation Log (Ground Truth)</span>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <span class="mono" style="font-size:0.75rem; color:${recordedSessions.length > 0 ? 'var(--green)' : 'var(--muted)'};">${recordedSessions.length} / 10 observed</span>
+          <a href="/api/audit/pilot/export" class="btn-gold" style="font-size:0.7rem; padding:4px 10px;">Export Audit JSON &rarr;</a>
+        </div>
+      </div>
+      ${recordedSessions.length === 0 ? `
+        <div style="text-align:center; padding:36px 20px; color:var(--muted); font-size:0.85rem;">
+          <div style="font-size:1.8rem; margin-bottom:8px;">📋</div>
+          <strong style="color:#FFFFFF; font-size:0.95rem;">Every result starts empty until observed.</strong>
+          <div style="margin-top:4px;">0 of 10 participant usability sessions logged. Record a completed session below to begin populating empirical audit data.</div>
+        </div>
+      ` : `
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Date (UTC)</th>
+                <th>Participant</th>
+                <th>Device &amp; Browser</th>
+                <th>Duration</th>
+                <th>Independent?</th>
+                <th>Assistance Details</th>
+                <th>Comprehension Response</th>
+                <th>Defects / Confusion</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${recordedSessions.map(s => `
+                <tr>
+                  <td class="mono" style="color:var(--muted); font-size:0.75rem;">${(s.createdAt || '').slice(0, 16).replace('T', ' ')}</td>
+                  <td class="mono" style="color:var(--accent); font-weight:700;">${s.participantRef}</td>
+                  <td style="font-size:0.78rem;">${s.device}</td>
+                  <td class="mono" style="font-size:0.78rem;">${s.durationMinutes}m</td>
+                  <td class="mono">
+                    <span style="display:inline-block; padding:2px 6px; border-radius:3px; font-size:0.7rem; font-weight:700; ${s.unassisted === 'YES' ? 'background:rgba(16,185,129,0.15); color:var(--green); border:1px solid rgba(16,185,129,0.3);' : 'background:rgba(244,63,94,0.15); color:var(--rose); border:1px solid rgba(244,63,94,0.3);'}">
+                      ${s.unassisted === 'YES' ? 'YES (UNASSISTED)' : 'NO (ASSISTED)'}
+                    </span>
+                  </td>
+                  <td style="font-size:0.75rem; color:var(--text);">${s.assistanceDetails || '<span style="color:var(--muted);">None</span>'}</td>
+                  <td style="font-size:0.75rem; color:var(--text);">${s.comprehensionCostFee || s.comprehensionBreakeven || '—'}</td>
+                  <td style="font-size:0.75rem; color:var(--text);">${s.confusionNotes || '<span style="color:var(--muted);">Zero defects</span>'}</td>
+                  <td class="mono" style="font-size:0.72rem; color:var(--green);">${s.status || 'COMPLETED'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `}
+    </div>
+
     <!-- Session Observation Note Entry Form -->
     <div class="card">
       <div class="card-title">
         <span>Record Real Participant Session Observation</span>
         <span class="mono" style="font-size:0.75rem; color:var(--cyan);">AUDIT ARTIFACT BUILDER</span>
       </div>
-      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:14px; margin-bottom:14px;">
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:14px; margin-bottom:14px;">
+        <div class="form-group">
+          <label class="form-label">Session Date &amp; Time (UTC)</label>
+          <input type="datetime-local" id="obs-date" class="form-input">
+        </div>
         <div class="form-group">
           <label class="form-label">Participant ID</label>
           <input type="text" id="obs-id" class="form-input" placeholder="P-01">
@@ -299,7 +362,7 @@ export function renderPilotAuditPageHtml(data: PilotAuditPageData): string {
         </div>
         <div class="form-group">
           <label class="form-label">Device &amp; Browser</label>
-          <input type="text" id="obs-device" class="form-input" placeholder="iPhone 15 Pro (Safari)">
+          <input type="text" id="obs-device" class="form-input" placeholder="iPhone 15 Mobile Safari">
         </div>
         <div class="form-group">
           <label class="form-label">Task Duration (mm:ss)</label>
@@ -309,157 +372,113 @@ export function renderPilotAuditPageHtml(data: PilotAuditPageData): string {
 
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-bottom:14px;">
         <div class="form-group">
-          <label class="form-label">Unassisted Completion?</label>
-          <select id="obs-unassisted" class="form-input">
-            <option value="YES">YES — Zero coaching or button hints</option>
+          <label class="form-label">Independent Completion?</label>
+          <select id="obs-unassisted" class="form-input" onchange="toggleAssistanceField(this.value)">
+            <option value="YES">YES — Fully independent, zero coaching</option>
             <option value="NO">NO — Required assistance/clarification</option>
           </select>
         </div>
         <div class="form-group">
           <label class="form-label">Persistence Check (Sign out &rarr; Sign in)</label>
           <select id="obs-persistence" class="form-input">
-            <option value="VERIFIED">VERIFIED — Saved check found in journal</option>
+            <option value="VERIFIED">VERIFIED — Saved check persisted in journal</option>
             <option value="FAILED">FAILED — Entry missing or error</option>
           </select>
         </div>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">Observed Hesitations / Confusion Points</label>
-        <input type="text" id="obs-friction" class="form-input" placeholder="e.g. Looked for slider vs input, read Kalshi round-up note">
+      <div class="form-group" id="group-assistance" style="display:none;">
+        <label class="form-label" style="color:var(--rose);">Assistance Details (What guidance or hints were provided?)</label>
+        <input type="text" id="obs-assistance" class="form-input" placeholder="e.g. Guided to slider preset, explained round-up calculation">
       </div>
 
       <div class="form-group">
-        <label class="form-label">Comprehension Verbatim Response (Cost, Fee, Breakeven, Zero Alpha Claim)</label>
-        <input type="text" id="obs-comprehension" class="form-input" placeholder="e.g. 'Max loss is $5.28, fee is $0.18, 52.8% is just the hurdle to break even'">
+        <label class="form-label">Comprehension Verbatim Response (Fee drag, breakeven hurdle, $0 live risk)</label>
+        <input type="text" id="obs-comprehension" class="form-input" placeholder="e.g. 'Max loss is $5.28 ($5.10 + $0.18 fee), 52.8% is just the hurdle to break even'">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Defects / Confusion Points Observed (Leave blank if zero defects)</label>
+        <input type="text" id="obs-defects" class="form-input" placeholder="e.g. Mobile keypad blocked Save button, or: Zero defects">
       </div>
 
       <div style="display:flex; justify-content:space-between; align-items:center; margin-top:18px;">
-        <span style="font-size:0.75rem; color:var(--muted);">Stored locally in audit buffer for one-click report assembly.</span>
-        <button type="button" class="btn-gold" onclick="recordObservation()">+ Save Session Note to Audit Buffer</button>
-      </div>
-
-      <!-- Buffer Table -->
-      <div id="buffer-section" style="margin-top:24px; display:none;">
-        <div style="font-weight:700; font-size:0.85rem; margin-bottom:8px; color:var(--accent);">Active Pilot Buffer (<span id="buffer-count">0</span> / 10 sessions logged)</div>
-        <div style="overflow-x:auto;">
-          <table id="buffer-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Device</th>
-                <th>Time</th>
-                <th>Unassisted</th>
-                <th>Persistence</th>
-                <th>Comprehension</th>
-              </tr>
-            </thead>
-            <tbody id="buffer-tbody"></tbody>
-          </table>
-        </div>
-        <div style="margin-top:14px; display:flex; gap:10px;">
-          <button type="button" class="btn-gold" onclick="exportAuditJson()">Export Audit JSON &rarr;</button>
-          <button type="button" class="btn-gold" style="background:rgba(255,255,255,0.06); color:#FFF; border-color:var(--border);" onclick="clearBuffer()">Reset Buffer</button>
-        </div>
+        <span style="font-size:0.75rem; color:var(--muted);">Stored directly to database. Results start empty until observed.</span>
+        <button type="button" class="btn-gold" id="btn-save-obs" onclick="recordObservation()">+ Record Observed Session &rarr;</button>
       </div>
     </div>
   </div>
 
   <script>
-    let observations = JSON.parse(localStorage.getItem('quanterraos_pilot_observations') || '[]');
-
-    function renderBuffer() {
-      const section = document.getElementById('buffer-section');
-      const tbody = document.getElementById('buffer-tbody');
-      const countEl = document.getElementById('buffer-count');
-      if (observations.length === 0) {
-        section.style.display = 'none';
-        return;
+    // Initialize date picker to current local datetime
+    window.addEventListener('DOMContentLoaded', function() {
+      const now = new Date();
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      const dateEl = document.getElementById('obs-date');
+      if (dateEl && !dateEl.value) {
+        dateEl.value = now.toISOString().slice(0, 16);
       }
-      section.style.display = 'block';
-      countEl.textContent = observations.length;
-      tbody.innerHTML = observations.map(function(o) {
-        return '<tr>' +
-          '<td class="mono"><strong>' + o.id + '</strong></td>' +
-          '<td>' + o.device + '</td>' +
-          '<td class="mono">' + o.duration + '</td>' +
-          '<td class="mono" style="color:' + (o.unassisted === 'YES' ? 'var(--green)' : 'var(--rose)') + '">' + o.unassisted + '</td>' +
-          '<td class="mono" style="color:' + (o.persistence === 'VERIFIED' ? 'var(--green)' : 'var(--rose)') + '">' + o.persistence + '</td>' +
-          '<td style="font-size:0.75rem; color:var(--muted);">' + o.comprehension + '</td>' +
-        '</tr>';
-      }).join('');
+    });
+
+    function toggleAssistanceField(val) {
+      const grp = document.getElementById('group-assistance');
+      if (grp) grp.style.display = val === 'NO' ? 'block' : 'none';
     }
 
-    function recordObservation() {
-      const id = document.getElementById('obs-id').value || ('P-' + (observations.length + 1).toString().padStart(2, '0'));
-      const channel = document.getElementById('obs-channel').value || 'Direct Prediction Market Trader';
-      const device = document.getElementById('obs-device').value || 'iPhone Safari';
-      const duration = document.getElementById('obs-duration').value || '02:00';
+    async function recordObservation() {
+      const btn = document.getElementById('btn-save-obs');
+      const dateVal = document.getElementById('obs-date').value;
+      const createdAt = dateVal ? new Date(dateVal).toISOString() : new Date().toISOString();
+      const id = document.getElementById('obs-id').value.trim() || 'P-01';
+      const channel = document.getElementById('obs-channel').value.trim() || 'Direct Participant';
+      const device = document.getElementById('obs-device').value.trim() || 'iPhone Mobile Safari';
+      const duration = document.getElementById('obs-duration').value.trim() || '02:00';
       const unassisted = document.getElementById('obs-unassisted').value;
+      const assistanceDetails = document.getElementById('obs-assistance') ? document.getElementById('obs-assistance').value.trim() : '';
       const persistence = document.getElementById('obs-persistence').value;
-      const friction = document.getElementById('obs-friction').value || 'None';
-      const comprehension = document.getElementById('obs-comprehension').value || 'Confirmed cost, fees, and no alpha claim';
+      const comprehension = document.getElementById('obs-comprehension').value.trim() || 'Confirmed cost, fees, and no alpha claim';
+      const defects = document.getElementById('obs-defects').value.trim() || 'Zero defects observed';
       const durationNum = parseFloat(duration.replace(':', '.')) || 2.0;
 
-      const sessionPayload = {
-        id: id,
+      const payload = {
         participantRef: id,
         channel: channel,
         device: device,
         durationMinutes: durationNum,
         unassisted: unassisted,
+        assistanceDetails: unassisted === 'NO' ? assistanceDetails : null,
         persistenceStatus: persistence,
-        confusionNotes: friction,
+        confusionNotes: defects,
         comprehensionCostFee: comprehension,
         comprehensionBreakeven: comprehension,
         comprehensionZeroAlpha: comprehension,
-        operatorNotes: friction,
-        timestamp: new Date().toISOString()
+        operatorNotes: defects,
+        createdAt: createdAt
       };
 
-      // Persist to SQLite backend via API
-      fetch('/api/audit/pilot/session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(sessionPayload)
-      }).then(function(res) {
-        if (!res.ok) console.warn('Backend sync returned', res.status);
-      }).catch(function(err) {
-        console.warn('Backend sync offline:', err);
-      });
+      btn.disabled = true;
+      btn.textContent = 'Saving to database...';
 
-      // Update local buffer
-      observations.push({
-        id: id,
-        channel: channel,
-        device: device,
-        duration: duration,
-        unassisted: unassisted,
-        persistence: persistence,
-        friction: friction,
-        comprehension: comprehension,
-        timestamp: sessionPayload.timestamp
-      });
-
-      localStorage.setItem('quanterraos_pilot_observations', JSON.stringify(observations));
-      renderBuffer();
-      alert('Recorded session ' + id + ' (' + observations.length + '/10 logged) and synchronized to database.');
-    }
-
-    function exportAuditJson() {
-      // First attempt server-side complete manifest download
-      window.location.href = '/api/audit/pilot/export';
-    }
-
-    function clearBuffer() {
-      if (confirm('Clear local observation buffer?')) {
-        observations = [];
-        localStorage.removeItem('quanterraos_pilot_observations');
-        renderBuffer();
+      try {
+        const res = await fetch('/api/audit/pilot/session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          alert('Successfully recorded session ' + id + '. Dashboard updated.');
+          window.location.reload();
+        } else {
+          alert('Could not save session observation. Please verify founder authorization.');
+          btn.disabled = false;
+          btn.textContent = '+ Record Observed Session →';
+        }
+      } catch (err) {
+        alert('Network error saving session observation.');
+        btn.disabled = false;
+        btn.textContent = '+ Record Observed Session →';
       }
     }
-
-    renderBuffer();
   </script>
   ${ASSISTANT_WIDGET_HTML}
 </body>

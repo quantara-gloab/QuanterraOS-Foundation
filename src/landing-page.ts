@@ -2,6 +2,7 @@ import type { MarketPriceCalibrationReport } from "./market-price-calibration.ts
 import { getCouncilAgentsData } from "./agents/council-data.ts";
 import { renderSpecialistIcon, SPECIALIST_ICONS_CSS } from "./specialist-icons.ts";
 import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
+import { renderBetaFeedbackWidgetHtml } from "./feedback-widget.ts";
 
 /**
  * QuanterraOS Flagship — Elite Institutional Grade
@@ -917,36 +918,21 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     <div style="font-family: var(--font-mono); color: var(--muted);">CRYPTOGRAPHIC REPRODUCIBILITY VERIFIED</div>
   </div>
 
-  <!-- Navigation -->
+  <!-- Primary Consumer Navigation: Check · Journal · Learn · Sign in -->
   <nav class="top-nav">
     <div class="nav-left">
       <a href="/" class="nav-brand"><span class="brand-dot"></span> quanterraos</a>
       <div class="nav-links">
-        <a href="/calculator" style="color:var(--accent);font-weight:700;">calculator</a>
-        <a href="/compare" style="color:#38BDF8;font-weight:700;">compare venues</a>
-        <a href="/learn" style="color:var(--accent-light);font-weight:700;">learn / curriculum</a>
-        <a href="/journal" style="color:#10B981;font-weight:700;">decision journal</a>
-        <a href="/pricing" style="color:var(--accent);">pricing</a>
-        <a href="/kalshi/15m">kalshi 15m</a>
-        <a href="/kalshi/1h">kalshi 1h</a>
-        <a href="/trustos">trustos pilot</a>
-        <a href="/calibration">calibration</a>
-        <a href="/council">council</a>
-        <a href="/predictions">predictions</a>
-        <a href="/autopilot">autopilot</a>
-        <a href="/wallet">wallet</a>
-        <a href="/growth">growth</a>
-        <a href="/index">index</a>
-        <a href="/spread">spread</a>
-        <a href="/research">research</a>
-        <a href="/account">account</a>
-        <a href="/status">status</a>
+        <a href="/calculator" style="color:var(--accent); font-weight:700;">Check</a>
+        <a href="/journal" style="color:#10B981; font-weight:700;">Journal</a>
+        <a href="/learn" style="color:var(--accent-light); font-weight:700;">Learn</a>
+        <a href="/access" style="color:var(--text); font-weight:500;">Sign in</a>
       </div>
     </div>
-    <div class="nav-right" style="display:flex;gap:10px;align-items:center;">
-      <a href="/access" class="nav-cta" style="background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%);color:#07080B;border:1px solid rgba(255,248,220,0.8);box-shadow:0 4px 16px rgba(212,175,55,0.4), inset 0 1px 0 #FFF;font-weight:800;">OPERATOR ACCESS &rarr;</a>
-      <a href="/calculator" class="nav-cta" style="background:linear-gradient(180deg, #10B981 0%, #047857 100%);color:#fff;border-color:rgba(52,211,153,0.5);box-shadow:0 4px 14px rgba(16,185,129,0.35);">TRUE COST CALC &rarr;</a>
-      <a href="/council" class="nav-cta">COUNCIL CONSOLE</a>
+    <div class="nav-right" style="display:flex; gap:12px; align-items:center;">
+      <a href="/research" style="color:var(--muted); font-size:0.78rem; text-decoration:none;">Research</a>
+      <a href="/access" style="color:var(--muted); font-size:0.78rem; text-decoration:none;">Institutional</a>
+      <a href="/calculator" class="nav-cta" style="background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%); color:#07080B; border:1px solid rgba(255,248,220,0.8); box-shadow:0 4px 16px rgba(212,175,55,0.4), inset 0 1px 0 #FFF; font-weight:800;">FREE CHECK &rarr;</a>
     </div>
   </nav>
 
@@ -965,9 +951,9 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
           The independent companion you consult before entering any prediction-market position. Verify executable taker fees, true breakeven odds, and settlement friction across Kalshi and Polymarket before risking capital.
         </p>
         <div class="hero-actions">
-          <a href="/calculator" class="btn-primary" style="background:linear-gradient(180deg, #10B981 0%, #059669 100%);border-color:#34D399;box-shadow:0 0 20px rgba(16,185,129,0.35);font-weight:700;">Free True-Cost &amp; Breakeven Check &rarr;</a>
-          <a href="/access" class="btn-secondary" style="border-color:rgba(212,175,55,0.4);color:var(--accent-light);">Board Command Spaceship</a>
-          <a href="/calibration/surface" class="btn-secondary">Calibration Surface</a>
+          <a href="/calculator" class="btn-primary" style="background:linear-gradient(180deg, #10B981 0%, #059669 100%); border-color:#34D399; box-shadow:0 0 20px rgba(16,185,129,0.35); font-weight:700;">Free True-Cost &amp; Breakeven Check &rarr;</a>
+          <a href="/journal?preview=true" class="btn-secondary" style="border-color:rgba(212,175,55,0.4); color:var(--accent-light);">Preview Decision Journal &rarr;</a>
+          <a href="/pricing" class="btn-secondary">Plans &amp; Pricing</a>
         </div>
 
         <div style="background: rgba(14, 20, 30, 0.7); border: 1px solid rgba(212, 175, 55, 0.25); border-radius: 6px; padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 24px; width: 100%; font-family: var(--font-mono); font-size: 0.74rem;">
@@ -1077,7 +1063,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
               </div>
               <div class="wedge-metric-row">
                 <span class="wedge-metric-key">Exchange Taker Fee:</span>
-                <span class="wedge-metric-val" style="color:var(--warning);" id="wedge-out-fee">+$0.18 (1.75¢/ct)</span>
+                <span class="wedge-metric-val" style="color:var(--warning);" id="wedge-out-fee">+$0.18 (1.80¢/ct)</span>
               </div>
               <div class="wedge-metric-row">
                 <span class="wedge-metric-key">Maximum Potential Loss:</span>
@@ -1085,7 +1071,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
               </div>
               <div class="wedge-metric-row">
                 <span class="wedge-metric-key">Required Breakeven Win Probability:</span>
-                <span class="wedge-metric-val" style="color:var(--accent);" id="wedge-out-breakeven">52.75%</span>
+                <span class="wedge-metric-val" style="color:var(--accent);" id="wedge-out-breakeven">52.80%</span>
               </div>
               <div class="wedge-metric-row">
                 <span class="wedge-metric-key">Net Arithmetic EV (at Assessed p):</span>
@@ -1099,16 +1085,16 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
 
             <div style="margin-top: 20px;">
               <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                <a href="/account?flow=save-check" onclick="handleWedgeSaveCheck(event)" class="btn-primary" style="flex:1; text-align:center; padding:10px 14px; font-size:0.8rem; background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%); color:#07080B; border:1px solid #DFB843; font-weight:700;">
+                <a href="/account?flow=save-check" id="btn-wedge-save" onclick="handleWedgeSaveCheck(event)" class="btn-primary" style="flex:1; text-align:center; padding:10px 14px; font-size:0.8rem; background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%); color:#07080B; border:1px solid #DFB843; font-weight:700;">
                   Save My Check &amp; Start Journal &rarr;
                 </a>
+                <button type="button" class="btn-secondary" onclick="loadExampleWedgeCheck()" style="padding:10px 14px; font-size:0.8rem; border-color:rgba(56,189,248,0.4); color:#38BDF8; font-weight:600;">
+                  ⚡ Example Preview
+                </button>
                 <button type="button" class="btn-secondary" onclick="openShareCardModal()" style="display:inline-flex; align-items:center; gap:6px; padding:10px 14px; font-size:0.8rem; font-weight:600; background:rgba(212,175,55,0.08); border-color:rgba(212,175,55,0.3); color:var(--accent-light);">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-                  Export Decision Card
+                  Export Card
                 </button>
-                <a href="/calculator" class="btn-secondary" style="padding:10px 14px; font-size:0.8rem;">
-                  Full Calculator &rarr;
-                </a>
               </div>
               <div style="font-size: 0.72rem; color: var(--muted); margin-top: 10px; line-height: 1.45;">
                 <strong>Advisory Notice:</strong> Expected profit is pure arithmetic ($p - P_{ask} - fee$), not an established QuanterraOS edge. User-entered probabilities are personal assumptions, never validated forecasts.
@@ -1972,6 +1958,29 @@ function installPwaApp() {
   }
 }
 
+function loadExampleWedgeCheck() {
+  const venue = document.getElementById('wedge-venue');
+  const price = document.getElementById('wedge-price');
+  const count = document.getElementById('wedge-count');
+  const prob = document.getElementById('wedge-prob');
+  if (venue) venue.value = 'kalshi-15m';
+  if (price) price.value = 50;
+  if (count) count.value = 10;
+  if (prob) prob.value = 55;
+  recalcWedge();
+  if (window.__wedgeCheck) {
+    window.__wedgeCheck.isExample = true;
+    window.__wedgeCheck.preview = true;
+  }
+  const saveBtn = document.getElementById('btn-wedge-save');
+  if (saveBtn) {
+    saveBtn.textContent = 'Preview in Journal (No Account Required) \u2192';
+    saveBtn.style.background = 'linear-gradient(180deg, #38BDF8 0%, #0284C7 100%)';
+    saveBtn.style.borderColor = '#38BDF8';
+    saveBtn.style.color = '#FFFFFF';
+  }
+}
+
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', recalcWedge);
 } else {
@@ -1982,6 +1991,7 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 ${ASSISTANT_WIDGET_HTML}
+${renderBetaFeedbackWidgetHtml()}
 </body>
 </html>`;
 }

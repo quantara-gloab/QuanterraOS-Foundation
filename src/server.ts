@@ -14,7 +14,7 @@ import { randomUUID } from "node:crypto";
 import { eq, and, gte, asc, desc, sql } from "drizzle-orm";
 import { db, runMigrations } from "./db.ts";
 import { getChatGPTUser, requireFounderAuth } from "./auth.ts";
-import { researchObservations, researchResolutions, researchResolutionHistory, edgeScores, falconRecommendations, btcIndexTicks, users, sessions, events, userDecisionJournal, pilotObservationSessions } from "./schema.ts";
+import { researchObservations, researchResolutions, researchResolutionHistory, edgeScores, falconRecommendations, btcIndexTicks, users, sessions, events, userDecisionJournal, pilotObservationSessions, betaFeedback } from "./schema.ts";
 import { buildPrediction, type LiveMarket } from "./btc15m-predictor.ts";
 import { handleResolve, handleEdgeScore, handleObserve } from "./routes/workspace.ts";
 import { handleFalconRecommend, handleFalconJevRecommend, handleFalconDecision, type FalconRecommendationRow } from "./routes/falcon.ts";
@@ -1802,6 +1802,11 @@ app.get(["/journal", "/decisions"], (req, res) => {
 
 app.post("/api/analytics/check", (req, res) => {
   const auth = getUserAuth(req);
+  const isExample = req.body?.isExample === true || req.body?.preview === true;
+  if (isExample) {
+    logEvent("example_check_preview", auth.user?.id, req.body);
+    return res.json({ success: true, preview: true });
+  }
   logEvent("check_completed", auth.user?.id, req.body);
   res.json({ success: true });
 });
@@ -1812,8 +1817,44 @@ app.post("/api/analytics/journal-viewed", (req, res) => {
   res.json({ success: true });
 });
 
+app.post("/api/feedback", (req, res) => {
+  const { page, appVersion, category, comment, deviceInfo, contactEmail } = req.body || {};
+  if (!comment && !category) {
+    return res.status(400).json({ error: "Comment or category required" });
+  }
+  const id = `fb_${randomUUID().slice(0, 16)}`;
+  const now = new Date().toISOString();
+  db.insert(betaFeedback)
+    .values({
+      id,
+      page: String(page || "/").slice(0, 255),
+      appVersion: String(appVersion || "0.1.0-pilot"),
+      category: String(category || "general"),
+      comment: String(comment || "Reported via feedback button").slice(0, 2000),
+      deviceInfo: String(deviceInfo || "").slice(0, 255),
+      contactEmail: contactEmail ? String(contactEmail).slice(0, 120) : null,
+      createdAt: now,
+    })
+    .run();
+  logEvent("beta_feedback_submitted", null, { id, page, category });
+  res.json({ success: true, id, message: "Thank you for reporting this issue. Our team has received your feedback." });
+});
+
 app.post("/api/journal/save", (req, res) => {
   const auth = getUserAuth(req);
+  const b = req.body || {};
+  const isExample = b.isExample === true || b.preview === true;
+
+  if (isExample) {
+    logEvent("example_check_preview", auth.user?.id, b);
+    return res.json({
+      success: true,
+      id: "preview_example",
+      isExample: true,
+      message: "Example check previewed successfully without saving to customer metrics."
+    });
+  }
+
   let activeUser = auth.user;
   if (!activeUser) {
     const guestEmail = `operator_${randomUUID().slice(0, 8)}@quanterraos.local`;
@@ -1823,7 +1864,6 @@ app.post("/api/journal/save", (req, res) => {
     res.setHeader("Set-Cookie", `quanterraos_session=${sessionId}; Path=/; HttpOnly; SameSite=Lax`);
   }
 
-  const b = req.body || {};
   const id = `jrn_${randomUUID().slice(0, 16)}`;
   const now = new Date().toISOString();
 
@@ -1841,12 +1881,15 @@ app.post("/api/journal/save", (req, res) => {
       purchaseCost: typeof b.purchaseCost === "number" ? b.purchaseCost : 5.10,
       exchangeFee: typeof b.exchangeFee === "number" ? b.exchangeFee : 0.18,
       halfSpreadDrag: typeof b.halfSpreadDrag === "number" ? b.halfSpreadDrag : 0.0,
-      totalDrag: typeof b.totalDrag === "number" ? b.totalDrag : 0.0175,
-      breakevenWinProb: typeof b.breakevenWinProb === "number" ? b.breakevenWinProb : 52.75,
+      totalDrag: typeof b.totalDrag === "number" ? b.totalDrag : 0.018,
+      breakevenWinProb: typeof b.breakevenWinProb === "number" ? b.breakevenWinProb : 52.80,
       assessedWinProb: typeof b.assessedWinProb === "number" ? b.assessedWinProb : 55.0,
       netExpectedValue: typeof b.netExpectedValue === "number" ? b.netExpectedValue : 0.22,
       settlementSource: b.settlementSource || "CME CF BRTI 60s TWAP",
       notes: b.notes || null,
+      reasoning: b.reasoning || b.notes || null,
+      decisionAction: b.decisionAction || "paper_trade",
+      isExample: 0,
       status: "saved_check",
       createdAt: now,
       updatedAt: now,
@@ -1861,6 +1904,44 @@ app.post("/api/journal/save", (req, res) => {
   });
 
   res.json({ success: true, id, userId: activeUser.id });
+});
+
+app.post("/api/journal/update-action", (req, res) => {
+  const auth = getUserAuth(req);
+  const { id, action } = req.body || {};
+  if (!id || !["skipped", "paper_trade", "actual_trade"].includes(action)) {
+    return res.status(400).json({ error: "Invalid payload: id and action (skipped|paper_trade|actual_trade) required" });
+  }
+  if (id === "preview_example") {
+    return res.json({ success: true, id, action });
+  }
+  if (!auth.user) {
+    return res.status(401).json({ error: "Authentication required" });
+  }
+  db.update(userDecisionJournal)
+    .set({ decisionAction: action, updatedAt: new Date().toISOString() })
+    .where(and(eq(userDecisionJournal.id, id), eq(userDecisionJournal.userId, auth.user.id)))
+    .run();
+  res.json({ success: true, id, action });
+});
+
+app.post("/api/journal/update-reasoning", (req, res) => {
+  const auth = getUserAuth(req);
+  const { id, reasoning } = req.body || {};
+  if (!id) {
+    return res.status(400).json({ error: "id required" });
+  }
+  if (id === "preview_example") {
+    return res.json({ success: true, id, reasoning });
+  }
+  if (!auth.user) {
+    return res.status(401).json({ error: "Authentication required" });
+  }
+  db.update(userDecisionJournal)
+    .set({ reasoning: String(reasoning || ""), notes: String(reasoning || ""), updatedAt: new Date().toISOString() })
+    .where(and(eq(userDecisionJournal.id, id), eq(userDecisionJournal.userId, auth.user.id)))
+    .run();
+  res.json({ success: true, id, reasoning });
 });
 
 app.get("/api/journal", (req, res) => {
@@ -2067,18 +2148,24 @@ app.get("/api/analytics/funnel-summary", requireFounderAuth, (_req, res) => {
   };
 
   for (const e of allEvents) {
+    if (e.eventName === "example_check_preview") continue;
     let isInternal = false;
+    let isExample = false;
     if (e.userId && internalUserIds.has(e.userId)) {
       isInternal = true;
     }
     if (e.metadata) {
       try {
         const meta = JSON.parse(e.metadata);
+        if (meta.isExample || meta.preview || meta.is_example) {
+          isExample = true;
+        }
         if (meta.is_internal || meta.internal || meta.test || meta.source === "test_suite") {
           isInternal = true;
         }
       } catch (_) {}
     }
+    if (isExample) continue;
 
     const bucket = isInternal ? internalCounts : customerCounts;
     if (e.eventName === "check_completed") bucket.checks_completed++;
@@ -2139,16 +2226,22 @@ app.get("/audit/pilot", requireFounderAuth, (_req, res) => {
   };
 
   for (const e of allEvents) {
+    if (e.eventName === "example_check_preview") continue;
     let isInternal = false;
+    let isExample = false;
     if (e.userId && internalUserIds.has(e.userId)) isInternal = true;
     if (e.metadata) {
       try {
         const meta = JSON.parse(e.metadata);
+        if (meta.isExample || meta.preview || meta.is_example) {
+          isExample = true;
+        }
         if (meta.is_internal || meta.internal || meta.test || meta.source === "test_suite") {
           isInternal = true;
         }
       } catch (_) {}
     }
+    if (isExample) continue;
 
     const bucket = isInternal ? internalCounts : customerCounts;
     if (e.eventName === "check_completed") bucket.checks_completed++;

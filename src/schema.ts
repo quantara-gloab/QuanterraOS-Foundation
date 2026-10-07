@@ -692,6 +692,9 @@ export const userDecisionJournal = sqliteTable(
     netExpectedValue: real("net_expected_value").notNull(),
     settlementSource: text("settlement_source").notNull(),
     notes: text("notes"),
+    reasoning: text("reasoning"),
+    decisionAction: text("decision_action").notNull().default("paper_trade"), // 'skipped' | 'paper_trade' | 'actual_trade'
+    isExample: integer("is_example").notNull().default(0),
     status: text("status").notNull().default("saved_check"), // 'saved_check' | 'paper_tracked' | 'executed_live'
     outcome: text("outcome"), // 'WON' | 'LOST' | 'VOID' | 'PENDING'
     realizedPnl: real("realized_pnl"),
@@ -701,6 +704,23 @@ export const userDecisionJournal = sqliteTable(
   (table) => ({
     userIdIdx: index("user_decision_journal_user_id_idx").on(table.userId),
     createdAtIdx: index("user_decision_journal_created_at_idx").on(table.createdAt),
+  })
+);
+
+export const betaFeedback = sqliteTable(
+  "beta_feedback",
+  {
+    id: text("id").primaryKey(),
+    page: text("page").notNull(),
+    appVersion: text("app_version").notNull().default("0.1.0-pilot"),
+    category: text("category").notNull(), // 'friction' | 'calculation' | 'bug' | 'general'
+    comment: text("comment").notNull(),
+    deviceInfo: text("device_info"),
+    contactEmail: text("contact_email"),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => ({
+    createdAtIdx: index("beta_feedback_created_at_idx").on(table.createdAt),
   })
 );
 

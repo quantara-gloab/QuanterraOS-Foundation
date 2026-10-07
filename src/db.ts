@@ -48,6 +48,7 @@ export function runMigrations(): void {
     "0020_decision_journal.sql",
     "0021_pilot_observation_sessions.sql",
     "0022_user_risk_plans.sql",
+    "0023_journal_details_and_feedback.sql",
   ]) {
     const migrationPath = path.join(migrationsDir, migration);
     if (migration === "0006_multi_asset.sql") {
@@ -77,6 +78,32 @@ export function runMigrations(): void {
       if (!userCols.some((col) => col.name === "phone")) {
         sqlite.exec("ALTER TABLE users ADD COLUMN phone text");
       }
+    }
+    if (migration === "0023_journal_details_and_feedback.sql") {
+      const journalCols = sqlite.prepare("PRAGMA table_info(user_decision_journal)").all() as Array<{ name: string }>;
+      if (!journalCols.some((col) => col.name === "decision_action")) {
+        sqlite.exec("ALTER TABLE user_decision_journal ADD COLUMN decision_action TEXT NOT NULL DEFAULT 'paper_trade'");
+      }
+      if (!journalCols.some((col) => col.name === "reasoning")) {
+        sqlite.exec("ALTER TABLE user_decision_journal ADD COLUMN reasoning TEXT");
+      }
+      if (!journalCols.some((col) => col.name === "is_example")) {
+        sqlite.exec("ALTER TABLE user_decision_journal ADD COLUMN is_example INTEGER NOT NULL DEFAULT 0");
+      }
+      sqlite.exec(`
+        CREATE TABLE IF NOT EXISTS beta_feedback (
+          id TEXT PRIMARY KEY,
+          page TEXT NOT NULL,
+          app_version TEXT NOT NULL DEFAULT '0.1.0-pilot',
+          category TEXT NOT NULL,
+          comment TEXT NOT NULL,
+          device_info TEXT,
+          contact_email TEXT,
+          created_at TEXT NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS beta_feedback_created_at_idx ON beta_feedback (created_at);
+      `);
+      continue;
     }
     sqlite.exec(readFileSync(migrationPath, "utf-8"));
   }

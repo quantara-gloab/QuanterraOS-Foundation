@@ -12,6 +12,7 @@
 
 import type { UserRecord, UserTier } from "./auth.ts";
 import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
+import { renderBetaFeedbackWidgetHtml } from "./feedback-widget.ts";
 
 export interface DecisionJournalEntry {
   id: string;
@@ -35,6 +36,9 @@ export interface DecisionJournalEntry {
   status: string;
   outcome?: string | null;
   realizedPnl?: number | null;
+  decisionAction?: string | null; // 'skipped' | 'paper_trade' | 'actual_trade'
+  reasoning?: string | null;
+  isExample?: boolean;
   createdAt: string;
 }
 
@@ -48,13 +52,33 @@ export function renderJournalPageHtml(
   const isAuth = user !== null;
   const count = entries.length;
   const totalFeesTracked = entries.reduce((acc, e) => acc + (e.exchangeFee || 0), 0);
-  const avgBreakeven = count > 0 ? (entries.reduce((acc, e) => acc + e.breakevenWinProb, 0) / count).toFixed(2) : "52.75";
+  const avgBreakeven = count > 0 ? (entries.reduce((acc, e) => acc + e.breakevenWinProb, 0) / count).toFixed(2) : "52.80";
 
   // Calculate settlement & outcome metrics
   const settledEntries = entries.filter(e => e.outcome === 'WON' || e.outcome === 'LOST' || e.outcome === 'VOID');
   const scoredEntries = entries.filter(e => e.outcome === 'WON' || e.outcome === 'LOST');
   const settledCount = settledEntries.length;
   const totalRealizedPnl = entries.reduce((acc, e) => acc + (e.realizedPnl || 0), 0);
+
+  // Weekly Recap calculation (trailing 7 days UTC)
+  const nowMs = Date.now();
+  const sevenDaysAgoMs = nowMs - (7 * 24 * 60 * 60 * 1000);
+  const weeklyEntries = entries.filter(e => {
+    if (!e.createdAt) return false;
+    const t = new Date(e.createdAt).getTime();
+    return !isNaN(t) && t >= sevenDaysAgoMs;
+  });
+
+  const weeklyChecksCount = weeklyEntries.length;
+  const weeklySkipped = weeklyEntries.filter(e => (e.decisionAction || '').toLowerCase() === 'skipped');
+  const weeklyPaper = weeklyEntries.filter(e => !e.decisionAction || e.decisionAction.toLowerCase() === 'paper_trade');
+  const weeklyActual = weeklyEntries.filter(e => (e.decisionAction || '').toLowerCase() === 'actual_trade');
+  const weeklyResolved = weeklyEntries.filter(e => e.outcome === 'WON' || e.outcome === 'LOST' || e.outcome === 'VOID');
+  const weeklyUnresolvedCount = weeklyChecksCount - weeklyResolved.length;
+  const weeklyFrictionAvoided = weeklySkipped.reduce((sum, e) => sum + (e.purchaseCost || 0) + (e.exchangeFee || 0), 0);
+  const weeklyWonCount = weeklyEntries.filter(e => e.outcome === 'WON').length;
+  const weeklyLostCount = weeklyEntries.filter(e => e.outcome === 'LOST').length;
+  const weeklyMissingFees = weeklyEntries.filter(e => !e.exchangeFee && e.exchangeFee !== 0).length;
   
   // Personal Brier Score
   let personalBrierStr = "—";
@@ -304,6 +328,66 @@ export function renderJournalPageHtml(
     .badge-lost { background: rgba(244, 63, 94, 0.15); color: var(--rose); border: 1px solid rgba(244, 63, 94, 0.3); }
     .badge-void { background: rgba(255, 255, 255, 0.1); color: var(--text-dim); border: 1px solid rgba(255, 255, 255, 0.2); }
 
+    .badge-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .badge-skipped { background: rgba(148, 163, 184, 0.15); color: #94A3B8; border: 1px solid rgba(148, 163, 184, 0.3); }
+    .badge-paper { background: rgba(56, 189, 248, 0.15); color: #38BDF8; border: 1px solid rgba(56, 189, 248, 0.3); }
+    .badge-actual { background: rgba(223, 184, 67, 0.15); color: var(--accent); border: 1px solid rgba(223, 184, 67, 0.3); }
+
+    .action-select {
+      background: rgba(6, 9, 14, 0.9);
+      border: 1px solid var(--border);
+      color: #FFFFFF;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      padding: 3px 6px;
+      border-radius: 4px;
+      outline: none;
+      cursor: pointer;
+    }
+    .action-select:focus { border-color: var(--accent); }
+
+    .reasoning-textarea {
+      width: 100%;
+      background: rgba(6, 9, 14, 0.85);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      color: #FFFFFF;
+      font-size: 0.75rem;
+      font-family: var(--font-sans);
+      padding: 6px 8px;
+      resize: vertical;
+      min-height: 44px;
+      box-sizing: border-box;
+    }
+    .reasoning-textarea:focus { border-color: var(--accent); outline: none; }
+
+    .weekly-recap-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+      margin-bottom: 12px;
+    }
+    .recap-box {
+      background: rgba(6, 9, 14, 0.6);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 12px 14px;
+    }
+    .recap-label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 4px; }
+    .recap-value { font-family: var(--font-mono); font-size: 1.25rem; font-weight: 700; color: #FFFFFF; }
+    .recap-sub { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+
     .btn-settle {
       background: rgba(223, 184, 67, 0.1);
       border: 1px solid rgba(223, 184, 67, 0.4);
@@ -406,9 +490,8 @@ export function renderJournalPageHtml(
 
     @media (max-width: 640px) {
       .header-block { flex-direction: column; }
-      .nav-links a:not(.active) { display: none; }
+      .top-nav { padding: 12px 16px; flex-wrap: wrap; gap: 8px; }
       h1 { font-size: 1.45rem; }
-      .top-nav { padding: 12px 16px; }
       .container { padding: 0 14px; }
     }
   </style>
@@ -416,19 +499,25 @@ export function renderJournalPageHtml(
 <body>
 
   <nav class="top-nav">
-    <a href="/" class="nav-brand">
-      <span class="brand-dot"></span>
-      QUANTERRAOS
-      <span>/ JOURNAL</span>
-    </a>
-    <div class="nav-links">
-      <a href="/calculator">Calculator</a>
-      <a href="/compare" style="color:#38BDF8; font-weight:600;">Compare Venues</a>
-      <a href="/journal" class="active" style="color:var(--accent); font-weight:600;">Journal</a>
-      <a href="/dashboard">Terminal</a>
-      <a href="/account">Account</a>
+    <div style="display:flex; align-items:center; gap:24px;">
+      <a href="/" class="nav-brand">
+        <span class="brand-dot"></span>
+        QUANTERRAOS
+        <span>/ JOURNAL</span>
+      </a>
+      <div class="nav-links">
+        <a href="/calculator">Check</a>
+        <a href="/journal" class="active" style="color:var(--accent); font-weight:700;">Journal</a>
+        <a href="/calibration">Learn</a>
+        <a href="/account">Sign in</a>
+      </div>
     </div>
-    <div>
+    <div style="display:flex; gap:14px; align-items:center;">
+      <div style="display:flex; gap:10px; align-items:center; font-size:0.75rem;">
+        <a href="/research" style="color:var(--text-dim); text-decoration:none;">Research</a>
+        <span style="color:rgba(255,255,255,0.15);">|</span>
+        <a href="/council" style="color:var(--text-dim); text-decoration:none;">Institutional</a>
+      </div>
       <a href="/calculator" class="btn-gold">+ New Check</a>
     </div>
   </nav>
@@ -436,6 +525,11 @@ export function renderJournalPageHtml(
   <main class="container">
     ${error ? `<div class="alert alert-error">${error}</div>` : ""}
     ${success ? `<div class="alert alert-success">${success}</div>` : ""}
+
+    <!-- Rule B5 & B4 Consumer Safeguard Banner -->
+    <div style="background:rgba(212,175,55,0.06); border-left:3px solid var(--accent); padding:10px 16px; margin-bottom:20px; font-size:0.78rem; color:var(--text-dim); border-radius:0 4px 4px 0;">
+      <strong style="color:#FFFFFF;">Rule B5 &amp; B4 Safeguards:</strong> Saving a check freezes pre-trade friction and your assessed probability only ($0.00 live exposure). Saving a check does <strong>never</strong> place a trade or commit live capital on Kalshi or Polymarket.
+    </div>
 
     <div id="pending-save-banner" style="display:none;" class="banner-onboarding">
       <div>
@@ -472,6 +566,105 @@ export function renderJournalPageHtml(
         <a href="/calculator" class="btn-gold">
           + Run True-Cost Check
         </a>
+      </div>
+    </div>
+
+    <!-- Priority 6: Weekly Decision & Outcome Recap -->
+    <div class="journal-card" style="margin-bottom:24px;">
+      <div class="journal-card-header">
+        <div class="journal-card-title">
+          <span>📅 Weekly Decision &amp; Outcome Recap</span>
+          <span class="mono" style="font-size:0.72rem; color:var(--accent); font-weight:600;">TRAILING 7 DAYS</span>
+        </div>
+        <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--text-dim);">
+          Strictly user-supplied data · $0 live risk
+        </div>
+      </div>
+      ${weeklyChecksCount === 0 ? `
+        <div style="padding:24px; text-align:center; color:var(--muted); font-size:0.82rem;">
+          <div style="font-size:1.4rem; margin-bottom:6px;">📊</div>
+          <strong>No checks recorded in the trailing 7 days.</strong>
+          <div style="margin-top:4px;">Run a pre-trade True-Cost check to generate your weekly friction and decision recap.</div>
+        </div>
+      ` : `
+        <div class="weekly-recap-grid">
+          <div class="recap-box">
+            <div class="recap-label">Checks This Week</div>
+            <div class="recap-value">${weeklyChecksCount}</div>
+            <div class="recap-sub">${weeklySkipped.length} skipped · ${weeklyPaper.length} paper · ${weeklyActual.length} actual</div>
+          </div>
+          <div class="recap-box">
+            <div class="recap-label">Friction / Outlay Avoided</div>
+            <div class="recap-value" style="color:var(--green);">$${weeklyFrictionAvoided.toFixed(2)}</div>
+            <div class="recap-sub">Capital preserved by skipping low-EV checks</div>
+          </div>
+          <div class="recap-box">
+            <div class="recap-label">Outcomes Resolved</div>
+            <div class="recap-value" style="color:var(--cyan);">${weeklyResolved.length} / ${weeklyChecksCount}</div>
+            <div class="recap-sub">${weeklyWonCount} won · ${weeklyLostCount} lost · ${weeklyUnresolvedCount} unresolved</div>
+          </div>
+          <div class="recap-box">
+            <div class="recap-label">Data Completeness</div>
+            <div class="recap-value" style="color:var(--accent); font-size:1rem;">
+              ${weeklyUnresolvedCount > 0 ? `${weeklyUnresolvedCount} position(s) pending resolution` : '100% Resolved'}
+            </div>
+            <div class="recap-sub">${weeklyMissingFees > 0 ? `⚠️ ${weeklyMissingFees} checks missing fee data` : 'Calculated strictly from verified user checks'}</div>
+          </div>
+        </div>
+      `}
+    </div>
+
+    <!-- Priority 1: First-Use Example Preview Card -->
+    <div id="first-use-preview-card" style="background:linear-gradient(135deg, rgba(14,18,27,0.95) 0%, rgba(20,26,38,0.95) 100%); border:1px solid rgba(223,184,67,0.35); border-radius:8px; padding:20px; margin-bottom:24px; box-shadow:0 12px 30px rgba(0,0,0,0.5);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid rgba(212,175,55,0.15); padding-bottom:8px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="background:rgba(223,184,67,0.15); border:1px solid var(--accent); color:var(--accent); font-family:var(--font-mono); font-size:0.68rem; font-weight:700; padding:2px 6px; border-radius:3px;">
+            ⚡ FIRST-USE EXAMPLE PREVIEW
+          </span>
+          <span style="font-size:0.85rem; font-weight:700; color:#FFFFFF;">KXBTC15M Example Check</span>
+        </div>
+        <span style="font-family:var(--font-mono); font-size:0.7rem; color:var(--muted);">Excluded from customer metrics</span>
+      </div>
+      <p style="font-size:0.8rem; color:var(--text-dim); margin-bottom:14px; line-height:1.4;">
+        This example illustrates how pre-trade true costs and post-check discipline are journaled. You can choose whether you would have <strong>Skipped</strong>, <strong>Paper traded</strong>, or <strong>Actual traded</strong>, and record your reasoning below.
+      </p>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-bottom:16px; font-family:var(--font-mono); font-size:0.75rem;">
+        <div style="background:rgba(6,9,14,0.7); padding:8px 10px; border-radius:4px; border:1px solid var(--border-subtle);">
+          <div style="color:var(--muted); font-size:0.65rem;">CONTRACT &amp; ASK</div>
+          <div style="color:#FFF; font-weight:600; margin-top:2px;">10x @ 51¢ ($5.10)</div>
+        </div>
+        <div style="background:rgba(6,9,14,0.7); padding:8px 10px; border-radius:4px; border:1px solid var(--border-subtle);">
+          <div style="color:var(--muted); font-size:0.65rem;">EXCHANGE FEE</div>
+          <div style="color:var(--rose); font-weight:600; margin-top:2px;">+$0.18 (1.80¢/ct)</div>
+        </div>
+        <div style="background:rgba(6,9,14,0.7); padding:8px 10px; border-radius:4px; border:1px solid var(--border-subtle);">
+          <div style="color:var(--muted); font-size:0.65rem;">MAX LOSS</div>
+          <div style="color:var(--rose); font-weight:700; margin-top:2px;">$5.28</div>
+        </div>
+        <div style="background:rgba(6,9,14,0.7); padding:8px 10px; border-radius:4px; border:1px solid var(--border-subtle);">
+          <div style="color:var(--muted); font-size:0.65rem;">BREAKEVEN HURDLE</div>
+          <div style="color:var(--accent); font-weight:700; margin-top:2px;">52.80%</div>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 2fr; gap:14px; align-items:start;">
+        <div>
+          <label style="display:block; font-size:0.72rem; color:var(--text-dim); margin-bottom:4px; font-family:var(--font-mono);">Decision Action:</label>
+          <select id="preview-action-select" class="action-select" style="width:100%; padding:6px 8px; font-size:0.75rem;" onchange="handlePreviewActionChange(this.value)">
+            <option value="skipped" selected>Skipped (Avoided Negative-EV Risk)</option>
+            <option value="paper_trade">Paper Trade ($0 Live Capital)</option>
+            <option value="actual_trade">Actual Trade (Executed on Exchange)</option>
+          </select>
+          <div id="preview-action-hint" style="font-size:0.7rem; color:var(--muted); margin-top:6px; line-height:1.3;">
+            ✓ Skipped: Capital protected. Saving a check does not place an order.
+          </div>
+        </div>
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <label style="font-size:0.72rem; color:var(--text-dim); font-family:var(--font-mono);">Edit Decision Reasoning &amp; Thesis:</label>
+            <span id="preview-reasoning-status" style="font-size:0.68rem; color:var(--accent);">Auto-saved locally</span>
+          </div>
+          <textarea id="preview-reasoning-text" class="reasoning-textarea" placeholder="Record your decision reasoning..." oninput="handlePreviewReasoning(this.value)">Required breakeven hurdle was 52.80% due to $0.18 fee friction on 10 contracts. Decided to skip execution to preserve bankroll.</textarea>
+        </div>
       </div>
     </div>
 
@@ -516,7 +709,7 @@ export function renderJournalPageHtml(
       ${count === 0 ? `
         <div style="text-align:center; padding:48px 20px;">
           <div style="font-size:2rem; margin-bottom:12px;">📓</div>
-          <div style="font-weight:700; font-size:1.05rem; margin-bottom:6px; color:#FFFFFF;">Your Decision Journal is Ready</div>
+          <div style="font-weight:700; font-size:1.05rem; margin-bottom:6px; color:#FFFFFF;">Your Personal Journal is Ready</div>
           <p style="font-size:0.85rem; color:var(--muted); max-width:440px; margin:0 auto 20px;">
             Run a True-Cost check on any Kalshi or Polymarket contract to verify your fees and save your first decision card.
           </p>
@@ -534,50 +727,60 @@ export function renderJournalPageHtml(
                 <th>Basis / Side</th>
                 <th>Cost &amp; Fee</th>
                 <th>Breakeven Hurdle</th>
-                <th>Assessed p</th>
-                <th>Realized P&amp;L</th>
+                <th>Action</th>
+                <th>Reasoning / Thesis</th>
                 <th>Outcome / Action</th>
-                <th>Notes / Benchmark</th>
+                <th>Card</th>
               </tr>
             </thead>
             <tbody>
               ${entries.map(e => `
                 <tr>
-                  <td class="mono" style="color:var(--text-dim);">${e.createdAt ? e.createdAt.slice(0, 16).replace('T', ' ') : '—'}</td>
-                  <td><strong style="color:#FFFFFF;">${e.contractTicker}</strong> <span style="font-size:0.75rem; color:var(--muted);">(${e.venue})</span></td>
-                  <td class="mono">${e.pricingBasis === 'mid_price' ? 'Mid' : 'Ask'} · <span style="color:${e.side === 'yes' ? 'var(--green)' : 'var(--rose)'};">${e.side.toUpperCase()}</span></td>
-                  <td class="mono">
+                  <td class="mono" style="color:var(--text-dim); font-size:0.75rem;">${e.createdAt ? e.createdAt.slice(0, 16).replace('T', ' ') : '—'}</td>
+                  <td><strong style="color:#FFFFFF;">${e.contractTicker}</strong> <span style="font-size:0.72rem; color:var(--muted);">(${e.venue})</span></td>
+                  <td class="mono" style="font-size:0.75rem;">${e.pricingBasis === 'mid_price' ? 'Mid' : 'Ask'} · <span style="color:${e.side === 'yes' ? 'var(--green)' : 'var(--rose)'};">${e.side.toUpperCase()}</span></td>
+                  <td class="mono" style="font-size:0.75rem;">
                     $${(e.purchaseCost || 0).toFixed(2)}
-                    <span style="font-size:0.72rem; color:var(--rose);"> (+$${(e.exchangeFee || 0).toFixed(2)} fee)</span>
+                    <span style="font-size:0.7rem; color:var(--rose);"> (+$${(e.exchangeFee || 0).toFixed(2)} fee)</span>
                   </td>
                   <td class="mono" style="color:var(--accent); font-weight:700;">${(e.breakevenWinProb || 0).toFixed(2)}%</td>
-                  <td class="mono">${(e.assessedWinProb || 0).toFixed(1)}%</td>
-                  <td class="mono">
-                    ${e.realizedPnl !== null && e.realizedPnl !== undefined ? `
-                      <span style="font-weight:700; color:${e.realizedPnl >= 0 ? 'var(--green)' : 'var(--rose)'};">
-                        ${e.realizedPnl >= 0 ? '+' : ''}$${e.realizedPnl.toFixed(2)}
-                      </span>
-                    ` : `<span style="color:var(--muted);">Pending</span>`}
+                  <td>
+                    <select class="action-select" onchange="updateEntryAction('${e.id}', this.value)">
+                      <option value="skipped" ${e.decisionAction === 'skipped' ? 'selected' : ''}>Skipped</option>
+                      <option value="paper_trade" ${!e.decisionAction || e.decisionAction === 'paper_trade' ? 'selected' : ''}>Paper trade</option>
+                      <option value="actual_trade" ${e.decisionAction === 'actual_trade' ? 'selected' : ''}>Actual trade</option>
+                    </select>
+                  </td>
+                  <td style="min-width:180px;">
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                      <textarea id="reasoning-${e.id}" class="reasoning-textarea" placeholder="Edit decision reasoning...">${e.reasoning || e.notes || ''}</textarea>
+                      <button type="button" id="btn-save-reasoning-${e.id}" onclick="saveEntryReasoning('${e.id}')" class="btn-settle" style="align-self:flex-end; font-size:0.65rem; padding:2px 8px;">
+                        Save Reasoning
+                      </button>
+                    </div>
                   </td>
                   <td>
-                    <div style="display:flex; gap:6px; align-items:center;">
+                    <div style="display:flex; flex-direction:column; gap:4px;">
                       ${e.outcome ? `
                         <span class="badge-status ${e.outcome === 'WON' ? 'badge-won' : e.outcome === 'LOST' ? 'badge-lost' : 'badge-void'}">
                           ${e.outcome}
                         </span>
+                        ${e.realizedPnl !== null && e.realizedPnl !== undefined ? `
+                          <span class="mono" style="font-size:0.72rem; font-weight:700; color:${e.realizedPnl >= 0 ? 'var(--green)' : 'var(--rose)'};">
+                            ${e.realizedPnl >= 0 ? '+' : ''}$${e.realizedPnl.toFixed(2)}
+                          </span>
+                        ` : ''}
                       ` : `
                         <button type="button" class="btn-settle" onclick="openSettleModal('${e.id}', '${e.contractTicker}', ${e.contractCount || 10}, ${e.contractPrice || 0.51}, ${e.exchangeFee || 0.18})">
                           Log Outcome &rarr;
                         </button>
                       `}
-                      <button type="button" class="btn-card-export" onclick="showEvidenceCard('${e.id}', '${e.contractTicker}', '${e.venue}', '${e.side}', '${e.pricingBasis}', ${e.contractPrice || 0.51}, ${e.contractCount || 10}, ${e.purchaseCost || 5.10}, ${e.exchangeFee || 0.18}, ${e.breakevenWinProb || 52.8}, ${e.assessedWinProb || 55.0}, ${e.netExpectedValue || 0.22}, '${(e.settlementSource || 'CME CF BRTI 60s TWAP').replace(/'/g, "\\'")}', '${e.createdAt ? e.createdAt.slice(0, 16).replace('T', ' ') : ''}')" title="View &amp; Print Evidence Card">
-                        🖨 Card
-                      </button>
                     </div>
                   </td>
-                  <td style="font-size:0.75rem; color:var(--muted);">
-                    ${e.notes ? `<div style="color:var(--text); margin-bottom:2px; font-weight:500;">${e.notes}</div>` : ''}
-                    <div>${e.settlementSource || 'CME CF BRTI'}</div>
+                  <td>
+                    <button type="button" class="btn-card-export" onclick="showEvidenceCard('${e.id}', '${e.contractTicker}', '${e.venue}', '${e.side}', '${e.pricingBasis}', ${e.contractPrice || 0.51}, ${e.contractCount || 10}, ${e.purchaseCost || 5.10}, ${e.exchangeFee || 0.18}, ${e.breakevenWinProb || 52.8}, ${e.assessedWinProb || 55.0}, ${e.netExpectedValue || 0.22}, '${(e.settlementSource || 'CME CF BRTI 60s TWAP').replace(/'/g, "\\'")}', '${e.createdAt ? e.createdAt.slice(0, 16).replace('T', ' ') : ''}')" title="View &amp; Print Evidence Card">
+                      🖨 Card
+                    </button>
                   </td>
                 </tr>
               `).join('')}
@@ -974,6 +1177,67 @@ export function renderJournalPageHtml(
       document.getElementById('risk-plan-modal').style.display = 'none';
     }
 
+    async function updateEntryAction(id, action) {
+      try {
+        const res = await fetch('/api/journal/update-action', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: id, decisionAction: action })
+        });
+        if (!res.ok) alert('Could not update decision action.');
+      } catch (_) {
+        alert('Network error updating decision action.');
+      }
+    }
+
+    async function saveEntryReasoning(id) {
+      const el = document.getElementById('reasoning-' + id);
+      const btn = document.getElementById('btn-save-reasoning-' + id);
+      if (!el) return;
+      if (btn) { btn.textContent = 'Saving...'; btn.disabled = true; }
+      try {
+        const res = await fetch('/api/journal/update-reasoning', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: id, reasoning: el.value })
+        });
+        if (btn) {
+          btn.textContent = res.ok ? '✓ Saved' : 'Error';
+          btn.disabled = false;
+          setTimeout(function() { btn.textContent = 'Save Reasoning'; }, 2000);
+        }
+      } catch (_) {
+        if (btn) { btn.textContent = 'Error'; btn.disabled = false; }
+      }
+    }
+
+    function handlePreviewActionChange(action) {
+      const hint = document.getElementById('preview-action-hint');
+      if (hint) {
+        if (action === 'skipped') {
+          hint.innerHTML = '<span style="color:var(--text-dim);">✓ Skipped: Capital protected. Saving a check does not place an order.</span>';
+        } else if (action === 'paper_trade') {
+          hint.innerHTML = '<span style="color:var(--cyan);">✓ Paper Trade: Tracking outcome under $0.00 live exposure.</span>';
+        } else {
+          hint.innerHTML = '<span style="color:var(--accent);">✓ Actual Trade: Traded on external exchange. QuanterraOS holds $0 exposure.</span>';
+        }
+      }
+      try {
+        localStorage.setItem('quanterraos_example_action', action);
+      } catch (_) {}
+    }
+
+    function handlePreviewReasoning(txt) {
+      try {
+        localStorage.setItem('quanterraos_example_reasoning', txt);
+        const status = document.getElementById('preview-reasoning-status');
+        if (status) {
+          status.textContent = '✓ Saved locally';
+          setTimeout(function() { status.textContent = 'Auto-saved locally'; }, 1500);
+        }
+      } catch (_) {}
+    }
+
     async function submitRiskPlan() {
       const btn = document.getElementById('btn-save-risk-plan');
       const daily = parseFloat(document.getElementById('risk-daily-max').value) || 50;
@@ -1009,6 +1273,7 @@ export function renderJournalPageHtml(
     }
   </script>
   ${ASSISTANT_WIDGET_HTML}
+  ${renderBetaFeedbackWidgetHtml()}
 </body>
 </html>`;
 }

@@ -1,5 +1,6 @@
 import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
 import { renderMarketEvidenceCardHtml } from "./market-evidence-card.ts";
+import { renderBetaFeedbackWidgetHtml } from "./feedback-widget.ts";
 
 /**
  * True Cost & Expected Value Calculator for Short-Duration Prediction Markets
@@ -307,61 +308,78 @@ export function renderCalculatorPageHtml(): string {
     </div>
   </div>
 
+  <div class="live-ticker-strip">
+    <div class="ticker-content">
+      <span class="ticker-item"><span class="ticker-pulse"></span>TRUE COST &amp; NET EV ENGINE</span>
+      <span class="ticker-sep">//</span>
+      <span class="ticker-item">KALSHI TAKER FEE FORMULA: ceil(0.07 × Count × P × (1 − P))</span>
+      <span class="ticker-sep">//</span>
+      <span class="ticker-item">SETTLEMENT TARGET: CME CF BRTI</span>
+      <span class="ticker-sep">//</span>
+      <span class="ticker-item">INDEPENDENT PRE-TRADE AUDIT · $0 LIVE RISK</span>
+    </div>
+  </div>
+
   <nav class="top-nav">
     <div class="nav-left">
-      <a href="/" class="nav-brand"><span class="brand-dot"></span> quanterraos</a>
+      <a href="/" class="nav-brand"><span class="brand-dot"></span> QUANTERRAOS</a>
       <div class="nav-links">
-        <a href="/calculator" class="active" style="color:var(--accent);font-weight:700;">true-cost calculator</a>
-        <a href="/compare" style="color:#38BDF8;font-weight:600;">compare venues</a>
-        <a href="/journal" style="color:#10B981;font-weight:600;">decision journal</a>
-        <a href="/kalshi/15m">kalshi 15m</a>
-        <a href="/kalshi/1h">kalshi 1h</a>
-        <a href="/calibration">calibration</a>
-        <a href="/index">composite index</a>
-        <a href="/research">research</a>
+        <a href="/calculator" class="active" style="color:var(--accent);font-weight:700;">Check</a>
+        <a href="/journal" style="color:#10B981;font-weight:600;">Journal</a>
+        <a href="/calibration" style="color:var(--muted);font-weight:500;">Learn</a>
+        <a href="/account" style="color:var(--muted);font-weight:500;">Sign in</a>
       </div>
     </div>
-    <div style="display:flex; gap:10px; align-items:center;">
-      <a href="/compare" class="nav-cta" style="background:rgba(56,189,248,0.15); color:#38BDF8; border-color:rgba(56,189,248,0.4);">COMPARE VENUES &rarr;</a>
+    <div style="display:flex; gap:14px; align-items:center;">
+      <div style="display:flex; gap:12px; align-items:center; font-size:0.75rem;">
+        <a href="/research" style="color:var(--muted); text-decoration:none;">Research</a>
+        <span style="color:rgba(255,255,255,0.15);">|</span>
+        <a href="/council" style="color:var(--muted); text-decoration:none;">Institutional</a>
+      </div>
       <a href="/journal" class="nav-cta" style="background:rgba(16,185,129,0.15); color:#10B981; border-color:rgba(16,185,129,0.4);">MY JOURNAL &rarr;</a>
     </div>
   </nav>
 
   <main class="container">
-    <div class="eyebrow">Transaction Friction · Probability Math</div>
-    <h1>True Cost &amp; Net EV Calculator</h1>
+    <div class="eyebrow">Pre-Trade True-Cost Verification · Level 1 Consumer Tool</div>
+    <h1>True Cost &amp; Net EV Check</h1>
     <p class="lead">
-      Short-duration prediction markets are zero-sum before fees, and strictly negative-sum after fees and spreads. Compute your fee- and spread-adjusted expected value (EV) per contract to verify if your directional thesis actually overcomes market friction.
+      Short-duration prediction markets are zero-sum before fees, and strictly negative-sum after exchange fees and spreads. Enter your price and quantity to verify exact fee drag and your true breakeven hurdle before entering any contract.
     </p>
 
+    <!-- First-Use Example Preview Banner -->
+    <div style="background:linear-gradient(135deg, rgba(223,184,67,0.12) 0%, rgba(14,18,27,0.9) 100%); border:1px solid rgba(223,184,67,0.35); border-radius:6px; padding:12px 16px; margin-bottom:24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+      <div style="font-size:0.82rem; color:var(--text);">
+        <strong style="color:var(--accent);">⚡ First-Use Preview:</strong> Try an unauthenticated example check (10 contracts @ 51¢) and preview your personal outcome journal with zero sign-up friction.
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button type="button" onclick="loadExampleCheck()" class="preset-btn" style="border-color:var(--accent); color:var(--accent-light); padding:5px 12px; font-weight:600;">
+          Load Example Check
+        </button>
+        <button type="button" onclick="previewExampleInJournal()" class="preset-btn" style="background:rgba(16,185,129,0.15); border-color:var(--green); color:var(--green); padding:5px 12px; font-weight:600;">
+          Preview in Journal &rarr;
+        </button>
+      </div>
+    </div>
+
     <div class="calc-grid">
-      <!-- Left Column: Inputs -->
+      <!-- Left Column: Primary Order Inputs First -->
       <div class="card">
         <div class="card-title">
-          <span>Contract &amp; Strategy Parameters</span>
+          <span>1. Contract Order Inputs</span>
           <span class="mono" style="font-size:0.75rem; color:var(--accent);">KXBTC15M MODEL</span>
         </div>
 
-        <div class="input-group">
-          <label style="font-size:0.8rem; color:var(--muted); display:block; margin-bottom:6px;">Pricing Basis</label>
-          <select id="select-pricing-mode" class="number-input" onchange="togglePricingMode()">
-            <option value="executable-ask" selected>Executable Ask Price (Crossing Spread Already Included)</option>
-            <option value="mid-price">Quoted Mid-Price (Requires Half-Spread to Cross)</option>
-          </select>
-          <div style="font-size:0.72rem; color:var(--muted); margin-top:5px; line-height:1.4;" id="pricing-mode-explainer">
-            <span style="color:var(--accent);">✓ Standard Ask:</span> Half-spread is already built into the market ask. No additional spread penalty is added.
-          </div>
-        </div>
-
+        <!-- 1. Price First -->
         <div class="input-group">
           <div class="input-label-row">
             <div style="display:flex; align-items:center; gap:6px;">
               <span style="display:inline-block; width:8px; height:8px; border-radius:2px; background:#DFB843;"></span>
-              <label for="slider-price" id="label-price-title" style="color:#FFFFFF; font-weight:600;">Contract Ask Price (Cost to Enter)</label>
+              <label for="slider-price" id="label-price-title" style="color:#FFFFFF; font-weight:600;">Contract Price (Executable Ask)</label>
             </div>
             <span id="label-price" style="color:#DFB843; font-weight:700;">51¢ ($0.51)</span>
           </div>
-          <div style="font-size:0.72rem; color:var(--muted); margin-bottom:6px;">Exchange purchase price. Determines maximum dollar loss and initial entry cost.</div>
+          <div style="font-size:0.72rem; color:var(--muted); margin-bottom:6px;">Per-contract purchase price. Half-spread is already factored into executable ask.</div>
           <input type="range" id="slider-price" min="1" max="99" value="51" oninput="handleSliderSnap('slider-price', [10,25,50,51,75,90]); recalc();">
           <div style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;">
             <button type="button" class="preset-btn" onclick="setPrice(10)">10¢</button>
@@ -373,112 +391,173 @@ export function renderCalculatorPageHtml(): string {
           </div>
         </div>
 
+        <!-- 2. Quantity (Count) Second -->
         <div class="input-group">
           <div class="input-label-row">
-            <div style="display:flex; align-items:center; gap:6px;">
-              <span style="display:inline-block; width:8px; height:8px; border-radius:2px; background:#38BDF8;"></span>
-              <label for="slider-prob" style="color:#FFFFFF; font-weight:600;">Your Assessed Win Probability (Subjective Thesis)</label>
-            </div>
-            <span id="label-prob" style="color:#38BDF8; font-weight:700;">55.0%</span>
+            <label for="input-count" style="color:#FFFFFF; font-weight:600;">Quantity (Contract Count)</label>
+            <span id="label-count" style="color:var(--text); font-family:var(--font-mono); font-weight:700;">10 contracts</span>
           </div>
-          <div style="font-size:0.72rem; color:var(--muted); margin-bottom:6px;">Your subjective assessment. This is your personal opinion, NOT an automated forecast.</div>
-          <input type="range" id="slider-prob" min="1" max="99" value="55" oninput="handleSliderSnap('slider-prob', [35,50,52.8,55,65,75]); recalc();">
+          <div style="font-size:0.72rem; color:var(--muted); margin-bottom:6px;">Kalshi rounds taker fees up to the nearest cent on the entire order.</div>
+          <input type="number" id="input-count" class="number-input" value="10" min="1" max="10000" oninput="recalc()">
           <div style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;">
-            <button type="button" class="preset-btn" onclick="setProb(35)">35%</button>
-            <button type="button" class="preset-btn" onclick="setProb(50)">50% (Coin)</button>
-            <button type="button" class="preset-btn" onclick="setProb(55)" style="border-color:#38BDF8; color:#38BDF8;">55% (Std)</button>
-            <button type="button" class="preset-btn" onclick="setProb(65)">65%</button>
-            <button type="button" class="preset-btn" onclick="setProb(75)">75%</button>
+            <button type="button" class="preset-btn" onclick="setCount(1)" title="1 contract: ceil(1.75¢) = 2¢ fee (+0.25¢ rounding drag)">1 ct (2.0¢/ct)</button>
+            <button type="button" class="preset-btn" onclick="setCount(10)" style="border-color:#DFB843; color:#DFB843;" title="10 contracts: ceil(17.5¢) = 18¢ fee (+0.05¢ rounding drag)">10 ct (1.8¢/ct)</button>
+            <button type="button" class="preset-btn" onclick="setCount(50)" title="50 contracts: ceil(87.5¢) = 88¢ fee">50 ct</button>
+            <button type="button" class="preset-btn" onclick="setCount(100)" title="100 contracts: ceil(175¢) = $1.75 fee (exact 1.75¢/ct)">100 ct (1.75¢/ct)</button>
           </div>
         </div>
 
-        <div class="input-group" id="group-spread" style="display:none;">
-          <div class="input-label-row">
-            <label for="slider-spread">Observed Bid-Ask Spread</label>
-            <span id="label-spread">2.0¢</span>
-          </div>
-          <div style="font-size:0.72rem; color:var(--muted); margin-bottom:6px;">Full spread between best bid and best ask. Half-spread is added to mid-price.</div>
-          <input type="range" id="slider-spread" min="1" max="10" value="2" oninput="recalc()">
-        </div>
-
-        <div class="input-row-flex">
-          <div class="input-group">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-              <label style="font-size:0.8rem; color:var(--muted); margin:0;">Contract Count (Order Size)</label>
-              <span style="font-size:0.7rem; color:var(--accent); font-family:var(--font-mono);">Hold Price Constant</span>
-            </div>
-            <input type="number" id="input-count" class="number-input" value="100" min="1" max="10000" oninput="recalc()">
-            <div style="display:flex; gap:6px; margin-top:6px; flex-wrap:wrap;">
-              <button type="button" class="preset-btn" onclick="setCount(1)" title="1 contract: ceil(1.75¢) = 2¢ fee (+0.25¢ rounding drag)">1 ct (2.0¢/ct)</button>
-              <button type="button" class="preset-btn" onclick="setCount(10)" title="10 contracts: ceil(17.5¢) = 18¢ fee (+0.05¢ rounding drag)">10 ct (1.8¢/ct)</button>
-              <button type="button" class="preset-btn" onclick="setCount(100)" title="100 contracts: ceil(175¢) = $1.75 fee (exact 1.75¢/ct)">100 ct (1.75¢/ct)</button>
+        <!-- Direction & Series -->
+        <div class="input-row-flex" style="margin-bottom:18px;">
+          <div class="input-group" style="margin-bottom:0;">
+            <label style="font-size:0.8rem; color:var(--muted); display:block; margin-bottom:6px;">Directional Side</label>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+              <button type="button" id="btn-side-above" class="number-input" style="background:rgba(16,185,129,0.15); border:1px solid var(--green); color:var(--green); cursor:pointer; font-weight:600; padding:6px 8px; font-size:0.78rem;" onclick="setSide('above')">▲ YES</button>
+              <button type="button" id="btn-side-below" class="number-input" style="background:rgba(255,255,255,0.04); border:1px solid var(--panel-border); color:var(--muted); cursor:pointer; font-weight:600; padding:6px 8px; font-size:0.78rem;" onclick="setSide('below')">▼ NO</button>
             </div>
           </div>
-          <div class="input-group">
-            <label style="font-size:0.8rem; color:var(--muted); display:block; margin-bottom:6px;">Contract Cadence &amp; Series</label>
-            <select id="select-contract" class="number-input" onchange="recalc()">
-              <option value="kalshi-15m" selected>Kalshi 15-Minute Above/Below (KXBTC15M)</option>
-              <option value="kalshi-1h">Kalshi 1-Hour Above/Below (KXBTCD)</option>
-              <option value="polymarket-15m">Polymarket 15-Minute (Binary)</option>
+          <div class="input-group" style="margin-bottom:0;">
+            <label style="font-size:0.8rem; color:var(--muted); display:block; margin-bottom:6px;">Contract Venue</label>
+            <select id="select-contract" class="number-input" style="padding:7px 10px; font-size:0.8rem;" onchange="recalc()">
+              <option value="kalshi-15m" selected>Kalshi 15M (KXBTC15M)</option>
+              <option value="kalshi-1h">Kalshi 1H (KXBTCD)</option>
+              <option value="polymarket-15m">Polymarket 15M</option>
             </select>
           </div>
         </div>
 
-        <div class="input-group" style="margin-top:14px;">
-          <label style="font-size:0.8rem; color:var(--muted); display:block; margin-bottom:6px;">Directional Thesis (Above vs Below)</label>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-            <button type="button" id="btn-side-above" class="number-input" style="background:rgba(16,185,129,0.15); border:1px solid var(--green); color:var(--green); cursor:pointer; font-weight:600;" onclick="setSide('above')">▲ Above Strike (BUY YES)</button>
-            <button type="button" id="btn-side-below" class="number-input" style="background:rgba(255,255,255,0.04); border:1px solid var(--panel-border); color:var(--muted); cursor:pointer; font-weight:600;" onclick="setSide('below')">▼ Below Strike (BUY NO)</button>
+        <!-- Quick Summary of Key Figures on Left for Mobile -->
+        <div style="background:rgba(6,9,14,0.7); border:1px solid var(--panel-border-subtle); border-radius:6px; padding:14px; margin-bottom:18px;">
+          <div style="font-size:0.75rem; font-family:var(--font-mono); color:var(--muted); text-transform:uppercase; margin-bottom:8px; display:flex; justify-content:space-between;">
+            <span>Immediate Friction Summary</span>
+            <span style="color:var(--accent);">Rule B5 Verified</span>
+          </div>
+          <div class="stat-row" style="padding:4px 0;">
+            <span class="stat-label">Purchase Outlay:</span>
+            <span class="stat-val" id="val-summary-cost">$5.10</span>
+          </div>
+          <div class="stat-row" style="padding:4px 0;">
+            <span class="stat-label">Exchange Taker Fee:</span>
+            <span class="stat-val" style="color:var(--rose);" id="val-summary-fee">$0.18 (1.80¢/ct)</span>
+          </div>
+          <div class="stat-row" style="padding:4px 0;">
+            <span class="stat-label"><strong>Maximum Loss:</strong></span>
+            <span class="stat-val" style="color:var(--rose); font-weight:700;" id="val-summary-loss">$5.28</span>
+          </div>
+          <div class="stat-row" style="padding:4px 0; border-bottom:none;">
+            <span class="stat-label"><strong>Required Breakeven:</strong></span>
+            <span class="stat-val" style="color:var(--accent); font-weight:700;" id="val-summary-breakeven">52.80%</span>
           </div>
         </div>
 
-        <div class="banner-note" id="contract-note">
-          <strong>Why this matters on Kalshi 15M:</strong> Taker fees are calculated on the aggregate order using Kalshi's official round-up rule: <code>ceil(0.07 × Count × P × (1 − P))</code>. For an executable ask of 50¢, the 1.75¢ taker fee establishes a <strong>51.75% breakeven hurdle</strong> (or 52.00% on a single contract due to cent rounding). Crossing the spread is already incorporated in the ask price.
+        <!-- Immediate Easy-To-Reach Save Button -->
+        <button type="button" onclick="saveCheckToJournal()" class="nav-cta" style="width:100%; justify-content:center; padding:12px; font-size:0.85rem; font-weight:700; margin-bottom:18px; cursor:pointer;">
+          SAVE CHECK TO JOURNAL &rarr;
+        </button>
+
+        <!-- Collapsible Advanced Assumptions -->
+        <details style="background:rgba(6,9,14,0.4); border:1px solid var(--panel-border-subtle); border-radius:6px; padding:12px 14px;">
+          <summary style="cursor:pointer; font-weight:600; font-size:0.82rem; color:var(--accent); outline:none;">
+            ⚙️ Advanced Assumptions (Win Probability, Pricing Mode &amp; Spread Drag)
+          </summary>
+          <div style="margin-top:14px;">
+            <div class="input-group">
+              <label style="font-size:0.8rem; color:var(--muted); display:block; margin-bottom:6px;">Pricing Mode Reference</label>
+              <select id="select-pricing-mode" class="number-input" onchange="togglePricingMode()">
+                <option value="executable-ask" selected>Executable Ask Price (Crossing Spread Already Included)</option>
+                <option value="mid-price">Quoted Mid-Price (Requires Half-Spread to Cross)</option>
+              </select>
+              <div style="font-size:0.72rem; color:var(--muted); margin-top:5px; line-height:1.4;" id="pricing-mode-explainer">
+                <span style="color:var(--accent);">✓ Standard Ask:</span> Half-spread is already built into the market ask. No additional spread penalty is added.
+              </div>
+            </div>
+
+            <div class="input-group">
+              <div class="input-label-row">
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <span style="display:inline-block; width:8px; height:8px; border-radius:2px; background:#38BDF8;"></span>
+                  <label for="slider-prob" style="color:#FFFFFF; font-weight:600;">Assessed Win Probability (Subjective Thesis)</label>
+                </div>
+                <span id="label-prob" style="color:#38BDF8; font-weight:700;">55.0%</span>
+              </div>
+              <div style="font-size:0.72rem; color:var(--muted); margin-bottom:6px;">Your subjective assessment. This is your personal opinion, NOT an automated forecast.</div>
+              <input type="range" id="slider-prob" min="1" max="99" value="55" oninput="handleSliderSnap('slider-prob', [35,50,52.8,55,65,75]); recalc();">
+              <div style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;">
+                <button type="button" class="preset-btn" onclick="setProb(35)">35%</button>
+                <button type="button" class="preset-btn" onclick="setProb(50)">50% (Coin)</button>
+                <button type="button" class="preset-btn" onclick="setProb(52.8)">52.8% (Hurdle)</button>
+                <button type="button" class="preset-btn" onclick="setProb(55)" style="border-color:#38BDF8; color:#38BDF8;">55% (Std)</button>
+                <button type="button" class="preset-btn" onclick="setProb(65)">65%</button>
+                <button type="button" class="preset-btn" onclick="setProb(75)">75%</button>
+              </div>
+            </div>
+
+            <div class="input-group" id="group-spread" style="display:none;">
+              <div class="input-label-row">
+                <label for="slider-spread">Observed Bid-Ask Spread</label>
+                <span id="label-spread">2.0¢</span>
+              </div>
+              <div style="font-size:0.72rem; color:var(--muted); margin-bottom:6px;">Full spread between best bid and best ask. Half-spread is added to mid-price.</div>
+              <input type="range" id="slider-spread" min="1" max="10" value="2" oninput="recalc()">
+            </div>
+          </div>
+        </details>
+
+        <div class="banner-note" id="contract-note" style="margin-top:16px;">
+          <strong>Why this matters on Kalshi 15M:</strong> Taker fees are calculated on the aggregate order using Kalshi's official round-up rule: <code>ceil(0.07 × Count × P × (1 − P))</code>. For 10 contracts @ 51¢ ask, the $0.18 taker fee (1.80¢/ct) creates a <strong>52.80% breakeven hurdle</strong> ($5.28 max loss).
         </div>
       </div>
 
-      <!-- Right Column: Live Net Results -->
+      <!-- Right Column: Net Mathematical Results -->
       <div class="card">
         <div class="card-title">
-          <span>Net Mathematical Expected Value</span>
-          <span id="badge-verdict" class="mono" style="font-size:0.75rem; padding:2px 8px; border-radius:3px;">CALCULATING</span>
+          <span>2. Net Expected Value &amp; Hurdle</span>
+          <span id="badge-verdict" class="mono" style="font-size:0.75rem; padding:2px 8px; border-radius:3px; background:rgba(16,185,129,0.15); color:var(--green); border:1px solid var(--green);">POSITIVE EDGE</span>
         </div>
 
         <div class="result-hero" id="hero-box">
           <div class="result-hero-label">Net EV Per Contract</div>
-          <div class="result-hero-value" id="val-net-ev-contract">+$0.0225</div>
-          <div class="result-hero-sub" id="val-total-pnl">+$2.25 on 100 contracts</div>
+          <div class="result-hero-value" id="val-net-ev-contract" style="color:var(--green);">+$0.0220</div>
+          <div class="result-hero-sub" id="val-total-pnl" style="color:var(--green);">+$0.22 net expectancy on 10 contracts</div>
         </div>
 
         <div class="friction-breakdown">
           <div class="friction-box">
-            <div class="friction-label">Exchange Taker Fee</div>
-            <div class="friction-val" id="val-fee">1.75¢</div>
+            <div class="friction-label">Total Taker Fee</div>
+            <div class="friction-val" id="val-fee">$0.18 (1.80¢/ct)</div>
           </div>
           <div class="friction-box">
-            <div class="friction-label">Half-Spread Drag</div>
-            <div class="friction-val" id="val-spread-drag">1.00¢</div>
+            <div class="friction-label">Total Outlay + Fee</div>
+            <div class="friction-val" id="val-max-loss" style="color:var(--accent);">$5.28</div>
           </div>
         </div>
 
         <div class="stat-row">
-          <span class="stat-label">Gross Model Edge (before friction)</span>
-          <span class="stat-val" id="val-gross-edge">+5.00¢</span>
+          <span class="stat-label">Purchase Cost (10x @ 51¢)</span>
+          <span class="stat-val" id="val-row-cost">$5.10</span>
         </div>
         <div class="stat-row">
-          <span class="stat-label">Total Transaction Drag</span>
-          <span class="stat-val" style="color:var(--rose);" id="val-total-drag">-2.75¢</span>
+          <span class="stat-label">Exchange Taker Fee</span>
+          <span class="stat-val" style="color:var(--rose);" id="val-row-fee">$0.18</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Maximum Loss (Capital at Risk)</span>
+          <span class="stat-val" style="color:var(--rose); font-weight:700;" id="val-row-max-loss">$5.28</span>
         </div>
         <div class="stat-row">
           <span class="stat-label">Required Breakeven Win Rate</span>
-          <span class="stat-val" style="color:var(--accent);" id="val-breakeven">52.75%</span>
+          <span class="stat-val" style="color:var(--accent); font-weight:700;" id="val-breakeven">52.80%</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Gross Model Edge (55.0% - 51.0%)</span>
+          <span class="stat-val" id="val-gross-edge">+4.00¢</span>
         </div>
         <div class="stat-row">
           <span class="stat-label">Settlement Reference Benchmark</span>
           <span class="stat-val mono" style="color:#FFFFFF;" id="val-benchmark">CME CF BRTI 60s TWAP</span>
         </div>
         <div class="stat-row">
-          <span class="stat-label">Contract Cadence &amp; Horizon</span>
+          <span class="stat-label">Contract Horizon</span>
           <span class="stat-val mono" style="color:var(--accent-light);" id="val-cadence">15-Minute Intraday (KXBTC15M)</span>
         </div>
         <div id="risk-plan-advisory-box" style="display:none; margin-top:14px; padding:10px 14px; background:rgba(244,63,94,0.08); border:1px solid rgba(244,63,94,0.25); border-radius:4px; font-size:0.75rem;">
@@ -491,9 +570,12 @@ export function renderCalculatorPageHtml(): string {
 
         <div style="margin-top:20px; display:flex; flex-direction:column; gap:10px;">
           <button type="button" id="btn-save-journal" onclick="saveCheckToJournal()" class="nav-cta" style="width:100%; justify-content:center; padding:12px; font-size:0.85rem; font-weight:700; background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%); color:#07080B; border:1px solid #DFB843; cursor:pointer;">
-            SAVE CHECK &amp; ACTIVATE JOURNAL &rarr;
+            SAVE CHECK TO JOURNAL &rarr;
           </button>
-          <a href="/kalshi" class="btn-pricing" style="width:100%; text-align:center; padding:10px; font-size:0.8rem;">
+          <button type="button" onclick="previewExampleInJournal()" class="preset-btn" style="width:100%; padding:10px; font-size:0.8rem; text-align:center; color:var(--green); border-color:rgba(16,185,129,0.4); background:rgba(16,185,129,0.08); font-weight:600; cursor:pointer;">
+            ⚡ Preview Example Entry in Journal (No Account Required) &rarr;
+          </button>
+          <a href="/kalshi" class="btn-pricing" style="width:100%; text-align:center; padding:10px; font-size:0.8rem; text-decoration:none; color:var(--accent); border:1px solid rgba(223,184,67,0.3); border-radius:4px; display:block;">
             TEST AGAINST LIVE KALSHI BTC DESK &rarr;
           </a>
           <button type="button" onclick="openEmbedModal()" class="preset-btn" style="width:100%; padding:8px 12px; font-size:0.75rem; text-align:center; color:var(--muted); border-color:rgba(212,175,55,0.25); display:flex; align-items:center; justify-content:center; gap:6px; cursor:pointer;">
@@ -563,7 +645,7 @@ export function renderCalculatorPageHtml(): string {
         }
       } else {
         groupSpread.style.display = 'none';
-        labelPriceTitle.textContent = 'Contract Ask Price (Cost to Enter)';
+        labelPriceTitle.textContent = 'Contract Price (Executable Ask)';
         if (explainer) {
           explainer.innerHTML = '<span style="color:var(--accent);">✓ Standard Ask:</span> Half-spread is already built into the market ask. No additional spread penalty is added.';
         }
@@ -603,10 +685,13 @@ export function renderCalculatorPageHtml(): string {
 
       document.getElementById('label-price').textContent = (price * 100).toFixed(0) + '¢ ($' + price.toFixed(2) + ')';
       document.getElementById('label-prob').textContent = (prob * 100).toFixed(1) + '%';
-      document.getElementById('label-spread').textContent = (spread * 100).toFixed(1) + '¢';
+      if (document.getElementById('label-spread')) {
+        document.getElementById('label-spread').textContent = (spread * 100).toFixed(1) + '¢';
+      }
+      const labelCount = document.getElementById('label-count');
+      if (labelCount) labelCount.textContent = count + ' contract' + (count === 1 ? '' : 's');
 
       // Spread drag is ONLY present when evaluating from mid-price reference.
-      // An executable ask price already incorporates the crossing cost.
       let halfSpreadDrag = 0;
       let effectiveAsk = price;
       if (pricingMode === 'mid-price') {
@@ -647,35 +732,76 @@ export function renderCalculatorPageHtml(): string {
       const totalPnl = netEvContract * count;
       const breakevenProb = pricingMode === 'mid-price' ? (price + totalDrag) : (effectiveAsk + feePerContract);
 
+      const purchaseCost = effectiveAsk * count;
+      const maxLoss = purchaseCost + totalFee;
+
       const isPositive = netEvContract > 0;
       const color = isPositive ? 'var(--green)' : 'var(--rose)';
       const sign = isPositive ? '+' : '';
 
       const heroVal = document.getElementById('val-net-ev-contract');
-      heroVal.textContent = sign + '$' + netEvContract.toFixed(4);
-      heroVal.style.color = color;
+      if (heroVal) {
+        heroVal.textContent = sign + '$' + netEvContract.toFixed(4);
+        heroVal.style.color = color;
+      }
 
       const totalPnlEl = document.getElementById('val-total-pnl');
-      totalPnlEl.textContent = sign + '$' + totalPnl.toFixed(2) + ' net expectancy on ' + count + ' contracts';
-      totalPnlEl.style.color = isPositive ? 'var(--green)' : 'var(--muted)';
+      if (totalPnlEl) {
+        totalPnlEl.textContent = sign + '$' + totalPnl.toFixed(2) + ' net expectancy on ' + count + ' contract' + (count === 1 ? '' : 's');
+        totalPnlEl.style.color = isPositive ? 'var(--green)' : 'var(--muted)';
+      }
 
-      document.getElementById('val-fee').textContent = (feePerContract * 100).toFixed(2) + '¢ ($' + totalFee.toFixed(2) + ' total)';
-      document.getElementById('val-spread-drag').textContent = (halfSpreadDrag * 100).toFixed(2) + '¢' + (pricingMode === 'executable-ask' ? ' (in price)' : '');
-      document.getElementById('val-gross-edge').textContent = (grossEdge >= 0 ? '+' : '') + (grossEdge * 100).toFixed(2) + '¢';
-      document.getElementById('val-total-drag').textContent = '-' + (totalDrag * 100).toFixed(2) + '¢';
-      document.getElementById('val-breakeven').textContent = (breakevenProb * 100).toFixed(2) + '%';
-      document.getElementById('val-benchmark').textContent = benchmark;
-      document.getElementById('val-cadence').textContent = cadence;
-      document.getElementById('val-100-drag').textContent = '-$' + (totalDrag * count * 10).toFixed(2);
+      // Update summary cards
+      const summaryCost = document.getElementById('val-summary-cost');
+      if (summaryCost) summaryCost.textContent = '$' + purchaseCost.toFixed(2);
+
+      const summaryFee = document.getElementById('val-summary-fee');
+      if (summaryFee) summaryFee.textContent = '$' + totalFee.toFixed(2) + ' (' + (feePerContract * 100).toFixed(2) + '¢/ct)';
+
+      const summaryLoss = document.getElementById('val-summary-loss');
+      if (summaryLoss) summaryLoss.textContent = '$' + maxLoss.toFixed(2);
+
+      const summaryBreakeven = document.getElementById('val-summary-breakeven');
+      if (summaryBreakeven) summaryBreakeven.textContent = (breakevenProb * 100).toFixed(2) + '%';
+
+      // Update right column table
+      const elValFee = document.getElementById('val-fee');
+      if (elValFee) elValFee.textContent = '$' + totalFee.toFixed(2) + ' (' + (feePerContract * 100).toFixed(2) + '¢/ct)';
+
+      const elMaxLoss = document.getElementById('val-max-loss');
+      if (elMaxLoss) elMaxLoss.textContent = '$' + maxLoss.toFixed(2);
+
+      const elRowCost = document.getElementById('val-row-cost');
+      if (elRowCost) elRowCost.textContent = '$' + purchaseCost.toFixed(2);
+
+      const elRowFee = document.getElementById('val-row-fee');
+      if (elRowFee) elRowFee.textContent = '$' + totalFee.toFixed(2);
+
+      const elRowMaxLoss = document.getElementById('val-row-max-loss');
+      if (elRowMaxLoss) elRowMaxLoss.textContent = '$' + maxLoss.toFixed(2);
+
+      const elGross = document.getElementById('val-gross-edge');
+      if (elGross) elGross.textContent = (grossEdge >= 0 ? '+' : '') + (grossEdge * 100).toFixed(2) + '¢';
+
+      const elBreakeven = document.getElementById('val-breakeven');
+      if (elBreakeven) elBreakeven.textContent = (breakevenProb * 100).toFixed(2) + '%';
+
+      const elBenchmark = document.getElementById('val-benchmark');
+      if (elBenchmark) elBenchmark.textContent = benchmark;
+
+      const elCadence = document.getElementById('val-cadence');
+      if (elCadence) elCadence.textContent = cadence;
 
       const mobileBreakeven = document.getElementById('mobile-breakeven-val');
       if (mobileBreakeven) mobileBreakeven.textContent = (breakevenProb * 100).toFixed(2) + '%';
 
       const badge = document.getElementById('badge-verdict');
-      badge.textContent = isPositive ? 'POSITIVE EDGE' : 'NEGATIVE DRAG';
-      badge.style.background = isPositive ? 'rgba(16,185,129,0.15)' : 'rgba(244,63,94,0.15)';
-      badge.style.color = isPositive ? 'var(--green)' : 'var(--rose)';
-      badge.style.border = '1px solid ' + (isPositive ? 'var(--green)' : 'var(--rose)');
+      if (badge) {
+        badge.textContent = isPositive ? 'POSITIVE EDGE' : 'NEGATIVE DRAG';
+        badge.style.background = isPositive ? 'rgba(16,185,129,0.15)' : 'rgba(244,63,94,0.15)';
+        badge.style.color = isPositive ? 'var(--green)' : 'var(--rose)';
+        badge.style.border = '1px solid ' + (isPositive ? 'var(--green)' : 'var(--rose)');
+      }
 
       // Store current check state for 1-click journal save
       window.__latestCheck = {
@@ -685,7 +811,7 @@ export function renderCalculatorPageHtml(): string {
         side: currentSide,
         price: effectiveAsk,
         count: count,
-        purchaseCost: Number((effectiveAsk * count).toFixed(2)),
+        purchaseCost: Number(purchaseCost.toFixed(2)),
         exchangeFee: Number(totalFee.toFixed(2)),
         halfSpreadDrag: Number(halfSpreadDrag.toFixed(4)),
         totalDrag: Number(totalDrag.toFixed(4)),
@@ -765,6 +891,32 @@ export function renderCalculatorPageHtml(): string {
       recalc();
     }
 
+    function loadExampleCheck() {
+      setPrice(51);
+      setCount(10);
+      setProb(55);
+      setSide('above');
+      triggerHaptic();
+    }
+
+    function previewExampleInJournal() {
+      loadExampleCheck();
+      recalc();
+      const exampleCheck = Object.assign({}, window.__latestCheck, {
+        isExample: true,
+        exampleTag: 'first_use_preview'
+      });
+      try {
+        localStorage.setItem('quanterraos_pending_check', JSON.stringify(exampleCheck));
+        fetch('/api/analytics/check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(Object.assign({}, exampleCheck, { preview: true }))
+        }).catch(function() {});
+      } catch (_) {}
+      window.location.href = '/journal?preview=true';
+    }
+
     function saveCheckToJournal() {
       if (!window.__latestCheck) recalc();
       try {
@@ -813,6 +965,7 @@ export function renderCalculatorPageHtml(): string {
     recalc();
   </script>
   ${ASSISTANT_WIDGET_HTML}
+  ${renderBetaFeedbackWidgetHtml()}
 </body>
 </html>`;
 }
