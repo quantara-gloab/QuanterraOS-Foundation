@@ -122,6 +122,12 @@ import {
   renderLiquidityFlowWidgetHtml,
   renderLiquidityFlowPageHtml,
 } from "./liquidity-flow.ts";
+import {
+  computeDepthMatrixSnapshot,
+  generateDepthMatrixSvgReceipt,
+  renderDepthMatrixWidgetHtml,
+  renderDepthMatrixPageHtml,
+} from "./depth-matrix.ts";
 import { renderEducationalPageHtml, type EducationTopic } from "./educational-pages.ts";
 import { getReviewReminders, updateReviewReminders } from "./review-reminders.ts";
 import { renderVenueComparisonPageHtml } from "./venue-comparison-page.ts";
@@ -2320,6 +2326,58 @@ app.get("/api/flow/card.svg", (req, res) => {
   const windowSeconds = Number(req.query.window ?? 180);
   const state = computeLiquidityFlowState(ticker, { windowSeconds });
   const svg = generateLiquidityFlowSvgReceipt(state);
+  res.setHeader("Content-Type", "image/svg+xml; charset=utf-8");
+  res.setHeader("Cache-Control", "public, max-age=60, s-maxage=300");
+  res.send(svg);
+});
+
+// All-Strike Cross-Section Matrix & Liquidity Wall Terminal (/matrix, /cross-section)
+app.get(["/matrix", "/cross-section", "/depth-matrix"], (req, res) => {
+  const spotPrice = req.query.spot ? Number(req.query.spot) : undefined;
+  const minsRemaining = req.query.mins ? Number(req.query.mins) : undefined;
+  const vol = req.query.vol ? Number(req.query.vol) : undefined;
+  const snapshot = computeDepthMatrixSnapshot({
+    spotPrice,
+    timeRemainingMinutes: minsRemaining,
+    annualizedVol: vol
+  });
+  res.type("html").send(renderDepthMatrixPageHtml(snapshot));
+});
+
+app.get(["/embed/matrix", "/embed/cross-section"], (req, res) => {
+  const spotPrice = req.query.spot ? Number(req.query.spot) : undefined;
+  const minsRemaining = req.query.mins ? Number(req.query.mins) : undefined;
+  const vol = req.query.vol ? Number(req.query.vol) : undefined;
+  const snapshot = computeDepthMatrixSnapshot({
+    spotPrice,
+    timeRemainingMinutes: minsRemaining,
+    annualizedVol: vol
+  });
+  res.type("html").send(renderDepthMatrixWidgetHtml(snapshot));
+});
+
+app.get("/api/matrix/snapshot", (req, res) => {
+  const spotPrice = req.query.spot ? Number(req.query.spot) : undefined;
+  const minsRemaining = req.query.mins ? Number(req.query.mins) : undefined;
+  const vol = req.query.vol ? Number(req.query.vol) : undefined;
+  const snapshot = computeDepthMatrixSnapshot({
+    spotPrice,
+    timeRemainingMinutes: minsRemaining,
+    annualizedVol: vol
+  });
+  res.json({ success: true, snapshot });
+});
+
+app.get("/api/matrix/card.svg", (req, res) => {
+  const spotPrice = req.query.spot ? Number(req.query.spot) : undefined;
+  const minsRemaining = req.query.mins ? Number(req.query.mins) : undefined;
+  const vol = req.query.vol ? Number(req.query.vol) : undefined;
+  const snapshot = computeDepthMatrixSnapshot({
+    spotPrice,
+    timeRemainingMinutes: minsRemaining,
+    annualizedVol: vol
+  });
+  const svg = generateDepthMatrixSvgReceipt(snapshot);
   res.setHeader("Content-Type", "image/svg+xml; charset=utf-8");
   res.setHeader("Cache-Control", "public, max-age=60, s-maxage=300");
   res.send(svg);

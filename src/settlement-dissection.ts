@@ -554,6 +554,7 @@ export function renderSettlementDissectionPageHtml(
       <a href="/corridors">Corridors</a>
       <a href="/divergence">Divergence</a>
       <a href="/flow">Flow</a>
+      <a href="/matrix">Matrix</a>
       <a href="/calibration/explorer">Decomposition</a>
       <a href="/settlement" class="active" style="color:var(--accent); font-weight:600;">Settlement Dissection</a>
       <a href="/schedule">Schedule</a>

@@ -463,6 +463,7 @@ export function renderMarketScheduleHtml(matrix: DailyScheduleMatrix): string {
       <a href="/corridors">Corridors</a>
       <a href="/divergence">Divergence</a>
       <a href="/flow">Flow</a>
+      <a href="/matrix">Matrix</a>
       <a href="/calibration/explorer">Decomposition</a>
       <a href="/settlement">Settlement</a>
       <a href="/schedule" class="active" style="color:var(--accent);">Schedule</a>

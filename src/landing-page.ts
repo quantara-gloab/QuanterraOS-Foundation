@@ -1713,6 +1713,7 @@ ${miniCircles}
         <a href="/radar">radar</a>
         <a href="/radar/audio">sonification</a>
         <a href="/flow">flow</a>
+        <a href="/matrix">matrix</a>
         <a href="/divergence">divergence</a>
         <a href="/calibration">calibration</a>
         <a href="/calibration/explorer">decomposition</a>

@@ -1289,6 +1289,7 @@ export function renderExpiryRadarPageHtml(
       <a href="/corridors">Corridors</a>
       <a href="/divergence">Cross-Venue Divergence</a>
       <a href="/flow">Order Flow</a>
+      <a href="/matrix">Depth Matrix</a>
       <a href="/calibration/explorer">Decomposition</a>
       <a href="/settlement">Settlement Dissection</a>
       <a href="/schedule">Schedule</a>
