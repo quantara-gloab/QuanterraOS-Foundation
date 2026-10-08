@@ -1052,6 +1052,99 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     font-family: var(--font-mono);
     font-size: 0.75rem;
   }
+
+  /* 90-Day Execution Roadmap & Microstructure Cockpit */
+  .cockpit-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 24px;
+  }
+  @media (max-width: 1040px) {
+    .cockpit-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 680px) {
+    .cockpit-grid { grid-template-columns: 1fr; }
+  }
+
+  .cockpit-card {
+    background: linear-gradient(180deg, rgba(16, 22, 32, 0.85) 0%, rgba(9, 13, 20, 0.95) 100%);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 8px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 16px;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 1px 0 rgba(255, 245, 215, 0.1), 0 12px 28px -10px rgba(0, 0, 0, 0.7);
+  }
+  .cockpit-card:hover {
+    border-color: rgba(223, 184, 67, 0.5);
+    box-shadow: inset 0 1px 0 rgba(255, 245, 215, 0.3), 0 16px 36px -10px rgba(223, 184, 67, 0.25);
+    transform: translateY(-2px);
+  }
+  .cockpit-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--accent);
+    background: rgba(223, 184, 67, 0.1);
+    border: 1px solid rgba(223, 184, 67, 0.3);
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    width: fit-content;
+  }
+  .cockpit-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin-top: 4px;
+    letter-spacing: -0.01em;
+  }
+  .cockpit-desc {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.55;
+    flex-grow: 1;
+  }
+  .cockpit-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 8px 0;
+  }
+  .cockpit-pill {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    padding: 2px 7px;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: #cbd5e1;
+  }
+  .cockpit-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--accent);
+    transition: color 0.15s;
+    text-decoration: none;
+    margin-top: 4px;
+  }
+  .cockpit-card:hover .cockpit-cta {
+    color: var(--accent-light);
+  }
 </style>
 </head>
 <body>
@@ -1073,12 +1166,13 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       <a href="/" class="nav-brand"><span class="brand-dot"></span> quanterraos</a>
       <div class="nav-links">
         <a href="/calculator" style="color:var(--accent); font-weight:700;">Check</a>
+        <a href="/paper" style="color:var(--accent-light); font-weight:700;">Paper Mode</a>
+        <a href="/compare" style="color:var(--accent); font-weight:700;">Compare</a>
         <a href="/radar" style="color:var(--accent-light); font-weight:700;">Radar</a>
+        <a href="/flow" style="color:var(--accent); font-weight:700;">Flow</a>
+        <a href="/matrix" style="color:var(--accent-light); font-weight:700;">Matrix</a>
         <a href="/corridors" style="color:var(--accent); font-weight:700;">Corridors</a>
-        <a href="/divergence" style="color:var(--accent); font-weight:700;">Divergence</a>
         <a href="/settlement" style="color:var(--accent-light); font-weight:700;">Settlement</a>
-        <a href="/schedule" style="color:var(--accent); font-weight:700;">Schedule</a>
-        <a href="/webhooks" style="color:var(--accent); font-weight:700;">Webhooks</a>
         <a href="/journal" style="color:#10B981; font-weight:700;">Journal</a>
         <a href="/learn" style="color:var(--accent-light); font-weight:700;">Learn</a>
         <a href="/access" style="color:var(--text); font-weight:500;">Sign in</a>
@@ -1418,6 +1512,139 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
             <a href="/journal?preview=true" class="btn-primary" style="padding:8px 16px; font-size:0.82rem; font-weight:700;">
               Start Your Private Decision Journal &rarr;
             </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 90-Day Execution Roadmap: Specialized Microstructure & Risk Cockpit -->
+    <section class="section-block" id="roadmap-cockpit" style="margin-top: 48px;">
+      <div class="section-heading-group">
+        <div class="section-eyebrow" style="color:var(--accent-light);">&Sigma; 90-Day Plan &bull; Institutional Microstructure Engines</div>
+        <h2 class="section-heading">Active Prediction Market Microstructure Cockpit</h2>
+        <p class="section-description">
+          Six specialized tools designed to enforce pre-trade discipline, quantify exchange friction, and evaluate out-of-sample forecast accuracy before risking live capital.
+        </p>
+      </div>
+
+      <div class="cockpit-grid">
+        <!-- 1. Realistic Paper Mode -->
+        <div class="cockpit-card">
+          <div>
+            <div class="cockpit-badge">Build Order #5 &bull; Realistic Paper Mode</div>
+            <div class="cockpit-title">Practice Without Deposits</div>
+            <p class="cockpit-desc">
+              Realistic simulation incorporating matching engine network transit latency (50ms–350ms), Level-2 queue depth depletion, parabolic CFTC taker fees ($0.07&times;P(1-P)), and missed fills on fast price jumps.
+            </p>
+            <div class="cockpit-pills">
+              <span class="cockpit-pill">50ms/150ms/350ms Latency</span>
+              <span class="cockpit-pill">Queue Depth Depletion</span>
+              <span class="cockpit-pill">Risk Plan Limit Advisory</span>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.06); padding-top:12px;">
+            <span style="font-family:var(--font-mono); font-size:0.72rem; color:var(--muted);">$0.00 Live Risk</span>
+            <a href="/paper" class="cockpit-cta">Launch Paper Mode &rarr;</a>
+          </div>
+        </div>
+
+        <!-- 2. Validated Forecast Comparison -->
+        <div class="cockpit-card">
+          <div>
+            <div class="cockpit-badge">Build Order #6 &bull; Prospective Value Study</div>
+            <div class="cockpit-title">Forecast Comparison &amp; Audit</div>
+            <p class="cockpit-desc">
+              Tests whether your subjective forecast adds statistical value over the naive Kalshi market mid-price baseline. Evaluates prospective Brier scores and net expected profit after taker fees, half-spreads, and slippage.
+            </p>
+            <div class="cockpit-pills">
+              <span class="cockpit-pill">Net EV: p - price - fee</span>
+              <span class="cockpit-pill">Lognormal Itô Model</span>
+              <span class="cockpit-pill">Empirical Brier Score</span>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.06); padding-top:12px;">
+            <span style="font-family:var(--font-mono); font-size:0.72rem; color:var(--muted);">Out-of-Sample</span>
+            <a href="/compare" class="cockpit-cta">Compare Forecast &rarr;</a>
+          </div>
+        </div>
+
+        <!-- 3. All-Strike Level-2 Cross-Section Matrix -->
+        <div class="cockpit-card">
+          <div>
+            <div class="cockpit-badge">Microstructure &bull; L2 Book Matrix</div>
+            <div class="cockpit-title">All-Strike Liquidity Wall Matrix</div>
+            <p class="cockpit-desc">
+              Cross-sectional 5-strike order book matrix centered around live spot BTC. Scans resting inventory walls (&ge;250 contracts), queue imbalances, and continuous Black-Scholes lognormal model divergence.
+            </p>
+            <div class="cockpit-pills">
+              <span class="cockpit-pill">5-Strike Spectrum</span>
+              <span class="cockpit-pill">Liquidity Wall Scanner</span>
+              <span class="cockpit-pill">&Delta; Model Divergence</span>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.06); padding-top:12px;">
+            <span style="font-family:var(--font-mono); font-size:0.72rem; color:var(--muted);">L2 Depth Book</span>
+            <a href="/matrix" class="cockpit-cta">Open Matrix &rarr;</a>
+          </div>
+        </div>
+
+        <!-- 4. Order Book Liquidity Flow -->
+        <div class="cockpit-card">
+          <div>
+            <div class="cockpit-badge">Microstructure &bull; Flow Engine</div>
+            <div class="cockpit-title">Order Book Liquidity Flow</div>
+            <p class="cockpit-desc">
+              Real-time measurement of order-book tension, bid/ask depth imbalance ratio, and toxic order flow pressure. Generates 640x720 vector verification receipts with SHA-256 cryptographic provenance.
+            </p>
+            <div class="cockpit-pills">
+              <span class="cockpit-pill">Imbalance Ratio</span>
+              <span class="cockpit-pill">Resting Depth vs Spread</span>
+              <span class="cockpit-pill">Vector SVG Receipts</span>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.06); padding-top:12px;">
+            <span style="font-family:var(--font-mono); font-size:0.72rem; color:var(--muted);">Sub-Minute Flow</span>
+            <a href="/flow" class="cockpit-cta">Inspect Flow &rarr;</a>
+          </div>
+        </div>
+
+        <!-- 5. Live Microstructure Sonification -->
+        <div class="cockpit-card">
+          <div>
+            <div class="cockpit-badge">Audio Telemetry &bull; Web Audio API</div>
+            <div class="cockpit-title">Live Microstructure Sonification</div>
+            <p class="cockpit-desc">
+              Web Audio dual-oscillator acoustic synthesizer sonifying the CME CF BRTI 60-second TWAP settlement index vs Kalshi market-mid. Translates basis volatility and spread tension into real-time auditory frequencies.
+            </p>
+            <div class="cockpit-pills">
+              <span class="cockpit-pill">Dual-Oscillator Audio</span>
+              <span class="cockpit-pill">Basis Pitch Mapping</span>
+              <span class="cockpit-pill">Harmonic Oracle Tones</span>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.06); padding-top:12px;">
+            <span style="font-family:var(--font-mono); font-size:0.72rem; color:var(--muted);">Real-Time Audio</span>
+            <a href="/radar/audio" class="cockpit-cta">Listen to Oracle &rarr;</a>
+          </div>
+        </div>
+
+        <!-- 6. Historical Calibration Explorer -->
+        <div class="cockpit-card">
+          <div>
+            <div class="cockpit-badge">Statistical Proof &bull; Murphy &amp; Yates</div>
+            <div class="cockpit-title">Calibration Explorer &amp; Decomposition</div>
+            <p class="cockpit-desc">
+              Rigorous Brier score decomposition (Reliability / Resolution / Uncertainty) across 1,316 settled windows. Interactive calibration curve exploring out-of-sample probability accuracy without marketing exaggeration.
+            </p>
+            <div class="cockpit-pills">
+              <span class="cockpit-pill">n=1,316 Settled Windows</span>
+              <span class="cockpit-pill">Murphy &amp; Yates Math</span>
+              <span class="cockpit-pill">Reliability Slope</span>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.06); padding-top:12px;">
+            <span style="font-family:var(--font-mono); font-size:0.72rem; color:var(--muted);">Empirical Audit</span>
+            <a href="/calibration/explorer" class="cockpit-cta">Decompose Brier &rarr;</a>
           </div>
         </div>
       </div>

@@ -919,6 +919,35 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 - `npx tsx --test src/__tests__/forecast-comparison.test.ts` — **6/6 passing**.
 - Total Platform Suite: **458 tests passing across 103 suites**.
 
+---
+
+### Session: 2026-10-07 — Flagship Website Update: 90-Day Execution Roadmap & Microstructure Cockpit
+
+**Trigger:** The founder instructed: "now update the website make all the live changes lets see where we are at so far", deploying a dedicated institutional cockpit section and universal consumer navigation across the flagship landing page.
+
+**Delivered Capabilities:**
+- **Primary Consumer Navigation Modernization (`src/landing-page.ts`)**:
+  - Expanded primary top navigation bar to feature all core 90-day plan and microstructure workflows: `Check` (`/calculator`), `Paper Mode` (`/paper`), `Compare` (`/compare`), `Radar` (`/radar`), `Flow` (`/flow`), `Matrix` (`/matrix`), `Corridors` (`/corridors`), `Settlement` (`/settlement`), `Journal` (`/journal`), `Learn` (`/learn`).
+- **Active Prediction Market Microstructure Cockpit (`#roadmap-cockpit`)**:
+  - 6-card institutional grid styled with obsidian glassmorphic surfaces (`#101620`), bullion gold metallic borders, and cyan telemetry accents:
+    1. **Realistic Paper Mode** (`/paper`): Practice without deposits; models matching engine latency (50–350ms), queue depth depletion, CFTC non-linear taker fees ($0.07 \times P(1-P)$), and voluntary risk plan limits.
+    2. **Validated Forecast Comparison** (`/compare`): Prospective out-of-sample evaluation testing whether user forecasts add value over naive market mid-price after all fees, spreads, and slippage.
+    3. **All-Strike Level-2 Cross-Section Matrix** (`/matrix`): 5-strike spectrum, resting liquidity wall scanner ($\ge 250$ contracts), and Black-Scholes lognormal model divergence.
+    4. **Order Book Liquidity Flow** (`/flow`): Sub-minute order-book tension, bid/ask depth imbalance ratio, and toxic queue pressure.
+    5. **Live Microstructure Sonification** (`/radar/audio`): Web Audio dual-oscillator acoustic synthesizer sonifying CME CF BRTI 60s TWAP vs Kalshi mid-price.
+    6. **Historical Calibration Explorer** (`/calibration/explorer`): Murphy and Yates decomposition across 1,316 settled windows, verifying empirical calibration without marketing claims.
+- **Dedicated Acceptance Test Suite (`src/__tests__/landing-page-cockpit.test.ts`)**:
+  - 3 automated tests validating:
+    1. Navigation links for all 6 core 90-day plan tools in primary consumer navigation.
+    2. Microstructure cockpit section rendering with valid deep links and badges.
+    3. Strict compliance with Rule B4 (no banned words), Rule B5 ($0.00 capital deployed), and Rule B10 (marks notice).
+
+**Verification:**
+- `npx tsc --noEmit` — **0 errors (clean exit 0)**.
+- `npx tsx --test src/__tests__/landing-page-cockpit.test.ts` — **3/3 passing**.
+- Total Platform Suite: **461 tests passing across 104 suites**.
+
+
 
 
 
