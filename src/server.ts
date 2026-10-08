@@ -170,6 +170,10 @@ import {
   exportPeriodicFrictionReportCsv,
   renderPeriodicFrictionReportPageHtml,
 } from "./periodic-outcome-reports.ts";
+import {
+  WIDGET_CATALOG_LIST,
+  renderWidgetCatalogHtml,
+} from "./widget-catalog.ts";
 import { renderEducationalPageHtml, type EducationTopic } from "./educational-pages.ts";
 import { getReviewReminders, updateReviewReminders } from "./review-reminders.ts";
 import { renderVenueComparisonPageHtml } from "./venue-comparison-page.ts";
@@ -2674,6 +2678,15 @@ app.get(["/api/reports/friction/export.csv", "/api/reports/friction.csv"], (_req
   res.setHeader("Content-Type", "text/csv; charset=utf-8");
   res.setHeader("Content-Disposition", 'attachment; filename="quanterraos-market-friction-report.csv"');
   res.send(csv);
+});
+
+// Embeddable Widgets & Distribution Cards Hub (Sections 6.3 & 6.5 of Global Growth Strategy)
+app.get(["/widgets", "/embeds", "/developers/widgets"], (_req, res) => {
+  res.type("html").send(renderWidgetCatalogHtml());
+});
+
+app.get("/api/widgets", (_req, res) => {
+  res.json({ success: true, count: WIDGET_CATALOG_LIST.length, widgets: WIDGET_CATALOG_LIST });
 });
 
 app.get(["/learn", "/education", "/curriculum"], (req, res) => {

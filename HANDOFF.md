@@ -1097,6 +1097,36 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 - `npm test` — **484/484 tests passing across 108 test suites**.
 - Remote production healthcheck: `GET https://quanterraos.com/healthz` returns `200 OK` (`status: ok, circuit: LOCKED_RULE_B5`).
 
+---
+
+### Session: 2026-10-08 — Distribution Cards & Embeddable Widgets Hub (Growth Strategy Sections 6.3 & 6.5)
+
+**Trigger:** "continue to next developement task on the list" — delivering Growth Strategy Sections 6.3 ("Shareable Educational Cards") and 6.5 ("Embedded Cost/Risk Widgets"), launching a public Widget Catalog and Embed Hub (`/widgets`, `/embeds`) for financial journalists, Substack authors, crypto educators, and quantitative developers.
+
+**Delivered Upgrades:**
+- **Widget Catalog & Embed Hub Engine (`src/widget-catalog.ts`)**:
+  - Central showcase indexing 8 sovereign QuanterraOS embeddable widgets & vector verification cards across three categories:
+    1. *Friction & Cost Auditing*: True Cost & Breakeven Calculator (`/embed/calculator`), 2026 Competitive Teardown Referee (`/embed/benchmark`), Periodic Market Friction Audit (`/embed/transparency`).
+    2. *Settlement & Microstructure*: CME CF BRTI 60-Second TWAP Radar (`/embed/radar`), Cross-Venue Basis & Divergence Monitor (`/embed/divergence`).
+    3. *Education & Governance*: Know Your Costs Pilot Study (#6.4) (`/embed/study`), Educator & Distribution Partner Roster (`/embed/educators`), Realistic Microstructure Paper Mode (`/embed/paper`).
+  - Interactive live preview panel with responsive viewport toggle switches (Full Width, Tablet 640px, Mobile 380px).
+  - Multi-tab snippet generator with 1-click clipboard copy: HTML `<iframe>`, Markdown Badge `[![...](...svg)](...)`, and Direct Endpoint URLs.
+  - Strict Rule B4 (zero superlatives), Rule B5 ($0.00 capital risk lock), and Rule B10 non-affiliation disclaimers.
+- **Server Routes & API Integration (`src/server.ts`)**:
+  - `GET /widgets`, `GET /embeds`, `GET /developers/widgets`: Serves interactive Widget Catalog dashboard.
+  - `GET /api/widgets`: Returns structured JSON manifest of all 8 widgets.
+- **Navigation Integration (`src/landing-page.ts`)**:
+  - Added `/widgets` to top-right navigation and footer link roster.
+- **Acceptance Testing Suite (`src/__tests__/widget-catalog.test.ts`)**:
+  - 4 comprehensive tests passing covering catalog completeness (8 widgets), category coverage (friction, microstructure, education), HTML rendering with viewport toggles, and compliance guardrails.
+
+**Verification:**
+- `npx tsc --noEmit` — **0 errors (clean exit 0)**.
+- `node --experimental-strip-types --test src/__tests__/widget-catalog.test.ts` — **4/4 passing**.
+- `npm test` — **488/488 tests passing across 109 test suites**.
+- Remote production healthcheck: `GET https://quanterraos.com/healthz` returns `200 OK` (`status: ok, circuit: LOCKED_RULE_B5`).
+
+
 
 
 
