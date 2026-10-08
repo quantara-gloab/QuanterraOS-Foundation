@@ -1181,6 +1181,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       </div>
     </div>
     <div class="nav-right" style="display:flex; gap:12px; align-items:center;">
+      <a href="/why" style="color:var(--accent); font-size:0.78rem; text-decoration:none; font-weight:600;">Why QuanterraOS</a>
       <a href="/research" style="color:var(--muted); font-size:0.78rem; text-decoration:none;">Research</a>
       <a href="/access" style="color:var(--muted); font-size:0.78rem; text-decoration:none;">Institutional</a>
       <a href="/calculator" class="nav-cta" style="background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%); color:#07080B; border:1px solid rgba(255,248,220,0.8); box-shadow:0 4px 16px rgba(212,175,55,0.4), inset 0 1px 0 #FFF; font-weight:800;">FREE CHECK &rarr;</a>
@@ -1939,6 +1940,7 @@ ${miniCircles}
     <!-- Footer -->
     <footer class="page-footer">
       <div class="footer-links">
+        <a href="/why">why</a>
         <a href="/radar">radar</a>
         <a href="/paper">paper</a>
         <a href="/compare">compare</a>

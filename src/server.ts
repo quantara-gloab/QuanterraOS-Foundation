@@ -157,6 +157,12 @@ import {
   renderEducatorWidgetHtml,
   renderEducatorPageHtml,
 } from "./educator-portal.ts";
+import {
+  computeFrictionTeardown,
+  generateBenchmarkSvgReceipt,
+  renderBenchmarkWidgetHtml,
+  renderBenchmarkPageHtml,
+} from "./competitive-benchmark.ts";
 import { renderEducationalPageHtml, type EducationTopic } from "./educational-pages.ts";
 import { getReviewReminders, updateReviewReminders } from "./review-reminders.ts";
 import { renderVenueComparisonPageHtml } from "./venue-comparison-page.ts";
@@ -2591,6 +2597,41 @@ app.get("/api/educators/card.svg", (_req, res) => {
   const partners = getActiveEducatorPartners();
   const summary = summarizeEducatorProgram(partners);
   const svg = generateEducatorSvgReceipt(summary);
+  res.setHeader("Content-Type", "image/svg+xml; charset=utf-8");
+  res.setHeader("Cache-Control", "public, max-age=60, s-maxage=300");
+  res.send(svg);
+});
+
+// Competitive Benchmark & Truth vs. Hype (Why QuanterraOS)
+app.get(["/why", "/why-quanterraos", "/benchmark", "/vs"], (req, res) => {
+  const nominalPriceCents = req.query.p ? Number(req.query.p) : 51;
+  const userStatedWinRatePct = req.query.w ? Number(req.query.w) : 55;
+  const contracts = req.query.c ? Number(req.query.c) : 100;
+  const teardown = computeFrictionTeardown({ nominalPriceCents, userStatedWinRatePct, contracts });
+  res.type("html").send(renderBenchmarkPageHtml(teardown));
+});
+
+app.get(["/embed/why", "/embed/benchmark"], (req, res) => {
+  const nominalPriceCents = req.query.p ? Number(req.query.p) : 51;
+  const userStatedWinRatePct = req.query.w ? Number(req.query.w) : 55;
+  const teardown = computeFrictionTeardown({ nominalPriceCents, userStatedWinRatePct });
+  res.type("html").send(renderBenchmarkWidgetHtml(teardown));
+});
+
+app.get("/api/benchmark/teardown", (req, res) => {
+  const nominalPriceCents = req.query.p ? Number(req.query.p) : 51;
+  const userStatedWinRatePct = req.query.w ? Number(req.query.w) : 55;
+  const contracts = req.query.c ? Number(req.query.c) : 100;
+  const teardown = computeFrictionTeardown({ nominalPriceCents, userStatedWinRatePct, contracts });
+  res.json({ success: true, teardown });
+});
+
+app.get("/api/benchmark/card.svg", (req, res) => {
+  const nominalPriceCents = req.query.p ? Number(req.query.p) : 51;
+  const userStatedWinRatePct = req.query.w ? Number(req.query.w) : 55;
+  const contracts = req.query.c ? Number(req.query.c) : 100;
+  const teardown = computeFrictionTeardown({ nominalPriceCents, userStatedWinRatePct, contracts });
+  const svg = generateBenchmarkSvgReceipt(teardown);
   res.setHeader("Content-Type", "image/svg+xml; charset=utf-8");
   res.setHeader("Cache-Control", "public, max-age=60, s-maxage=300");
   res.send(svg);

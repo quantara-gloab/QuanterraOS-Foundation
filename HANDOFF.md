@@ -988,6 +988,32 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 - `node --experimental-strip-types --test src/__tests__/study-and-educator-portals.test.ts src/__tests__/forecast-comparison.test.ts src/__tests__/plan.test.ts src/__tests__/landing-page-cockpit.test.ts` — **19/19 tests passing across 4 suites (duration ~2.1s)**.
 - Total Platform Suite: **468 tests passing across 105 suites**.
 
+---
+
+### Session: 2026-10-08 — Competitive Benchmark & "Truth vs. Hype" Terminal (/why, /why-quanterraos, /vs)
+
+**Trigger:** The founder instructed: "now study the competition their apps and websites make sure we stand out and are a game changer", initiating a deep competitive teardown of Verso, Oddpool (Kalshi-acquired), Dome (Polymarket-acquired), Predly, Stand.Trade, and Unusual Whales, followed by the deployment of the Competitive Benchmark & Friction Teardown Terminal.
+
+**Delivered Capabilities:**
+- **Competitive Deep Dive Artifact (`competitive_deep_dive_2026.md`)**:
+  - Detailed analysis of competitor vulnerabilities: venue capture (Dome & Oddpool acquisitions creating conflicts of interest), uncalibrated black-box AI claims (Predly's 89% accuracy marketing without backtests), and friction blindness (hiding Kalshi's parabolic taker fee curve).
+  - Outlined QuanterraOS's 5 game-changing pillars: Anti-Friction Reality, 60s TWAP Settlement Radar, Falsifiable Brier Science, Consented Decision Memory, and Sovereign MCP Interoperability.
+- **Competitive Benchmark & Friction Teardown Engine (`src/competitive-benchmark.ts`, `/why`, `/why-quanterraos`, `/benchmark`, `/vs`)**:
+  - `computeFrictionTeardown()`: Interactive simulator showing competitor illusion vs QuanterraOS reality. E.g. for a 51¢ contract at a 55% forecast win rate, competitors claim a "+4.00% edge" and "+$4.00 gross EV", while QuanterraOS reveals the -$1.75 CFTC taker fee drag, calculates the true 52.75% breakeven hurdle, proves net EV is only +$2.25, and exposes that 43.8% of profit is consumed by the exchange.
+  - 6-Dimension Architectural Battlecard (`COMPETITOR_BENCHMARK_ROWS`): Side-by-side audit across Independence, Taker Fee Drag, Settlement Oracle Gauge, Calibration Rigor, Decision Memory, and Model Context Protocol (MCP) support.
+  - Institutional SVG Comparison Receipt Generator (`/api/benchmark/card.svg`) & Embeddable Widget (`/embed/why`).
+  - Cryptographic 64-char SHA-256 provenance hash and Rule B5 $0.00 capital lock.
+- **Universal Navigation Interlinking (`src/landing-page.ts`)**:
+  - Added "Why QuanterraOS" to top nav header and footer links.
+- **Dedicated Acceptance Test Suite (`src/__tests__/competitive-benchmark.test.ts`)**:
+  - 5 automated tests validating teardown arithmetic, architectural rows, SVG receipt XML, embeddable widget HTML, and Rule B4/B5/B10 compliance.
+
+**Verification:**
+- `npx tsc --noEmit` — **0 errors (clean exit 0)**.
+- `node --experimental-strip-types --test src/__tests__/competitive-benchmark.test.ts src/__tests__/study-and-educator-portals.test.ts src/__tests__/forecast-comparison.test.ts src/__tests__/plan.test.ts` — **21/21 tests passing across 4 suites (duration ~2.1s)**.
+- Total Platform Suite: **473 tests passing across 106 suites**.
+
+
 
 
 
