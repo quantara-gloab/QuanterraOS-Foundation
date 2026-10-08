@@ -91,6 +91,15 @@ import {
   generateCorridorSvgReceipt,
   renderCorridorTerminalHtml,
 } from "./corridor-engine.ts";
+import {
+  createAlertEvent,
+  dispatchAlertWebhook,
+  getRecentDispatchedAlerts,
+  renderWebhookDashboardHtml,
+  formatDiscordAlertPayload,
+  formatTelegramAlertPayload,
+  type AlertEventType,
+} from "./alert-dispatcher.ts";
 import { renderEducationalPageHtml, type EducationTopic } from "./educational-pages.ts";
 import { getReviewReminders, updateReviewReminders } from "./review-reminders.ts";
 import { renderVenueComparisonPageHtml } from "./venue-comparison-page.ts";
@@ -2091,6 +2100,113 @@ app.get("/api/corridor/card.svg", (req, res) => {
   res.setHeader("Content-Type", "image/svg+xml");
   res.setHeader("Cache-Control", "public, max-age=60");
   res.send(svg);
+});
+
+// Institutional Webhooks & Alert Dispatcher
+app.get(["/webhooks", "/alerts"], (req, res) => {
+  res.type("html").send(renderWebhookDashboardHtml(getRecentDispatchedAlerts()));
+});
+
+app.get("/api/alerts/recent", (req, res) => {
+  res.json({ success: true, alerts: getRecentDispatchedAlerts() });
+});
+
+app.post("/api/alerts/webhook/test", async (req, res) => {
+  const { eventType = "CROSS_VENUE_DIVERGENCE_SPIKE", webhookUrl } = req.body || {};
+  let spotPrice = 91250;
+  try {
+    const live = await getLiveQuotes();
+    if (live.compositePrice) spotPrice = live.compositePrice;
+  } catch {
+    spotPrice = 91250;
+  }
+
+  let event;
+  if (eventType === "SETTLEMENT_ORACLE_DANGER") {
+    event = createAlertEvent(
+      "SETTLEMENT_ORACLE_DANGER",
+      "BTC",
+      "Settlement Danger Zone: Spot Within $50 of Strike",
+      `Bitcoin spot ($${spotPrice.toLocaleString()}) is within $50 of ATM strike during final 60-second TWAP window.`,
+      {
+        spot_price: `$${spotPrice.toFixed(2)}`,
+        atm_strike: `$${(Math.round(spotPrice / 250) * 250).toLocaleString()}`,
+        distance: "$18.50",
+        twap_status: "48s / 60s Active",
+      },
+      "https://quanterraos.com/radar",
+      "CRITICAL",
+      "KXBTC15M-26OCT07-2200"
+    );
+  } else if (eventType === "SETTLEMENT_POSTMORTEM_RESOLVED") {
+    event = createAlertEvent(
+      "SETTLEMENT_POSTMORTEM_RESOLVED",
+      "BTC",
+      "15m Event Settled: KXBTC15M-26OCT07-2145",
+      "60-Second TWAP tape reconstructed. 1 decisive crossing tick identified.",
+      {
+        settled_twap: `$${spotPrice.toFixed(2)}`,
+        atm_strike: `$${(Math.round(spotPrice / 250) * 250).toLocaleString()}`,
+        outcome: "YES",
+        flips_detected: "0 Flips (Clean Trend)",
+      },
+      "https://quanterraos.com/settlement",
+      "INFO",
+      "KXBTC15M-26OCT07-2145"
+    );
+  } else if (eventType === "CORRIDOR_ASYMMETRY_AUDITED") {
+    event = createAlertEvent(
+      "CORRIDOR_ASYMMETRY_AUDITED",
+      "BTC",
+      "Multi-Strike Binary Corridor Audited",
+      "Range pin corridor audited with 5.2% fee drag and +$7.20 net profit ceiling.",
+      {
+        strategy: "RANGE_PIN_CORRIDOR",
+        net_max_profit: "+$7.20",
+        capital_at_risk: "-$3.14",
+        fee_drag: "5.2%",
+        breakeven_win_rate: "28.5%",
+      },
+      "https://quanterraos.com/corridors",
+      "INFO"
+    );
+  } else {
+    event = createAlertEvent(
+      "CROSS_VENUE_DIVERGENCE_SPIKE",
+      "BTC",
+      "Cross-Venue Divergence Spike (240 bps)",
+      "Kalshi KXBTC15M vs Polymarket BTC spread widened beyond 200 bps threshold.",
+      {
+        kalshi_price: "$0.52",
+        polymarket_price: "$0.48",
+        spread_bps: "240 bps",
+        kalshi_friction: "1.75¢ (CFTC Taker)",
+        polymarket_friction: "0.50¢ (Gas/Amortized)",
+      },
+      "https://quanterraos.com/divergence",
+      "WARNING",
+      "KXBTC15M-26OCT07-2200"
+    );
+  }
+
+  const dryRun = !webhookUrl || typeof webhookUrl !== "string" || webhookUrl.trim() === "";
+  const dispatchResult = await dispatchAlertWebhook(
+    event,
+    dryRun ? "https://discord.com/api/webhooks/dry-run" : webhookUrl,
+    dryRun
+  );
+
+  res.json({
+    success: dispatchResult.success,
+    simulated: dispatchResult.simulated,
+    destination: dispatchResult.destination,
+    eventId: dispatchResult.eventId,
+    latencyMs: dispatchResult.latencyMs,
+    error: dispatchResult.error,
+    event,
+    discordPayload: formatDiscordAlertPayload(event),
+    telegramPayload: formatTelegramAlertPayload(event),
+  });
 });
 
 app.get(["/learn", "/education", "/curriculum"], (req, res) => {

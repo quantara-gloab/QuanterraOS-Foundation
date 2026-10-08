@@ -797,6 +797,7 @@ export function renderCorridorTerminalHtml(analysis: CorridorAnalysisResult): st
       <a href="/corridors" class="active" style="color:var(--accent);">Corridors</a>
       <a href="/divergence">Divergence</a>
       <a href="/settlement">Settlement</a>
+      <a href="/webhooks">Webhooks</a>
       <a href="/journal">Journal</a>
       <a href="/account">Account</a>
     </nav>

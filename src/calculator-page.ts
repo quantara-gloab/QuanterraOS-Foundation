@@ -331,6 +331,7 @@ export function renderCalculatorPageHtml(): string {
         <a href="/corridors" style="color:var(--accent);font-weight:600;">Corridors</a>
         <a href="/divergence" style="color:var(--accent);font-weight:600;">Divergence</a>
         <a href="/settlement" style="color:var(--accent-light);font-weight:600;">Settlement</a>
+        <a href="/webhooks" style="color:var(--accent);font-weight:600;">Webhooks</a>
         <a href="/journal" style="color:#10B981;font-weight:600;">Journal</a>
         <a href="/calibration" style="color:var(--muted);font-weight:500;">Learn</a>
         <a href="/account" style="color:var(--muted);font-weight:500;">Sign in</a>

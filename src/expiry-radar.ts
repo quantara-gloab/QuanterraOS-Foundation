@@ -1285,6 +1285,7 @@ export function renderExpiryRadarPageHtml(
       <a href="/corridors">Corridors</a>
       <a href="/divergence">Cross-Venue Divergence</a>
       <a href="/settlement">Settlement Dissection</a>
+      <a href="/webhooks">Webhooks</a>
       <a href="/calibration">Calibration Proof</a>
       <a href="/account">Account</a>
     </nav>

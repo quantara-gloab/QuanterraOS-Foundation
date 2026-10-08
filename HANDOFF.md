@@ -624,5 +624,43 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 - `npx tsx --test src/__tests__/corridor-engine.test.ts ...` — **27/27 passing across 7 suites in spot-check**.
 - Total Platform Suite: **412 tests passing across 95 suites**.
 
+---
+
+### Session: 2026-10-07 — Institutional Alert & Webhook Dispatcher Engine (Discord & Telegram Real-Time Cards)
+
+**Trigger:** The founder confirmed "proceed", expanding the platform's multi-channel reach to trading syndicates, quant communities, and Discord/Telegram channels.
+
+**Delivered Capabilities:**
+- **Institutional Alert & Webhook Dispatcher Engine (`src/alert-dispatcher.ts`, `/webhooks`, `/alerts`)**:
+  - `createAlertEvent()`: Deterministic alert constructor generating structured payloads with SHA-256 provenance hashes.
+  - Multi-Channel Formatting:
+    - **Discord Rich Embeds (`formatDiscordAlertPayload`)**: Pixel-perfect Gold Standard color palette (`0xDFB843` gold, `0xEF4444` danger, `0xF59E0B` amber), inline monospace telemetry fields, interactive deep links to QuanterraOS terminals, and mandatory Rule B4/B5 footer.
+    - **Telegram HTML Cards (`formatTelegramAlertPayload`)**: Clean HTML formatted messages with emoji status badges, key metrics table, deep links, and provenance watermarks.
+    - **Generic JSON Webhooks**: Standard institutional JSON schema.
+  - 4 Institutional Event Triggers:
+    1. `CROSS_VENUE_DIVERGENCE_SPIKE`: Alerts when Kalshi vs Polymarket spread exceeds 150 bps.
+    2. `SETTLEMENT_ORACLE_DANGER`: Alerts when spot is within $50 of ATM strike in final 60 seconds.
+    3. `SETTLEMENT_POSTMORTEM_RESOLVED`: Reconstructed 60s TWAP tape and strike flip summaries.
+    4. `CORRIDOR_ASYMMETRY_AUDITED`: High net margin binary corridors with low CFTC fee drag.
+  - Deduplication & Anti-Spam Gate: 60-second cooldown window per event key (`eventType:underlying:ticker`) preventing channel flooding.
+  - Dry-Run Dispatch Simulator: Test mode enabling safe validation without real external HTTP delivery.
+- **Interactive Webhook Management & Live Dispatch Simulator (`/webhooks`, `/alerts`)**:
+  - Live simulator allowing users to select an alert scenario, paste their Discord/Telegram webhook URL, trigger test dispatches, and inspect formatted JSON payloads.
+  - Telemetry log of recent dispatched alerts with timestamp and provenance hash.
+- **API Endpoints (`src/server.ts`)**:
+  - `GET /webhooks`, `GET /alerts`: Webhook dashboard
+  - `POST /api/alerts/webhook/test`: Test dispatch endpoint with dry-run support
+  - `GET /api/alerts/recent`: Dispatched alerts telemetry
+- **Platform Navigation Interlinking**:
+  - Connected `/webhooks` into top nav across `/radar`, `/`, `/calculator`, `/corridors`, `/divergence`, `/settlement`, and `/account`.
+- **Dedicated Acceptance Test Suite (`src/__tests__/alert-dispatcher.test.ts`)**:
+  - 6 automated tests validating event creation, Discord embeds, Telegram HTML formatting, deduplication cooldowns, dry-run dispatch, and Rule B4/B5 compliance.
+
+**Verification:**
+- `npm run typecheck` (`tsc --noEmit`) — **0 errors (clean exit 0)**.
+- `npx tsx --test src/__tests__/alert-dispatcher.test.ts ...` — **33/33 passing across 8 suites in spot-check**.
+- Total Platform Suite: **418 tests passing across 96 suites**.
+
+
 
 
