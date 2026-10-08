@@ -13,8 +13,8 @@
  */
 
 import { createHash } from "node:crypto";
-import { calculateKalshiTakerFee } from "./kalshi-contracts.js";
-import { computeLognormalBinaryProb } from "./depth-matrix.js";
+import { calculateKalshiTakerFee } from "./kalshi-contracts.ts";
+import { computeLognormalBinaryProb } from "./depth-matrix.ts";
 
 export type ForecastSource = "user" | "market_mid" | "lognormal_model" | "naive_50_50";
 

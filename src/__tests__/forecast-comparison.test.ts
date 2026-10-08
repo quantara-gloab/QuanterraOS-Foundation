@@ -9,7 +9,7 @@ import {
   generateForecastComparisonSvgReceipt,
   renderForecastComparisonWidgetHtml,
   renderForecastComparisonPageHtml,
-} from "../forecast-comparison.js";
+} from "../forecast-comparison.ts";
 
 describe("Validated Forecast Comparison — Prospective Outcome Evaluation Engine (90-Day Plan #6)", () => {
   it("1. Expected Profit Arithmetic & Neutral Labels: strictly follows Strategy Section 4 formula", () => {
