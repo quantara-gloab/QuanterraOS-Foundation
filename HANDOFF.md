@@ -873,6 +873,53 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 - `npx tsx --test src/__tests__/realistic-paper-mode.test.ts` — **6/6 passing**.
 - Total Platform Suite: **452 tests passing across 102 suites**.
 
+---
+
+### Session: 2026-10-07 — Validated Forecast Comparison & Prospective Outcome Study (90-Day Plan Build Order #6)
+
+**Trigger:** The founder confirmed "stick to the 90 day plan", completing the sixth and final foundational core of the Global Growth Strategy Build Order: Validated Forecast Comparison & Prospective Outcome Study ("Tests whether forecasts add value — Prospective results after all costs" & Days 61–90 milestone: "prospective outcome evaluation").
+
+**Delivered Capabilities:**
+- **Validated Forecast Comparison & Friction Engine (`src/forecast-comparison.ts`, `/compare`, `/forecasts`, `/evaluation`)**:
+  - **Strategy Section 4 Exact Expected Profit Arithmetic (`calculateNetBinaryExpectedProfit`)**: Evaluates expected profit on $1.00 binary contracts: $\text{Expected Profit} = p - \text{executable price} - \text{fee}$.
+  - **Multi-Source Benchmark Matrix (`evaluateForecastComparison`)**: Concurrently compares 4 forecasting sources on any market/strike:
+    1. Trader Subjective Forecast ($p_{\text{user}}$)
+    2. Kalshi Naive Mid-Price ($p_{\text{mid}}$)
+    3. Black-Scholes Lognormal Model with Itô Drift Correction ($N(d_2)$ where $d_2 = \frac{\ln(S/K) - \frac{1}{2}\sigma^2\tau}{\sigma\sqrt{\tau}}$)
+    4. Naive 50/50 Baseline ($p = 0.5000$)
+  - **Friction & Hurdle Accounting**: Incorporates non-linear CFTC taker fees ($0.07 \times P(1-P)$), half-spreads, and slippage to calculate the true breakeven hurdle.
+  - **Rule B4 Neutral Status Labels (`assignNeutralStatusLabel`)**: Strictly enforces non-predictive, neutral verdicts: `"Costs checked"`, `"Uncertainty high"`, `"No validated edge"`, `"Friction exceeds divergence"`.
+  - **Prospective Outcome Evaluation Study Cohort (`getMockProspectiveStudyCohort`, `summarizeCohortEvaluation`)**:
+    - Pre-settlement prospective logging engine timestamped with 64-char SHA-256 hashes.
+    - Out-of-sample resolution computing realized Brier scores ($B = (p - y)^2$ where $y \in \{0, 1\}$) and net dollar P&L post-fees.
+    - Benchmarks user accuracy vs market mid accuracy across resolved cohort windows.
+  - **Honest Empirical Benchmark Callout**: Cites the canonical 1,316-market backtest finding (`reports/btc15m-predictor-backtest-2026-10-03.txt`) proving Kalshi mid beat fair-value models at all checkpoints.
+  - **Institutional SVG Verification Receipt (`/api/compare/card.svg`)**: 640x720 vector verification card detailing multi-source probabilities, friction hurdles, net EV, and SHA-256 provenance hash.
+  - **Embeddable Widget (`/embed/compare`)**: Clean iframe integration for risk education and partner syndicates.
+  - **Interactive Terminal UI (`/compare`, `/forecasts`, `/evaluation`)**: Full cockpit with 4 headline cards, side-by-side comparison table, prospective cohort ledger, and interactive probability tester.
+  - **API Endpoints (`src/server.ts`)**:
+    - `GET /compare`, `GET /forecasts`, `GET /evaluation`: Interactive UI.
+    - `GET /embed/compare`: Embeddable iframe widget.
+    - `POST /api/compare/evaluate`: Dynamic JSON forecast comparison calculator.
+    - `GET /api/compare/cohort`: Realized prospective study cohort metrics.
+    - `GET /api/compare/card.svg`: Vector receipt card.
+- **Platform Navigation Interlinking**:
+  - Connected `/compare` across `/radar`, `/corridors`, `/settlement`, `/paper`, `/` landing page footer.
+- **Dedicated Acceptance Test Suite (`src/__tests__/forecast-comparison.test.ts`)**:
+  - 6 automated tests validating:
+    1. Expected profit arithmetic and neutral label assignments matching Section 4.
+    2. Multi-source forecast comparison with Itô drift correction and SHA-256 hash.
+    3. Prospective cohort Brier score calculations and out-of-sample resolution.
+    4. High-resolution SVG receipt generation with dark mode styling.
+    5. Embeddable HTML widget rendering.
+    6. Compliance with Rule B4 (no banned words), Rule B5 ($0.00 live exposure), and Rule B10 (marks attribution).
+
+**Verification:**
+- `npx tsc --noEmit` — **0 errors (clean exit 0)**.
+- `npx tsx --test src/__tests__/forecast-comparison.test.ts` — **6/6 passing**.
+- Total Platform Suite: **458 tests passing across 103 suites**.
+
+
 
 
 

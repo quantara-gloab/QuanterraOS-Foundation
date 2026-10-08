@@ -1287,6 +1287,7 @@ export function renderExpiryRadarPageHtml(
       <a href="/radar" class="active">Expiry Radar</a>
       <a href="/calculator">True-Cost Calculator</a>
       <a href="/paper">Paper Mode</a>
+      <a href="/compare">Forecast Comparison</a>
       <a href="/corridors">Corridors</a>
       <a href="/divergence">Cross-Venue Divergence</a>
       <a href="/flow">Order Flow</a>

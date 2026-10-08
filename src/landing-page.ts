@@ -1712,6 +1712,7 @@ ${miniCircles}
       <div class="footer-links">
         <a href="/radar">radar</a>
         <a href="/paper">paper</a>
+        <a href="/compare">compare</a>
         <a href="/radar/audio">sonification</a>
         <a href="/flow">flow</a>
         <a href="/matrix">matrix</a>

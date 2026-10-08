@@ -134,6 +134,14 @@ import {
   renderRealisticPaperWidgetHtml,
   renderRealisticPaperPageHtml,
 } from "./realistic-paper-mode.ts";
+import {
+  evaluateForecastComparison,
+  getMockProspectiveStudyCohort,
+  summarizeCohortEvaluation,
+  generateForecastComparisonSvgReceipt,
+  renderForecastComparisonWidgetHtml,
+  renderForecastComparisonPageHtml,
+} from "./forecast-comparison.ts";
 import { renderEducationalPageHtml, type EducationTopic } from "./educational-pages.ts";
 import { getReviewReminders, updateReviewReminders } from "./review-reminders.ts";
 import { renderVenueComparisonPageHtml } from "./venue-comparison-page.ts";
@@ -2445,6 +2453,72 @@ app.get("/api/paper/card.svg", (req, res) => {
     contracts
   });
   const svg = generatePaperExecutionSvgReceipt(result);
+  res.setHeader("Content-Type", "image/svg+xml; charset=utf-8");
+  res.setHeader("Cache-Control", "public, max-age=60, s-maxage=300");
+  res.send(svg);
+});
+
+// Validated Forecast Comparison & Prospective Outcome Evaluation (90-Day Plan Build Order #6)
+app.get(["/compare", "/forecasts", "/evaluation"], (req, res) => {
+  const userProbability = req.query.p ? Number(req.query.p) : 0.55;
+  const strike = req.query.k ? Number(req.query.k) : 87500;
+  const minutesToExpiry = req.query.m ? Number(req.query.m) : 9.5;
+  const yesAsk = req.query.ask ? Number(req.query.ask) : 0.51;
+  const yesBid = req.query.bid ? Number(req.query.bid) : Number((yesAsk - 0.04).toFixed(2));
+  const spotPrice = req.query.spot ? Number(req.query.spot) : 87450;
+  const ticker = typeof req.query.ticker === "string" ? req.query.ticker : "KXBTC15M-SIMULATED";
+
+  const result = evaluateForecastComparison({
+    userProbability,
+    marketTicker: ticker,
+    strike,
+    spotPrice,
+    minutesToExpiry,
+    yesBid,
+    yesAsk
+  });
+
+  const records = getMockProspectiveStudyCohort();
+  const summary = summarizeCohortEvaluation(records);
+
+  res.type("html").send(renderForecastComparisonPageHtml(result, summary, records));
+});
+
+app.get("/embed/compare", (req, res) => {
+  const userProbability = req.query.p ? Number(req.query.p) : 0.55;
+  const result = evaluateForecastComparison({ userProbability });
+  res.type("html").send(renderForecastComparisonWidgetHtml(result));
+});
+
+app.post("/api/compare/evaluate", express.json(), (req, res) => {
+  const { userProbability, marketTicker, strike, spotPrice, minutesToExpiry, yesBid, yesAsk, annualizedVol } = req.body;
+  const result = evaluateForecastComparison({
+    userProbability: Number(userProbability ?? 0.5),
+    marketTicker,
+    strike: strike ? Number(strike) : undefined,
+    spotPrice: spotPrice ? Number(spotPrice) : undefined,
+    minutesToExpiry: minutesToExpiry ? Number(minutesToExpiry) : undefined,
+    yesBid: yesBid ? Number(yesBid) : undefined,
+    yesAsk: yesAsk ? Number(yesAsk) : undefined,
+    annualizedVol: annualizedVol ? Number(annualizedVol) : undefined
+  });
+  res.json({ success: true, result });
+});
+
+app.get("/api/compare/cohort", (_req, res) => {
+  const records = getMockProspectiveStudyCohort();
+  const summary = summarizeCohortEvaluation(records);
+  res.json({ success: true, summary, records });
+});
+
+app.get("/api/compare/card.svg", (req, res) => {
+  const userProbability = req.query.p ? Number(req.query.p) : 0.55;
+  const strike = req.query.k ? Number(req.query.k) : 87500;
+  const result = evaluateForecastComparison({
+    userProbability,
+    strike
+  });
+  const svg = generateForecastComparisonSvgReceipt(result);
   res.setHeader("Content-Type", "image/svg+xml; charset=utf-8");
   res.setHeader("Cache-Control", "public, max-age=60, s-maxage=300");
   res.send(svg);

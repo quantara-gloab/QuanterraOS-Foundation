@@ -800,6 +800,7 @@ export function renderCorridorTerminalHtml(analysis: CorridorAnalysisResult): st
       <a href="/matrix">Matrix</a>
       <a href="/calibration/explorer">Decomposition</a>
       <a href="/paper">Paper</a>
+      <a href="/compare">Compare</a>
       <a href="/settlement">Settlement</a>
       <a href="/schedule">Schedule</a>
       <a href="/webhooks">Webhooks</a>

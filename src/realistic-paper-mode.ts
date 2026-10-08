@@ -511,6 +511,7 @@ export function renderRealisticPaperPageHtml(sampleResult?: PaperExecutionResult
       <a href="/radar">Radar</a>
       <a href="/calculator">Calculator</a>
       <a href="/paper" class="active" style="color:var(--accent);">Paper Mode</a>
+      <a href="/compare">Forecast Comparison</a>
       <a href="/risk-plan">Risk Plan</a>
       <a href="/journal">Journal</a>
       <a href="/corridors">Corridors</a>
