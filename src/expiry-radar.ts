@@ -1283,6 +1283,7 @@ export function renderExpiryRadarPageHtml(
       <a href="/radar" class="active">Expiry Radar</a>
       <a href="/calculator">True-Cost Calculator</a>
       <a href="/divergence">Cross-Venue Divergence</a>
+      <a href="/settlement">Settlement Dissection</a>
       <a href="/calibration">Calibration Proof</a>
       <a href="/account">Account</a>
     </nav>

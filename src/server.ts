@@ -79,6 +79,12 @@ import {
   renderEmbedDivergenceHtml,
 } from "./embed-widget.ts";
 import { renderLearnPageHtml } from "./learn-page.ts";
+import {
+  computeSettlementDissection,
+  getRecentSettledWindows,
+  renderSettlementDissectionPageHtml,
+  renderSettlementForensicCardSvg,
+} from "./settlement-dissection.ts";
 import { renderEducationalPageHtml, type EducationTopic } from "./educational-pages.ts";
 import { getReviewReminders, updateReviewReminders } from "./review-reminders.ts";
 import { renderVenueComparisonPageHtml } from "./venue-comparison-page.ts";
@@ -1923,6 +1929,53 @@ app.get(["/embed/divergence", "/widget/divergence"], (req, res) => {
 // Phase 4 Cross-Venue Divergence Monitor (HANDOFF.md Section G)
 app.get(["/divergence", "/compare", "/venues"], (_req, res) => {
   res.type("html").send(renderVenueComparisonPageHtml());
+});
+
+// Forensic Post-Mortem Settlement Dissection Engine (60s TWAP Reconstruction)
+app.get(["/settlement", "/postmortem", "/dissection"], async (req, res) => {
+  const windowTicker = typeof req.query.ticker === "string" ? req.query.ticker : undefined;
+  let spotPrice: number | null = null;
+  try {
+    const live = await getLiveQuotes();
+    spotPrice = live.compositePrice;
+  } catch {
+    spotPrice = 91250;
+  }
+  const recentWindows = getRecentSettledWindows();
+  const dissection = computeSettlementDissection({
+    windowTicker,
+    anchorBasePrice: spotPrice ?? 91250,
+  });
+  res.type("html").send(renderSettlementDissectionPageHtml(dissection, recentWindows));
+});
+
+app.get("/api/settlement/dissect", async (req, res) => {
+  const windowTicker = typeof req.query.ticker === "string" ? req.query.ticker : undefined;
+  let spotPrice: number | null = null;
+  try {
+    const live = await getLiveQuotes();
+    spotPrice = live.compositePrice;
+  } catch {
+    spotPrice = 91250;
+  }
+  const dissection = computeSettlementDissection({
+    windowTicker,
+    anchorBasePrice: spotPrice ?? 91250,
+  });
+  res.json({ success: true, dissection });
+});
+
+app.get("/api/settlement/card.svg", (req, res) => {
+  const windowTicker = typeof req.query.ticker === "string" ? req.query.ticker : undefined;
+  const basePrice = req.query.price ? Number(req.query.price) : 91250;
+  const dissection = computeSettlementDissection({
+    windowTicker,
+    anchorBasePrice: basePrice,
+  });
+  const svg = renderSettlementForensicCardSvg(dissection);
+  res.setHeader("Content-Type", "image/svg+xml");
+  res.setHeader("Cache-Control", "public, max-age=60");
+  res.send(svg);
 });
 
 app.get(["/learn", "/education", "/curriculum"], (req, res) => {

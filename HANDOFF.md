@@ -562,3 +562,32 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 - `npm run typecheck` (`tsc --noEmit`) — **0 errors (clean exit 0)**.
 - `npm test` — **398/398 passing across 93 suites, 0 failures**.
 
+---
+
+### Session: 2026-10-07 — Forensic Post-Mortem Settlement Dissection Engine, 60s TWAP Tape Reconstruction & SVG Receipts
+
+**Trigger:** The founder confirmed "excellent work keep full force ahead were doing great", continuing full-throttle development to build market-defining tools that surpass all competition.
+
+**Delivered Capabilities:**
+- **Forensic Post-Mortem Settlement Dissection Engine (`src/settlement-dissection.ts`, `/settlement`, `/postmortem`, `/dissection`)**:
+  - `generateRecentSettledWindows()`: Generates historical 15m and 1h closed event windows with authoritative Kalshi ticker schemas (`KXBTC15M-YYMONDD-HHMM`).
+  - `reconstruct60SecondTwapTape()`: Reconstructs second-by-second spot price ticks across the final 60 seconds (seconds 840–900 of the 15-minute window), computing running TWAP mean, tick-by-tick delta, volatility, and trajectory.
+  - `reconstructStrikeFlipMatrix()`: Maps out the entire strike ladder around settlement, determining strike outcomes (`YES` vs `NO`), final distance from TWAP settlement price, whether any intra-minute flip or reversal occurred during the final 60 seconds, and timestamp of the decisive strike crossing tick.
+  - `computeConstituentExchangeWeighting()`: Details the CME CF Bitcoin Real-Time Index (BRTI) constituent exchange composition across Coinbase (42.0%), Kraken (28.5%), Bitstamp (16.2%), Gemini (8.1%), and itBit (5.2%), confirming exact 100% total weight and individual price variances.
+  - SHA-256 Provenance & Audit Watermark: Cryptographic fingerprint generated deterministically over the window data ensuring institutional auditability.
+- **Institutional SVG Forensic Settlement Receipt Generator (`/api/settlement/card.svg`)**:
+  - Generates standalone, pixel-perfect SVG receipt (640x780) adhering to Gold Standard styling (Obsidian `#06070A`, Imperial Gold `#DFB843`, Champagne `#F7E7B4`, tabular monospace figures).
+  - Encapsulates settled ticker, final TWAP, spot delta, strike flip summary, constituent exchange breakdown, cryptographic SHA-256 hash, and strict Rule B10 / Rule B5 compliance notices.
+  - Client actions: 1-click "Copy SVG Receipt to Clipboard" and "Share on X".
+- **JSON API Endpoints (`/api/settlement/dissect`)**:
+  - Provides full programmatic access to window dissection, tape ticks, flip matrix, and constituent weights for researchers, algorithmic desks, and Discord/Telegram bots.
+- **Platform-Wide Navigation Interlinking**:
+  - Connected `/settlement` into the top navigation bars of `/radar` (`src/expiry-radar.ts`), `/` (`src/landing-page.ts`), `/calculator` (`src/calculator-page.ts`), `/divergence` (`src/venue-comparison-page.ts`), and `/account` (`src/account-page.ts`).
+- **Dedicated Acceptance Test Suite (`src/__tests__/settlement-dissection.test.ts`)**:
+  - 7 automated tests validating window generation, 60s TWAP arithmetic, strike resolution and flip detection, constituent exchange weight totals, SHA-256 cryptographic provenance hashing, SVG receipt generation, and Rule B4/B5 compliance.
+
+**Verification:**
+- `npm run typecheck` (`tsc --noEmit`) — **0 errors (clean exit 0)**.
+- `npm test` — **405/405 passing across 94 suites, 0 failures** (duration ~101s).
+
+

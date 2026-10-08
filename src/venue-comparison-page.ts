@@ -305,6 +305,7 @@ export function renderVenueComparisonPageHtml(): string {
       <a href="/radar">Radar</a>
       <a href="/calculator">Calculator</a>
       <a href="/divergence" class="active" style="color:var(--accent); font-weight:600;">Venues</a>
+      <a href="/settlement">Settlement</a>
       <a href="/journal">Journal</a>
       <a href="/dashboard">Terminal</a>
     </div>

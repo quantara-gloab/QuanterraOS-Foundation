@@ -296,6 +296,7 @@ export function renderAccountPageHtml(user: UserRecord | null, tier: UserTier, e
       <a href="/calculator">Calculator</a>
       <a href="/radar">Radar</a>
       <a href="/divergence">Divergence</a>
+      <a href="/settlement">Settlement</a>
       <a href="/journal">Journal</a>
       <a href="/research">Research</a>
       <a href="/predictions">Predictions</a>
