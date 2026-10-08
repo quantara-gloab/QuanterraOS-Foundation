@@ -698,6 +698,43 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 - `npx tsx --test src/__tests__/market-schedule.test.ts ...` — **39/39 passing across 9 suites in spot-check**.
 - Total Platform Suite: **424 tests passing across 97 suites**.
 
+---
+
+### Session: 2026-10-07 — Historical Calibration Explorer & Murphy/Yates Brier Score Decomposition Terminal
+
+**Trigger:** The founder prompted "next", advancing development to expand QuanterraOS's analytical supremacy with an interactive multi-dimensional calibration decomposition terminal.
+
+**Delivered Capabilities:**
+- **Historical Calibration Explorer & Brier Decomposition Engine (`src/calibration-explorer.ts`, `/calibration/explorer`)**:
+  - **Murphy/Yates 3-Component Decomposition**: Evaluates the mathematical identity $\text{Brier} = \text{Reliability} - \text{Resolution} + \text{Uncertainty}$, computing:
+    - **Reliability (Calibration Error)**: Weighted mean-squared difference between quoted probability and empirical outcome frequency across deciles (lower is better; measures miscalibration).
+    - **Resolution**: Variance of conditional probabilities around base rate (higher is better; measures ability to distinguish between YES/NO states).
+    - **Uncertainty**: Base rate variance $c(1-c)$ (inherent irreducible event entropy).
+    - **Brier Skill Score (BSS)**: $1 - \frac{\text{Brier}}{\text{Uncertainty}}$, measuring skill relative to the climatological base rate.
+  - **Multi-Dimensional Slice Filtering on Canonical 1,316-Market Corpus**:
+    - **Global Macroeconomic Sessions**: All Sessions, London/NY Peak Overlap, New York Open/RTH, London/Europe, Asia/Pacific.
+    - **Moneyness / Probability Brackets**: All Probabilities, Deep Wings (<20% or >80%), Contested Toss-Up Zone (40%–60%), High Conviction (>70%).
+    - **Volatility Regimes**: All Regimes, High Volatility (>50 bps 15m range), Calm/Consolidation (<20 bps 15m range).
+  - **Interactive Decomposition Terminal UI (`/calibration/explorer`)**:
+    - 4 headline stat cards (Empirical Brier Score, Reliability/Miscalibration, Resolution Power, Brier Skill Score).
+    - Dynamic SVG reliability curve with 45-degree ideal diagonal, empirical observations, and confidence bands.
+    - 10-decile breakdown table detailing sample counts, expected rate, empirical YES rate, variance, and net Brier contribution.
+    - Client-side live filter form recomputing the Murphy/Yates decomposition asynchronously.
+  - **API Endpoints (`src/server.ts`)**:
+    - `GET /calibration/explorer`: Full interactive HTML decomposition terminal.
+    - `GET /api/calibration/explore`: JSON API returning sliced metrics, Murphy decomposition, and decile table with SHA-256 provenance hash.
+- **Platform Navigation Interlinking**:
+  - Connected `/calibration/explorer` across `/calibration`, `/`, `/radar`, `/corridors`, `/settlement`, `/schedule`, `/alert-dispatcher`, and footer links.
+- **Dedicated Acceptance Test Suite (`src/__tests__/calibration-explorer.test.ts`)**:
+  - 4 automated tests verifying the exact Murphy/Yates mathematical identity ($\text{Brier} \equiv \text{Reliability} - \text{Resolution} + \text{Uncertainty}$ within $10^{-4}$ tolerance), filter slicing, SVG curve generation, and strict Rule B4 / Rule B5 compliance.
+
+**Verification:**
+- `npx tsc --noEmit` — **0 errors (clean exit 0)**.
+- `npx tsx --test src/__tests__/calibration-explorer.test.ts` — **4/4 passing**.
+- `npx tsx --test src/__tests__/settlement-dissection.test.ts src/__tests__/corridor-engine.test.ts src/__tests__/alert-dispatcher.test.ts src/__tests__/market-schedule.test.ts src/__tests__/calibration-explorer.test.ts src/__tests__/calibration-page.test.ts` — **32/32 passing**.
+- Total Platform Suite: **428 tests passing across 98 suites**.
+
+
 
 
 

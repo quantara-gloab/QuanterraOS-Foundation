@@ -688,6 +688,7 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
         <a href="/calculator">EV Calculator</a>
         <a href="/calibration" class="active">Calibration Proof</a>
         <a href="/calibration/surface">Surface (1–14m)</a>
+        <a href="/calibration/explorer">Brier Decomposition</a>
         <a href="/index">Composite Index</a>
         <a href="/spread">Spread Monitor</a>
         <a href="/research">Research</a>
@@ -726,7 +727,10 @@ export function renderCalibrationHtml(report: MarketPriceCalibrationReport, comp
         <a href="/calibration/surface" class="debate-link" style="color:var(--accent-light);">
           View Minute-by-Minute (1–14m) Surface →
         </a>
-        <a href="/calculator" class="debate-link" style="color:var(--accent);">
+        <a href="/calibration/explorer" class="debate-link" style="color:var(--accent); font-weight:700;">
+          Open Murphy/Yates Decomposition Terminal &amp; Slices &rarr;
+        </a>
+        <a href="/calculator" class="debate-link" style="color:var(--muted);">
           True Cost &amp; EV Calculator →
         </a>
       </div>

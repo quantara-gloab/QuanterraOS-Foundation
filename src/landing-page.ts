@@ -1474,6 +1474,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
           </p>
           <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap; margin-top:12px;">
             <a href="/calibration" style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent); text-decoration: underline; text-underline-offset: 4px;">Inspect 10-bin decile decomposition &rarr;</a>
+            <a href="/calibration/explorer" style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent); text-decoration: underline; text-underline-offset: 4px;">Murphy/Yates Explorer &rarr;</a>
             <a href="/research#architecture" style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-light); text-decoration: underline; text-underline-offset: 4px;">Explore Sovereign Stack &amp; Papers on Research &rarr;</a>
           </div>
         </div>
@@ -1712,6 +1713,7 @@ ${miniCircles}
         <a href="/radar">radar</a>
         <a href="/divergence">divergence</a>
         <a href="/calibration">calibration</a>
+        <a href="/calibration/explorer">decomposition</a>
         <a href="/council">council</a>
         <a href="/predictions">predictions</a>
         <a href="/autopilot">autopilot</a>

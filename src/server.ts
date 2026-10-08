@@ -105,6 +105,13 @@ import {
   generateIcsCalendarFeed,
   renderMarketScheduleHtml,
 } from "./market-schedule.ts";
+import {
+  computeCalibrationExplorer,
+  renderCalibrationExplorerHtml,
+  type SessionFilter,
+  type MoneynessFilter,
+  type VolatilityFilter,
+} from "./calibration-explorer.ts";
 import { renderEducationalPageHtml, type EducationTopic } from "./educational-pages.ts";
 import { getReviewReminders, updateReviewReminders } from "./review-reminders.ts";
 import { renderVenueComparisonPageHtml } from "./venue-comparison-page.ts";
@@ -2231,6 +2238,25 @@ app.get("/api/schedule/calendar.ics", (req, res) => {
   res.setHeader("Content-Type", "text/calendar; charset=utf-8");
   res.setHeader("Content-Disposition", 'attachment; filename="quanterraos-btc-expiries.ics"');
   res.send(ics);
+});
+
+// Historical Calibration Explorer & Brier Decomposition Terminal
+app.get("/calibration/explorer", async (req, res) => {
+  const session = (typeof req.query.session === "string" ? req.query.session : "ALL") as SessionFilter;
+  const moneyness = (typeof req.query.moneyness === "string" ? req.query.moneyness : "ALL") as MoneynessFilter;
+  const volatility = (typeof req.query.volatility === "string" ? req.query.volatility : "ALL") as VolatilityFilter;
+
+  const result = await computeCalibrationExplorer(session, moneyness, volatility);
+  res.type("html").send(renderCalibrationExplorerHtml(result));
+});
+
+app.get("/api/calibration/explore", async (req, res) => {
+  const session = (typeof req.query.session === "string" ? req.query.session : "ALL") as SessionFilter;
+  const moneyness = (typeof req.query.moneyness === "string" ? req.query.moneyness : "ALL") as MoneynessFilter;
+  const volatility = (typeof req.query.volatility === "string" ? req.query.volatility : "ALL") as VolatilityFilter;
+
+  const result = await computeCalibrationExplorer(session, moneyness, volatility);
+  res.json({ success: true, result });
 });
 
 app.get(["/learn", "/education", "/curriculum"], (req, res) => {
