@@ -1889,17 +1889,89 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
           </div>
         </div>
 
+        <!-- Strategic Move #2: Cross-Venue Spread Teardown Simulator -->
+        <div style="margin-top:28px; background:rgba(12,15,23,0.7); border:1px solid rgba(212,175,55,0.2); border-radius:8px; padding:22px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:10px;">
+            <div>
+              <span style="font-family:var(--font-mono); font-size:0.7rem; color:var(--accent); text-transform:uppercase; font-weight:700;">STRATEGIC MOVE #2 // SPREAD TEARDOWN</span>
+              <div style="font-size:1.05rem; font-weight:700; color:#FFFFFF;">Cross-Venue Illusory Spread Audit: Debunking Aggregator Traps</div>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button type="button" class="btn-secondary" style="font-size:0.7rem; padding:4px 8px;" onclick="applyHomeCrossPreset('btc')">BTC 15M (48¢ vs 49¢)</button>
+              <button type="button" class="btn-secondary" style="font-size:0.7rem; padding:4px 8px;" onclick="applyHomeCrossPreset('eth')">ETH 15M (52¢ vs 45¢)</button>
+              <button type="button" class="btn-secondary" style="font-size:0.7rem; padding:4px 8px;" onclick="applyHomeCrossPreset('macro')">Macro (54¢ vs 44¢)</button>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px;">
+            <div style="background:rgba(244,63,94,0.05); border:1px solid rgba(244,63,94,0.25); border-radius:6px; padding:16px;">
+              <div style="font-size:0.68rem; font-family:var(--font-mono); color:#F43F5E; font-weight:700; text-transform:uppercase;">Oddpool / Verso Aggregator Claim</div>
+              <div style="font-size:1.5rem; font-weight:800; color:#F43F5E; font-family:var(--font-mono); margin:6px 0 2px;" id="home-cross-gross">+$30.00</div>
+              <div style="font-size:0.75rem; color:var(--muted); font-family:var(--font-mono);" id="home-cross-nominal">3.00¢ nominal spread &bull; 1,000 contracts</div>
+              <div style="font-size:0.72rem; color:#FDA4AF; line-height:1.4; margin-top:10px; border-top:1px solid rgba(244,63,94,0.15); padding-top:8px;">
+                Conceals $17.50 Kalshi CFTC taker fees and $6.50 on-chain gas/friction drag.
+              </div>
+            </div>
+
+            <div style="background:rgba(223,184,67,0.05); border:1px solid rgba(223,184,67,0.3); border-radius:6px; padding:16px;">
+              <div style="font-size:0.68rem; font-family:var(--font-mono); color:var(--accent); font-weight:700; text-transform:uppercase;">QuanterraOS Verified Net Reality</div>
+              <div style="font-size:1.5rem; font-weight:800; color:var(--accent); font-family:var(--font-mono); margin:6px 0 2px;" id="home-cross-net">+$6.00</div>
+              <div style="font-size:0.75rem; color:#F43F5E; font-family:var(--font-mono);" id="home-cross-drag">80.0% consumed by exchange fees</div>
+              <div style="font-size:0.72rem; color:var(--accent-light); line-height:1.4; margin-top:10px; border-top:1px solid rgba(223,184,67,0.15); padding-top:8px;">
+                CME CF BRTI 60s TWAP vs UMA oracle basis creates asymmetric settlement hazard.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6-Competitor Dossier Summary Strip -->
+        <div style="margin-top:24px; display:grid; grid-template-columns:repeat(3, 1fr); gap:12px;">
+          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:12px;">
+            <div style="font-size:0.8rem; font-weight:700; color:#FFFFFF;">Verso &bull; verso.finance</div>
+            <div style="font-size:0.72rem; color:#F43F5E; margin:2px 0;">Fatal Flaw: Friction Blindness</div>
+            <div style="font-size:0.72rem; color:var(--muted); line-height:1.4;">Hides $0.07&times;P(1-P) taker fee. Pushes high-frequency execution into retail churn.</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:12px;">
+            <div style="font-size:0.8rem; font-weight:700; color:#FFFFFF;">Oddpool &bull; oddpool.com</div>
+            <div style="font-size:0.72rem; color:#F43F5E; margin:2px 0;">Fatal Flaw: Platform Captured</div>
+            <div style="font-size:0.72rem; color:var(--muted); line-height:1.4;">Acquired by Kalshi (Sep 2026). No longer an independent referee of spreads or fees.</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:12px;">
+            <div style="font-size:0.8rem; font-weight:700; color:#FFFFFF;">Dome &bull; domeapi.io</div>
+            <div style="font-size:0.72rem; color:#F43F5E; margin:2px 0;">Fatal Flaw: Platform Captured</div>
+            <div style="font-size:0.72rem; color:var(--muted); line-height:1.4;">Acquired by Polymarket (Feb 2026). Locked into single venue; ignores CFTC compliance.</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:12px;">
+            <div style="font-size:0.8rem; font-weight:700; color:#FFFFFF;">Predly &bull; predly.ai</div>
+            <div style="font-size:0.72rem; color:#F43F5E; margin:2px 0;">Fatal Flaw: Uncalibrated AI Claims</div>
+            <div style="font-size:0.72rem; color:var(--muted); line-height:1.4;">Claims 89% accuracy scraping news. Market mid beats models (0.2001 vs 0.2063).</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:12px;">
+            <div style="font-size:0.8rem; font-weight:700; color:#FFFFFF;">Stand.Trade &bull; stand.trade</div>
+            <div style="font-size:0.72rem; color:#F43F5E; margin:2px 0;">Fatal Flaw: Retail Churn Trap</div>
+            <div style="font-size:0.72rem; color:var(--muted); line-height:1.4;">Promotes copy-trading whales hedging basis off-exchange without risk plans.</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:12px;">
+            <div style="font-size:0.8rem; font-weight:700; color:#FFFFFF;">Unusual Whales</div>
+            <div style="font-size:0.72rem; color:#F43F5E; margin:2px 0;">Fatal Flaw: Superficial Alerts</div>
+            <div style="font-size:0.72rem; color:var(--muted); line-height:1.4;">Alerts on raw block sizes without contract delta, TWAP context, or fee drag audits.</div>
+          </div>
+        </div>
+
         <!-- Footer Actions -->
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-top:24px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.06);">
           <div style="font-size:0.78rem; color:var(--muted);">
             Explore our comprehensive competitive teardown comparing QuanterraOS to Verso, Oddpool, Dome, Predly, and Stand.Trade.
           </div>
-          <div style="display:flex; gap:10px; align-items:center;">
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
             <a href="/why" class="btn-primary" style="background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%); color:#07080B; border:1px solid #DFB843; font-weight:700; padding:8px 16px; font-size:0.8rem;">
               Full 2026 Competitive Teardown &rarr;
             </a>
-            <a href="/calculator" class="btn-secondary" style="padding:8px 14px; font-size:0.8rem;">
-              Free True-Cost Check
+            <a href="/transparency" class="btn-secondary" style="border-color:rgba(16,185,129,0.4); color:#10B981; padding:8px 14px; font-size:0.8rem;">
+              Outcome Transparency Audit (#6.6)
+            </a>
+            <a href="/widgets" class="btn-secondary" style="padding:8px 14px; font-size:0.8rem;">
+              Distribution Widgets (#6.5)
             </a>
           </div>
         </div>
@@ -2865,6 +2937,33 @@ function recalcHomeFrictionTeardown() {
   if (dangerZoneNotice) {
     dangerZoneNotice.style.display = (price >= 40 && price <= 60) ? 'block' : 'none';
   }
+}
+
+function applyHomeCrossPreset(preset) {
+  var pA = 48, pB = 49, count = 1000;
+  if (preset === 'eth') { pA = 52; pB = 45; }
+  else if (preset === 'macro') { pA = 54; pB = 44; }
+
+  var spreadCents = (100 - (pA + pB));
+  var gross = (spreadCents / 100) * count;
+  var feeA = (Math.ceil(0.07 * (pA / 100) * (1 - pA / 100) * 100 * 10) / 1000) * count;
+  var feeB = 1.50 + (0.005 * count);
+  var friction = feeA + feeB;
+  var net = gross - friction;
+  var drag = gross > 0 ? Math.min(100, (friction / gross) * 100) : 100;
+
+  var grossEl = document.getElementById('home-cross-gross');
+  var nomEl = document.getElementById('home-cross-nominal');
+  var netEl = document.getElementById('home-cross-net');
+  var dragEl = document.getElementById('home-cross-drag');
+
+  if (grossEl) grossEl.textContent = (gross >= 0 ? '+' : '') + '$' + gross.toFixed(2);
+  if (nomEl) nomEl.textContent = spreadCents.toFixed(2) + '¢ nominal spread • ' + count + ' contracts';
+  if (netEl) {
+    netEl.textContent = (net >= 0 ? '+' : '') + '$' + net.toFixed(2);
+    netEl.style.color = net >= 0 ? '#DFB843' : '#F43F5E';
+  }
+  if (dragEl) dragEl.textContent = drag.toFixed(1) + '% consumed by exchange fees';
 }
 
 if (document.readyState === 'loading') {

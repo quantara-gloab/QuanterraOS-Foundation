@@ -518,9 +518,11 @@ export function renderMobileInstallPageHtml(): string {
       <img src="/apple-touch-icon.png" alt="QuanterraOS Icon" class="brand-icon">
       <span>QUANTERRAOS</span>
     </a>
-    <div style="display:flex; align-items:center; gap:14px;">
-      <a href="/why" class="mono" style="color: var(--accent); font-size: 0.78rem; text-decoration: none;">Why QuanterraOS</a>
-      <a href="/calculator" class="mono" style="color: var(--accent-light); font-size: 0.78rem; text-decoration: none;">Launch Web Check &rarr;</a>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <a href="/why" class="mono" style="color: var(--accent); font-size: 0.76rem; text-decoration: none; font-weight:600;">Why</a>
+      <a href="/transparency" class="mono" style="color: #10B981; font-size: 0.76rem; text-decoration: none; font-weight:600;">Audit</a>
+      <a href="/widgets" class="mono" style="color: var(--muted); font-size: 0.76rem; text-decoration: none;">Widgets</a>
+      <a href="/calculator" class="mono" style="color: var(--accent-light); font-size: 0.76rem; text-decoration: none;">Calc &rarr;</a>
     </div>
   </header>
 
@@ -617,6 +619,37 @@ export function renderMobileInstallPageHtml(): string {
         <a href="/why" class="btn-gold" style="display: flex; margin-top: 14px; text-decoration: none;">
           Read Full 2026 Truth vs. Hype Teardown &rarr;
         </a>
+      </div>
+    </div>
+
+    <!-- Mobile Cross-Venue Spread Teardown Quick-Card -->
+    <div class="card" id="mobile-cross-venue-teardown" style="border-color: rgba(244, 63, 94, 0.35); background: linear-gradient(180deg, rgba(26, 16, 22, 0.85) 0%, rgba(10, 14, 22, 0.95) 100%);">
+      <div class="card-title">
+        <span style="color: #F43F5E;">⚠ Cross-Venue Spread Teardown (Move #2)</span>
+      </div>
+      <div style="font-size: 0.84rem; color: #CBD5E1; line-height: 1.6;">
+        <p style="margin-bottom: 10px;">
+          Aggregators (Oddpool / Verso) pitch cross-venue discrepancies (e.g., Kalshi 48¢ vs Polymarket 49¢) as free money. In reality:
+        </p>
+        <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 12px; font-family: var(--font-mono); font-size: 0.75rem; margin-bottom: 12px;">
+          <div style="display:flex; justify-content:space-between; color:#F43F5E;"><span>Claimed Gross Spread:</span> <strong>+$30.00 (3.0¢/ct)</strong></div>
+          <div style="display:flex; justify-content:space-between; color:var(--muted); margin-top:4px;"><span>Kalshi Taker Fee:</span> <strong>-$17.50</strong></div>
+          <div style="display:flex; justify-content:space-between; color:var(--muted); margin-top:4px;"><span>Polymarket Gas + Slippage:</span> <strong>-$6.50</strong></div>
+          <div style="display:flex; justify-content:space-between; color:var(--accent); border-top:1px solid rgba(255,255,255,0.08); margin-top:6px; padding-top:6px; font-weight:700;">
+            <span>Realized Net Return:</span> <strong>+$6.00 (80% Drag)</strong>
+          </div>
+        </div>
+        <div style="font-size: 0.75rem; color: var(--muted); margin-bottom: 14px;">
+          Plus: CME CF BRTI 60s TWAP vs UMA resolution hazard creates asymmetric divergence risk.
+        </div>
+        <div style="display:flex; gap:10px;">
+          <a href="/why#cross-venue-teardown" class="btn-gold" style="flex:1; text-decoration:none; font-size:0.75rem; padding:10px;">
+            Full Spread Teardown &rarr;
+          </a>
+          <a href="/transparency" class="btn-gold" style="flex:1; background:rgba(16,185,129,0.15); color:#10B981; border-color:rgba(16,185,129,0.4); text-decoration:none; font-size:0.75rem; padding:10px;">
+            Outcome Audit (#6.6)
+          </a>
+        </div>
       </div>
     </div>
 
