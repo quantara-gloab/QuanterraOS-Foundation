@@ -360,6 +360,7 @@ export function renderLearnPageHtml(userTier: string = "free"): string {
     <div class="nav-links">
       <a href="/">Home</a>
       <a href="/calculator">Calculator</a>
+      <a href="/why">Why QuanterraOS</a>
       <a href="/compare">Venues</a>
       <a href="/journal">Journal</a>
       <a href="/calibration">Calibration</a>
@@ -591,6 +592,49 @@ Integrity:      Cryptographically Verifiable Telemetry
         </div>
       </article>
 
+      <!-- Module 5: Competitive Reality & Venue Neutrality in 2026 -->
+      <article class="module-card featured" id="module-competitive-reality" style="border-color: rgba(223, 184, 67, 0.35);">
+        <div class="module-num">Module 05 // 2026 Competitive Landscape</div>
+        <h2 class="module-title">Venue Neutrality &amp; The Friction Trap in Acquired Prediction Tools</h2>
+        <div class="module-body">
+          <p>
+            In early 2026, the prediction market landscape experienced rapid consolidation: <strong>Dome was acquired by Polymarket</strong> (February 2026) and <strong>Oddpool was acquired by Kalshi</strong> (September 2026). When terminal frontends are owned by the exchanges they monitor, their commercial incentive flips from capital protection to trading turnover.
+          </p>
+
+          <div class="formula-box">
+            <div class="formula-line">
+              <span>Trap 1: Venue Capture:</span>
+              <strong>Exchange-owned tools cannot independently referee their parent platform</strong>
+            </div>
+            <div class="formula-line">
+              <span>Trap 2: Friction Blindness:</span>
+              <strong>Third-party apps conceal Kalshi's parabolic taker fee (up to 1.75¢/ct)</strong>
+            </div>
+            <div class="formula-line">
+              <span>Trap 3: TWAP Mismatch:</span>
+              <strong>Displaying instantaneous spot prices instead of 60s CME CF BRTI averaging</strong>
+            </div>
+          </div>
+
+          <p>
+            <strong>The Friction Trap Explained:</strong> Many competitor apps advertise contracts at nominal ask prices (e.g. 51¢) and suggest an immediate gross edge if a user believes the outcome has a 55% probability. However, Kalshi's exchange taker fee consumes up to <strong>43.8% of gross profit</strong> on 50¢ contracts. The required win rate is <strong>52.75%</strong> just to break even.
+          </p>
+
+          <p>
+            <strong>The QuanterraOS Sovereign Solution:</strong> As an unconflicted, independent referee with zero venue kickbacks, QuanterraOS computes your true mathematical breakeven hurdle, verifies the 60-second settlement window, and stores your thesis in an encrypted local vault.
+          </p>
+
+          <div style="margin-top:16px; display:flex; gap:12px; flex-wrap:wrap;">
+            <a href="/why" class="btn-action-nav" style="background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%); color:#07080B; text-decoration:none; font-weight:700; padding:8px 16px;">
+              Read Full 2026 Competitive Teardown &rarr;
+            </a>
+            <a href="/study" class="btn-action-nav" style="background:rgba(212,175,55,0.1); border:1px solid rgba(212,175,55,0.3); color:var(--accent-light); text-decoration:none;">
+              Know Your Costs Study (#6.4) &rarr;
+            </a>
+          </div>
+        </div>
+      </article>
+
     </div>
 
     <!-- Bottom Navigation Bar -->
@@ -600,6 +644,7 @@ Integrity:      Cryptographically Verifiable Telemetry
         <span style="color:var(--muted); font-size:0.8rem; margin-left:8px;">Check live contracts &bull; Log to journal &bull; Audit consensus</span>
       </div>
       <div style="display:flex; gap:16px; align-items:center;">
+        <a href="/why">Why QuanterraOS &rarr;</a>
         <a href="/calculator">Open True Cost Calculator &rarr;</a>
         <a href="/compare">Compare Venues &rarr;</a>
         <a href="/journal">Personal Outcome Journal &rarr;</a>

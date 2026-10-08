@@ -101,4 +101,29 @@ describe("MCP Pre-Trade Risk Coprocessor & Friction Simulator", () => {
     assert.ok(basis.referenceIndex.includes("Quanterra BTC Spot Composite"));
     assert.ok(basis.disclaimer.includes("does not represent its composite index as the official CME CF BRTI benchmark"));
   });
+
+  it("executes benchmark_competitor_claim through executeMcpTool and returns 64-char SHA-256 hash", async () => {
+    const teardown = await executeMcpTool("benchmark_competitor_claim", {
+      nominalPriceCents: 51,
+      userStatedWinRatePct: 55,
+      contracts: 100,
+    });
+
+    assert.strictEqual(teardown.nominalPriceCents, 51);
+    assert.strictEqual(teardown.userStatedWinRatePct, 55);
+    assert.strictEqual(teardown.competitorClaimedEdgePct, 4);
+    assert.strictEqual(teardown.competitorNominalGrossEV, 4.00);
+    assert.strictEqual(teardown.exactTakerFeeUsd, 1.75);
+    assert.strictEqual(teardown.trueBreakevenHurdlePct, 52.75);
+    assert.strictEqual(teardown.netRealizedExpectedProfitUsd, 2.25);
+    assert.strictEqual(teardown.dangerZoneRiskFlag, true);
+    assert.strictEqual(teardown.provenanceHash.length, 64);
+  });
+
+  it("executes get_competitive_battlecard through executeMcpTool and returns 6 dimensions", async () => {
+    const battlecard = await executeMcpTool("get_competitive_battlecard", {});
+    assert.strictEqual(battlecard.status, "ACTIVE_INDEPENDENT_REFEREE");
+    assert.strictEqual(battlecard.dimensions.length, 6);
+    assert.ok(battlecard.dimensions.some((d: any) => d.dimension.includes("Venue Neutrality")));
+  });
 });

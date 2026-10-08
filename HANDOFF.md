@@ -1040,6 +1040,31 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 - `node --experimental-strip-types --test src/__tests__/landing-page-cockpit.test.ts src/__tests__/competitive-benchmark.test.ts src/__tests__/static-copy-guardrails.test.ts src/__tests__/mobile-pwa.test.ts` — **26/26 tests passing across 4 suites**.
 - Remote production healthcheck: `GET https://quanterraos.com/healthz` returns `200 OK` (`status: ok, circuit: LOCKED_RULE_B5`).
 
+---
+
+### Session: 2026-10-08 — Autonomous MCP Competitive Tooling & Educational Curriculum Expansion
+
+**Trigger:** "great work lets keep becoming the leading contender in our space full force ahead" — expanding the technological moat by opening QuanterraOS's competitive intelligence engine directly to autonomous AI agents via the Model Context Protocol (MCP) and integrating Module 5 into the public curriculum.
+
+**Delivered Upgrades:**
+- **Model Context Protocol (MCP) Tools (`src/mcp-server.ts`)**:
+  - Registered `benchmark_competitor_claim`: allows any autonomous quant agent (Claude, Cursor, ChatGPT, custom Python/TypeScript quant bots) to submit competitor contract scenarios and receive exact taker fee deductions, true breakeven hurdles, and 64-char SHA-256 provenance receipts.
+  - Registered `get_competitive_battlecard`: exposes the 2026 6-dimension architectural differentiation matrix programmatically.
+  - Sanitized internal error and verdict copy to eliminate unverified superlatives, strictly enforcing Rule B4.
+  - Updated `/mcp` documentation console with interactive tool cards.
+- **Educational Curriculum Expansion (`src/learn-page.ts`, `/learn`)**:
+  - Added **Module 05 // 2026 Competitive Landscape: Venue Neutrality & The Friction Trap in Acquired Prediction Tools**.
+  - Educates traders on why exchange acquisitions (Dome by Polymarket, Oddpool by Kalshi) compromise terminal neutrality and how to calculate the parabolic taker fee hurdle before risking capital.
+  - Integrated `/why` into top navigation and bottom curriculum navigation.
+- **Automated Verification (`src/__tests__/mcp-friction.test.ts`)**:
+  - Added unit and integration tests verifying `benchmark_competitor_claim` returns accurate friction metrics and SHA-256 hashes, and `get_competitive_battlecard` returns all 6 dimensions.
+
+**Verification:**
+- `npx tsc --noEmit` — **0 errors (clean exit 0)**.
+- `node --experimental-strip-types --test src/__tests__/mcp-friction.test.ts src/__tests__/landing-page-cockpit.test.ts src/__tests__/competitive-benchmark.test.ts src/__tests__/static-copy-guardrails.test.ts` — **24/24 tests passing across 4 suites**.
+- Remote production healthcheck: `GET https://quanterraos.com/healthz` returns `200 OK` (`status: ok, circuit: LOCKED_RULE_B5`).
+
+
 
 
 

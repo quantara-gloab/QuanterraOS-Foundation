@@ -1,5 +1,6 @@
 import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
 import { getLiveQuotes } from "./live-quotes.ts";
+import { computeFrictionTeardown, COMPETITOR_BENCHMARK_ROWS } from "./competitive-benchmark.ts";
 
 /**
  * Model Context Protocol (MCP) Manifest & Agent Integration Layer
@@ -70,6 +71,27 @@ export const MCP_SERVER_MANIFEST = {
           assessedProbability: { type: "number", description: "Assessed win probability between 0.01 and 0.99" },
           orderType: { type: "string", enum: ["taker", "maker"], default: "taker", description: "Taker (immediate execution) or Maker (resting limit order)" }
         }
+      }
+    },
+    {
+      name: "benchmark_competitor_claim",
+      description: "Audits a competitor claim (Verso, Predly, Dome, Oddpool) against exact Kalshi CFTC taker fees, computing true breakeven hurdle, net realized EV, fee drag ratio, and danger zone risk flag with SHA-256 provenance.",
+      parameters: {
+        type: "object",
+        required: ["nominalPriceCents", "userStatedWinRatePct"],
+        properties: {
+          nominalPriceCents: { type: "number", description: "Contract price in cents (1 to 99)" },
+          userStatedWinRatePct: { type: "number", description: "Assessed win rate percentage (1 to 99)" },
+          contracts: { type: "number", default: 100, description: "Number of contracts" }
+        }
+      }
+    },
+    {
+      name: "get_competitive_battlecard",
+      description: "Returns the 2026 architectural differentiation matrix across Venue Neutrality, Taker Fee Drag, 60s TWAP Radar, Brier Calibration, and Consented Decision Memory.",
+      parameters: {
+        type: "object",
+        properties: {}
       }
     }
   ]
@@ -303,6 +325,14 @@ export function renderMcpPageHtml(): string {
           <div class="tool-name">simulate_order_friction</div>
           <div class="tool-desc">Pre-trade risk coprocessor: evaluates Kalshi non-linear taker/maker fees, required breakeven win rate, and net EV.</div>
         </div>
+        <div class="tool-item">
+          <div class="tool-name">benchmark_competitor_claim</div>
+          <div class="tool-desc">Competitive teardown referee: audits competitor claims against Kalshi taker fee formulas, returning true breakeven hurdles and fee drag.</div>
+        </div>
+        <div class="tool-item">
+          <div class="tool-name">get_competitive_battlecard</div>
+          <div class="tool-desc">Architectural differentiation: provides 6-dimension benchmark across venue neutrality, TWAP radar, and calibration integrity.</div>
+        </div>
       </div>
     </div>
   </main>
@@ -393,7 +423,7 @@ export function simulateOrderFriction(params: {
   if (isPositiveEv) {
     verdict = `POSITIVE EV: Model assessed edge (${(prob * 100).toFixed(1)}%) clears breakeven hurdle (${(breakevenWinRate * 100).toFixed(1)}%) after $${effectiveFee.toFixed(2)} in transaction friction.`;
   } else if (prob > price) {
-    verdict = `NEGATIVE EV (FEE DRAG): Gross directional edge exists (${(prob * 100).toFixed(1)}% vs ${(price * 100).toFixed(1)}%), but $${effectiveFee.toFixed(2)} (${feePercentOfCost}%) fee drag consumes all alpha. Win rate must exceed ${(breakevenWinRate * 100).toFixed(1)}% to break even.`;
+    verdict = `NEGATIVE EV (FEE DRAG): Gross directional differential exists (${(prob * 100).toFixed(1)}% vs ${(price * 100).toFixed(1)}%), but $${effectiveFee.toFixed(2)} (${feePercentOfCost}%) fee drag consumes all gross return. Win rate must exceed ${(breakevenWinRate * 100).toFixed(1)}% to break even.`;
   } else {
     verdict = `NEGATIVE EV: Assessed probability (${(prob * 100).toFixed(1)}%) is at or below market quote (${(price * 100).toFixed(1)}%). Zero edge.`;
   }
@@ -467,6 +497,23 @@ export async function executeMcpTool(name: string, params: Record<string, any> =
         assessedProbability: params.assessedProbability !== undefined ? Number(params.assessedProbability) : undefined,
         orderType: params.orderType,
       });
+    }
+    case "benchmark_competitor_claim": {
+      const priceCents = Number(params.nominalPriceCents ?? 51);
+      const winRatePct = Number(params.userStatedWinRatePct ?? 55);
+      const count = params.contracts !== undefined ? Number(params.contracts) : 100;
+      return computeFrictionTeardown({
+        nominalPriceCents: priceCents,
+        userStatedWinRatePct: winRatePct,
+        contracts: count,
+      });
+    }
+    case "get_competitive_battlecard": {
+      return {
+        timestamp: new Date().toISOString(),
+        status: "ACTIVE_INDEPENDENT_REFEREE",
+        dimensions: COMPETITOR_BENCHMARK_ROWS,
+      };
     }
     case "get_calibration_metrics": {
       return {
