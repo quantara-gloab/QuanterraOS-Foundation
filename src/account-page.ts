@@ -294,6 +294,7 @@ export function renderAccountPageHtml(user: UserRecord | null, tier: UserTier, e
     <div class="nav-links">
       <a href="/">Home</a>
       <a href="/calculator">Calculator</a>
+      <a href="/radar">Radar</a>
       <a href="/journal">Journal</a>
       <a href="/research">Research</a>
       <a href="/predictions">Predictions</a>

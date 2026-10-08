@@ -98,6 +98,7 @@ For direct human support, our team is reachable at <strong>support@quanterraos.c
     <!-- Quick Question Chips -->
     <div class="qos-quick-chips">
       <button class="qos-chip" data-q="Explain my costs">Explain my costs</button>
+      <button class="qos-chip" data-q="How does Expiry Radar work?">Expiry Radar?</button>
       <button class="qos-chip" data-q="Save my check">Save my check</button>
       <button class="qos-chip" data-q="Find my journal">Find my journal</button>
       <button class="qos-chip" data-q="How do fees work on Kalshi?">Kalshi fee formula?</button>

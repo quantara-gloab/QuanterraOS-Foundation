@@ -527,6 +527,27 @@ Any directional edge is pure arithmetic (Assessed Probability - Ask - Fee), not 
     };
   }
 
+  // Priority Concierge Query D: Expiry Radar & CME CF BRTI 60-Second TWAP
+  if (
+    norm.includes("radar") ||
+    norm.includes("expiry") ||
+    norm.includes("twap") ||
+    norm.includes("oracle") ||
+    norm.includes("settlement window") ||
+    norm.includes("danger zone")
+  ) {
+    citations.push("src/expiry-radar.ts", "/radar", "CME CF BRTI 60s TWAP Specification");
+    return {
+      reply: `The **QuanterraOS Expiry & Oracle Radar** (available live at **/radar**) is our real-time microstructure terminal for Kalshi BTC prediction contracts:
+1. **Live Expiry Countdown**: Tracks second-by-second time to expiry across 15-minute (\`KXBTC15M\`) and 1-hour (\`KXBTCD\`) contracts.
+2. **60-Second TWAP Oracle Visualizer**: The settlement for Kalshi BTC contracts is governed by the 60-second TWAP of the CME CF Bitcoin Real-Time Index (BRTI) during the final minute (seconds 840–900). Our radar visualizes each 1-second sampling tick in real time!
+3. **Settlement Danger Zone Alert**: If spot is within $50 of a strike during the final 5 minutes, single-tick fluctuations can flip the contract from $1.00 to $0.00. The radar automatically flags these high-risk strikes.
+4. **Strike Ladder Heatmap**: Displays bid/ask quotes, parabolic taker fees (\`0.07 × p × (1 - p)\`), and breakeven win hurdles across all active strikes.
+5. **Shareable Verification Cards**: Export one-click SVG receipts with fee breakdowns and cryptographic provenance to share on X or Substack!`,
+      citations
+    };
+  }
+
   // Question 2: Are you trading my money / capital?
   if (
     norm.includes("trading my money") ||

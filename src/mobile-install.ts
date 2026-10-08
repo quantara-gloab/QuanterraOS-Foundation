@@ -12,7 +12,7 @@
  * 7. Feature flag gating: Governed by FEATURE_MOBILE_INSTALL / ?feature=mobile-install.
  */
 
-export function renderMobileBottomNavHtml(activeTab?: "check" | "journal" | "review" | "account"): string {
+export function renderMobileBottomNavHtml(activeTab?: "check" | "radar" | "journal" | "review" | "account"): string {
   const current = activeTab || "check";
 
   const tabs = [
@@ -21,6 +21,12 @@ export function renderMobileBottomNavHtml(activeTab?: "check" | "journal" | "rev
       label: "Check",
       href: "/calculator",
       iconSvg: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`,
+    },
+    {
+      id: "radar",
+      label: "Radar",
+      href: "/radar",
+      iconSvg: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>`,
     },
     {
       id: "journal",
@@ -220,7 +226,7 @@ export function getMobileAppRuntimeScript(): string {
     (function restoreLastActivePage() {
       // Record current page as active tab
       var path = window.location.pathname;
-      if (path === '/calculator' || path === '/journal' || path === '/review' || path === '/account') {
+      if (path === '/calculator' || path === '/radar' || path === '/journal' || path === '/review' || path === '/account') {
         try {
           localStorage.setItem('quanterraos_last_active_tab', path);
         } catch (_) {}
@@ -231,7 +237,7 @@ export function getMobileAppRuntimeScript(): string {
       if (isStandalone && (path === '/' || path === '/install' || path === '/app' || path === '/download')) {
         try {
           var lastTab = localStorage.getItem('quanterraos_last_active_tab');
-          if (lastTab && lastTab !== path && (lastTab.startsWith('/calculator') || lastTab.startsWith('/journal') || lastTab.startsWith('/review') || lastTab.startsWith('/account'))) {
+          if (lastTab && lastTab !== path && (lastTab.startsWith('/calculator') || lastTab.startsWith('/radar') || lastTab.startsWith('/journal') || lastTab.startsWith('/review') || lastTab.startsWith('/account'))) {
             window.location.replace(lastTab);
           }
         } catch (_) {}

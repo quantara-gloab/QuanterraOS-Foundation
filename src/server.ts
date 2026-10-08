@@ -63,6 +63,12 @@ import { renderPilotAuditPageHtml } from "./pilot-audit-page.ts";
 import { renderAccessTerminalPage } from "./access-terminal-page.ts";
 import { renderWalletPageHtml } from "./wallet-page.ts";
 import { renderCalculatorPageHtml } from "./calculator-page.ts";
+import {
+  computeExpiryRadarState,
+  renderExpiryRadarPageHtml,
+  simulateExpiryPayoff,
+  generateShareableDebriefCardSvg,
+} from "./expiry-radar.ts";
 import { getSystemPulseTelemetry } from "./system-pulse.ts";
 import { renderMarketRhythmPageHtml } from "./research/market-rhythm.ts";
 import { renderMobileInstallPageHtml } from "./mobile-install.ts";
@@ -1803,6 +1809,86 @@ app.get("/signup", (_req, res) => {
 
 app.get("/calculator", (_req, res) => {
   res.type("html").send(renderCalculatorPageHtml());
+});
+
+// Expiry Radar & Microstructure Terminal (Flagship Real-Time Settlement Engine)
+app.get(["/radar", "/expiry-radar", "/microstructure"], async (req, res) => {
+  const auth = getUserAuth(req);
+  const tf = (req.query.series === "1h" ? "1h" : "15m") as any;
+  let spotPrice: number | null = null;
+  let activeVenuesCount = 3;
+  try {
+    const live = await getLiveQuotes();
+    spotPrice = live.compositePrice;
+    activeVenuesCount = live.activeVenuesCount;
+  } catch {
+    spotPrice = 91250;
+  }
+  const radarState = computeExpiryRadarState({ series: tf, spotPrice, activeVenuesCount });
+  res.type("html").send(renderExpiryRadarPageHtml(radarState, auth.user));
+});
+
+app.get("/api/radar/state", async (req, res) => {
+  const tf = (req.query.series === "1h" ? "1h" : "15m") as any;
+  let spotPrice: number | null = null;
+  let activeVenuesCount = 3;
+  try {
+    const live = await getLiveQuotes();
+    spotPrice = live.compositePrice;
+    activeVenuesCount = live.activeVenuesCount;
+  } catch {
+    spotPrice = 91250;
+  }
+  const radarState = computeExpiryRadarState({ series: tf, spotPrice, activeVenuesCount });
+  res.json({ success: true, radar: radarState });
+});
+
+app.get("/api/radar/simulate", (req, res) => {
+  const strike = Number(req.query.strike || 91250);
+  const contractPrice = Number(req.query.price || 0.51);
+  const side = (req.query.side === "no" ? "no" : "yes") as "yes" | "no";
+  const contractCount = Number(req.query.count || 10);
+  const simulatedSpotAtExpiry = Number(req.query.simSpot || strike);
+
+  const simulation = simulateExpiryPayoff({
+    strike,
+    contractPrice,
+    side,
+    contractCount,
+    simulatedSpotAtExpiry,
+  });
+
+  res.json({ success: true, simulation });
+});
+
+app.get("/api/radar/card.svg", (req, res) => {
+  const ticker = String(req.query.ticker || "KXBTC15M-T91250");
+  const strike = Number(req.query.strike || 91250);
+  const contractPrice = Number(req.query.price || 0.51);
+  const side = (req.query.side === "no" ? "no" : "yes") as "yes" | "no";
+  const contractCount = Number(req.query.count || 10);
+  const takerFee = Number(req.query.fee || 0.18);
+  const breakevenWinProb = Number(req.query.breakeven || 0.528);
+  const netPnl = req.query.pnl !== undefined ? Number(req.query.pnl) : undefined;
+  const outcome = (req.query.outcome as any) || "PENDING";
+  const dateIso = req.query.date ? String(req.query.date) : undefined;
+
+  const svg = generateShareableDebriefCardSvg({
+    ticker,
+    strike,
+    contractPrice,
+    side,
+    contractCount,
+    takerFee,
+    breakevenWinProb,
+    netPnl,
+    outcome,
+    dateIso,
+  });
+
+  res.setHeader("Content-Type", "image/svg+xml");
+  res.setHeader("Cache-Control", "public, max-age=60");
+  res.send(svg);
 });
 
 app.get(["/embed/calculator", "/widget/calculator", "/embed"], (_req, res) => {

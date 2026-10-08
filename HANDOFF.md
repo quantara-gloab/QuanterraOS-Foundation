@@ -496,6 +496,41 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 - `npm run typecheck` (`tsc --noEmit`) — **0 errors (clean exit 0)**.
 - `npm test` — **374/374 passing across 80 suites, 0 failures** (duration ~171s).
 
+---
+
+### Session: 2026-10-07 — Expiry Radar & Microstructure Terminal, 60s TWAP Oracle Visualizer, Payoff Simulator & Shareable Verification Card Engine
+
+**Trigger:** The founder confirmed that beta user recruitment/favors are deferred, directing continuous development full force to make QuanterraOS the undisputed leading contender in short-duration BTC prediction markets and outpace all competitors.
+
+**Delivered Capabilities:**
+- **Expiry Radar & Microstructure Terminal (`src/expiry-radar.ts`, `/radar`, `/api/radar/state`)**:
+  - Live Expiry Countdown: Second-by-second countdown clock across active 15-minute (`KXBTC15M`) and 1-hour (`KXBTCD`) windows with phase detection (`NORMAL_TRADING`, `PRE_SETTLEMENT_WARNING`, `ORACLE_SAMPLING_ACTIVE`, `SETTLED`).
+  - 60-Second TWAP Oracle Sampling Gauge: Visualizes the final 60 seconds (seconds 840–900) where the CME CF Bitcoin Real-Time Index (BRTI) TWAP determines final contract settlement, with a 60-block progressive pulse indicator.
+  - Settlement Danger Zone Scanner: Automatically detects and alerts when spot price is within $50 of a strike during the final 5 minutes, warning traders of extreme 1-tick outcome coin-flip risk.
+  - Strike Heatmap & Liquidity Quality Index (LQI): Categorizes order-book depth and spreads into `TIGHT_SPREAD`, `MODERATE_DRAG`, `HIGH_FRICTION`, and `UNQUOTED`, computing spot delta (in $ and bps), parabolic taker fee (`$0.07 × p × (1 - p)`), and breakeven win hurdles across all active strikes.
+  - 1-Click "Check in Calc": Seamlessly links any strike quote directly into `/calculator` with prefilled parameters.
+- **Interactive Expiry Payoff Scenario Simulator (`/radar`, `/api/radar/simulate`)**:
+  - Smooth interactive slider allowing traders to scrub hypothetical BTC spot prices at settlement (-$600 to +$600 from spot).
+  - Dynamically updates ATM contract outcome (YES/NO), gross payout, parabolic taker fee drag, and net fee-adjusted PnL and ROI.
+- **One-Click Shareable SVG Trade Debrief & Verification Card Generator (`src/expiry-radar.ts`, `/api/radar/card.svg`)**:
+  - Generates an institutional-grade, pixel-perfect standalone SVG graphic adhering to Gold Standard styling (Obsidian `#06070A`, Imperial Gold `#DFB843`, specular champagne `#F7E7B4`).
+  - Embeds contract ticker, strike, side, contract count, taker fee, breakeven hurdle %, net PnL, and cryptographic SHA-256 provenance watermark with CME CF BRTI non-affiliation attribution (Rule B10) and Rule B5 $0.00 capital lock.
+  - Client actions: 1-click "Copy SVG to Clipboard" and "Share Receipt to X" for organic community distribution.
+- **Cross-Platform Navigation & Virtual Concierge Wiring**:
+  - Added Radar to main navigation headers on `/` (Homepage), `/calculator`, and `/account`.
+  - Added dedicated Expiry Radar feature showcase block on `/` between the Acquisition Wedge and Decision Journal preview.
+  - Integrated Radar tab into the mobile web app bottom dock (`/app`, `/install`) and standalone launcher restoration.
+  - Added dedicated Aria virtual concierge query handler and quick chip ("Expiry Radar?") in `src/agents/council-chat.ts` and `src/assistant-widget.ts`.
+- **Database & Recovery Drill Schema Synchronization (`src/backup-recovery.ts`, `src/retained-recovery-drill.ts`)**:
+  - Synchronized in-memory sandbox and on-disk drill schemas to include migration 0027 fields (`max_contracts_per_trade`, `review_reminder`, `cooling_off_minutes` on `user_risk_plans`, and `cooling_off_until` on `user_decision_journal`).
+- **Dedicated Acceptance Test Suite (`src/__tests__/expiry-radar.test.ts`)**:
+  - 7 automated tests validating window boundaries, phase transitions, danger zone detection, LQI classification, fee-adjusted payoff simulation, SVG card generation, and Rule B4/B5 compliance.
+
+**Verification:**
+- `npm run typecheck` (`tsc --noEmit`) — **0 errors (clean exit 0)**.
+- `npm test` — **392/392 passing across 89 suites, 0 failures** (duration ~112s).
+
+
 
 
 

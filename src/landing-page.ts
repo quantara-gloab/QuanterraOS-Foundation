@@ -1073,6 +1073,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       <a href="/" class="nav-brand"><span class="brand-dot"></span> quanterraos</a>
       <div class="nav-links">
         <a href="/calculator" style="color:var(--accent); font-weight:700;">Check</a>
+        <a href="/radar" style="color:var(--accent-light); font-weight:700;">Radar</a>
         <a href="/journal" style="color:#10B981; font-weight:700;">Journal</a>
         <a href="/learn" style="color:var(--accent-light); font-weight:700;">Learn</a>
         <a href="/access" style="color:var(--text); font-weight:500;">Sign in</a>
@@ -1285,6 +1286,59 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1.5. Live Expiry & Oracle Radar Feature Block -->
+    <section class="section-block" id="radar-preview" style="margin-top: 48px;">
+      <div class="section-heading-group">
+        <div class="section-eyebrow" style="color:var(--accent-light);">Real-Time Microstructure &bull; Oracle Cadence</div>
+        <h2 class="section-heading">Live Bitcoin Expiry &amp; Oracle Radar</h2>
+        <p class="section-description">
+          Monitor active 15-minute and 1-hour expiries, watch the 60-second CME CF BRTI TWAP averaging window in real time, and audit strike-by-strike fee drag before committing capital.
+        </p>
+      </div>
+
+      <div style="background: linear-gradient(180deg, rgba(17, 23, 34, 0.9) 0%, rgba(10, 14, 20, 0.96) 100%); border: 1px solid rgba(212, 175, 55, 0.28); border-radius: 8px; padding: 28px; box-shadow: inset 0 1px 0 rgba(255, 245, 215, 0.12), 0 20px 40px -15px rgba(0, 0, 0, 0.7);">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; border-bottom:1px solid rgba(212,175,55,0.15); padding-bottom:16px; margin-bottom:20px;">
+          <div>
+            <span style="font-family:var(--font-mono); font-size:0.75rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px;">Active Series: Kalshi KXBTC15M</span>
+            <div style="font-size:1.15rem; font-weight:700; color:#FFFFFF; margin-top:2px;">15-Minute Above/Below Settlement Monitor</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="display:inline-flex; align-items:center; gap:6px; background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3); color:#34D399; padding:4px 10px; border-radius:999px; font-family:var(--font-mono); font-size:0.72rem; font-weight:700;">
+              <span style="width:6px; height:6px; border-radius:50%; background:#10B981; box-shadow:0 0 6px #10B981;"></span>
+              LIVE CONSENSUS (3/3 VENUES)
+            </span>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; margin-bottom:24px;">
+          <div style="background:rgba(6,9,14,0.6); border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:16px;">
+            <div style="font-family:var(--font-mono); font-size:0.7rem; color:var(--muted); text-transform:uppercase;">Oracle Settlement Window</div>
+            <div style="font-size:1.4rem; font-weight:800; font-family:var(--font-mono); color:var(--accent); margin-top:4px;">60s TWAP</div>
+            <div style="font-size:0.75rem; color:var(--muted); margin-top:4px;">CME CF BRTI final minute averaging</div>
+          </div>
+          <div style="background:rgba(6,9,14,0.6); border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:16px;">
+            <div style="font-family:var(--font-mono); font-size:0.7rem; color:var(--muted); text-transform:uppercase;">Parabolic Taker Friction</div>
+            <div style="font-size:1.4rem; font-weight:800; font-family:var(--font-mono); color:var(--text); margin-top:4px;">$0.07 &times; P(1-P)</div>
+            <div style="font-size:0.75rem; color:var(--muted); margin-top:4px;">Up to 1.75&cent;/contract at 50&cent; mid</div>
+          </div>
+          <div style="background:rgba(6,9,14,0.6); border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:16px;">
+            <div style="font-family:var(--font-mono); font-size:0.7rem; color:var(--muted); text-transform:uppercase;">Danger Zone Scanner</div>
+            <div style="font-size:1.4rem; font-weight:800; font-family:var(--font-mono); color:#10B981; margin-top:4px;">Active</div>
+            <div style="font-size:0.75rem; color:var(--muted); margin-top:4px;">Flags contracts within $50 of spot</div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; border-top:1px solid rgba(255,255,255,0.06); padding-top:16px;">
+          <div style="font-size:0.76rem; color:var(--muted);">
+            Includes full interactive strike heatmap, payoff scenario simulator, and one-click shareable verification cards.
+          </div>
+          <a href="/radar" class="btn-primary" style="background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%); color:#07080B; border:1px solid #DFB843; font-weight:700; padding:9px 18px; font-size:0.82rem;">
+            Launch Full Expiry Radar &rarr;
+          </a>
         </div>
       </div>
     </section>
