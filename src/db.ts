@@ -52,6 +52,7 @@ export function runMigrations(): void {
     "0024_outcome_tracking_and_booking.sql",
     "0025_statement_import_and_reconciliation.sql",
     "0026_beta_attribution_support_and_drills.sql",
+    "0027_risk_plan_advisory_controls.sql",
   ]) {
     const migrationPath = path.join(migrationsDir, migration);
     if (migration === "0006_multi_asset.sql") {
@@ -195,6 +196,23 @@ export function runMigrations(): void {
         CREATE INDEX IF NOT EXISTS imported_stmt_batch_id_idx ON imported_statement_records (batch_id);
         CREATE INDEX IF NOT EXISTS imported_stmt_matched_journal_idx ON imported_statement_records (matched_journal_id);
       `);
+      continue;
+    }
+    if (migration === "0027_risk_plan_advisory_controls.sql") {
+      const rpCols = sqlite.prepare("PRAGMA table_info(user_risk_plans)").all() as Array<{ name: string }>;
+      if (!rpCols.some((col) => col.name === "max_contracts_per_trade")) {
+        sqlite.exec("ALTER TABLE user_risk_plans ADD COLUMN max_contracts_per_trade INTEGER NOT NULL DEFAULT 50");
+      }
+      if (!rpCols.some((col) => col.name === "review_reminder")) {
+        sqlite.exec("ALTER TABLE user_risk_plans ADD COLUMN review_reminder TEXT NOT NULL DEFAULT 'settlement'");
+      }
+      if (!rpCols.some((col) => col.name === "cooling_off_minutes")) {
+        sqlite.exec("ALTER TABLE user_risk_plans ADD COLUMN cooling_off_minutes INTEGER NOT NULL DEFAULT 15");
+      }
+      const journalCols = sqlite.prepare("PRAGMA table_info(user_decision_journal)").all() as Array<{ name: string }>;
+      if (!journalCols.some((col) => col.name === "cooling_off_until")) {
+        sqlite.exec("ALTER TABLE user_decision_journal ADD COLUMN cooling_off_until TEXT");
+      }
       continue;
     }
     sqlite.exec(readFileSync(migrationPath, "utf-8"));

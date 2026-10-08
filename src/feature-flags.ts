@@ -13,11 +13,12 @@ export interface PilotFeatureFlags {
   statementImport: boolean;
   mobileInstall: boolean;
   decisionCoach: boolean;
+  riskPlan: boolean;
 }
 
 export function getFeatureFlags(query?: Record<string, any>): PilotFeatureFlags {
   // Configured via environment variables (default true in production/test unless set to "false")
-  // or overridden via query string (?beta=1, ?feature=coach, ?feature=mobile-install, or ?pilot=1)
+  // or overridden via query string (?beta=1, ?feature=coach, ?feature=mobile-install, ?feature=risk-plan, or ?pilot=1)
   const isQueryActive =
     query?.beta === "1" ||
     query?.feature === "outcomes" ||
@@ -25,6 +26,8 @@ export function getFeatureFlags(query?: Record<string, any>): PilotFeatureFlags 
     query?.feature === "mobile-install" ||
     query?.feature === "coach" ||
     query?.feature === "decision-coach" ||
+    query?.feature === "risk-plan" ||
+    query?.feature === "risk" ||
     query?.pilot === "1";
 
   const outcomeTracking = process.env.FEATURE_OUTCOME_TRACKING !== "false" || isQueryActive;
@@ -33,6 +36,7 @@ export function getFeatureFlags(query?: Record<string, any>): PilotFeatureFlags 
   const statementImport = process.env.FEATURE_STATEMENT_IMPORT !== "false" || isQueryActive;
   const mobileInstall = process.env.FEATURE_MOBILE_INSTALL !== "false" || isQueryActive;
   const decisionCoach = process.env.FEATURE_DECISION_COACH !== "false" || isQueryActive;
+  const riskPlan = process.env.FEATURE_RISK_PLAN !== "false" || isQueryActive;
 
   return {
     outcomeTracking,
@@ -41,5 +45,6 @@ export function getFeatureFlags(query?: Record<string, any>): PilotFeatureFlags 
     statementImport,
     mobileInstall,
     decisionCoach,
+    riskPlan,
   };
 }

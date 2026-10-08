@@ -471,6 +471,62 @@ Explore our TrustOS pilot at **/trustos** or read our full analysis in docs/comp
     };
   }
 
+  // Priority Concierge Query A: Explain my costs / cost mechanics / taker fees
+  if (
+    norm.includes("explain my cost") ||
+    norm.includes("explain costs") ||
+    norm.includes("my costs") ||
+    norm.includes("how do fees work") ||
+    norm.includes("how does fee work") ||
+    norm.includes("fee formula") ||
+    norm.includes("cost formula")
+  ) {
+    citations.push("Kalshi Rulebook Chapter 3", "src/calculator-page.ts", "/learn/fees");
+    return {
+      reply: `Your prediction-market transaction costs consist of three components:
+1. **Executable Purchase Cost**: Contract Price × Quantity (for example, 10 contracts @ $0.51 = $5.10).
+2. **Exchange Taker Fee**: On Kalshi, taker friction follows the parabolic formula **Fee = $0.07 × Count × P × (1 - P)**. For a 51¢ contract, this equals **1.80¢ per contract** (+$0.18 total for 10 contracts).
+3. **Required Breakeven Win Rate**: Because taker fees increase your total cost to $5.28, your required breakeven win probability is **52.80%** (Ask Price + Fee per contract).
+Any directional edge is pure arithmetic (Assessed Probability - Ask - Fee), not an established platform edge. You can audit your exact costs for any contract using our free True-Cost Check!`,
+      citations
+    };
+  }
+
+  // Priority Concierge Query B: Save my check / save check / start journal
+  if (
+    norm.includes("save my check") ||
+    norm.includes("save check") ||
+    norm.includes("save this check") ||
+    norm.includes("start journal")
+  ) {
+    citations.push("src/journal-page.ts", "src/landing-page.ts", "/journal");
+    return {
+      reply: `You can save any cost check directly into your Decision Journal using the **'Save My Check & Start Journal'** button on the homepage or calculator:
+- **Automatic Local Preservation**: Your parameters (venue, ask price, contract count, assessed probability) are saved immediately to local storage so you never lose unfinished work.
+- **Journal Preview**: If exploring without an account, you can preview the saved trade entry and hypothesis in the sandbox journal.
+- **Account Linking**: To permanently link and sync your journal records across devices, sign in to your authenticated account at **/account**.`,
+      citations
+    };
+  }
+
+  // Priority Concierge Query C: Find my journal / my journal / private records
+  if (
+    norm.includes("find my journal") ||
+    norm.includes("my journal") ||
+    norm.includes("where is my journal") ||
+    norm.includes("view my journal") ||
+    norm.includes("find journal")
+  ) {
+    citations.push("src/account-page.ts", "src/journal-page.ts", "/account");
+    return {
+      reply: `To view your private trading journal and historical records:
+1. **Authentication Required**: Account-specific trading journals, private trade premises, and personal calibration records require an authenticated session to protect your privacy. Please sign in at **/account** or **/access**.
+2. **Linked Records**: Once authenticated, your full historical decision log, Brier calibration curve, and statement reconciliation history are accessible under **/journal**.
+3. **Local Unfinished Checks**: If you checked costs while signed out, your current browser session automatically preserves your pending check in local storage, ready to link when you sign in!`,
+      citations
+    };
+  }
+
   // Question 2: Are you trading my money / capital?
   if (
     norm.includes("trading my money") ||

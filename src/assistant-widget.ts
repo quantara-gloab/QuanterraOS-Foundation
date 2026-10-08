@@ -74,8 +74,8 @@ export const ASSISTANT_WIDGET_HTML = `
         <img src="/assets/assistant-avatar.jpg" alt="Aria" class="qos-hero-img" />
         <div class="qos-hero-body">
           <div class="qos-hero-name">Aria <span class="qos-hero-verified">✓ Concierge</span></div>
-          <div class="qos-hero-tagline">Executive Concierge & Market Specialist</div>
-          <div class="qos-hero-desc">Ask me about live calibration proofs, Brier scoring, pricing tiers, or platform governance.</div>
+          <div class="qos-hero-tagline">Executive Concierge &amp; Risk Guide</div>
+          <div class="qos-hero-desc">Ask me to explain contract costs, save your check to your journal, or locate your records.</div>
         </div>
       </div>
 
@@ -84,11 +84,11 @@ export const ASSISTANT_WIDGET_HTML = `
         <img src="/assets/assistant-avatar.jpg" alt="Aria" class="qos-msg-avatar" />
         <div class="qos-msg-content">
           <div class="qos-msg-bubble">
-Hello! I am <strong>Aria</strong>, your QuanterraOS executive concierge and market specialist.
+Hello! I am <strong>Aria</strong>, your QuanterraOS executive concierge.
 <br><br>
-I'm here to assist you with exploring the <strong>canonical market calibration baseline (0.2001 Kalshi Brier)</strong>, delayed vs real-time ledgers, or our <strong>$0.00 paper mode (Rule B5)</strong>.
+I'm here to help you <strong>explain your contract costs</strong>, <strong>save your checks</strong> to your personal decision journal, or locate your trading records.
 <br><br>
-For direct human inquiries, our team is reachable at <strong>support@quanterraos.com</strong>. How may I assist you today?
+For direct human support, our team is reachable at <strong>support@quanterraos.com</strong>. How may I assist you today?
           </div>
           <div class="qos-msg-meta">Aria · Just now</div>
         </div>
@@ -97,16 +97,16 @@ For direct human inquiries, our team is reachable at <strong>support@quanterraos
 
     <!-- Quick Question Chips -->
     <div class="qos-quick-chips">
-      <button class="qos-chip" data-q="What is the canonical Brier baseline?">Brier baseline (0.2001)?</button>
-      <button class="qos-chip" data-q="How does the 20-min delayed free tier work?">Delayed free feed?</button>
-      <button class="qos-chip" data-q="Is any customer capital at risk?">Is capital at risk?</button>
-      <button class="qos-chip" data-q="How do I subscribe to Pro Terminal ($199/mo)?">Upgrade to Pro?</button>
+      <button class="qos-chip" data-q="Explain my costs">Explain my costs</button>
+      <button class="qos-chip" data-q="Save my check">Save my check</button>
+      <button class="qos-chip" data-q="Find my journal">Find my journal</button>
+      <button class="qos-chip" data-q="How do fees work on Kalshi?">Kalshi fee formula?</button>
       <button class="qos-chip" data-q="How do I contact customer support?">Contact support</button>
     </div>
 
     <!-- Chat Input Area -->
     <form id="qos-chat-form" class="qos-input-bar">
-      <input type="text" id="qos-chat-input" placeholder="Ask Aria about market calibration, telemetry, or support…" autocomplete="off" maxlength="1000" aria-label="Message Aria" />
+      <input type="text" id="qos-chat-input" placeholder="Ask Aria to explain costs, save your check, or find your journal…" autocomplete="off" maxlength="1000" aria-label="Message Aria" />
       <button type="button" id="qos-mic-btn" class="qos-mic-btn" title="Speak to Aria (Speech-to-Text)" aria-label="Voice input">
         <span id="qos-mic-icon">🎙️</span>
       </button>

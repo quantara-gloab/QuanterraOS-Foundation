@@ -17,176 +17,19 @@ import { db } from "./db.ts";
 import { userDecisionJournal, userRiskPlans } from "./schema.ts";
 import { logEvent } from "./metrics.ts";
 
-export interface RiskPlan {
-  id: string;
-  userId: string;
-  dailyMaxOutlay: number;
-  singleTradeMaxOutlay: number;
-  maxConcurrentPositions: number;
-  correlatedMarketAlert: boolean;
-  updatedAt: string;
-}
-
-export interface RiskAdvisoryCheck {
-  isExceeded: boolean;
-  warnings: string[];
-  singleTradeLimit: number;
-  dailyLimit: number;
-  currentTradeOutlay: number;
-  projectedDailyOutlay: number;
-}
-
-/**
- * Retrieves the user's voluntary risk plan, provisioning standard defaults if none exists.
- */
-export function getUserRiskPlan(userId: string): RiskPlan {
-  const existing = db
-    .select()
-    .from(userRiskPlans)
-    .where(eq(userRiskPlans.userId, userId))
-    .get();
-
-  if (existing) {
-    return {
-      id: existing.id,
-      userId: existing.userId,
-      dailyMaxOutlay: existing.dailyMaxOutlay,
-      singleTradeMaxOutlay: existing.singleTradeMaxOutlay,
-      maxConcurrentPositions: existing.maxConcurrentPositions,
-      correlatedMarketAlert: existing.correlatedMarketAlert === 1,
-      updatedAt: existing.updatedAt,
-    };
-  }
-
-  // Default advisory risk caps: $50 daily, $25 per trade, 3 max positions
-  const defaultPlan: RiskPlan = {
-    id: `rp_${randomUUID().slice(0, 12)}`,
-    userId,
-    dailyMaxOutlay: 50.0,
-    singleTradeMaxOutlay: 25.0,
-    maxConcurrentPositions: 3,
-    correlatedMarketAlert: true,
-    updatedAt: new Date().toISOString(),
-  };
-
-  db.insert(userRiskPlans)
-    .values({
-      id: defaultPlan.id,
-      userId: defaultPlan.userId,
-      dailyMaxOutlay: defaultPlan.dailyMaxOutlay,
-      singleTradeMaxOutlay: defaultPlan.singleTradeMaxOutlay,
-      maxConcurrentPositions: defaultPlan.maxConcurrentPositions,
-      correlatedMarketAlert: defaultPlan.correlatedMarketAlert ? 1 : 0,
-      updatedAt: defaultPlan.updatedAt,
-    })
-    .run();
-
-  return defaultPlan;
-}
-
-/**
- * Updates the user's voluntary advisory risk caps.
- */
-export function saveUserRiskPlan(userId: string, updates: Partial<RiskPlan>): RiskPlan {
-  const current = getUserRiskPlan(userId);
-  const updated: RiskPlan = {
-    ...current,
-    dailyMaxOutlay: typeof updates.dailyMaxOutlay === "number" && updates.dailyMaxOutlay > 0 ? updates.dailyMaxOutlay : current.dailyMaxOutlay,
-    singleTradeMaxOutlay: typeof updates.singleTradeMaxOutlay === "number" && updates.singleTradeMaxOutlay > 0 ? updates.singleTradeMaxOutlay : current.singleTradeMaxOutlay,
-    maxConcurrentPositions: typeof updates.maxConcurrentPositions === "number" && updates.maxConcurrentPositions > 0 ? updates.maxConcurrentPositions : current.maxConcurrentPositions,
-    correlatedMarketAlert: typeof updates.correlatedMarketAlert === "boolean" ? updates.correlatedMarketAlert : current.correlatedMarketAlert,
-    updatedAt: new Date().toISOString(),
-  };
-
-  db.update(userRiskPlans)
-    .set({
-      dailyMaxOutlay: updated.dailyMaxOutlay,
-      singleTradeMaxOutlay: updated.singleTradeMaxOutlay,
-      maxConcurrentPositions: updated.maxConcurrentPositions,
-      correlatedMarketAlert: updated.correlatedMarketAlert ? 1 : 0,
-      updatedAt: updated.updatedAt,
-    })
-    .where(eq(userRiskPlans.userId, userId))
-    .run();
-
-  logEvent("risk_plan_updated", userId, {
-    dailyMaxOutlay: updated.dailyMaxOutlay,
-    singleTradeMaxOutlay: updated.singleTradeMaxOutlay,
-    maxConcurrentPositions: updated.maxConcurrentPositions,
-  });
-
-  return updated;
-}
-
-/**
- * Checks an evaluated check against the user's advisory risk plan and emits non-coercive advisories.
- */
-export function checkTradeAgainstRiskPlan(
-  userId: string,
-  trade: { ticker: string; price: number; count: number; purchaseCost: number; exchangeFee: number }
-): RiskAdvisoryCheck {
-  const plan = getUserRiskPlan(userId);
-  const totalOutlay = trade.purchaseCost + trade.exchangeFee;
-  const warnings: string[] = [];
-
-  // 1. Single Trade Outlay Cap
-  if (totalOutlay > plan.singleTradeMaxOutlay) {
-    warnings.push(
-      `Voluntary Cap: Outlay of $${totalOutlay.toFixed(2)} exceeds your configured single-trade cap of $${plan.singleTradeMaxOutlay.toFixed(2)}.`
-    );
-  }
-
-  // 2. Daily Outlay Cap (Sum recent entries in last 24h)
-  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-  const recentEntries = db
-    .select({ purchaseCost: userDecisionJournal.purchaseCost, exchangeFee: userDecisionJournal.exchangeFee })
-    .from(userDecisionJournal)
-    .where(
-      and(
-        eq(userDecisionJournal.userId, userId),
-        gte(userDecisionJournal.createdAt, oneDayAgo)
-      )
-    )
-    .all();
-
-  const past24hOutlay = recentEntries.reduce((acc, e) => acc + (e.purchaseCost + e.exchangeFee), 0);
-  const projectedDailyOutlay = past24hOutlay + totalOutlay;
-
-  if (projectedDailyOutlay > plan.dailyMaxOutlay) {
-    warnings.push(
-      `Daily Outlay Advisory: 24h allocation of $${projectedDailyOutlay.toFixed(2)} exceeds your voluntary daily cap of $${plan.dailyMaxOutlay.toFixed(2)}.`
-    );
-  }
-
-  // 3. Correlated Asset Flag (e.g. BTC and ETH simultaneously)
-  if (plan.correlatedMarketAlert) {
-    const activeEntries = db
-      .select({ contractTicker: userDecisionJournal.contractTicker })
-      .from(userDecisionJournal)
-      .where(and(eq(userDecisionJournal.userId, userId), eq(userDecisionJournal.outcome, "PENDING")))
-      .all();
-
-    const isCrypto = trade.ticker.toUpperCase().includes("BTC") || trade.ticker.toUpperCase().includes("ETH") || trade.ticker.toUpperCase().includes("SOL");
-    const hasExistingCrypto = activeEntries.some(
-      (e) => e.contractTicker.toUpperCase().includes("BTC") || e.contractTicker.toUpperCase().includes("ETH") || e.contractTicker.toUpperCase().includes("SOL")
-    );
-
-    if (isCrypto && hasExistingCrypto) {
-      warnings.push(
-        "Correlated Exposure: Multiple active short-duration crypto contracts detected. Market shocks may simultaneously impact positions."
-      );
-    }
-  }
-
-  return {
-    isExceeded: warnings.length > 0,
-    warnings,
-    singleTradeLimit: plan.singleTradeMaxOutlay,
-    dailyLimit: plan.dailyMaxOutlay,
-    currentTradeOutlay: totalOutlay,
-    projectedDailyOutlay,
-  };
-}
+export {
+  getUserRiskPlan,
+  saveUserRiskPlan,
+  checkTradeAgainstRiskPlan,
+  saveCheckForLater,
+  renderRiskPlanSettingsHtml,
+  ADVISORY_CONTROL_DISCLAIMER,
+  type UserRiskPlan,
+  type RiskPlan,
+  type RiskAdvisoryCheck,
+  type RiskAdvisoryWarning,
+  type PreSaveRiskCheckResult,
+} from "./risk-plan.ts";
 
 /**
  * Parses CSV statements from QuanterraOS, Kalshi, or Polymarket into personal decision journal entries.

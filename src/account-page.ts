@@ -7,9 +7,13 @@
 import type { UserRecord, UserTier } from "./auth.ts";
 import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
 import { renderMobileBottomNavHtml, getMobileAppRuntimeScript } from "./mobile-install.ts";
+import { getReviewReminders, renderReviewRemindersHtml } from "./review-reminders.ts";
+import { getUserRiskPlan, renderRiskPlanSettingsHtml } from "./risk-plan.ts";
 
 export function renderAccountPageHtml(user: UserRecord | null, tier: UserTier, error?: string, success?: string): string {
   const isAuth = user !== null;
+  const reminders = getReviewReminders(user?.id || "guest");
+  const riskPlan = getUserRiskPlan(user?.id || "guest");
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -479,6 +483,12 @@ export function renderAccountPageHtml(user: UserRecord | null, tier: UserTier, e
             </a>
           </div>
         </div>
+
+        <!-- Review Reminders & Discipline Notifications (Sprint Days 8–11) -->
+        ${renderReviewRemindersHtml(reminders)}
+
+        <!-- Personal Risk Plan & Advisory Controls (User-set limits) -->
+        ${renderRiskPlanSettingsHtml(riskPlan)}
 
         <!-- Downloads & Data Exports (Gated) -->
         <div class="downloads-box">

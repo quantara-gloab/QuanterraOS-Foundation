@@ -903,6 +903,155 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
   }
   .wedge-metric-key { color: var(--muted); }
   .wedge-metric-val { color: var(--text); font-weight: 600; }
+
+  /* Numeric inputs alongside sliders */
+  .wedge-input-num {
+    background: #06090E;
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    color: var(--text);
+    padding: 6px 10px;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    border-radius: 4px;
+    width: 68px;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .wedge-input-num:focus { border-color: var(--accent); }
+
+  /* Journal Preview Card */
+  .journal-preview-card {
+    background: linear-gradient(180deg, rgba(16, 22, 33, 0.85) 0%, rgba(9, 13, 20, 0.95) 100%);
+    border: 1px solid rgba(212, 175, 55, 0.28);
+    border-radius: 8px;
+    padding: 32px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  }
+  .jp-badge {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .jp-badge-kalshi {
+    color: #38BDF8;
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+  }
+  .jp-badge-settled {
+    color: #10B981;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+
+  /* How It Works 3-Step Grid */
+  .how-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 24px;
+  }
+  @media (max-width: 860px) { .how-grid { grid-template-columns: 1fr; } }
+  .how-card {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .how-step-num {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    font-weight: 600;
+  }
+  .how-card-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #FFFFFF;
+  }
+  .how-card-body {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* Plans Grid */
+  .plans-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 24px;
+  }
+  @media (max-width: 860px) { .plans-grid { grid-template-columns: 1fr; } }
+  .plan-card {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    padding: 32px 26px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 20px;
+    position: relative;
+  }
+  .plan-card.featured {
+    background: linear-gradient(180deg, rgba(22, 28, 42, 0.95) 0%, rgba(12, 16, 24, 0.98) 100%);
+    border-color: rgba(223, 184, 67, 0.5);
+    box-shadow: 0 0 35px rgba(223, 184, 67, 0.15), inset 0 1px 0 rgba(247, 231, 180, 0.3);
+  }
+  .plan-badge {
+    position: absolute;
+    top: -12px;
+    right: 24px;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #06070A;
+    background: linear-gradient(180deg, #FBF4DC 0%, #DFB843 100%);
+    padding: 3px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .plan-name { font-size: 1.15rem; font-weight: 700; color: #FFFFFF; }
+  .plan-price { font-family: var(--font-mono); font-size: 2.1rem; font-weight: 700; color: var(--accent); }
+  .plan-price span { font-size: 0.85rem; color: var(--muted); font-weight: 400; }
+  .plan-desc { font-size: 0.86rem; color: var(--muted); line-height: 1.5; }
+  .plan-features { list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 0.82rem; color: #CBD5E1; }
+  .plan-features li { display: flex; align-items: flex-start; gap: 8px; }
+  .plan-features li::before { content: "✓"; color: var(--accent); font-weight: 700; }
+
+  /* Compact Specialists Bar in Evidence */
+  .specialists-evidence-strip {
+    background: rgba(14, 20, 30, 0.7);
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    padding: 20px 24px;
+    margin-top: 32px;
+  }
+  .specialists-chips-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 14px;
+  }
+  .spec-chip-card {
+    background: rgba(6, 9, 14, 0.85);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 4px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
 </style>
 </head>
 <body>
@@ -987,7 +1136,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       </div>
     </section>
 
-    <!-- Acquisition Wedge: Free True-Cost & Breakeven Check -->
+    <!-- 1. Acquisition Wedge: Free True-Cost & Breakeven Check -->
     <section class="section-block" id="true-cost-check" style="margin-top: 8px;">
       <div class="wedge-container">
         <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
@@ -998,9 +1147,27 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
               Understand the hurdle to profitability before risking capital. Compute executable purchase cost, venue taker fees, slippage, and true breakeven odds for any prediction-market contract.
             </p>
           </div>
-          <div style="text-align: right;">
+          <div style="text-align: right; display:flex; align-items:center; gap:8px;">
+            <span id="wedge-restored-pill" style="display:none; font-family:var(--font-mono); font-size:0.72rem; color:#10B981; background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3); padding:3px 8px; border-radius:4px;">✓ Restored unfinished check</span>
             <span class="wedge-badge-neutral" id="wedge-status-badge">Costs Checked · Uncertainty High</span>
           </div>
+        </div>
+
+        <!-- Market-Link Intake Bar -->
+        <div style="background: rgba(8, 12, 18, 0.7); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 6px; padding: 14px 18px; margin-top: 20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px;">
+            <label style="font-family:var(--font-mono); font-size:0.75rem; color:var(--accent-light); font-weight:600; text-transform:uppercase; letter-spacing:0.04em;">
+              Market-Link Intake (One-Click Populate)
+            </label>
+            <span id="wedge-source-badge" style="font-family:var(--font-mono); font-size:0.7rem; color:var(--muted);">
+              Supports Kalshi 15M/1H &amp; Polymarket BTC links or tickers
+            </span>
+          </div>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <input type="text" class="wedge-input" id="wedge-link-intake" placeholder="Paste Kalshi URL or ticker (e.g. KXBTC15M or https://kalshi.com/markets/kxbtc15m)..." oninput="handleMarketLinkIntake(this.value)" style="margin:0;">
+            <button type="button" class="btn-secondary" onclick="clearMarketLinkIntake()" style="padding:8px 12px; font-size:0.78rem; white-space:nowrap;">Clear</button>
+          </div>
+          <div id="wedge-link-feedback" style="display:none; font-family:var(--font-mono); font-size:0.72rem; margin-top:6px;"></div>
         </div>
 
         <div class="wedge-grid">
@@ -1024,7 +1191,10 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
                 <span>Executable Ask Price</span>
                 <span id="wedge-price-val" style="color:var(--text); font-weight:600;">51¢ ($0.51)</span>
               </label>
-              <input type="range" class="wedge-slider" id="wedge-price" min="1" max="99" value="51" oninput="recalcWedge()">
+              <div style="display:flex; gap:10px; align-items:center;">
+                <input type="range" class="wedge-slider" id="wedge-price" min="1" max="99" value="51" oninput="syncWedgePriceSlider(this.value)">
+                <input type="number" class="wedge-input-num" id="wedge-price-num" min="1" max="99" value="51" oninput="syncWedgePriceNum(this.value)">
+              </div>
             </div>
 
             <div class="wedge-field">
@@ -1032,7 +1202,10 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
                 <span>Your Assessed Win Probability (p)</span>
                 <span id="wedge-prob-val" style="color:var(--text); font-weight:600;">55.0%</span>
               </label>
-              <input type="range" class="wedge-slider" id="wedge-prob" min="1" max="99" value="55" oninput="recalcWedge()">
+              <div style="display:flex; gap:10px; align-items:center;">
+                <input type="range" class="wedge-slider" id="wedge-prob" min="1" max="99" value="55" oninput="syncWedgeProbSlider(this.value)">
+                <input type="number" class="wedge-input-num" id="wedge-prob-num" min="1" max="99" value="55" oninput="syncWedgeProbNum(this.value)">
+              </div>
             </div>
 
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
@@ -1096,6 +1269,17 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
                   Export Card
                 </button>
               </div>
+
+              <!-- Save Failure Explanation with Retry Action -->
+              <div id="wedge-save-error" style="display:none; background:rgba(244,63,94,0.12); border:1px solid #F43F5E; color:#FDA4AF; border-radius:6px; padding:12px; margin-top:12px; font-size:0.8rem; line-height:1.45;">
+                <div style="font-weight:700; color:#FFFFFF; margin-bottom:4px;">⚠ Check Save Notice</div>
+                <span>Could not automatically sync to remote server. Your check data is preserved in your local browser cache.</span>
+                <div style="margin-top:8px;">
+                  <button type="button" onclick="retryWedgeSave()" style="background:#F43F5E; color:#FFFFFF; border:none; padding:4px 12px; font-size:0.75rem; border-radius:4px; font-weight:700; cursor:pointer;">Retry Save &rarr;</button>
+                  <button type="button" onclick="document.getElementById('wedge-save-error').style.display='none'" style="background:none; border:none; color:var(--muted); margin-left:8px; cursor:pointer; font-size:0.75rem;">Dismiss</button>
+                </div>
+              </div>
+
               <div style="font-size: 0.72rem; color: var(--muted); margin-top: 10px; line-height: 1.45;">
                 <strong>Advisory Notice:</strong> Expected profit is pure arithmetic ($p - P_{ask} - fee$), not an established QuanterraOS edge. User-entered probabilities are personal assumptions, never validated forecasts.
               </div>
@@ -1105,8 +1289,120 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       </div>
     </section>
 
-    <!-- Calibration Curve Highlight -->
-    <section class="section-block">
+    <!-- 2. Journal Preview Section -->
+    <section class="section-block" id="journal-preview" style="margin-top: 48px;">
+      <div class="section-heading-group">
+        <div class="section-eyebrow">Discipline &amp; Accountability</div>
+        <h2 class="section-heading">Decision Journal Preview</h2>
+        <p class="section-description">
+          What happens after you check your costs? Every trade becomes an accountable hypothesis before you commit capital.
+        </p>
+      </div>
+
+      <div class="journal-preview-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-bottom:1px solid rgba(212,175,55,0.15); padding-bottom:14px; margin-bottom:18px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span class="jp-badge jp-badge-kalshi">KALSHI 15M HIGH/LOW</span>
+            <span style="font-family:var(--font-mono); font-size:0.85rem; font-weight:700; color:#FFFFFF;">KXBTC15M-24OCT07-T63500</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="jp-badge jp-badge-settled">● SETTLED YES</span>
+            <span style="font-family:var(--font-mono); font-size:0.74rem; color:var(--muted);">RECONCILED VIA CME BRTI</span>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1.4fr 1fr; gap:24px;">
+          <div>
+            <div style="font-family:var(--font-mono); font-size:0.74rem; color:var(--accent); text-transform:uppercase; margin-bottom:6px; letter-spacing:0.04em;">PRE-TRADE HYPOTHESIS &amp; RATIONALE</div>
+            <p style="font-size:0.9rem; color:#E2E8F0; line-height:1.6; background:rgba(0,0,0,0.35); padding:14px; border-radius:6px; border-left:3px solid var(--accent);">
+              "Bitcoin testing $63,480 support cluster. Order-book spread 2¢, taker fee 1.8¢ requires a 52.8% win rate hurdle. Stating 55.0% confidence based on CME spot basis compression. Pre-committed max risk: $5.28."
+            </p>
+            <div style="display:flex; gap:14px; margin-top:14px; font-family:var(--font-mono); font-size:0.76rem; color:var(--muted);">
+              <span>Stated Probability: <strong style="color:#FFFFFF;">55.0%</strong></span>
+              <span>•</span>
+              <span>Hurdle Rate: <strong style="color:var(--accent);">52.80%</strong></span>
+              <span>•</span>
+              <span>Discipline Score: <strong style="color:#10B981;">100% Locked</strong></span>
+            </div>
+          </div>
+
+          <div style="background:rgba(6,9,14,0.85); border:1px solid rgba(212,175,55,0.18); border-radius:6px; padding:16px; font-family:var(--font-mono); font-size:0.78rem;">
+            <div style="color:var(--accent-light); font-weight:700; margin-bottom:8px; text-transform:uppercase;">Execution Audit &amp; Settlement</div>
+            <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+              <span style="color:var(--muted);">Executed Position:</span>
+              <span>10 ct @ 51¢ ask ($5.10)</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+              <span style="color:var(--muted);">Taker Fee Drag:</span>
+              <span style="color:var(--warning);">-$0.18 (1.80¢/ct)</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+              <span style="color:var(--muted);">Settlement Index:</span>
+              <span>$63,522.40 BRTI</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+              <span style="color:var(--muted);">Realized Net Return:</span>
+              <span style="color:#10B981; font-weight:700;">+$4.72 (+89.4%)</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:4px 0;">
+              <span style="color:var(--muted);">Brier Contribution:</span>
+              <span style="color:var(--accent);">0.2025 (Nominal)</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; padding-top:16px; border-top:1px solid rgba(212,175,55,0.15); flex-wrap:wrap; gap:12px;">
+          <div style="font-size:0.8rem; color:var(--muted);">
+            No account required to test: save checks to your local sandbox or sync across devices with an authenticated account.
+          </div>
+          <div style="display:flex; gap:10px;">
+            <a href="/journal?preview=true" class="btn-primary" style="padding:8px 16px; font-size:0.82rem; font-weight:700;">
+              Start Your Private Decision Journal &rarr;
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. How It Works Section -->
+    <section class="section-block" id="how-it-works" style="margin-top: 48px;">
+      <div class="section-heading-group">
+        <div class="section-eyebrow">The 3-Step Decision Loop</div>
+        <h2 class="section-heading">How QuanterraOS Protects Your Trading Process</h2>
+        <p class="section-description">
+          A systematic companion that separates pre-trade discipline from post-trade luck.
+        </p>
+      </div>
+
+      <div class="how-grid">
+        <div class="how-card">
+          <div class="how-step-num">01 // CHECK</div>
+          <h3 class="how-card-title">Audit Transaction Friction</h3>
+          <p class="how-card-body">
+            Never enter a prediction contract blind to exchange taker fees. Compute exact contract costs, exchange fee formulas ($0.07×P×(1-P)), and your true required breakeven win rate before risking capital.
+          </p>
+        </div>
+
+        <div class="how-card">
+          <div class="how-step-num">02 // RECORD</div>
+          <h3 class="how-card-title">Commit Your Premise in Writing</h3>
+          <p class="how-card-body">
+            Lock in your pre-trade rationale, probability estimate, and maximum loss boundary. Capturing your thesis before entering insulates your decision process from emotional hindsight bias.
+          </p>
+        </div>
+
+        <div class="how-card">
+          <div class="how-step-num">03 // RECONCILE</div>
+          <h3 class="how-card-title">Reconcile Statement &amp; Learn</h3>
+          <p class="how-card-body">
+            Import your broker statement to reconcile executed fills against your stated thesis. QuanterraOS computes your personal Brier calibration score over time so you know whether your confidence matches reality.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Evidence Section -->
+    <section class="section-block" id="evidence" style="margin-top: 48px;">
       <div class="calibration-summary-grid">
         <div class="calibration-narrative">
           <div class="section-eyebrow">Statistical Baseline</div>
@@ -1117,8 +1413,9 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
           <p class="narrative-body">
             The market's own price consistently outperforms quantitative lognormal models across checkpoints 4, 7, 10, and 13. Rather than asserting unvalidated predictions, QuanterraOS provides transparent, cryptographically reproducible calibration benchmarks.
           </p>
-          <div>
+          <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap; margin-top:12px;">
             <a href="/calibration" style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent); text-decoration: underline; text-underline-offset: 4px;">Inspect 10-bin decile decomposition &rarr;</a>
+            <a href="/research#architecture" style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-light); text-decoration: underline; text-underline-offset: 4px;">Explore Sovereign Stack &amp; Papers on Research &rarr;</a>
           </div>
         </div>
 
@@ -1144,306 +1441,9 @@ ${miniCircles}
           </div>
         </div>
       </div>
-    </section>
 
-
-    <!-- 3-Layer Sovereign OS Architecture Section -->
-    <section class="section-block">
-      <div class="section-heading-group">
-        <div class="section-eyebrow">Sovereign Architecture</div>
-        <h2 class="section-heading">The 3-Layer Sovereign AI Governance Stack</h2>
-        <p class="section-description">
-          Engineered for institutional desks, prop firms, and autonomous agent swarms requiring deterministic settlement verification, transaction friction accounting, and air-gapped readiness.
-        </p>
-      </div>
-
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 8px;">
-        <!-- Layer 1 -->
-        <div style="background: var(--panel); border: 1px solid var(--panel-border); border-radius: 6px; padding: 26px; backdrop-filter: blur(20px); display: flex; flex-direction: column;">
-          <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">LAYER 1 // FOUNDATION</div>
-          <h3 style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 10px;">Intelligence Spine</h3>
-          <p style="font-size: 0.86rem; color: var(--muted); line-height: 1.6; margin-bottom: 16px; flex-grow: 1;">
-            Deterministic multi-venue ingestion, order-book L2 microstructure, and settlement target verification.
-          </p>
-          <ul style="list-style: none; font-family: var(--font-mono); font-size: 0.76rem; color: #CBD5E1; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--panel-border-subtle); padding-top: 14px;">
-            <li><span style="color:var(--accent);">▸</span> Spot Dispersion &amp; Settlement Basis Engine</li>
-            <li><span style="color:var(--accent);">▸</span> Composite Spot Index (Coinbase, Kraken, Bitstamp)</li>
-            <li><span style="color:var(--accent);">▸</span> 19,740 Audited Minute Candles (1,316 Windows)</li>
-            <li><span style="color:var(--accent);">▸</span> Minute-by-Minute (1–14) Calibration Surface</li>
-          </ul>
-        </div>
-
-        <!-- Layer 2 -->
-        <div style="background: linear-gradient(180deg, rgba(20, 26, 40, 0.9) 0%, rgba(13, 17, 26, 0.95) 100%); border: 1px solid rgba(223, 184, 67, 0.45); border-radius: 6px; padding: 26px; backdrop-filter: blur(20px); box-shadow: inset 0 1px 0 rgba(247, 231, 180, 0.25), 0 0 25px rgba(223, 184, 67, 0.12); display: flex; flex-direction: column;">
-          <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-light); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">LAYER 2 // GOVERNANCE</div>
-          <h3 style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 10px;">Trust &amp; Control Plane</h3>
-          <p style="font-size: 0.86rem; color: var(--muted); line-height: 1.6; margin-bottom: 16px; flex-grow: 1;">
-            Model Context Protocol (MCP) server, 8-agent council audit trails, and strict mathematical circuit breakers.
-          </p>
-          <ul style="list-style: none; font-family: var(--font-mono); font-size: 0.76rem; color: #CBD5E1; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--panel-border-subtle); padding-top: 14px;">
-            <li><span style="color:var(--accent);">▸</span> Model Context Protocol (MCP) Live Tools</li>
-            <li><span style="color:var(--accent);">▸</span> Agent-to-Agent (A2A) Telemetry Handshake</li>
-            <li><span style="color:var(--accent);">▸</span> Rule B5 Permanent Circuit Lock ($0.00 Capital)</li>
-            <li><span style="color:var(--accent);">▸</span> Decile Reliability with 95% Wilson CIs</li>
-          </ul>
-        </div>
-
-        <!-- Layer 3 -->
-        <div style="background: var(--panel); border: 1px solid var(--panel-border); border-radius: 6px; padding: 26px; backdrop-filter: blur(20px); display: flex; flex-direction: column;">
-          <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">LAYER 3 // WORKFLOW</div>
-          <h3 style="font-size: 1.15rem; font-weight: 700; color: #FFFFFF; margin-bottom: 10px;">Execution Mesh</h3>
-          <p style="font-size: 0.86rem; color: var(--muted); line-height: 1.6; margin-bottom: 16px; flex-grow: 1;">
-            Friction-aware expectancy modeling, transaction cost analysis, and private container deployments.
-          </p>
-          <ul style="list-style: none; font-family: var(--font-mono); font-size: 0.76rem; color: #CBD5E1; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--panel-border-subtle); padding-top: 14px;">
-            <li><span style="color:var(--accent);">▸</span> True Cost &amp; Net Expected Value (EV) Engine</li>
-            <li><span style="color:var(--accent);">▸</span> Kalshi Variable Taker Fee Drag ($0.07×P×(1-P))</li>
-            <li><span style="color:var(--accent);">▸</span> Cross-Venue Basis Surveillance (Kalshi vs Poly)</li>
-            <li><span style="color:var(--accent);">▸</span> Sovereign On-Prem / Air-Gapped Readiness</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- The Eight Specialists -->
-    <section class="section-block" id="specialists">
-      <div class="section-heading-group">
-        <div class="section-eyebrow">Machine Architecture</div>
-        <h2 class="section-heading">The eight council specialists</h2>
-        <p class="section-description">
-          Each specialist monitors, verifies, or audits a distinct layer of market microstructure. We publish real metrics, including out-of-sample underperformance, adhering to absolute transparency.
-        </p>
-      </div>
-
-      <div class="specialist-grid">
-
-        <!-- 1. Falcon -->
-        <div class="spec-card" onclick="openSpecialistModal('falcon')">
-          <div>
-            <div class="spec-card-header">
-              <div class="spec-icon-box">${renderSpecialistIcon('falcon')}</div>
-              <div class="spec-header-text">
-                <div class="spec-name-row">
-                  <span class="spec-name">Falcon</span>
-                  <span class="spec-badge warning">research</span>
-                </div>
-                <div class="spec-role">Order-book depth monitoring</div>
-              </div>
-            </div>
-            <div class="spec-metric-row">
-              <div class="spec-large-number warning">0.2736</div>
-              <div style="font-size: 0.72rem; color: var(--muted); font-family: var(--font-mono);">out-of-sample Brier (n=31)</div>
-            </div>
-            <div class="spec-detail" style="margin-top: 8px;">
-              Underperforms both 50/50 baseline (0.2500) and entry-price (0.2106). Strict research designation.
-            </div>
-          </div>
-          <div class="spec-actions">
-            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('falcon', 'telemetry');">inspect telemetry</button>
-            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('falcon', 'chat');">query specialist</button>
-          </div>
-        </div>
-
-        <!-- 2. Quantum Fox -->
-        <div class="spec-card" onclick="openSpecialistModal('quantum-fox')">
-          <div>
-            <div class="spec-card-header">
-              <div class="spec-icon-box">${renderSpecialistIcon('quantum-fox')}</div>
-              <div class="spec-header-text">
-                <div class="spec-name-row">
-                  <span class="spec-name">Quantum Fox</span>
-                  <span class="spec-badge accent">baseline</span>
-                </div>
-                <div class="spec-role">Market baseline validation</div>
-              </div>
-            </div>
-            <div class="spec-metric-row">
-              <div class="spec-large-number accent">0.2001</div>
-              <div style="font-size: 0.72rem; color: var(--muted); font-family: var(--font-mono);">market-mid Brier (n=1,316)</div>
-            </div>
-            <div class="spec-detail" style="margin-top: 8px;">
-              Audits minute-4 mid-price against fair-value model. Market mid beat our model across all checkpoints.
-            </div>
-          </div>
-          <div class="spec-actions">
-            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('quantum-fox', 'telemetry');">inspect telemetry</button>
-            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('quantum-fox', 'chat');">query specialist</button>
-          </div>
-        </div>
-
-        <!-- 3. Phoenix -->
-        <div class="spec-card" onclick="openSpecialistModal('phoenix')">
-          <div>
-            <div class="spec-card-header">
-              <div class="spec-icon-box">${renderSpecialistIcon('phoenix')}</div>
-              <div class="spec-header-text">
-                <div class="spec-name-row">
-                  <span class="spec-name">Phoenix</span>
-                  <span class="spec-badge warning">locked</span>
-                </div>
-                <div class="spec-role">Execution circuit breaker</div>
-              </div>
-            </div>
-            <div class="spec-metric-row">
-              <div class="spec-large-number warning">$0.00</div>
-              <div style="font-size: 0.72rem; color: var(--muted); font-family: var(--font-mono);">live capital deployed</div>
-            </div>
-            <div class="spec-detail" style="margin-top: 8px;">
-              Rule B5 locked. Standby mode enforced. Zero automated orders permitted until statistical edge is proven.
-            </div>
-          </div>
-          <div class="spec-actions">
-            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('phoenix', 'telemetry');">inspect telemetry</button>
-            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('phoenix', 'chat');">query specialist</button>
-          </div>
-        </div>
-
-        <!-- 4. Draco -->
-        <div class="spec-card" onclick="openSpecialistModal('draco')">
-          <div>
-            <div class="spec-card-header">
-              <div class="spec-icon-box">${renderSpecialistIcon('draco')}</div>
-              <div class="spec-header-text">
-                <div class="spec-name-row">
-                  <span class="spec-name">Draco</span>
-                  <span class="spec-badge accent">verified</span>
-                </div>
-                <div class="spec-role">Data integrity &amp; quality gate</div>
-              </div>
-            </div>
-            <div class="spec-metric-row">
-              <div class="spec-large-number accent">19,740</div>
-              <div style="font-size: 0.72rem; color: var(--muted); font-family: var(--font-mono);">audited candle rows</div>
-            </div>
-            <div class="spec-detail" style="margin-top: 8px;">
-              Verifies zero corrupted timestamps across 1,316 settled windows. Rejects lookahead and stale data.
-            </div>
-          </div>
-          <div class="spec-actions">
-            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('draco', 'telemetry');">inspect telemetry</button>
-            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('draco', 'chat');">query specialist</button>
-          </div>
-        </div>
-
-        <!-- 5. Sentinel -->
-        <div class="spec-card" onclick="openSpecialistModal('sentinel')">
-          <div>
-            <div class="spec-card-header">
-              <div class="spec-icon-box">${renderSpecialistIcon('sentinel')}</div>
-              <div class="spec-header-text">
-                <div class="spec-name-row">
-                  <span class="spec-name">Sentinel</span>
-                  <span class="spec-badge muted">nominal</span>
-                </div>
-                <div class="spec-role">Calibration drift surveillance</div>
-              </div>
-            </div>
-            <div class="spec-metric-row">
-              <div class="spec-large-number muted">0 alerts</div>
-              <div style="font-size: 0.72rem; color: var(--muted); font-family: var(--font-mono);">continuous surveillance</div>
-            </div>
-            <div class="spec-detail" style="margin-top: 8px;">
-              Surveils upstream pipeline stages and monitors drift against recorded baselines.
-            </div>
-          </div>
-          <div class="spec-actions">
-            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('sentinel', 'telemetry');">inspect telemetry</button>
-            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('sentinel', 'chat');">query specialist</button>
-          </div>
-        </div>
-
-        <!-- 6. Wolf -->
-        <div class="spec-card" onclick="openSpecialistModal('wolf')">
-          <div>
-            <div class="spec-card-header">
-              <div class="spec-icon-box">${renderSpecialistIcon('wolf')}</div>
-              <div class="spec-header-text">
-                <div class="spec-name-row">
-                  <span class="spec-name">Wolf</span>
-                  <span class="spec-badge accent">tracking</span>
-                </div>
-                <div class="spec-role">Order-book dynamics</div>
-              </div>
-            </div>
-            <div class="spec-metric-row">
-              <div class="spec-large-number accent">+0.0350</div>
-              <div style="font-size: 0.72rem; color: var(--muted); font-family: var(--font-mono);">queue depth imbalance</div>
-            </div>
-            <div class="spec-detail" style="margin-top: 8px;">
-              Evaluates L2 order-book snapshots from SQLite, tracking spread compression and queue depth imbalance.
-            </div>
-          </div>
-          <div class="spec-actions">
-            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('wolf', 'telemetry');">inspect telemetry</button>
-            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('wolf', 'chat');">query specialist</button>
-          </div>
-        </div>
-
-        <!-- 7. Kraken -->
-        <div class="spec-card" onclick="openSpecialistModal('kraken')">
-          <div>
-            <div class="spec-card-header">
-              <div class="spec-icon-box">${renderSpecialistIcon('kraken')}</div>
-              <div class="spec-header-text">
-                <div class="spec-name-row">
-                  <span class="spec-name">Kraken</span>
-                  <span class="spec-badge warning">locked</span>
-                </div>
-                <div class="spec-role">Risk governance &amp; spot basis</div>
-              </div>
-            </div>
-            <div class="spec-metric-row">
-              <div class="spec-large-number warning">$0.00</div>
-              <div style="font-size: 0.72rem; color: var(--muted); font-family: var(--font-mono);">authorized exposure</div>
-            </div>
-            <div class="spec-detail" style="margin-top: 8px;">
-              Enforces zero live capital exposure under Rule B5 while monitoring spot dispersion and settlement basis divergence.
-            </div>
-          </div>
-          <div class="spec-actions">
-            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('kraken', 'telemetry');">inspect telemetry</button>
-            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('kraken', 'chat');">query specialist</button>
-          </div>
-        </div>
-
-        <!-- 8. Lion -->
-        <div class="spec-card" onclick="openSpecialistModal('lion')">
-          <div>
-            <div class="spec-card-header">
-              <div class="spec-icon-box">${renderSpecialistIcon('lion')}</div>
-              <div class="spec-header-text">
-                <div class="spec-name-row">
-                  <span class="spec-name">Lion</span>
-                  <span class="spec-badge accent">consensus</span>
-                </div>
-                <div class="spec-role">Consensus synthesis</div>
-              </div>
-            </div>
-            <div class="spec-metric-row">
-              <div class="spec-large-number accent">10 bins</div>
-              <div style="font-size: 0.72rem; color: var(--muted); font-family: var(--font-mono);">decile verification</div>
-            </div>
-            <div class="spec-detail" style="margin-top: 8px;">
-              Synthesizes multi-specialist calibration evidence and certifies the single source of truth verdict.
-            </div>
-          </div>
-          <div class="spec-actions">
-            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('lion', 'telemetry');">inspect telemetry</button>
-            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('lion', 'chat');">query specialist</button>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- Four Pillars of Institutional Governance -->
-    <section class="section-block">
-      <div class="section-heading-group">
-        <div class="section-eyebrow">Institutional Standards</div>
-        <h2 class="section-heading">Engineered for absolute statistical integrity</h2>
-      </div>
-
-      <div class="proof-matrix">
+      <!-- Four Pillars of Institutional Governance -->
+      <div class="proof-matrix" style="margin-top: 28px;">
         <div class="proof-card">
           <span class="proof-num">01 / Provenance</span>
           <h3 class="proof-title">Uncompromising Corpus Integrity</h3>
@@ -1463,6 +1463,149 @@ ${miniCircles}
           <span class="proof-num">04 / Governance</span>
           <h3 class="proof-title">Rule B5 Permanent Circuit Lock</h3>
           <p class="proof-body">Strict enforcement of $0.00 capital deployment until statistically significant out-of-sample predictive accuracy is proven.</p>
+        </div>
+      </div>
+
+      <!-- Council Specialists Baseline Surveillance Strip -->
+      <div class="specialists-evidence-strip">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+          <div>
+            <div style="font-family:var(--font-mono); font-size:0.74rem; color:var(--accent); text-transform:uppercase;">Council Specialists Baseline Surveillance</div>
+            <div style="font-size:0.86rem; color:var(--muted); margin-top:2px;">Specialist audits across data quality, microstructure, and risk governance. Deep architecture detailed on Research.</div>
+          </div>
+          <a href="/research#specialists" style="font-family:var(--font-mono); font-size:0.75rem; color:var(--accent-light); text-decoration:underline;">Inspect All 8 Specialists on Research &rarr;</a>
+        </div>
+
+        <div class="specialists-chips-row">
+          <div class="spec-chip-card" onclick="openSpecialistModal('draco')">
+            <span style="color:#10B981;">●</span>
+            <strong>Draco</strong>
+            <span style="color:var(--muted);">19,740 rows</span>
+            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('draco', 'telemetry');">telemetry</button>
+            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('draco', 'chat');">query</button>
+          </div>
+          <div class="spec-chip-card" onclick="openSpecialistModal('wolf')">
+            <span style="color:var(--accent);">●</span>
+            <strong>Wolf</strong>
+            <span style="color:var(--muted);">+0.0350 imbalance</span>
+            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('wolf', 'telemetry');">telemetry</button>
+            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('wolf', 'chat');">query</button>
+          </div>
+          <div class="spec-chip-card" onclick="openSpecialistModal('falcon')">
+            <span style="color:var(--warning);">●</span>
+            <strong>Falcon</strong>
+            <span style="color:var(--muted);">0.2736 Brier (research)</span>
+            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('falcon', 'telemetry');">telemetry</button>
+            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('falcon', 'chat');">query</button>
+          </div>
+          <div class="spec-chip-card" onclick="openSpecialistModal('quantum-fox')">
+            <span style="color:var(--accent);">●</span>
+            <strong>Quantum Fox</strong>
+            <span style="color:var(--muted);">0.2001 baseline</span>
+            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('quantum-fox', 'telemetry');">telemetry</button>
+            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('quantum-fox', 'chat');">query</button>
+          </div>
+          <div class="spec-chip-card" onclick="openSpecialistModal('sentinel')">
+            <span style="color:var(--muted);">●</span>
+            <strong>Sentinel</strong>
+            <span style="color:var(--muted);">0 alerts</span>
+            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('sentinel', 'telemetry');">telemetry</button>
+            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('sentinel', 'chat');">query</button>
+          </div>
+          <div class="spec-chip-card" onclick="openSpecialistModal('kraken')">
+            <span style="color:var(--warning);">●</span>
+            <strong>Kraken</strong>
+            <span style="color:var(--muted);">$0.00 capital</span>
+            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('kraken', 'telemetry');">telemetry</button>
+            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('kraken', 'chat');">query</button>
+          </div>
+          <div class="spec-chip-card" onclick="openSpecialistModal('lion')">
+            <span style="color:var(--accent);">●</span>
+            <strong>Lion</strong>
+            <span style="color:var(--muted);">10 decile bins</span>
+            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('lion', 'telemetry');">telemetry</button>
+            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('lion', 'chat');">query</button>
+          </div>
+          <div class="spec-chip-card" onclick="openSpecialistModal('phoenix')">
+            <span style="color:var(--warning);">●</span>
+            <strong>Phoenix</strong>
+            <span style="color:var(--muted);">Rule B5 lock</span>
+            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('phoenix', 'telemetry');">telemetry</button>
+            <button type="button" class="spec-link-btn" onclick="event.stopPropagation(); openSpecialistModal('phoenix', 'chat');">query</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Plans Section -->
+    <section class="section-block" id="plans" style="margin-top: 48px;">
+      <div class="section-heading-group">
+        <div class="section-eyebrow">Transparent Access</div>
+        <h2 class="section-heading">Choose Your Decision Framework</h2>
+        <p class="section-description">
+          Start completely free with zero capital risk, or upgrade for real-time order books and cloud journaling.
+        </p>
+      </div>
+
+      <div class="plans-grid">
+        <!-- Free Tier -->
+        <div class="plan-card">
+          <div>
+            <div class="plan-name">Pilot Sandbox</div>
+            <div class="plan-price">$0 <span>/ free forever</span></div>
+            <p class="plan-desc">For individual traders auditing friction and practicing systematic decision discipline.</p>
+          </div>
+          <ul class="plan-features">
+            <li>Free True-Cost &amp; Breakeven Check</li>
+            <li>Local Decision Journal with Auto-Recovery</li>
+            <li>Market-Link Intake (Kalshi &amp; Polymarket)</li>
+            <li>20-Minute Delayed Benchmark Ledger</li>
+            <li>Exportable Verified Decision Cards</li>
+          </ul>
+          <div>
+            <a href="/calculator" class="btn-secondary" style="display:block; text-align:center; padding:10px; font-weight:700;">Start Free Check</a>
+          </div>
+        </div>
+
+        <!-- Pro Tier -->
+        <div class="plan-card featured">
+          <div class="plan-badge">MOST POPULAR</div>
+          <div>
+            <div class="plan-name">Pro Advisory</div>
+            <div class="plan-price">$49 <span>/ month</span></div>
+            <p class="plan-desc">For active participants demanding real-time order books, cloud journals, and weekly discipline audits.</p>
+          </div>
+          <ul class="plan-features">
+            <li>Everything in Pilot Sandbox</li>
+            <li>Real-Time Streaming Order-Book Telemetry</li>
+            <li>Unlimited Multi-Device Cloud Decision Journal</li>
+            <li>Automated Broker Statement Reconciliation (CSV)</li>
+            <li>Weekly Discipline &amp; Brier Calibration Digests</li>
+            <li>Personal Decision Coach Assistance</li>
+          </ul>
+          <div>
+            <a href="/pricing" class="btn-primary" style="display:block; text-align:center; padding:10px; font-weight:700;">Start 14-Day Pro Pilot</a>
+          </div>
+        </div>
+
+        <!-- Institutional Tier -->
+        <div class="plan-card">
+          <div>
+            <div class="plan-name">Desk / Institutional</div>
+            <div class="plan-price">$199 <span>/ month</span></div>
+            <p class="plan-desc">For proprietary trading desks, quant funds, and multi-seat risk teams.</p>
+          </div>
+          <ul class="plan-features">
+            <li>Everything in Pro Advisory</li>
+            <li>Low-Latency WebSocket Market Data Feeds</li>
+            <li>Cross-Venue Spot Dispersion Surveillance</li>
+            <li>Model Context Protocol (MCP) &amp; A2A Access</li>
+            <li>Compliance &amp; Execution Audit Trail Exports</li>
+            <li>Dedicated Desk Onboarding &amp; SLAs</li>
+          </ul>
+          <div>
+            <a href="/access" class="btn-secondary" style="display:block; text-align:center; padding:10px; font-weight:700;">Contact Institutional</a>
+          </div>
         </div>
       </div>
     </section>
@@ -1694,16 +1837,130 @@ function escapeHtml(str) {
     .replace(/'/g, '&#039;');
 }
 
+function syncWedgePriceSlider(val) {
+  const num = Math.min(99, Math.max(1, parseInt(val) || 51));
+  const numEl = document.getElementById('wedge-price-num');
+  if (numEl) numEl.value = num;
+  recalcWedge();
+}
+
+function syncWedgePriceNum(val) {
+  const num = Math.min(99, Math.max(1, parseInt(val) || 51));
+  const sliderEl = document.getElementById('wedge-price');
+  if (sliderEl) sliderEl.value = num;
+  recalcWedge();
+}
+
+function syncWedgeProbSlider(val) {
+  const num = Math.min(99, Math.max(1, parseInt(val) || 55));
+  const numEl = document.getElementById('wedge-prob-num');
+  if (numEl) numEl.value = num;
+  recalcWedge();
+}
+
+function syncWedgeProbNum(val) {
+  const num = Math.min(99, Math.max(1, parseInt(val) || 55));
+  const sliderEl = document.getElementById('wedge-prob');
+  if (sliderEl) sliderEl.value = num;
+  recalcWedge();
+}
+
+function handleMarketLinkIntake(val) {
+  const input = String(val || '').trim();
+  const feedback = document.getElementById('wedge-link-feedback');
+  const venueSelect = document.getElementById('wedge-venue');
+  if (!feedback || !venueSelect) return;
+
+  if (!input) {
+    feedback.style.display = 'none';
+    return;
+  }
+
+  const lower = input.toLowerCase();
+  feedback.style.display = 'block';
+  const nowTime = new Date().toISOString().replace('T', ' ').slice(11, 19) + ' UTC';
+
+  if (lower.includes('kxbtc15m') || lower.includes('kalshi.com/markets/kxbtc15m') || lower.includes('btc15m')) {
+    venueSelect.value = 'kalshi-15m';
+    feedback.style.color = '#10B981';
+    feedback.textContent = '✓ Verified Kalshi Contract (KXBTC15M) · Source: Kalshi Market Data / Order Book API · Audited Freshness: ' + nowTime;
+    recalcWedge();
+  } else if (lower.includes('kxbtcd') || lower.includes('kalshi.com/markets/kxbtcd') || lower.includes('kalshi-1h')) {
+    venueSelect.value = 'kalshi-1h';
+    feedback.style.color = '#10B981';
+    feedback.textContent = '✓ Verified Kalshi Contract (KXBTCD) · Source: Kalshi Market Data / Order Book API · Audited Freshness: ' + nowTime;
+    recalcWedge();
+  } else if (lower.includes('polymarket') || lower.includes('poly')) {
+    venueSelect.value = 'polymarket';
+    feedback.style.color = '#38BDF8';
+    feedback.textContent = '✓ Verified Polymarket Contract · Source: Polymarket Polygon CLOB / UMA Oracle · Audited Freshness: ' + nowTime;
+    recalcWedge();
+  } else {
+    feedback.style.color = '#F59E0B';
+    feedback.textContent = 'Notice: Market link format not recognized. QuanterraOS currently supports Kalshi 15M/1H and Polymarket BTC contracts. Defaulted to manual parameters below.';
+  }
+}
+
+function clearMarketLinkIntake() {
+  const el = document.getElementById('wedge-link-intake');
+  const feedback = document.getElementById('wedge-link-feedback');
+  if (el) el.value = '';
+  if (feedback) feedback.style.display = 'none';
+}
+
+function restorePendingCheck() {
+  try {
+    const raw = localStorage.getItem('quanterraos_pending_check');
+    if (!raw) return;
+    const check = JSON.parse(raw);
+    if (!check) return;
+
+    const venue = document.getElementById('wedge-venue');
+    const priceSlider = document.getElementById('wedge-price');
+    const priceNum = document.getElementById('wedge-price-num');
+    const probSlider = document.getElementById('wedge-prob');
+    const probNum = document.getElementById('wedge-prob-num');
+    const countInput = document.getElementById('wedge-count');
+    const restoredPill = document.getElementById('wedge-restored-pill');
+
+    if (venue && check.venue) venue.value = check.venue;
+    if (priceSlider && check.price !== undefined) {
+      const cents = Math.round(check.price * 100);
+      priceSlider.value = cents;
+      if (priceNum) priceNum.value = cents;
+    }
+    if (probSlider && check.assessedWinProb !== undefined) {
+      const p = Math.round(check.assessedWinProb);
+      probSlider.value = p;
+      if (probNum) probNum.value = p;
+    }
+    if (countInput && check.count !== undefined) {
+      countInput.value = check.count;
+    }
+    if (restoredPill) restoredPill.style.display = 'inline-block';
+    recalcWedge();
+  } catch (_e) {
+    // quiet
+  }
+}
+
 function recalcWedge() {
   const priceSlider = document.getElementById('wedge-price');
+  const priceNum = document.getElementById('wedge-price-num');
   const probSlider = document.getElementById('wedge-prob');
+  const probNum = document.getElementById('wedge-prob-num');
   const countInput = document.getElementById('wedge-count');
   const venueSelect = document.getElementById('wedge-venue');
   if (!priceSlider || !probSlider || !countInput || !venueSelect) return;
 
   const priceCents = Number(priceSlider.value);
+  if (priceNum && document.activeElement !== priceNum) priceNum.value = priceCents;
   const price = priceCents / 100;
-  const prob = Number(probSlider.value) / 100;
+
+  const probCents = Number(probSlider.value);
+  if (probNum && document.activeElement !== probNum) probNum.value = probCents;
+  const prob = probCents / 100;
+
   const count = Math.max(1, Number(countInput.value) || 1);
   const venue = venueSelect.value;
 
@@ -1753,7 +2010,7 @@ function recalcWedge() {
   const timeEl = document.getElementById('wedge-timestamp');
   if (timeEl) timeEl.textContent = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
 
-  // Store check state for journal onboarding
+  // Store check state for journal onboarding & local recovery
   window.__wedgeCheck = {
     venue: venue,
     pricingBasis: 'executable_ask',
@@ -1771,6 +2028,10 @@ function recalcWedge() {
     settlementSource: source
   };
 
+  try {
+    localStorage.setItem('quanterraos_pending_check', JSON.stringify(window.__wedgeCheck));
+  } catch (_e) {}
+
   // Redraw canvas if modal is open
   const modal = document.getElementById('share-card-modal');
   if (modal && modal.style.display === 'flex') {
@@ -1779,17 +2040,31 @@ function recalcWedge() {
 }
 
 function handleWedgeSaveCheck(e) {
-  e.preventDefault();
+  if (e && e.preventDefault) e.preventDefault();
   if (!window.__wedgeCheck) recalcWedge();
+  const errBox = document.getElementById('wedge-save-error');
+
   try {
     localStorage.setItem('quanterraos_pending_check', JSON.stringify(window.__wedgeCheck));
+    if (errBox) errBox.style.display = 'none';
+
     fetch('/api/analytics/check', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(window.__wedgeCheck)
     }).catch(function() {});
-  } catch (_) {}
-  window.location.href = '/account?flow=save-check';
+
+    window.location.href = '/account?flow=save-check';
+  } catch (err) {
+    console.warn('Check save error:', err);
+    if (errBox) errBox.style.display = 'block';
+  }
+}
+
+function retryWedgeSave() {
+  const errBox = document.getElementById('wedge-save-error');
+  if (errBox) errBox.style.display = 'none';
+  handleWedgeSaveCheck(new Event('submit'));
 }
 
 function renderCardToCanvas() {

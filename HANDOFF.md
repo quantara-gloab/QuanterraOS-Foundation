@@ -467,6 +467,35 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 - `npm test` — **362/362 tests passing across 76 suites** (0 failures).
 - Standalone Recovery Drill: `npm run recovery:drill` — **PASSED in 866ms with 100% cryptographic parity across 337 records**.
 
+---
+
+### Session: 2026-10-07 — Educational Discovery Architecture, Review Reminders, Concierge Handlers & Landing Page Polish
+
+**Delivered Capabilities:**
+- **Educational Discovery Pages (`src/educational-pages.ts`, `/learn/fees`, `/learn/breakeven`, `/learn/settlement`, `/learn/journal`)**:
+  - Implemented 4 authoritative educational guides covering prediction market fees (Kalshi parabolic taker curve `0.07 × p × (1 - p)`), true breakeven win rate hurdles, settlement oracle mechanics (CME CF BRTI 60s TWAP vs UMA Optimistic Oracle), and pre-trade decision journaling.
+  - Each topic embeds a live interactive True-Cost Check with verified source attribution, real-time formula computation, and zero registration barrier.
+  - Strict compliance with Rule B4 (zero marketing superlatives, no unverified edge claims) and Rule B5 ($0.00 capital lock).
+- **Review Reminders & Discipline Notifications (`src/review-reminders.ts`, `src/server.ts`, `src/account-page.ts`)**:
+  - Incomplete Journal Entry Alerts: Prompts users for post-settlement reconciliation when a contract settles without recorded notes or actual result.
+  - Weekly Trading Discipline Digest: Optional Sunday evening review comparing stated win probability vs realized Brier calibration score.
+  - User notification preferences supporting in-app banner, browser notification, or email delivery with 1-click easy disabling and opt-out.
+  - Wired to `/api/account/reminders` (GET/POST) and integrated directly into the `/account` settings panel.
+- **Virtual Concierge (Aria) High-Priority Query Handlers (`src/agents/council-chat.ts`, `src/agents/council-personas.ts`, `src/assistant-widget.ts`)**:
+  - Added dedicated persona answers and quick chips for top consumer workflows: "Explain my costs", "Save my check", and "Find my journal".
+  - Explains the exact parabolic taker fee formula and breakeven arithmetic with Rulebook Chapter 3 citations.
+  - Clarifies local storage check preservation and authenticated account privacy boundaries.
+- **Consumer Homepage & Research Architecture Restructuring (`src/landing-page.ts`, `src/research-page.ts`)**:
+  - Relocated the 3-layer sovereign agent architecture and 8 Council specialists from the consumer landing page to `/research` to keep the front page focused on consumer tools and clear risk explanations.
+  - Consumer-first homepage features: True-Cost Check wedge with synchronized slider + numeric inputs, Kalshi & Polymarket market link intake, Journal Preview card, and 3-step "How It Works" workflow.
+  - Restored unfinished check pill in `/calculator` and `/` from browser local storage.
+- **Dedicated Acceptance Test Suite (`src/__tests__/educational-pages-and-review-reminders.test.ts`)**:
+  - Validates topic page rendering, compliance guardrails, review reminder store & HTML rendering, and Aria concierge responses.
+
+**Verification:**
+- `npm run typecheck` (`tsc --noEmit`) — **0 errors (clean exit 0)**.
+- `npm test` — **374/374 passing across 80 suites, 0 failures** (duration ~171s).
+
 
 
 

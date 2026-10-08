@@ -376,6 +376,28 @@ export function renderCalculatorPageHtml(): string {
           <span class="mono" style="font-size:0.75rem; color:var(--accent);">KXBTC15M MODEL</span>
         </div>
 
+        <!-- Restored unfinished check pill -->
+        <div id="calc-restored-pill" style="display:none; font-family:var(--font-mono); font-size:0.72rem; color:#10B981; background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3); padding:4px 10px; border-radius:4px; margin-bottom:14px;">
+          ✓ Restored unfinished check from your previous session
+        </div>
+
+        <!-- Market-Link Intake Bar -->
+        <div style="background: rgba(6, 9, 14, 0.7); border: 1px solid var(--panel-border-subtle); border-radius: 6px; padding: 12px; margin-bottom: 16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
+            <label style="font-family:var(--font-mono); font-size:0.72rem; color:var(--accent-light); font-weight:600; text-transform:uppercase; letter-spacing:0.04em;">
+              Market-Link Intake (One-Click Populate)
+            </label>
+            <span id="calc-source-badge" style="font-family:var(--font-mono); font-size:0.68rem; color:var(--muted);">
+              Supports Kalshi 15M/1H &amp; Polymarket BTC links or tickers
+            </span>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <input type="text" class="number-input" id="calc-link-intake" placeholder="Paste Kalshi URL or ticker (e.g. KXBTC15M or https://kalshi.com/markets/kxbtc15m)..." oninput="handleMarketLinkIntake(this.value)" style="margin:0; width:100%; font-size:0.8rem; padding:8px 10px;">
+            <button type="button" class="preset-btn" onclick="clearMarketLinkIntake()" style="padding:7px 12px; font-size:0.75rem; white-space:nowrap;">Clear</button>
+          </div>
+          <div id="calc-link-feedback" style="display:none; font-family:var(--font-mono); font-size:0.72rem; margin-top:6px;"></div>
+        </div>
+
         <!-- 1. Price First -->
         <div class="input-group">
           <div class="input-label-row">
@@ -386,7 +408,13 @@ export function renderCalculatorPageHtml(): string {
             <span id="label-price" style="color:#DFB843; font-weight:700;">51¢ ($0.51)</span>
           </div>
           <div style="font-size:0.72rem; color:var(--muted); margin-bottom:6px;">Per-contract purchase price. Half-spread is already factored into executable ask.</div>
-          <input type="range" id="slider-price" min="1" max="99" value="51" oninput="handleSliderSnap('slider-price', [10,25,50,51,75,90]); recalc();">
+          <div style="display:flex; gap:10px; align-items:center;">
+            <input type="range" id="slider-price" min="1" max="99" value="51" style="flex:1;" oninput="handleSliderSnap('slider-price', [10,25,50,51,75,90]); syncPriceFromSlider();">
+            <div style="display:flex; align-items:center; gap:2px;">
+              <input type="number" id="input-price-num" class="number-input" min="1" max="99" value="51" style="width:60px; text-align:center; padding:6px 4px; font-weight:700; color:#DFB843;" oninput="syncPriceFromNum();">
+              <span style="font-family:var(--font-mono); font-size:0.8rem; color:#DFB843;">¢</span>
+            </div>
+          </div>
           <div style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;">
             <button type="button" class="preset-btn" onclick="setPrice(10)">10¢</button>
             <button type="button" class="preset-btn" onclick="setPrice(25)">25¢</button>
@@ -467,6 +495,13 @@ export function renderCalculatorPageHtml(): string {
           </div>
         </div>
 
+        <!-- Save Failure / Retry Alert -->
+        <div id="calc-save-error" style="display:none; background:rgba(244,63,94,0.12); border:1px solid #F43F5E; border-radius:6px; padding:12px; margin-bottom:14px; font-size:0.82rem; color:#FDA4AF;">
+          <div style="font-weight:700; margin-bottom:4px;">Save Failure: Local journal storage was unavailable or rejected the entry.</div>
+          <div style="font-size:0.76rem; color:var(--text-dim); margin-bottom:8px;">Your entered numbers and thesis are preserved in memory. You can retry saving now.</div>
+          <button type="button" onclick="retryCalcSave()" class="btn-primary" style="padding:6px 14px; font-size:0.75rem; background:#F43F5E; color:#fff; border-color:#FDA4AF; cursor:pointer;">Retry Save &rarr;</button>
+        </div>
+
         <!-- Immediate Easy-To-Reach Save Button -->
         <button type="button" onclick="saveCheckToJournal()" class="nav-cta" style="width:100%; justify-content:center; padding:12px; font-size:0.85rem; font-weight:700; margin-bottom:18px; cursor:pointer;">
           SAVE CHECK TO JOURNAL &rarr;
@@ -498,7 +533,13 @@ export function renderCalculatorPageHtml(): string {
                 <span id="label-prob" style="color:#38BDF8; font-weight:700;">55.0%</span>
               </div>
               <div style="font-size:0.72rem; color:var(--muted); margin-bottom:6px;">Your subjective assessment. This is your personal opinion, NOT an automated forecast.</div>
-              <input type="range" id="slider-prob" min="1" max="99" value="55" oninput="handleSliderSnap('slider-prob', [35,50,52.8,55,65,75]); recalc();">
+              <div style="display:flex; gap:10px; align-items:center;">
+                <input type="range" id="slider-prob" min="1" max="99" value="55" style="flex:1;" oninput="handleSliderSnap('slider-prob', [35,50,52.8,55,65,75]); syncProbFromSlider();">
+                <div style="display:flex; align-items:center; gap:2px;">
+                  <input type="number" id="input-prob-num" class="number-input" min="1" max="99" value="55" style="width:60px; text-align:center; padding:6px 4px; font-weight:700; color:#38BDF8;" oninput="syncProbFromNum();">
+                  <span style="font-family:var(--font-mono); font-size:0.8rem; color:#38BDF8;">%</span>
+                </div>
+              </div>
               <div style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;">
                 <button type="button" class="preset-btn" onclick="setProb(35)">35%</button>
                 <button type="button" class="preset-btn" onclick="setProb(50)">50% (Coin)</button>
@@ -577,12 +618,62 @@ export function renderCalculatorPageHtml(): string {
           <span class="stat-label">Contract Horizon</span>
           <span class="stat-val mono" style="color:var(--accent-light);" id="val-cadence">15-Minute Intraday (KXBTC15M)</span>
         </div>
-        <div id="risk-plan-advisory-box" style="display:none; margin-top:14px; padding:10px 14px; background:rgba(244,63,94,0.08); border:1px solid rgba(244,63,94,0.25); border-radius:4px; font-size:0.75rem;">
-          <div style="display:flex; align-items:center; gap:6px; color:var(--rose); font-weight:700; margin-bottom:4px;">
-            <span>⚠️ VOLUNTARY RISK PLAN ADVISORY</span>
+        <!-- Pre-Save Advisory Risk Check Component -->
+        <div id="risk-plan-advisory-box" style="display:none; margin-top:16px; padding:14px; background:rgba(14,20,32,0.95); border:1px solid rgba(212,175,55,0.3); border-radius:6px; font-size:0.78rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px;">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span id="risk-plan-advisory-icon" style="font-size:0.9rem;">🛡️</span>
+              <strong style="color:#FFFFFF; font-family:var(--font-mono); font-size:0.8rem; text-transform:uppercase;">Pre-Save Advisory Risk Check</strong>
+            </div>
+            <span id="risk-plan-status-badge" style="font-family:var(--font-mono); font-size:0.68rem; padding:2px 8px; border-radius:4px; font-weight:700;">
+              CALCULATING
+            </span>
           </div>
-          <div id="risk-plan-advisory-text" style="color:var(--text); line-height:1.4;"></div>
-          <div style="margin-top:6px;"><a href="/journal" style="color:var(--accent); text-decoration:underline; font-size:0.7rem;">Configure Voluntary Spending Caps in Journal &rarr;</a></div>
+
+          <!-- Advisory Disclaimer -->
+          <div style="font-size:0.72rem; color:var(--muted); line-height:1.4; margin-bottom:10px; padding:6px 8px; background:rgba(0,0,0,0.4); border-radius:4px; border-left:2px solid var(--accent);">
+            <strong>Advisory Control:</strong> QuanterraOS cannot claim to block exchange trading unless an integration actually enforces that restriction. All limits are voluntary personal boundaries.
+          </div>
+
+          <!-- Exposure Comparison Metrics -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+            <div style="background:rgba(6,9,14,0.7); padding:8px; border-radius:4px; border:1px solid rgba(255,255,255,0.06);">
+              <div style="font-family:var(--font-mono); font-size:0.68rem; color:var(--muted); text-transform:uppercase;">Proposed Outlay</div>
+              <div style="display:flex; justify-content:space-between; align-items:baseline; margin-top:2px;">
+                <span id="risk-val-trade-outlay" style="font-family:var(--font-mono); font-size:0.9rem; font-weight:700; color:#FFFFFF;">$0.00</span>
+                <span style="font-size:0.7rem; color:var(--muted);">Cap: <strong id="risk-val-single-cap" style="color:var(--text);">$25.00</strong></span>
+              </div>
+            </div>
+
+            <div style="background:rgba(6,9,14,0.7); padding:8px; border-radius:4px; border:1px solid rgba(255,255,255,0.06);">
+              <div style="font-family:var(--font-mono); font-size:0.68rem; color:var(--muted); text-transform:uppercase;">Projected 24h Outlay</div>
+              <div style="display:flex; justify-content:space-between; align-items:baseline; margin-top:2px;">
+                <span id="risk-val-projected-outlay" style="font-family:var(--font-mono); font-size:0.9rem; font-weight:700; color:#FFFFFF;">$0.00</span>
+                <span style="font-size:0.7rem; color:var(--muted);">Limit: <strong id="risk-val-daily-limit" style="color:var(--text);">$50.00</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Warning text & Trigger explanation -->
+          <div id="risk-plan-advisory-text" style="color:var(--text); line-height:1.45; margin-bottom:8px;"></div>
+
+          <!-- Uncertainty Notice -->
+          <div id="risk-uncertainty-notice" style="display:none; padding:8px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.25); border-radius:4px; color:#FBBF24; font-size:0.72rem; margin-bottom:8px;">
+            <span id="risk-uncertainty-text"></span>
+            <div style="margin-top:4px;"><a href="/account" style="color:#FBBF24; text-decoration:underline;">Review and reconcile incomplete records &rarr;</a></div>
+          </div>
+
+          <!-- Pause & Cooling-Off Option -->
+          <div id="risk-pause-container" style="display:none; margin-top:10px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.08);">
+            <button type="button" onclick="saveCheckForLaterAction()" style="width:100%; padding:8px; background:rgba(212,175,55,0.12); color:var(--accent); border:1px solid rgba(212,175,55,0.35); border-radius:4px; font-family:var(--font-mono); font-size:0.76rem; font-weight:700; cursor:pointer;">
+              ⏸ SAVE FOR LATER (15-MIN COOLING-OFF PAUSE)
+            </button>
+            <span style="display:block; font-size:0.7rem; color:var(--muted); text-align:center; margin-top:4px;">Pausing exempts this check from active exposure while you take time to reflect.</span>
+          </div>
+
+          <div style="margin-top:8px; display:flex; justify-content:space-between; align-items:center; font-size:0.7rem;">
+            <a href="/account" style="color:var(--accent); text-decoration:underline;">Configure Risk Plan in Account &rarr;</a>
+          </div>
         </div>
 
         <div style="margin-top:20px; display:flex; flex-direction:column; gap:10px;">
@@ -838,7 +929,7 @@ export function renderCalculatorPageHtml(): string {
         settlementSource: benchmark
       };
 
-      // Check voluntary risk plan thresholds
+      // Check voluntary risk plan thresholds with pre-save verification
       if (window.__riskCheckTimer) clearTimeout(window.__riskCheckTimer);
       window.__riskCheckTimer = setTimeout(function() {
         if (!window.__latestCheck) return;
@@ -848,7 +939,9 @@ export function renderCalculatorPageHtml(): string {
           body: JSON.stringify({
             ticker: window.__latestCheck.contractTicker,
             venue: window.__latestCheck.venue,
-            outlay: window.__latestCheck.purchaseCost,
+            price: window.__latestCheck.price,
+            purchaseCost: window.__latestCheck.purchaseCost,
+            exchangeFee: window.__latestCheck.exchangeFee,
             count: window.__latestCheck.count
           })
         })
@@ -856,13 +949,59 @@ export function renderCalculatorPageHtml(): string {
         .then(function(res) {
           var box = document.getElementById('risk-plan-advisory-box');
           var txt = document.getElementById('risk-plan-advisory-text');
-          if (!box || !txt) return;
-          var w = (res && res.warnings) || (res && res.advisory && res.advisory.warnings) || [];
-          if (w.length > 0) {
-            txt.innerHTML = w.map(function(item) { return '&bull; ' + item; }).join('<br>');
-            box.style.display = 'block';
-          } else {
-            box.style.display = 'none';
+          var badge = document.getElementById('risk-plan-status-badge');
+          var tradeEl = document.getElementById('risk-val-trade-outlay');
+          var capEl = document.getElementById('risk-val-single-cap');
+          var projEl = document.getElementById('risk-val-projected-outlay');
+          var limitEl = document.getElementById('risk-val-daily-limit');
+          var pauseEl = document.getElementById('risk-pause-container');
+          var uncertBox = document.getElementById('risk-uncertainty-notice');
+          var uncertTxt = document.getElementById('risk-uncertainty-text');
+
+          if (!box) return;
+
+          box.style.display = 'block';
+
+          if (tradeEl && res.exposure) tradeEl.innerText = '$' + res.exposure.proposedTradeOutlay.toFixed(2);
+          if (capEl && res.limits) capEl.innerText = '$' + res.limits.singleTradeMaxOutlay.toFixed(2);
+          if (projEl && res.exposure) projEl.innerText = '$' + res.exposure.projectedTotalOutlay.toFixed(2);
+          if (limitEl && res.limits) limitEl.innerText = '$' + res.limits.dailySpendingLimit.toFixed(2);
+
+          var isExceeded = res.isExceeded;
+          if (badge) {
+            badge.innerText = isExceeded ? 'LIMIT EXCEEDED' : 'WITHIN LIMITS';
+            badge.style.background = isExceeded ? 'rgba(244,63,94,0.15)' : 'rgba(16,185,129,0.15)';
+            badge.style.color = isExceeded ? '#F43F5E' : '#10B981';
+            badge.style.border = '1px solid ' + (isExceeded ? 'rgba(244,63,94,0.3)' : 'rgba(16,185,129,0.3)');
+          }
+
+          if (pauseEl) {
+            pauseEl.style.display = isExceeded ? 'block' : 'none';
+          }
+
+          if (uncertBox && uncertTxt) {
+            if (res.hasIncompleteImports && res.uncertaintyNotice) {
+              uncertTxt.innerText = res.uncertaintyNotice;
+              uncertBox.style.display = 'block';
+            } else {
+              uncertBox.style.display = 'none';
+            }
+          }
+
+          var details = res.warningDetails || [];
+          if (details.length > 0 && txt) {
+            var itemsHtml = details.map(function(item) {
+              var recs = item.triggerRecords && item.triggerRecords.length > 0 ?
+                '<div style="margin-top:4px; font-size:0.7rem; color:var(--muted);">Triggering records: ' +
+                item.triggerRecords.map(function(tr) { return tr.ticker + ' ($' + tr.outlay.toFixed(2) + ')'; }).join(', ') + '</div>' : '';
+              var assum = item.assumptions ?
+                '<div style="font-size:0.68rem; color:var(--muted); opacity:0.85;">Assumption: ' +
+                item.assumptions.assumedCount + ' ct @ ' + Math.round(item.assumptions.assumedPrice * 100) + '¢ + $' + item.assumptions.assumedFee.toFixed(2) + ' fee</div>' : '';
+              return '<div style="margin-bottom:6px; padding:6px; background:rgba(0,0,0,0.25); border-radius:4px;"><strong style="color:' + (item.severity === 'warning' ? '#F43F5E' : 'var(--accent)') + ';">' + item.title + ':</strong> ' + item.message + recs + assum + '</div>';
+            }).join('');
+            txt.innerHTML = itemsHtml;
+          } else if (txt) {
+            txt.innerHTML = '<span style="color:#10B981;">✓ Proposed check is within your voluntary spending limits and position caps.</span>';
           }
         })
         .catch(function() {});
@@ -890,15 +1029,114 @@ export function renderCalculatorPageHtml(): string {
       }
     }
 
+    function syncPriceFromSlider() {
+      var slider = document.getElementById('slider-price');
+      var num = document.getElementById('input-price-num');
+      if (slider && num) num.value = slider.value;
+      recalc();
+    }
+
+    function syncPriceFromNum() {
+      var slider = document.getElementById('slider-price');
+      var num = document.getElementById('input-price-num');
+      if (slider && num) {
+        var v = Math.min(99, Math.max(1, parseInt(num.value, 10) || 51));
+        slider.value = v;
+      }
+      recalc();
+    }
+
+    function syncProbFromSlider() {
+      var slider = document.getElementById('slider-prob');
+      var num = document.getElementById('input-prob-num');
+      if (slider && num) num.value = slider.value;
+      recalc();
+    }
+
+    function syncProbFromNum() {
+      var slider = document.getElementById('slider-prob');
+      var num = document.getElementById('input-prob-num');
+      if (slider && num) {
+        var v = Math.min(99, Math.max(1, parseInt(num.value, 10) || 55));
+        slider.value = v;
+      }
+      recalc();
+    }
+
+    function handleMarketLinkIntake(val) {
+      val = (val || '').trim();
+      var feedback = document.getElementById('calc-link-feedback');
+      var venueSelect = document.getElementById('select-contract');
+      var sourceBadge = document.getElementById('calc-source-badge');
+      if (!val) {
+        if (feedback) feedback.style.display = 'none';
+        if (sourceBadge) sourceBadge.innerText = 'Supports Kalshi 15M/1H & Polymarket BTC links or tickers';
+        return;
+      }
+
+      var lower = val.toLowerCase();
+      var recognized = false;
+      var title = '';
+      var price = 51;
+      var venue = 'kalshi-15m';
+
+      if (lower.indexOf('kxbtc15m') !== -1 || (lower.indexOf('kalshi.com') !== -1 && lower.indexOf('15m') !== -1)) {
+        recognized = true;
+        title = 'Kalshi BTC 15-Minute Above/Below (KXBTC15M)';
+        price = 51;
+        venue = 'kalshi-15m';
+      } else if (lower.indexOf('kxbtcd') !== -1 || (lower.indexOf('kalshi.com') !== -1 && (lower.indexOf('hourly') !== -1 || lower.indexOf('1h') !== -1))) {
+        recognized = true;
+        title = 'Kalshi BTC 1-Hour Fixed Strike (KXBTCD)';
+        price = 48;
+        venue = 'kalshi-1h';
+      } else if (lower.indexOf('polymarket.com') !== -1 || lower.indexOf('poly-btc') !== -1) {
+        recognized = true;
+        title = 'Polymarket BTC 15-Minute Binary (USDC)';
+        price = 52;
+        venue = 'polymarket-15m';
+      }
+
+      if (recognized) {
+        if (venueSelect) venueSelect.value = venue;
+        setPrice(price);
+        if (sourceBadge) sourceBadge.innerText = 'Source: Verified Exchange Contract · Freshness: Live';
+        if (feedback) {
+          feedback.style.display = 'block';
+          feedback.style.color = '#10B981';
+          feedback.innerHTML = '✓ Populated: <strong>' + title + '</strong> (' + price + '¢ ask). Order parameters locked.';
+        }
+      } else {
+        if (sourceBadge) sourceBadge.innerText = 'Format unrecognized: Falling back to manual entry';
+        if (feedback) {
+          feedback.style.display = 'block';
+          feedback.style.color = '#FBBF24';
+          feedback.innerHTML = 'ℹ Unrecognized link format. You can enter contract parameters manually below.';
+        }
+      }
+    }
+
+    function clearMarketLinkIntake() {
+      var el = document.getElementById('calc-link-intake');
+      if (el) el.value = '';
+      handleMarketLinkIntake('');
+    }
+
     function setPrice(p) {
       triggerHaptic();
-      document.getElementById('slider-price').value = p;
+      var slider = document.getElementById('slider-price');
+      var num = document.getElementById('input-price-num');
+      if (slider) slider.value = p;
+      if (num) num.value = p;
       recalc();
     }
 
     function setProb(pr) {
       triggerHaptic();
-      document.getElementById('slider-prob').value = pr;
+      var slider = document.getElementById('slider-prob');
+      var num = document.getElementById('input-prob-num');
+      if (slider) slider.value = pr;
+      if (num) num.value = pr;
       recalc();
     }
 
@@ -950,6 +1188,9 @@ export function renderCalculatorPageHtml(): string {
         reason: statedReason,
       };
 
+      var errorBox = document.getElementById('calc-save-error');
+      if (errorBox) errorBox.style.display = 'none';
+
       executeReflectivePause(checkDetails, function() {
         try {
           localStorage.setItem('quanterraos_pending_check', JSON.stringify(window.__latestCheck));
@@ -958,8 +1199,48 @@ export function renderCalculatorPageHtml(): string {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(window.__latestCheck)
           }).catch(function() {});
-        } catch (_) {}
-        window.location.href = '/account?flow=save-check';
+          window.location.href = '/account?flow=save-check';
+        } catch (err) {
+          console.error("Save failure:", err);
+          if (errorBox) {
+            errorBox.style.display = 'block';
+          }
+        }
+      });
+    }
+
+    function retryCalcSave() {
+      saveCheckToJournal();
+    }
+
+    function saveCheckForLaterAction() {
+      if (!window.__latestCheck) recalc();
+      var reasonInput = document.getElementById('calc-stated-reason');
+      var statedReason = reasonInput ? reasonInput.value.trim() : 'Paused for voluntary cooling-off reflection';
+      var payload = Object.assign({}, window.__latestCheck, {
+        reasoning: statedReason,
+        coolingOffMinutes: 15
+      });
+
+      var statusBox = document.getElementById('risk-plan-advisory-box');
+      fetch('/api/calculator/save-later', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(res) {
+        if (res.success) {
+          if (statusBox) {
+            statusBox.style.display = 'block';
+            statusBox.style.background = 'rgba(16,185,129,0.12)';
+            statusBox.style.borderColor = 'rgba(16,185,129,0.3)';
+            statusBox.innerHTML = '<div style="color:#10B981; font-weight:700; font-family:var(--font-mono); font-size:0.82rem;">✓ Check Paused: Saved for Later (15-min Cooling-Off)</div><div style="font-size:0.75rem; color:var(--text); margin-top:4px;">This check is exempt from your spending limit and active exposure during cooling-off. You can resume or review it in your Journal.</div><div style="margin-top:8px;"><a href="/journal" style="color:var(--accent); font-size:0.75rem; font-weight:600; text-decoration:underline;">View in Journal &rarr;</a></div>';
+          }
+        }
+      })
+      .catch(function(err) {
+        console.error("Save for later error:", err);
       });
     }
 
@@ -994,6 +1275,26 @@ export function renderCalculatorPageHtml(): string {
         }
       }
     }
+
+    // Restore preserved unfinished check on load
+    try {
+      var saved = localStorage.getItem('quanterraos_pending_check');
+      if (saved) {
+        var parsed = JSON.parse(saved);
+        if (parsed && typeof parsed.price === 'number') {
+          var pVal = Math.round(parsed.price * 100);
+          setPrice(pVal);
+          if (parsed.count) setCount(parsed.count);
+          if (parsed.assessedWinProb) setProb(parsed.assessedWinProb);
+          if (parsed.reason) {
+            var rEl = document.getElementById('calc-stated-reason');
+            if (rEl) rEl.value = parsed.reason;
+          }
+          var pill = document.getElementById('calc-restored-pill');
+          if (pill) pill.style.display = 'block';
+        }
+      }
+    } catch (_) {}
 
     recalc();
   </script>

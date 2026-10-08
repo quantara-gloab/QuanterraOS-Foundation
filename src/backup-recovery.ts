@@ -113,6 +113,9 @@ export function runIsolatedBackupRecoveryCheck(): BackupVerificationReport {
         single_trade_max_outlay REAL NOT NULL DEFAULT 25.0,
         max_concurrent_positions INTEGER NOT NULL DEFAULT 3,
         correlated_market_alert INTEGER NOT NULL DEFAULT 1,
+        max_contracts_per_trade INTEGER NOT NULL DEFAULT 50,
+        review_reminder TEXT NOT NULL DEFAULT 'settlement',
+        cooling_off_minutes INTEGER NOT NULL DEFAULT 15,
         updated_at TEXT NOT NULL
       );
 
@@ -153,6 +156,7 @@ export function runIsolatedBackupRecoveryCheck(): BackupVerificationReport {
         original_contract_price REAL,
         original_contract_count INTEGER,
         original_exchange_fee REAL,
+        cooling_off_until TEXT,
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL
       );
@@ -202,8 +206,13 @@ export function runIsolatedBackupRecoveryCheck(): BackupVerificationReport {
     }
 
     const insertRiskPlan = sandboxDb.prepare(`
-      INSERT INTO user_risk_plans (id, user_id, daily_max_outlay, single_trade_max_outlay, max_concurrent_positions, correlated_market_alert, updated_at)
-      VALUES (@id, @userId, @dailyMaxOutlay, @singleTradeMaxOutlay, @maxConcurrentPositions, @correlatedMarketAlert, @updatedAt)
+      INSERT INTO user_risk_plans (
+        id, user_id, daily_max_outlay, single_trade_max_outlay, max_concurrent_positions,
+        correlated_market_alert, max_contracts_per_trade, review_reminder, cooling_off_minutes, updated_at
+      ) VALUES (
+        @id, @userId, @dailyMaxOutlay, @singleTradeMaxOutlay, @maxConcurrentPositions,
+        @correlatedMarketAlert, @maxContractsPerTrade, @reviewReminder, @coolingOffMinutes, @updatedAt
+      )
     `);
     for (const rp of sourceRiskPlans) {
       insertRiskPlan.run({
@@ -213,6 +222,9 @@ export function runIsolatedBackupRecoveryCheck(): BackupVerificationReport {
         singleTradeMaxOutlay: rp.singleTradeMaxOutlay,
         maxConcurrentPositions: rp.maxConcurrentPositions,
         correlatedMarketAlert: rp.correlatedMarketAlert,
+        maxContractsPerTrade: (rp as any).maxContractsPerTrade ?? 50,
+        reviewReminder: (rp as any).reviewReminder ?? "settlement",
+        coolingOffMinutes: (rp as any).coolingOffMinutes ?? 15,
         updatedAt: rp.updatedAt,
       });
     }
@@ -226,7 +238,7 @@ export function runIsolatedBackupRecoveryCheck(): BackupVerificationReport {
         outcome, realized_pnl, actual_quantity, actual_fill_price, actual_fees,
         exit_proceeds, outcome_status, outcome_notes, reconciliation_status,
         matched_statement_id, statement_reconciled_at, original_contract_price,
-        original_contract_count, original_exchange_fee, created_at, updated_at
+        original_contract_count, original_exchange_fee, cooling_off_until, created_at, updated_at
       ) VALUES (
         @id, @userId, @venue, @contractTicker, @contractType, @side, @pricingBasis,
         @contractPrice, @contractCount, @purchaseCost, @exchangeFee, @halfSpreadDrag,
@@ -235,7 +247,7 @@ export function runIsolatedBackupRecoveryCheck(): BackupVerificationReport {
         @outcome, @realizedPnl, @actualQuantity, @actualFillPrice, @actualFees,
         @exitProceeds, @outcomeStatus, @outcomeNotes, @reconciliationStatus,
         @matchedStatementId, @statementReconciledAt, @originalContractPrice,
-        @originalContractCount, @originalExchangeFee, @createdAt, @updatedAt
+        @originalContractCount, @originalExchangeFee, @coolingOffUntil, @createdAt, @updatedAt
       )
     `);
     for (const j of sourceJournals) {
@@ -276,6 +288,7 @@ export function runIsolatedBackupRecoveryCheck(): BackupVerificationReport {
         originalContractPrice: j.originalContractPrice,
         originalContractCount: j.originalContractCount,
         originalExchangeFee: j.originalExchangeFee,
+        coolingOffUntil: (j as any).coolingOffUntil ?? null,
         createdAt: j.createdAt,
         updatedAt: j.updatedAt,
       });

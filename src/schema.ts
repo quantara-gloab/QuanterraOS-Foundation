@@ -710,6 +710,7 @@ export const userDecisionJournal = sqliteTable(
     originalContractPrice: real("original_contract_price"),
     originalContractCount: integer("original_contract_count"),
     originalExchangeFee: real("original_exchange_fee"),
+    coolingOffUntil: text("cooling_off_until"),
     createdAt: text("created_at").notNull(),
     updatedAt: text("updated_at").notNull(),
   },
@@ -824,6 +825,9 @@ export const userRiskPlans = sqliteTable(
     singleTradeMaxOutlay: real("single_trade_max_outlay").notNull().default(25.0),
     maxConcurrentPositions: integer("max_concurrent_positions").notNull().default(3),
     correlatedMarketAlert: integer("correlated_market_alert").notNull().default(1),
+    maxContractsPerTrade: integer("max_contracts_per_trade").notNull().default(50),
+    reviewReminder: text("review_reminder").notNull().default("settlement"),
+    coolingOffMinutes: integer("cooling_off_minutes").notNull().default(15),
     updatedAt: text("updated_at").notNull(),
   },
   (table) => ({

@@ -68,6 +68,8 @@ import { renderMarketRhythmPageHtml } from "./research/market-rhythm.ts";
 import { renderMobileInstallPageHtml } from "./mobile-install.ts";
 import { renderEmbedCalculatorHtml, renderEmbedCardHtml } from "./embed-widget.ts";
 import { renderLearnPageHtml } from "./learn-page.ts";
+import { renderEducationalPageHtml, type EducationTopic } from "./educational-pages.ts";
+import { getReviewReminders, updateReviewReminders } from "./review-reminders.ts";
 import { renderVenueComparisonPageHtml } from "./venue-comparison-page.ts";
 import { renderCalibrationSurfacePageHtml } from "./calibration-surface-page.ts";
 import { renderMcpPageHtml, MCP_SERVER_MANIFEST, executeMcpTool } from "./mcp-server.ts";
@@ -93,6 +95,7 @@ import {
   getUserRiskPlan,
   saveUserRiskPlan,
   checkTradeAgainstRiskPlan,
+  saveCheckForLater,
 } from "./journal-import.ts";
 import {
   previewKalshiStatement,
@@ -1823,6 +1826,21 @@ app.get(["/learn", "/education", "/curriculum"], (req, res) => {
   res.type("html").send(renderLearnPageHtml(auth.tier));
 });
 
+// Educational Discovery Pages (Sprint Days 8–14)
+app.get(["/learn/fees", "/learn/breakeven", "/learn/settlement", "/learn/journal"], (req, res) => {
+  const parts = req.path.split("/");
+  const topic = parts[parts.length - 1] as EducationTopic;
+  res.type("html").send(renderEducationalPageHtml(topic));
+});
+
+app.get("/learn/:topic", (req, res) => {
+  const topic = req.params.topic as EducationTopic;
+  if (["fees", "breakeven", "settlement", "journal"].includes(topic)) {
+    return res.type("html").send(renderEducationalPageHtml(topic));
+  }
+  res.redirect("/learn");
+});
+
 app.get("/api/venues/compare", (req, res) => {
   const price = typeof req.query.price === "string" ? parseFloat(req.query.price) : 0.51;
   const count = typeof req.query.count === "string" ? parseInt(req.query.count, 10) : 10;
@@ -2552,6 +2570,21 @@ app.post("/api/account/risk-plan", (req, res) => {
   res.json({ success: true, plan: updated });
 });
 
+// Review Reminders & Notification Preferences (Sprint Days 8–11)
+app.get("/api/account/reminders", (req, res) => {
+  const auth = getUserAuth(req);
+  const userId = auth.user?.id || "guest";
+  const reminders = getReviewReminders(userId);
+  res.json({ success: true, reminders });
+});
+
+app.post("/api/account/reminders", (req, res) => {
+  const auth = getUserAuth(req);
+  const userId = auth.user?.id || "guest";
+  const updated = updateReviewReminders(userId, req.body || {});
+  res.json({ success: true, reminders: updated });
+});
+
 app.post("/api/calculator/advisory-check", (req, res) => {
   const auth = getUserAuth(req);
   const userId = auth.user?.id || "demo-subscriber";
@@ -2564,7 +2597,38 @@ app.post("/api/calculator/advisory-check", (req, res) => {
     purchaseCost: cost,
     exchangeFee: Number(exchangeFee) || 0.18,
   });
-  res.json({ success: true, advisory, warnings: advisory.warnings, isExceeded: advisory.isExceeded });
+  res.json({
+    success: true,
+    advisory,
+    warnings: advisory.warnings,
+    warningDetails: advisory.warningDetails,
+    isExceeded: advisory.isExceeded,
+    limits: advisory.limits,
+    exposure: advisory.exposure,
+    uncertaintyNotice: advisory.uncertaintyNotice,
+    hasIncompleteImports: advisory.hasIncompleteImports,
+    pauseOption: advisory.pauseOption,
+    advisoryDisclaimer: advisory.advisoryDisclaimer,
+  });
+});
+
+app.post("/api/calculator/save-later", (req, res) => {
+  const auth = getUserAuth(req);
+  const userId = auth.user?.id || "demo-subscriber";
+  const { contractTicker, price, count, purchaseCost, outlay, exchangeFee, breakevenWinProb, assessedWinProb, reasoning, coolingOffMinutes } = req.body || {};
+  const cost = Number(purchaseCost) || Number(outlay) || (Number(price || 0.51) * Number(count || 10));
+  const saved = saveCheckForLater(userId, {
+    contractTicker: contractTicker || "KXBTC15M",
+    price: Number(price) || 0.51,
+    count: Number(count) || 10,
+    purchaseCost: cost,
+    exchangeFee: Number(exchangeFee) || 0.18,
+    breakevenWinProb: Number(breakevenWinProb) || 52.8,
+    assessedWinProb: Number(assessedWinProb) || 55.0,
+    reasoning: reasoning || "Paused for voluntary cooling-off reflection",
+    coolingOffMinutes: Number(coolingOffMinutes) || 15,
+  });
+  res.json({ success: true, saved });
 });
 
 app.get("/api/analytics/funnel-summary", requireFounderAuth, (_req, res) => {

@@ -275,6 +275,9 @@ export function executeRetainedRecoveryDrill(options?: {
         single_trade_max_outlay REAL DEFAULT 25.0,
         max_concurrent_positions INTEGER DEFAULT 3,
         correlated_market_alert INTEGER DEFAULT 1,
+        max_contracts_per_trade INTEGER DEFAULT 50,
+        review_reminder TEXT DEFAULT 'settlement',
+        cooling_off_minutes INTEGER DEFAULT 15,
         updated_at TEXT
       );
 
@@ -315,6 +318,7 @@ export function executeRetainedRecoveryDrill(options?: {
         original_contract_price REAL,
         original_contract_count INTEGER,
         original_exchange_fee REAL,
+        cooling_off_until TEXT,
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL
       );
@@ -415,8 +419,13 @@ export function executeRetainedRecoveryDrill(options?: {
 
       // Risk Plans
       const insertPlan = isolatedDb!.prepare(`
-        INSERT INTO user_risk_plans (id, user_id, daily_max_outlay, single_trade_max_outlay, max_concurrent_positions, correlated_market_alert, updated_at)
-        VALUES (@id, @userId, @dailyMaxOutlay, @singleTradeMaxOutlay, @maxConcurrentPositions, @correlatedMarketAlert, @updatedAt)
+        INSERT INTO user_risk_plans (
+          id, user_id, daily_max_outlay, single_trade_max_outlay, max_concurrent_positions,
+          correlated_market_alert, max_contracts_per_trade, review_reminder, cooling_off_minutes, updated_at
+        ) VALUES (
+          @id, @userId, @dailyMaxOutlay, @singleTradeMaxOutlay, @maxConcurrentPositions,
+          @correlatedMarketAlert, @maxContractsPerTrade, @reviewReminder, @coolingOffMinutes, @updatedAt
+        )
       `);
       for (const row of fileData.data.riskPlans) {
         insertPlan.run({
@@ -426,6 +435,9 @@ export function executeRetainedRecoveryDrill(options?: {
           singleTradeMaxOutlay: row.singleTradeMaxOutlay ?? row.single_trade_max_outlay ?? 25.0,
           maxConcurrentPositions: row.maxConcurrentPositions ?? row.max_concurrent_positions ?? 3,
           correlatedMarketAlert: row.correlatedMarketAlert ?? row.correlated_market_alert ?? 1,
+          maxContractsPerTrade: (row as any).maxContractsPerTrade ?? (row as any).max_contracts_per_trade ?? 50,
+          reviewReminder: (row as any).reviewReminder ?? (row as any).review_reminder ?? "settlement",
+          coolingOffMinutes: (row as any).coolingOffMinutes ?? (row as any).cooling_off_minutes ?? 15,
           updatedAt: row.updatedAt ?? row.updated_at ?? new Date().toISOString(),
         });
       }
@@ -440,7 +452,7 @@ export function executeRetainedRecoveryDrill(options?: {
           outcome, realized_pnl, actual_quantity, actual_fill_price, actual_fees,
           exit_proceeds, outcome_status, outcome_notes, reconciliation_status,
           matched_statement_id, statement_reconciled_at, original_contract_price,
-          original_contract_count, original_exchange_fee, created_at, updated_at
+          original_contract_count, original_exchange_fee, cooling_off_until, created_at, updated_at
         ) VALUES (
           @id, @userId, @venue, @contractTicker, @contractType, @side, @pricingBasis,
           @contractPrice, @contractCount, @purchaseCost, @exchangeFee, @halfSpreadDrag,
@@ -449,7 +461,7 @@ export function executeRetainedRecoveryDrill(options?: {
           @outcome, @realizedPnl, @actualQuantity, @actualFillPrice, @actualFees,
           @exitProceeds, @outcomeStatus, @outcomeNotes, @reconciliationStatus,
           @matchedStatementId, @statementReconciledAt, @originalContractPrice,
-          @originalContractCount, @originalExchangeFee, @createdAt, @updatedAt
+          @originalContractCount, @originalExchangeFee, @coolingOffUntil, @createdAt, @updatedAt
         )
       `);
       for (const row of fileData.data.journals) {
@@ -490,6 +502,7 @@ export function executeRetainedRecoveryDrill(options?: {
           originalContractPrice: row.originalContractPrice ?? row.original_contract_price ?? null,
           originalContractCount: row.originalContractCount ?? row.original_contract_count ?? null,
           originalExchangeFee: row.originalExchangeFee ?? row.original_exchange_fee ?? null,
+          coolingOffUntil: (row as any).coolingOffUntil ?? (row as any).cooling_off_until ?? null,
           createdAt: row.createdAt ?? row.created_at,
           updatedAt: row.updatedAt ?? row.updated_at,
         });
