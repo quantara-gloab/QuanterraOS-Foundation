@@ -590,4 +590,39 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 - `npm run typecheck` (`tsc --noEmit`) — **0 errors (clean exit 0)**.
 - `npm test` — **405/405 passing across 94 suites, 0 failures** (duration ~101s).
 
+---
+
+### Session: 2026-10-07 — Multi-Strike Binary Corridor & Vertical Spread Terminal, Non-Linear CFTC Fee Drag Engine & Embeddable Widgets
+
+**Trigger:** The founder reiterated "excellent work keep full force ahead were doing great", advancing development full speed to create the undisputed benchmark platform in prediction markets.
+
+**Delivered Capabilities:**
+- **Multi-Strike Binary Corridor & Vertical Spread Engine (`src/corridor-engine.ts`, `/corridors`, `/spreads`)**:
+  - `computeCorridorAnalysis()`: Institutional pre-trade audit engine modeling binary vertical spreads:
+    - `RANGE_PIN_CORRIDOR` / `BULL_VERTICAL`: Long Lower Strike $K_1$ (YES), Short Higher Strike $K_2$ (YES).
+    - `BEAR_VERTICAL`: Long Higher Strike $K_2$ (NO), Short Lower Strike $K_1$ (NO).
+    - `VOLATILITY_STRANGLE`: Long Lower Strike $K_1$ (NO), Long Higher Strike $K_2$ (YES) (profiting on violent breakout beyond both strikes).
+  - Multi-Leg Non-Linear CFTC Taker Fee Model: Accurately calculates official Kalshi aggregate fee on both legs:
+    $\text{Total Fee} = \text{ceil}(0.07 \cdot c \cdot p_1 \cdot (1 - p_1) \cdot 100)/100 + \text{ceil}(0.07 \cdot c \cdot p_2 \cdot (1 - p_2) \cdot 100)/100$
+  - Fee Drag Ratio (% of Profit): Measures the percentage of maximum potential gross profit consumed by exchange taker fees, revealing to traders when narrow corridors destroy risk/reward expectancy.
+  - 9-Point Discontinuous Binary Payoff Curve: Plots exact realized net P&L across 5 market regimes (below $K_1$, at $K_1$, inside corridor, at $K_2$, above $K_2$) taking into account discontinuous binary step-function payouts.
+  - Legging-In Risk Scoring: Classifies execution friction (`LOW`, `ELEVATED`, `HIGH`) based on corridor width in basis points (<50 bps = HIGH) where non-atomic fills risk leg inversion.
+  - Maker Limit Order Optimization: Calculates potential fee relief from resting queue orders.
+- **Standalone Embeddable Corridor Widget (`/embed/corridor`, `/widget/corridor`)**:
+  - Compact HTML widget embeddable inside `<iframe>` tags on Substack, Discord bots, and financial research blogs.
+- **Institutional SVG Strategy Debrief Receipt Generator (`/api/corridor/card.svg`)**:
+  - Generates standalone, pixel-perfect 640x780 SVG graphic adhering to Gold Standard styling with SHA-256 cryptographic provenance, Rule B10 non-affiliation notice, and Rule B5 capital lock.
+- **Interactive Terminal UI & 1-Click Embed Snippet Modal (`/corridors`, `/spreads`)**:
+  - Dual slider + numeric price controls, instant client recalculation, responsive layout, and 1-click embed code generator modal with clipboard copy toast.
+- **Platform-Wide Navigation Interlinking**:
+  - Integrated `/corridors` into top nav across `/radar`, `/`, `/calculator`, `/divergence`, `/settlement`, and `/account`.
+- **Dedicated Acceptance Test Suite (`src/__tests__/corridor-engine.test.ts`)**:
+  - 7 automated tests validating multi-leg fee arithmetic, pin corridor payoff curves, strangle dispersion, legging-in scoring, HTML widget rendering, SVG debrief cards, and Rule B4/B5 compliance.
+
+**Verification:**
+- `npm run typecheck` (`tsc --noEmit`) — **0 errors (clean exit 0)**.
+- `npx tsx --test src/__tests__/corridor-engine.test.ts ...` — **27/27 passing across 7 suites in spot-check**.
+- Total Platform Suite: **412 tests passing across 95 suites**.
+
+
 

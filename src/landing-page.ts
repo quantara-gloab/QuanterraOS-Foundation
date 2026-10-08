@@ -1074,6 +1074,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       <div class="nav-links">
         <a href="/calculator" style="color:var(--accent); font-weight:700;">Check</a>
         <a href="/radar" style="color:var(--accent-light); font-weight:700;">Radar</a>
+        <a href="/corridors" style="color:var(--accent); font-weight:700;">Corridors</a>
         <a href="/divergence" style="color:var(--accent); font-weight:700;">Divergence</a>
         <a href="/settlement" style="color:var(--accent-light); font-weight:700;">Settlement</a>
         <a href="/journal" style="color:#10B981; font-weight:700;">Journal</a>

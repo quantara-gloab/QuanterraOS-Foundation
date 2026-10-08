@@ -551,6 +551,7 @@ export function renderSettlementDissectionPageHtml(
     <div class="nav-links">
       <a href="/radar">Radar</a>
       <a href="/calculator">Calculator</a>
+      <a href="/corridors">Corridors</a>
       <a href="/divergence">Divergence</a>
       <a href="/settlement" class="active" style="color:var(--accent); font-weight:600;">Settlement Dissection</a>
       <a href="/journal">Journal</a>

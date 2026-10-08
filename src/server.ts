@@ -85,6 +85,12 @@ import {
   renderSettlementDissectionPageHtml,
   renderSettlementForensicCardSvg,
 } from "./settlement-dissection.ts";
+import {
+  computeCorridorAnalysis,
+  renderEmbedCorridorHtml,
+  generateCorridorSvgReceipt,
+  renderCorridorTerminalHtml,
+} from "./corridor-engine.ts";
 import { renderEducationalPageHtml, type EducationTopic } from "./educational-pages.ts";
 import { getReviewReminders, updateReviewReminders } from "./review-reminders.ts";
 import { renderVenueComparisonPageHtml } from "./venue-comparison-page.ts";
@@ -1973,6 +1979,115 @@ app.get("/api/settlement/card.svg", (req, res) => {
     anchorBasePrice: basePrice,
   });
   const svg = renderSettlementForensicCardSvg(dissection);
+  res.setHeader("Content-Type", "image/svg+xml");
+  res.setHeader("Cache-Control", "public, max-age=60");
+  res.send(svg);
+});
+
+// Binary Corridor & Multi-Strike Spread Terminal
+app.get(["/corridors", "/spreads"], async (req, res) => {
+  let spotPrice = 91250;
+  try {
+    const live = await getLiveQuotes();
+    if (live.compositePrice) spotPrice = live.compositePrice;
+  } catch {
+    spotPrice = 91250;
+  }
+  const k1 = req.query.k1 ? Number(req.query.k1) : Math.floor(spotPrice / 250) * 250 - 250;
+  const k2 = req.query.k2 ? Number(req.query.k2) : k1 + 500;
+  const p1 = req.query.p1 ? Number(req.query.p1) : 0.62;
+  const p2 = req.query.p2 ? Number(req.query.p2) : 0.38;
+  const count = req.query.count ? Number(req.query.count) : 10;
+  const strategy = (typeof req.query.strategy === "string" ? req.query.strategy : "RANGE_PIN_CORRIDOR") as any;
+
+  const analysis = computeCorridorAnalysis(
+    strategy,
+    spotPrice,
+    k1,
+    k2,
+    p1,
+    p2,
+    count
+  );
+  res.type("html").send(renderCorridorTerminalHtml(analysis));
+});
+
+app.post(["/corridors", "/spreads"], (req, res) => {
+  const spotPrice = req.body.spotPrice ? Number(req.body.spotPrice) : 91250;
+  const k1 = req.body.k1 ? Number(req.body.k1) : 91000;
+  const k2 = req.body.k2 ? Number(req.body.k2) : 91500;
+  const p1 = req.body.p1 ? Number(req.body.p1) : 0.60;
+  const p2 = req.body.p2 ? Number(req.body.p2) : 0.40;
+  const count = req.body.count ? Number(req.body.count) : 10;
+  const strategy = (req.body.strategyType || "RANGE_PIN_CORRIDOR") as any;
+
+  const analysis = computeCorridorAnalysis(
+    strategy,
+    spotPrice,
+    k1,
+    k2,
+    p1,
+    p2,
+    count
+  );
+  res.type("html").send(renderCorridorTerminalHtml(analysis));
+});
+
+app.post("/api/corridor/calculate", (req, res) => {
+  const { strategyType, spotPrice, lowerStrike, higherStrike, leg1Price, leg2Price, contractCount, underlying } = req.body || {};
+  const analysis = computeCorridorAnalysis(
+    strategyType || "RANGE_PIN_CORRIDOR",
+    Number(spotPrice) || 91250,
+    Number(lowerStrike) || 91000,
+    Number(higherStrike) || 91500,
+    Number(leg1Price) || 0.60,
+    Number(leg2Price) || 0.40,
+    Number(contractCount) || 10,
+    underlying || "BTC"
+  );
+  res.json({ success: true, analysis });
+});
+
+app.get(["/embed/corridor", "/widget/corridor"], (req, res) => {
+  const spotPrice = req.query.spot ? Number(req.query.spot) : 91250;
+  const k1 = req.query.k1 ? Number(req.query.k1) : 91000;
+  const k2 = req.query.k2 ? Number(req.query.k2) : 91500;
+  const p1 = req.query.p1 ? Number(req.query.p1) : 0.62;
+  const p2 = req.query.p2 ? Number(req.query.p2) : 0.38;
+  const count = req.query.count ? Number(req.query.count) : 10;
+  const strategy = (typeof req.query.strategy === "string" ? req.query.strategy : "RANGE_PIN_CORRIDOR") as any;
+
+  const analysis = computeCorridorAnalysis(
+    strategy,
+    spotPrice,
+    k1,
+    k2,
+    p1,
+    p2,
+    count
+  );
+  res.type("html").send(renderEmbedCorridorHtml(analysis));
+});
+
+app.get("/api/corridor/card.svg", (req, res) => {
+  const spotPrice = req.query.spot ? Number(req.query.spot) : 91250;
+  const k1 = req.query.k1 ? Number(req.query.k1) : 91000;
+  const k2 = req.query.k2 ? Number(req.query.k2) : 91500;
+  const p1 = req.query.p1 ? Number(req.query.p1) : 0.62;
+  const p2 = req.query.p2 ? Number(req.query.p2) : 0.38;
+  const count = req.query.count ? Number(req.query.count) : 10;
+  const strategy = (typeof req.query.strategy === "string" ? req.query.strategy : "RANGE_PIN_CORRIDOR") as any;
+
+  const analysis = computeCorridorAnalysis(
+    strategy,
+    spotPrice,
+    k1,
+    k2,
+    p1,
+    p2,
+    count
+  );
+  const svg = generateCorridorSvgReceipt(analysis);
   res.setHeader("Content-Type", "image/svg+xml");
   res.setHeader("Cache-Control", "public, max-age=60");
   res.send(svg);
