@@ -1278,6 +1278,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       </div>
     </div>
     <div class="nav-right" style="display:flex; gap:12px; align-items:center;">
+      <a href="/transparency" style="color:#10B981; font-size:0.78rem; text-decoration:none; font-weight:600;">Transparency</a>
       <a href="/why" style="color:var(--accent); font-size:0.78rem; text-decoration:none; font-weight:600;">Why QuanterraOS</a>
       <a href="/research" style="color:var(--muted); font-size:0.78rem; text-decoration:none;">Research</a>
       <a href="/access" style="color:var(--muted); font-size:0.78rem; text-decoration:none;">Institutional</a>
@@ -2191,6 +2192,7 @@ ${miniCircles}
     <!-- Footer -->
     <footer class="page-footer">
       <div class="footer-links">
+        <a href="/transparency">transparency</a>
         <a href="/why">why</a>
         <a href="/radar">radar</a>
         <a href="/paper">paper</a>

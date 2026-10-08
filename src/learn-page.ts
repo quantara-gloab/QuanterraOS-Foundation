@@ -628,6 +628,9 @@ Integrity:      Cryptographically Verifiable Telemetry
             <a href="/why" class="btn-action-nav" style="background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%); color:#07080B; text-decoration:none; font-weight:700; padding:8px 16px;">
               Read Full 2026 Competitive Teardown &rarr;
             </a>
+            <a href="/transparency" class="btn-action-nav" style="background:#10B981; color:#07080B; text-decoration:none; font-weight:700; padding:8px 16px;">
+              Outcome &amp; Friction Transparency Audit (#6.6) &rarr;
+            </a>
             <a href="/study" class="btn-action-nav" style="background:rgba(212,175,55,0.1); border:1px solid rgba(212,175,55,0.3); color:var(--accent-light); text-decoration:none;">
               Know Your Costs Study (#6.4) &rarr;
             </a>
@@ -644,6 +647,7 @@ Integrity:      Cryptographically Verifiable Telemetry
         <span style="color:var(--muted); font-size:0.8rem; margin-left:8px;">Check live contracts &bull; Log to journal &bull; Audit consensus</span>
       </div>
       <div style="display:flex; gap:16px; align-items:center;">
+        <a href="/transparency" style="color:#10B981; font-weight:700;">Transparency Report &rarr;</a>
         <a href="/why">Why QuanterraOS &rarr;</a>
         <a href="/calculator">Open True Cost Calculator &rarr;</a>
         <a href="/compare">Compare Venues &rarr;</a>

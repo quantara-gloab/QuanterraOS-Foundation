@@ -163,6 +163,13 @@ import {
   renderBenchmarkWidgetHtml,
   renderBenchmarkPageHtml,
 } from "./competitive-benchmark.ts";
+import {
+  getPeriodicFrictionReport,
+  generatePeriodicFrictionReceiptSvg,
+  renderPeriodicFrictionWidgetHtml,
+  exportPeriodicFrictionReportCsv,
+  renderPeriodicFrictionReportPageHtml,
+} from "./periodic-outcome-reports.ts";
 import { renderEducationalPageHtml, type EducationTopic } from "./educational-pages.ts";
 import { getReviewReminders, updateReviewReminders } from "./review-reminders.ts";
 import { renderVenueComparisonPageHtml } from "./venue-comparison-page.ts";
@@ -2635,6 +2642,38 @@ app.get("/api/benchmark/card.svg", (req, res) => {
   res.setHeader("Content-Type", "image/svg+xml; charset=utf-8");
   res.setHeader("Cache-Control", "public, max-age=60, s-maxage=300");
   res.send(svg);
+});
+
+// Periodic Outcome & Market Friction Reports (Section 6.6 of Global Growth Strategy)
+app.get(["/transparency", "/reports/friction", "/reports/outcomes"], (_req, res) => {
+  const report = getPeriodicFrictionReport();
+  res.type("html").send(renderPeriodicFrictionReportPageHtml(report));
+});
+
+app.get(["/embed/transparency", "/embed/reports/friction"], (_req, res) => {
+  const report = getPeriodicFrictionReport();
+  res.type("html").send(renderPeriodicFrictionWidgetHtml(report));
+});
+
+app.get("/api/reports/friction", (_req, res) => {
+  const report = getPeriodicFrictionReport();
+  res.json({ success: true, report });
+});
+
+app.get("/api/reports/friction/card.svg", (_req, res) => {
+  const report = getPeriodicFrictionReport();
+  const svg = generatePeriodicFrictionReceiptSvg(report);
+  res.setHeader("Content-Type", "image/svg+xml; charset=utf-8");
+  res.setHeader("Cache-Control", "public, max-age=60, s-maxage=300");
+  res.send(svg);
+});
+
+app.get(["/api/reports/friction/export.csv", "/api/reports/friction.csv"], (_req, res) => {
+  const report = getPeriodicFrictionReport();
+  const csv = exportPeriodicFrictionReportCsv(report);
+  res.setHeader("Content-Type", "text/csv; charset=utf-8");
+  res.setHeader("Content-Disposition", 'attachment; filename="quanterraos-market-friction-report.csv"');
+  res.send(csv);
 });
 
 app.get(["/learn", "/education", "/curriculum"], (req, res) => {

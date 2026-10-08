@@ -1064,6 +1064,40 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 - `node --experimental-strip-types --test src/__tests__/mcp-friction.test.ts src/__tests__/landing-page-cockpit.test.ts src/__tests__/competitive-benchmark.test.ts src/__tests__/static-copy-guardrails.test.ts` — **24/24 tests passing across 4 suites**.
 - Remote production healthcheck: `GET https://quanterraos.com/healthz` returns `200 OK` (`status: ok, circuit: LOCKED_RULE_B5`).
 
+---
+
+### Session: 2026-10-08 — Periodic Outcome & Market Friction Reports (Growth Strategy Section 6.6)
+
+**Trigger:** "continue to next developement task on the list" — delivering Growth Strategy Section 6.6 ("Periodic Outcome Reports: Public transparency on real market friction"), establishing QuanterraOS as the industry's independent referee publishing audited empirical taker fee drag and calibration distributions across settled markets.
+
+**Delivered Upgrades:**
+- **Periodic Outcome Reports Engine (`src/periodic-outcome-reports.ts`)**:
+  - `getDecileOutcomeRows()`: Transcribes the 10 empirical deciles across 1,316 settled BTC15M windows (19,740 1-minute observations) from `docs/findings.md` §9b.
+  - `getPeriodicFrictionReport()`: Compiles weighted taker fee drag (average ~1.51¢ across distribution, peak 1.75¢ at mid-market), 0.2001 market-mid Brier score, 43.6% fee drag ratio, and cryptographic 64-char SHA-256 provenance hash.
+  - Reconciles academic & investigative findings: Wall Street Journal (May 2026, >70% loss rate), Roosevelt Institute (May 2026, $583.5M retail taker losses), and Vanderbilt University (Clinton & Huang 2026, probability calibration vs binary hit-rate).
+  - `generatePeriodicFrictionReceiptSvg()`: Generates institutional vector verification cards with gold-accented dark theme, metric grids, and provenance hashes.
+  - `renderPeriodicFrictionWidgetHtml()`: Lightweight embeddable iframe widget for external research publications.
+  - `exportPeriodicFrictionReportCsv()`: Full RFC 4180 CSV export endpoint for academic replication.
+  - `renderPeriodicFrictionReportPageHtml()`: Responsive dark-mode dashboard at `/transparency`, `/reports/friction`, and `/reports/outcomes`.
+- **Server Routes & API Integration (`src/server.ts`)**:
+  - `GET /transparency`, `GET /reports/friction`, `GET /reports/outcomes`: Renders full audit dashboard.
+  - `GET /embed/transparency`, `GET /embed/reports/friction`: Serves embeddable iframe widget.
+  - `GET /api/reports/friction`: Returns structured JSON report with deciles, academic citations, and provenance hash.
+  - `GET /api/reports/friction/card.svg`: Generates real-time institutional SVG card.
+  - `GET /api/reports/friction/export.csv`, `GET /api/reports/friction.csv`: Generates downloadable CSV dataset.
+- **Cross-Platform Navigation Integration**:
+  - `src/landing-page.ts`: Added `/transparency` link to top-right navigation and footer link roster.
+  - `src/learn-page.ts`: Added direct CTAs to `/transparency` from Module 05 and the curriculum bottom navigation bar.
+- **Acceptance Testing Suite (`src/__tests__/periodic-outcome-reports.test.ts`)**:
+  - 8 comprehensive tests passing covering decile counts (1,316 settled markets), Brier score (0.2001), SHA-256 hash length, academic context citations, SVG validation, embeddable widget HTML, RFC 4180 CSV export, and Rule B4/B5/B10 compliance.
+
+**Verification:**
+- `npx tsc --noEmit` — **0 errors (clean exit 0)**.
+- `node --experimental-strip-types --test src/__tests__/periodic-outcome-reports.test.ts` — **8/8 passing**.
+- `npm test` — **484/484 tests passing across 108 test suites**.
+- Remote production healthcheck: `GET https://quanterraos.com/healthz` returns `200 OK` (`status: ok, circuit: LOCKED_RULE_B5`).
+
+
 
 
 
