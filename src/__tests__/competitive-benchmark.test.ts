@@ -2,7 +2,9 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import {
   computeFrictionTeardown,
+  computeCrossVenueSpreadTeardown,
   COMPETITOR_BENCHMARK_ROWS,
+  COMPETITOR_DOSSIER_LIST,
   generateBenchmarkSvgReceipt,
   renderBenchmarkWidgetHtml,
   renderBenchmarkPageHtml,
@@ -70,8 +72,8 @@ describe("Competitive Benchmark & Truth vs. Hype Engine (2026 Strategy)", () => 
 
     assert.ok(widget.includes("<!DOCTYPE html>"));
     assert.ok(widget.includes("widget-box"));
-    assert.ok(widget.includes("Competitor Claim"));
-    assert.ok(widget.includes("QuanterraOS Reality"));
+    assert.ok(widget.includes("COMPETITOR CLAIM"));
+    assert.ok(widget.includes("QuanterraOS"));
     assert.ok(widget.includes('href="/why"'));
   });
 
@@ -98,4 +100,63 @@ describe("Competitive Benchmark & Truth vs. Hype Engine (2026 Strategy)", () => 
       assert.doesNotMatch(html, pat, `Benchmark page must not contain banned pattern: ${pat}`);
     }
   });
+
+  it("6. Strategic Move #2: Cross-Venue Spread Teardown uncovers hidden fees & oracle hazard", () => {
+    // 48c Kalshi Yes vs 49c Polymarket No across 1,000 contracts
+    const result = computeCrossVenueSpreadTeardown({
+      venueAPriceCents: 48,
+      venueBPriceCents: 49,
+      contracts: 1000,
+      venueBGasFeeUsd: 1.50,
+    });
+
+    assert.equal(result.venueAPriceCents, 48);
+    assert.equal(result.venueBPriceCents, 49);
+    assert.equal(result.claimedNominalSpreadCents, 3.00); // 100 - (48 + 49) = 3c
+    assert.equal(result.claimedGrossProfitUsd, 30.00); // $0.03 * 1000
+
+    // Deductions
+    assert.equal(result.venueATakerFeeUsd, 17.50); // Kalshi fee
+    assert.equal(result.venueBGasAndFrictionUsd, 6.50); // $1.50 gas + $5.00 friction
+    assert.equal(result.totalTransactionFrictionUsd, 24.00);
+    assert.equal(result.netRealizedProfitUsd, 6.00); // $30 - $24.00
+    assert.ok(result.feeDragRatioPct > 70.0, "Fee drag should consume over 70% of gross spread");
+
+    // Provenance & Oracle Risk
+    assert.equal(result.provenanceHash.length, 64);
+    assert.ok(result.oracleRiskWarning.includes("CME CF BRTI 60-second TWAP"));
+    assert.ok(result.oracleRiskWarning.includes("UMA"));
+
+    // When order count is small (100 contracts), gas and taker fees completely destroy nominal spread
+    const smallOrder = computeCrossVenueSpreadTeardown({
+      venueAPriceCents: 48,
+      venueBPriceCents: 49,
+      contracts: 100,
+      venueBGasFeeUsd: 1.50,
+    });
+    assert.equal(smallOrder.claimedGrossProfitUsd, 3.00);
+    assert.ok(smallOrder.netRealizedProfitUsd < 1.0, "Small orders must see spread completely consumed");
+    assert.equal(smallOrder.verdict, "ILLUSORY_SPREAD_DESTROYED");
+  });
+
+  it("7. Competitor Dossier: audits all 6 market incumbents against QuanterraOS advantages", () => {
+    assert.equal(COMPETITOR_DOSSIER_LIST.length, 6, "Must contain all 6 competitor dossiers");
+
+    const names = COMPETITOR_DOSSIER_LIST.map((c) => c.name);
+    assert.ok(names.includes("Verso"));
+    assert.ok(names.includes("Oddpool"));
+    assert.ok(names.includes("Dome"));
+    assert.ok(names.includes("Predly"));
+    assert.ok(names.includes("Stand.Trade"));
+    assert.ok(names.includes("Unusual Whales"));
+
+    for (const dossier of COMPETITOR_DOSSIER_LIST) {
+      assert.ok(dossier.domain.length > 3);
+      assert.ok(dossier.claim.length > 5);
+      assert.ok(dossier.targetUser.length > 5);
+      assert.ok(dossier.vulnerability.length > 20);
+      assert.ok(dossier.quanterraAdvantage.length > 20);
+    }
+  });
 });
+

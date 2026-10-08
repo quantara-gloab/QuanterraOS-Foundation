@@ -159,6 +159,8 @@ import {
 } from "./educator-portal.ts";
 import {
   computeFrictionTeardown,
+  computeCrossVenueSpreadTeardown,
+  COMPETITOR_DOSSIER_LIST,
   generateBenchmarkSvgReceipt,
   renderBenchmarkWidgetHtml,
   renderBenchmarkPageHtml,
@@ -2635,6 +2637,24 @@ app.get("/api/benchmark/teardown", (req, res) => {
   const contracts = req.query.c ? Number(req.query.c) : 100;
   const teardown = computeFrictionTeardown({ nominalPriceCents, userStatedWinRatePct, contracts });
   res.json({ success: true, teardown });
+});
+
+app.get("/api/benchmark/cross-venue", (req, res) => {
+  const venueAPriceCents = req.query.a ? Number(req.query.a) : 48;
+  const venueBPriceCents = req.query.b ? Number(req.query.b) : 49;
+  const contracts = req.query.c ? Number(req.query.c) : 1000;
+  const gasUsd = req.query.gas ? Number(req.query.gas) : 1.50;
+  const result = computeCrossVenueSpreadTeardown({
+    venueAPriceCents,
+    venueBPriceCents,
+    contracts,
+    venueBGasFeeUsd: gasUsd,
+  });
+  res.json({ success: true, result });
+});
+
+app.get("/api/benchmark/competitors", (_req, res) => {
+  res.json({ success: true, competitors: COMPETITOR_DOSSIER_LIST });
 });
 
 app.get("/api/benchmark/card.svg", (req, res) => {

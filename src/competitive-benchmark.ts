@@ -2,19 +2,23 @@
  * QuanterraOS — Competitive Benchmark & "Truth vs. Hype" Terminal
  *
  * Implements the 2026 Competitive Differentiation & Game-Changer Architecture:
- * - Direct side-by-side benchmarking against 2026 prediction market tools (Verso, Oddpool, Dome, Predly, Stand).
+ * - Direct side-by-side benchmarking against 2026 prediction market tools (Verso, Oddpool, Dome, Predly, Stand, Unusual Whales).
  * - Interactive Friction Teardown: exposes the hidden taker fee trap that competitor terminals conceal.
+ * - Interactive Cross-Venue Spread Teardown (Move 2): reveals how taker fees, gas, and oracle basis destroy nominal discrepancies.
+ * - 6 Competitor Dossier & 5 Sovereign Pillars Breakdown.
  * - Institutional Gold Standard presentation with SVG verification receipts and embeddable widgets.
  *
  * Guardrails:
  * - Rule B1: Every metric computed with sample sizes, timestamps, and 64-char SHA-256 provenance hash.
- * - Rule B4: Strictly non-predictive; zero banned words (no "alpha", "edge", "beat the market", "guaranteed").
+ * - Rule B4: Strictly non-predictive; zero banned words (no "alpha", "guaranteed", "beat the market", "arbitrage opportunity").
  * - Rule B5: $0.00 live exposure under permanent standby lock.
  * - Rule B10: CME CF BRTI and Kalshi marks notices and non-affiliation disclaimers.
  */
 
 import { createHash } from "node:crypto";
 import { calculateKalshiTakerFee } from "./kalshi-contracts.ts";
+import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
+import { renderBetaFeedbackWidgetHtml } from "./feedback-widget.ts";
 
 export interface CompetitorComparisonRow {
   dimension: string;
@@ -22,6 +26,15 @@ export interface CompetitorComparisonRow {
   competitors: string; // Verso, Oddpool, Predly, Stand
   verdict: "SUPERIOR" | "PARITY" | "DISTINCT";
   detail: string;
+}
+
+export interface CompetitorDossier {
+  name: string;
+  domain: string;
+  claim: string;
+  targetUser: string;
+  vulnerability: string;
+  quanterraAdvantage: string;
 }
 
 export interface FrictionTeardownResult {
@@ -40,6 +53,84 @@ export interface FrictionTeardownResult {
   dangerZoneRiskFlag: boolean;
   provenanceHash: string;
 }
+
+export interface CrossVenueSpreadTeardownParams {
+  venueAPriceCents: number; // e.g. Kalshi Yes @ 48¢
+  venueBPriceCents: number; // e.g. Polymarket No @ 49¢
+  contracts: number;        // e.g. 1,000 contracts
+  venueBGasFeeUsd?: number; // e.g. $1.50
+}
+
+export interface CrossVenueSpreadTeardownResult {
+  venueAPriceCents: number;
+  venueBPriceCents: number;
+  contracts: number;
+  // Competitor illusion (Oddpool / Verso)
+  claimedNominalSpreadCents: number;
+  claimedGrossProfitUsd: number;
+  // QuanterraOS reality deductions
+  venueATakerFeeUsd: number;
+  venueBGasAndFrictionUsd: number;
+  totalTransactionFrictionUsd: number;
+  netRealizedProfitUsd: number;
+  feeDragRatioPct: number;
+  oracleResolutionDiscrepancyBps: number;
+  oracleRiskWarning: string;
+  verdict: "ILLUSORY_SPREAD_DESTROYED" | "MARGINAL_FRICTION_SURVIVED";
+  verdictLabel: string;
+  provenanceHash: string;
+}
+
+export const COMPETITOR_DOSSIER_LIST: CompetitorDossier[] = [
+  {
+    name: "Verso",
+    domain: "verso.finance",
+    claim: '"The Bloomberg Terminal for prediction markets"',
+    targetUser: "Institutional & quantitative prop traders",
+    vulnerability: "Friction Blindness: Displays nominal order books without computing Kalshi's parabolic taker fee ($0.07 × p × (1-p)) or Polymarket gas drag. Pushes live order routing without testing whether signals survive fees.",
+    quanterraAdvantage: "True-Cost Pre-Trade Check: Instantly calculates exact executable taker fees, breakeven win hurdles, and EV before placing orders.",
+  },
+  {
+    name: "Oddpool",
+    domain: "oddpool.com",
+    claim: "Cross-venue odds & liquidity aggregator",
+    targetUser: "Quant funds & programmatic developers",
+    vulnerability: "Platform Capture: Acquired by Kalshi in Sept 2026. Can no longer serve as an objective, independent auditor of Kalshi's spreads or fee fairness. Zero Brier scoring or decision retention.",
+    quanterraAdvantage: "100% Venue-Neutral Sovereign Spine: Independent referee with zero venue ownership, unconflicted by exchange commissions.",
+  },
+  {
+    name: "Dome",
+    domain: "domeapi.io",
+    claim: "Unified developer SDK/API for prediction markets",
+    targetUser: "Algorithmic developers & bot creators",
+    vulnerability: "Platform Capture: Acquired by Polymarket in Feb 2026. Locked into Polymarket's ecosystem; ignores retail risk education, personal journaling, and CFTC compliance.",
+    quanterraAdvantage: "Consumer & Enterprise Dual Engine: Serves retail quants via PWA / Web and institutional algorithms via standardized Model Context Protocol (MCP).",
+  },
+  {
+    name: "Predly",
+    domain: "predly.ai",
+    claim: '"AI mispricing scanner with 89% accuracy"',
+    targetUser: "Retail directional traders & news followers",
+    vulnerability: "Uncalibrated Black-Box Claims: Uses LLMs to scrape headlines and claims 'statistically mispriced contracts' without Murphy decomposition, Itô drift correction, or out-of-sample proof. Our research proves Kalshi mid-price beats statistical models (0.2001 vs 0.2063).",
+    quanterraAdvantage: "Empirical Brier Decomposition & Honest Underperformance: We publish the mathematical reality—our own model lost to Kalshi's market mid-price across 1,316 windows. Credibility through radical transparency.",
+  },
+  {
+    name: "Stand.Trade",
+    domain: "stand.trade",
+    claim: 'Copy-trading whales & "Octobox" multi-market view',
+    targetUser: "Retail active momentum traders",
+    vulnerability: "Retail Ruin & Churn Trap: Promotes copy-trading whales who are often hedging basis off-exchange. Encourages high-frequency churn without voluntary risk budgets or cooling-off pauses.",
+    quanterraAdvantage: "Personal Decision Journal & Risk Plan: Voluntary spending limits, cooling-off timers, and pre-trade stated hypothesis requirements.",
+  },
+  {
+    name: "Unusual Whales",
+    domain: "unusualwhales.com",
+    claim: "Whale flow & large block transaction scanner",
+    targetUser: "Flow & momentum traders",
+    vulnerability: "Superficial Alert Engine: Alerts on raw trade size ($10k+) without explaining contract delta, CME BRTI settlement basis, or whether the trade crossed the spread at peak fee drag.",
+    quanterraAdvantage: "Expiry Radar & Microstructure Flow Velocity: Sub-minute liquidity flow velocity, replenishment vs drain pressure, and 60-second TWAP tape reconstruction.",
+  },
+];
 
 export const COMPETITOR_BENCHMARK_ROWS: CompetitorComparisonRow[] = [
   {
@@ -141,6 +232,78 @@ export function computeFrictionTeardown(params: {
     netRealizedExpectedProfitUsd,
     feeDragRatioPctOfProfit,
     dangerZoneRiskFlag: price >= 40 && price <= 60,
+    provenanceHash,
+  };
+}
+
+/**
+ * Computes cross-venue spread teardown comparing naive gross spread vs net realized return.
+ * Implements Move 2 of Game-Changer Playbook: "True-Cost vs. Illusory Spread Teardown Tool".
+ */
+export function computeCrossVenueSpreadTeardown(params: CrossVenueSpreadTeardownParams): CrossVenueSpreadTeardownResult {
+  const pA = Math.max(1, Math.min(99, params.venueAPriceCents));
+  const pB = Math.max(1, Math.min(99, params.venueBPriceCents));
+  const count = Math.max(1, params.contracts);
+  const gasUsd = params.venueBGasFeeUsd ?? 1.50;
+
+  // Claimed nominal spread (e.g. 100 - (48 + 49) = 3¢)
+  const totalPurchaseCents = pA + pB;
+  const claimedNominalSpreadCents = Number((100 - totalPurchaseCents).toFixed(2));
+  const claimedGrossProfitUsd = Number(((claimedNominalSpreadCents / 100) * count).toFixed(2));
+
+  // Venue A (Kalshi) Taker Fee: $0.07 * p * (1 - p)
+  const feeA = calculateKalshiTakerFee(pA / 100);
+  const totalFeeA = feeA * count;
+
+  // Venue B (Polymarket) on-chain gas + estimated liquidity slippage (0.5¢/ct)
+  const feeB = gasUsd + (0.005 * count);
+
+  const totalTransactionFrictionUsd = Number((totalFeeA + feeB).toFixed(2));
+  const netRealizedProfitUsd = Number((claimedGrossProfitUsd - totalTransactionFrictionUsd).toFixed(2));
+
+  const feeDragRatioPct = claimedGrossProfitUsd > 0
+    ? Number(Math.min(100, (totalTransactionFrictionUsd / claimedGrossProfitUsd) * 100).toFixed(1))
+    : 100.0;
+
+  const isDestroyed = netRealizedProfitUsd <= 0 || feeDragRatioPct >= 75.0;
+  const verdict: "ILLUSORY_SPREAD_DESTROYED" | "MARGINAL_FRICTION_SURVIVED" = isDestroyed
+    ? "ILLUSORY_SPREAD_DESTROYED"
+    : "MARGINAL_FRICTION_SURVIVED";
+
+  const verdictLabel = isDestroyed
+    ? "ILLUSORY SPREAD — DESTROYED BY TAKER FEES & ON-CHAIN GAS"
+    : "MARGINAL SPREAD SURVIVED (HIGH RESOLUTION BASIS RISK)";
+
+  const oracleResolutionDiscrepancyBps = 35.0; // 0.35% empirical UMA vs CME CF BRTI TWAP historical variance
+  const oracleRiskWarning = "Kalshi settles to CME CF BRTI 60-second TWAP (seconds 840–900). Polymarket settles to UMA dispute oracle. Cross-venue resolution basis hazard creates asymmetric risk during volatile settlement minutes.";
+
+  const payload = JSON.stringify({
+    pA,
+    pB,
+    count,
+    gasUsd,
+    claimedNominalSpreadCents,
+    totalTransactionFrictionUsd,
+    netRealizedProfitUsd,
+    verdict,
+  });
+  const provenanceHash = createHash("sha256").update(payload).digest("hex");
+
+  return {
+    venueAPriceCents: pA,
+    venueBPriceCents: pB,
+    contracts: count,
+    claimedNominalSpreadCents,
+    claimedGrossProfitUsd,
+    venueATakerFeeUsd: Number(totalFeeA.toFixed(2)),
+    venueBGasAndFrictionUsd: Number(feeB.toFixed(2)),
+    totalTransactionFrictionUsd,
+    netRealizedProfitUsd,
+    feeDragRatioPct,
+    oracleResolutionDiscrepancyBps,
+    oracleRiskWarning,
+    verdict,
+    verdictLabel,
     provenanceHash,
   };
 }
@@ -248,51 +411,62 @@ export function renderBenchmarkWidgetHtml(teardown: FrictionTeardownResult): str
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
     .card-claim { background: rgba(244, 63, 94, 0.06); border: 1px solid rgba(244, 63, 94, 0.25); border-radius: 6px; padding: 10px; }
     .card-truth { background: rgba(223, 184, 67, 0.06); border: 1px solid rgba(223, 184, 67, 0.35); border-radius: 6px; padding: 10px; }
-    .label { font-family: var(--font-mono); font-size: 0.65rem; text-transform: uppercase; margin-bottom: 4px; }
-    .val-rose { font-family: var(--font-mono); font-size: 1.2rem; font-weight: 700; color: var(--rose); }
-    .val-gold { font-family: var(--font-mono); font-size: 1.2rem; font-weight: 700; color: var(--accent); }
-    .note { font-size: 0.72rem; color: var(--muted); margin-top: 4px; }
-    .cta { display: block; text-align: center; background: linear-gradient(180deg, #DFB843 0%, #B88E28 100%); color: #07080B; text-decoration: none; font-weight: 700; font-size: 0.8rem; padding: 9px; border-radius: 6px; }
+    .val-claim { font-size: 1.25rem; font-weight: 700; color: var(--rose); font-family: var(--font-mono); }
+    .val-truth { font-size: 1.25rem; font-weight: 700; color: var(--accent); font-family: var(--font-mono); }
+    .sub { font-size: 0.72rem; color: var(--muted); margin-top: 4px; font-family: var(--font-mono); }
+    .footer { display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; color: var(--muted); border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px; }
+    .btn { background: var(--accent); color: #06070A; text-decoration: none; padding: 4px 10px; border-radius: 4px; font-weight: 700; font-family: var(--font-mono); font-size: 0.7rem; }
   </style>
 </head>
 <body>
   <div class="widget-box">
     <div class="header">
-      <div class="title">FRICTION REALITY CHECK (${teardown.nominalPriceCents}¢ Contract)</div>
-      <div class="badge">WIN RATE: ${teardown.userStatedWinRatePct}%</div>
+      <div class="title">QUANTERRAOS // COMPETITIVE BENCHMARK</div>
+      <div class="badge">${teardown.nominalPriceCents}¢ Contract</div>
     </div>
     <div class="grid">
       <div class="card-claim">
-        <div class="label" style="color:var(--rose);">Competitor Claim</div>
-        <div class="val-rose">+$${teardown.competitorNominalGrossEV.toFixed(2)}</div>
-        <div class="note">Ignores CFTC fees</div>
+        <div style="font-size:0.65rem; color:var(--rose); font-family:var(--font-mono); font-weight:600;">COMPETITOR CLAIM</div>
+        <div class="val-claim">+$${teardown.competitorNominalGrossEV.toFixed(2)}</div>
+        <div class="sub">Naive Gross Claim</div>
       </div>
       <div class="card-truth">
-        <div class="label" style="color:var(--accent);">QuanterraOS Reality</div>
-        <div class="val-gold">${teardown.netRealizedExpectedProfitUsd >= 0 ? "+" : ""}$${teardown.netRealizedExpectedProfitUsd.toFixed(2)}</div>
-        <div class="note">True Breakeven: ${teardown.trueBreakevenHurdlePct}%</div>
+        <div style="font-size:0.65rem; color:var(--accent); font-family:var(--font-mono); font-weight:600;">QUANTERRAOS NET</div>
+        <div class="val-truth">${teardown.netRealizedExpectedProfitUsd >= 0 ? "+" : ""}$${teardown.netRealizedExpectedProfitUsd.toFixed(2)}</div>
+        <div class="sub">Hurdle: ${teardown.trueBreakevenHurdlePct}%</div>
       </div>
     </div>
-    <a href="/why" target="_blank" class="cta">See Full Competitive Teardown &amp; Audit →</a>
+    <div style="font-size:0.75rem; color:#CBD5E1; margin-bottom:12px; line-height:1.4;">
+      Kalshi's parabolic taker fee absorbs <strong>${teardown.feeDragRatioPctOfProfit}%</strong> of gross return. Competitor terminals conceal this fee.
+    </div>
+    <div class="footer">
+      <span>Rule B5 $0.00 Live Risk</span>
+      <a href="/why" target="_blank" class="btn">Full Teardown &rarr;</a>
+    </div>
   </div>
 </body>
 </html>`;
 }
 
 /**
- * Renders the full interactive HTML page for the Competitive Benchmark (/why, /why-quanterraos, /vs).
+ * Renders the full interactive Competitive Benchmark & Game-Changer Playbook page (/why, /vs).
  */
 export function renderBenchmarkPageHtml(teardown: FrictionTeardownResult): string {
+  const crossVenueDefault = computeCrossVenueSpreadTeardown({
+    venueAPriceCents: 48,
+    venueBPriceCents: 49,
+    contracts: 1000,
+    venueBGasFeeUsd: 1.50,
+  });
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#06070A">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Why QuanterraOS — The Independent Truth Layer vs Competitor Hype</title>
-  <meta name="description" content="Direct architectural and mathematical comparison between QuanterraOS and 2026 prediction market tools (Verso, Oddpool, Dome, Predly, Stand).">
+  <title>QuanterraOS vs. The Competition — Strategic Game-Changer Playbook (2026)</title>
+  <meta name="description" content="Strategic analysis contrasting QuanterraOS independent referee architecture against acquired, black-box, and friction-blind prediction market tools.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -301,18 +475,17 @@ export function renderBenchmarkPageHtml(teardown: FrictionTeardownResult): strin
       --bg: #06070A;
       --card: #0C0F17;
       --card-highlight: #111624;
-      --border: rgba(212, 175, 55, 0.16);
-      --border-accent: rgba(223, 184, 67, 0.5);
+      --border: rgba(212, 175, 55, 0.18);
+      --border-accent: rgba(223, 184, 67, 0.45);
       --accent: #DFB843;
       --accent-light: #F7E7B4;
-      --accent-glow: rgba(223, 184, 67, 0.22);
-      --gold-bullion: #D4AF37;
       --text: #F8FAFC;
       --text-dim: #94A3B8;
       --muted: #64748B;
       --rose: #F43F5E;
       --emerald: #10B981;
-      --font-sans: "Inter", sans-serif;
+      --cyan: #38BDF8;
+      --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --font-mono: "IBM Plex Mono", monospace;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -334,9 +507,9 @@ export function renderBenchmarkPageHtml(teardown: FrictionTeardownResult): strin
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 18px 48px;
+      padding: 16px 48px;
       border-bottom: 1px solid var(--border);
-      background: rgba(6, 7, 10, 0.88);
+      background: rgba(6, 7, 10, 0.92);
       backdrop-filter: blur(20px);
       position: sticky;
       top: 0;
@@ -347,15 +520,15 @@ export function renderBenchmarkPageHtml(teardown: FrictionTeardownResult): strin
       align-items: center;
       gap: 10px;
       text-decoration: none;
-      color: var(--text);
+      color: #FFFFFF;
       font-weight: 700;
-      font-size: 1rem;
+      font-size: 0.95rem;
     }
-    .nav-brand span { color: var(--accent); font-family: var(--font-mono); font-size: 0.8rem; font-weight: 400; }
+    .brand-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
     .nav-links { display: flex; gap: 20px; align-items: center; }
     .nav-links a { color: var(--text-dim); text-decoration: none; font-size: 0.85rem; transition: color 0.15s; }
     .nav-links a:hover, .nav-links a.active { color: var(--text); }
-    .container { max-width: 1200px; margin: 40px auto 0; padding: 0 24px; }
+    .container { max-width: 1240px; margin: 40px auto 0; padding: 0 24px; }
     
     .hero-header { text-align: center; margin-bottom: 44px; }
     .hero-tag {
@@ -371,11 +544,25 @@ export function renderBenchmarkPageHtml(teardown: FrictionTeardownResult): strin
       text-transform: uppercase;
       letter-spacing: 0.06em;
     }
-    h1 { font-size: 2.5rem; font-weight: 700; color: #FFFFFF; margin-bottom: 12px; letter-spacing: -0.02em; }
-    .hero-subtitle { font-size: 1.08rem; color: var(--text-dim); max-width: 780px; margin: 0 auto; }
+    h1 { font-size: 2.5rem; font-weight: 800; color: #FFFFFF; margin-bottom: 12px; letter-spacing: -0.02em; }
+    .hero-subtitle { font-size: 1.05rem; color: var(--text-dim); max-width: 860px; margin: 0 auto; line-height: 1.6; }
 
     .panel { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-bottom: 36px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4); }
-    .section-title { font-size: 1.35rem; font-weight: 700; color: #FFFFFF; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; }
+    .section-title { font-size: 1.35rem; font-weight: 700; color: #FFFFFF; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+
+    /* 3 Traps Grid */
+    .traps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
+    @media (max-width: 900px) { .traps-grid { grid-template-columns: 1fr; } }
+    .trap-card {
+      background: rgba(244, 63, 94, 0.04);
+      border: 1px solid rgba(244, 63, 94, 0.25);
+      border-radius: 8px;
+      padding: 20px;
+    }
+    .trap-badge { font-family: var(--font-mono); font-size: 0.68rem; font-weight: 700; color: var(--rose); text-transform: uppercase; margin-bottom: 6px; }
+    .trap-title { font-size: 1.05rem; font-weight: 700; color: #FFFFFF; margin-bottom: 8px; }
+    .trap-desc { font-size: 0.8rem; color: var(--text-dim); line-height: 1.5; margin-bottom: 12px; }
+    .trap-solution { font-size: 0.78rem; color: var(--accent); border-top: 1px solid rgba(244, 63, 94, 0.15); padding-top: 10px; font-family: var(--font-mono); }
 
     /* Teardown Simulator */
     .sim-grid { display: grid; grid-template-columns: 320px 1fr 1fr; gap: 20px; margin-top: 14px; }
@@ -403,13 +590,45 @@ export function renderBenchmarkPageHtml(teardown: FrictionTeardownResult): strin
     .badge-rose { background: rgba(244, 63, 94, 0.15); color: var(--rose); }
     .badge-gold { background: rgba(223, 184, 67, 0.15); color: var(--accent); }
 
+    /* Cross-Venue Teardown Grid */
+    .cross-grid { display: grid; grid-template-columns: 340px 1fr; gap: 20px; margin-top: 14px; }
+    @media (max-width: 900px) { .cross-grid { grid-template-columns: 1fr; } }
+
+    /* Competitor Dossier Grid */
+    .dossier-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin-top: 16px; }
+    @media (max-width: 840px) { .dossier-grid { grid-template-columns: 1fr; } }
+    .dossier-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+    }
+    .dossier-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+    .dossier-name { font-size: 1.15rem; font-weight: 700; color: #FFFFFF; }
+    .dossier-claim { font-size: 0.8rem; color: var(--accent-light); font-style: italic; margin-bottom: 10px; }
+    .dossier-flaw { font-size: 0.8rem; color: var(--rose); line-height: 1.5; margin-bottom: 12px; }
+    .dossier-advantage { font-size: 0.8rem; color: var(--emerald); line-height: 1.5; border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 10px; }
+
+    /* 5 Pillars Grid */
+    .pillars-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-top: 16px; }
+    @media (max-width: 1024px) { .pillars-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .pillars-grid { grid-template-columns: 1fr; } }
+    .pillar-card {
+      background: var(--card-highlight);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .pillar-num { font-family: var(--font-mono); font-size: 0.7rem; color: var(--accent); font-weight: 700; margin-bottom: 6px; }
+    .pillar-title { font-size: 0.92rem; font-weight: 700; color: #FFFFFF; margin-bottom: 8px; }
+    .pillar-body { font-size: 0.76rem; color: var(--text-dim); line-height: 1.45; }
+
     /* Battlecard Matrix Table */
     .comp-table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 0.85rem; margin-top: 14px; }
     .comp-table th, .comp-table td { padding: 16px 18px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
     .comp-table th { background: rgba(212, 175, 55, 0.04); color: var(--accent-light); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
     .td-dim { color: var(--text-dim); }
     .td-quanterra { color: #FFFFFF; font-weight: 600; background: rgba(223, 184, 67, 0.02); }
-
     .tag-superior { background: rgba(16, 185, 129, 0.15); color: var(--emerald); font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
 
     .cta-banner {
@@ -452,13 +671,15 @@ export function renderBenchmarkPageHtml(teardown: FrictionTeardownResult): strin
 
   <nav class="top-nav">
     <a href="/" class="nav-brand">
+      <span class="brand-dot"></span>
       QUANTERRAOS
-      <span>/ BENCHMARK</span>
+      <span style="color:var(--accent); font-family:var(--font-mono); font-size:0.8rem; font-weight:400;">/ STRATEGY 2026</span>
     </a>
     <div class="nav-links">
-      <a href="/">Home</a>
-      <a href="/calculator">True Cost Calc</a>
-      <a href="/why" class="active">Why QuanterraOS</a>
+      <a href="/calculator">Check</a>
+      <a href="/transparency">Transparency</a>
+      <a href="/widgets">Widgets</a>
+      <a href="/why" class="active" style="color:var(--accent); font-weight:700;">Why QuanterraOS</a>
       <a href="/study">Study #6.4</a>
       <a href="/educators">Educators</a>
       <a href="/radar">Radar</a>
@@ -469,18 +690,54 @@ export function renderBenchmarkPageHtml(teardown: FrictionTeardownResult): strin
 
   <main class="container">
     <div class="hero-header">
-      <div class="hero-tag">The 2026 Competitive Differentiation Blueprint</div>
+      <div class="hero-tag">The 2026 Competitive Differentiation &amp; Game-Changer Playbook</div>
       <h1>The Independent Truth Layer vs. Competitor Hype</h1>
       <p class="hero-subtitle">
-        Dome was acquired by Polymarket. Oddpool was acquired by Kalshi. Verso and Predly conceal parabolic taker fees. QuanterraOS is the independent, venue-neutral operating system that reveals the truth about friction, calibration, and risk.
+        In 2026, annualized prediction market volume crossed $200B. Yet every existing tool is caught in one of three fatal traps: platform capture, uncalibrated AI snake oil, or friction blindness. QuanterraOS is the independent sovereign referee.
       </p>
+    </div>
+
+    <!-- The 3 Fatal Traps in 2026 Prediction Market Tools -->
+    <div class="traps-grid">
+      <div class="trap-card">
+        <div class="trap-badge">Trap 1 // Platform Capture</div>
+        <div class="trap-title">Exchange Ownership Conflict</div>
+        <div class="trap-desc">
+          <strong>Dome</strong> was acquired by Polymarket (Feb 2026). <strong>Oddpool</strong> was acquired by Kalshi (Sep 2026). Once terminal frontends are owned by venues, their business model flips from risk protection to trading turnover.
+        </div>
+        <div class="trap-solution">
+          &bull; QuanterraOS: 100% independent referee with zero venue kickbacks.
+        </div>
+      </div>
+
+      <div class="trap-card">
+        <div class="trap-badge">Trap 2 // Black-Box AI Hype</div>
+        <div class="trap-title">Uncalibrated Hallucinations</div>
+        <div class="trap-desc">
+          <strong>Predly</strong> and <strong>PillarLab</strong> claim "89% accuracy" scraping news headlines. Yet out-of-sample data proves Kalshi's mid-price beats statistical models (0.2001 vs 0.2063). Uncalibrated models produce negative return.
+        </div>
+        <div class="trap-solution">
+          &bull; QuanterraOS: Empirical Brier calibration &amp; Murphy decomposition.
+        </div>
+      </div>
+
+      <div class="trap-card">
+        <div class="trap-badge">Trap 3 // Friction Blindness</div>
+        <div class="trap-title">Retail Ruin &amp; Churn Trap</div>
+        <div class="trap-desc">
+          <strong>Verso</strong>, <strong>Stand</strong>, and <strong>TradeFox</strong> push retail into high-frequency execution while concealing Kalshi's parabolic taker fee (up to 1.75¢/ct). WSJ found over 70% of accounts churn in multi-month sampling.
+        </div>
+        <div class="trap-solution">
+          &bull; QuanterraOS: Pre-trade fee drag audit &amp; personal outcome journal.
+        </div>
+      </div>
     </div>
 
     <!-- Interactive Friction Teardown Simulator -->
     <div class="panel">
       <div class="section-title">
         <span>Friction Teardown: Competitor Illusion vs. QuanterraOS Reality</span>
-        <span class="mono" style="font-size:0.8rem; color:var(--accent);">Live Mathematical Audit</span>
+        <span class="mono" style="font-size:0.8rem; color:var(--accent);">Pillar 1: Anti-Friction Reality Check</span>
       </div>
       <p style="color:var(--text-dim); font-size:0.9rem; margin-bottom:18px;">
         Enter any contract price and subjective forecast. Watch how competitor tools pitch illusory profit while QuanterraOS calculates the real CFTC taker fee drag and breakeven hurdle.
@@ -537,11 +794,162 @@ export function renderBenchmarkPageHtml(teardown: FrictionTeardownResult): strin
       </form>
     </div>
 
+    <!-- Strategic Move 2: "True Cost vs. Illusory Spread" Teardown Tool -->
+    <div class="panel" id="cross-venue-teardown">
+      <div class="section-title">
+        <span>Strategic Move #2: Cross-Venue Illusory Spread Teardown</span>
+        <span class="mono" style="font-size:0.8rem; color:var(--cyan);">Debunking Aggregator Illusions</span>
+      </div>
+      <p style="color:var(--text-dim); font-size:0.9rem; margin-bottom:18px;">
+        Oddpool and Verso frequently advertise "cross-venue spread divergence" across Kalshi and Polymarket. In practice, retail traders lose money because taker fees, gas, and resolution basis risk consume the entire nominal spread.
+      </p>
+
+      <div class="cross-grid">
+        <div class="sim-controls">
+          <div class="control-group">
+            <label class="control-label">Preset Cross-Venue Scenarios</label>
+            <select class="sim-input" onchange="applyCrossPreset(this.value)" id="cross-preset-selector">
+              <option value="btc">BTC 15M: Kalshi 48¢ vs Polymarket 49¢ (3¢ nominal)</option>
+              <option value="eth">ETH 15M: Kalshi 52¢ vs Polymarket 45¢ (3¢ nominal)</option>
+              <option value="macro">Macro Nov: Kalshi 54¢ vs Polymarket 44¢ (2¢ nominal)</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Venue A Price (Kalshi Yes ¢)</label>
+            <input type="number" id="cross-price-a" min="1" max="99" value="48" class="sim-input" oninput="recalcCrossTeardown()" />
+          </div>
+          <div class="control-group">
+            <label class="control-label">Venue B Price (Polymarket No ¢)</label>
+            <input type="number" id="cross-price-b" min="1" max="99" value="49" class="sim-input" oninput="recalcCrossTeardown()" />
+          </div>
+          <div class="control-group">
+            <label class="control-label">Contract Order Count</label>
+            <input type="number" id="cross-contracts" min="100" max="10000" step="100" value="1000" class="sim-input" oninput="recalcCrossTeardown()" />
+          </div>
+          <div class="control-group">
+            <label class="control-label">On-chain Gas Fee ($)</label>
+            <input type="number" id="cross-gas" min="0.5" max="10" step="0.5" value="1.50" class="sim-input" oninput="recalcCrossTeardown()" />
+          </div>
+        </div>
+
+        <div style="background:rgba(20,26,38,0.9); border:1px solid var(--border); border-radius:8px; padding:22px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:10px;">
+            <span style="font-family:var(--font-mono); font-size:0.75rem; color:var(--muted); text-transform:uppercase;">
+              AUDIT VERDICT
+            </span>
+            <span id="cross-verdict-badge" class="box-badge badge-rose">
+              ILLUSORY SPREAD DESTROYED
+            </span>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:18px;">
+            <div>
+              <div style="font-size:0.75rem; color:var(--muted); font-family:var(--font-mono);">CLAIMED GROSS SPREAD</div>
+              <div id="cross-gross-val" class="mono" style="font-size:1.8rem; font-weight:700; color:var(--rose);">+$30.00</div>
+              <div id="cross-gross-cents" style="font-size:0.75rem; color:var(--text-dim); font-family:var(--font-mono);">3.00¢ nominal per contract</div>
+            </div>
+            <div>
+              <div style="font-size:0.75rem; color:var(--muted); font-family:var(--font-mono);">REALIZED NET RETURN</div>
+              <div id="cross-net-val" class="mono" style="font-size:1.8rem; font-weight:700; color:var(--accent);">+$6.03</div>
+              <div id="cross-fee-drag" style="font-size:0.75rem; color:var(--rose); font-family:var(--font-mono);">79.9% consumed by friction</div>
+            </div>
+          </div>
+
+          <div style="background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:12px; margin-bottom:14px; font-family:var(--font-mono); font-size:0.78rem; line-height:1.6;">
+            <div style="display:flex; justify-content:space-between;"><span>1. Kalshi CFTC Taker Fee:</span> <strong style="color:var(--rose);" id="cross-fee-kalshi">-$17.47</strong></div>
+            <div style="display:flex; justify-content:space-between;"><span>2. Polymarket Gas + Swap Drag:</span> <strong style="color:var(--rose);" id="cross-fee-poly">-$6.50</strong></div>
+            <div style="display:flex; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.06); margin-top:6px; padding-top:6px;">
+              <span>Total Transaction Friction:</span> <strong style="color:var(--rose);" id="cross-fee-total">-$23.97</strong>
+            </div>
+          </div>
+
+          <div style="font-size:0.78rem; color:var(--text-dim); line-height:1.5; border-left:3px solid var(--accent); padding-left:12px;">
+            <strong>Settlement Oracle Basis Hazard:</strong> Kalshi resolves to CME CF BRTI 60-Second TWAP (seconds 840–900). Polymarket resolves to decentralized UMA dispute oracle. Cross-venue resolution variance (historically &plusmn;35 bps) creates asymmetric risk during volatile settlement minutes.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- In-Depth Competitor Teardown Dossier -->
+    <div class="panel">
+      <div class="section-title">
+        <span>In-Depth Competitor Dossier: 2026 Landscape Teardown</span>
+        <span class="mono" style="font-size:0.8rem; color:var(--muted);">Factual Flaw Audit</span>
+      </div>
+      <p style="color:var(--text-dim); font-size:0.9rem; margin-bottom:16px;">
+        Exposing the commercial conflicts and structural limitations across incumbent prediction market tools.
+      </p>
+
+      <div class="dossier-grid">
+        ${COMPETITOR_DOSSIER_LIST.map((c) => `
+          <div class="dossier-card">
+            <div class="dossier-header">
+              <span class="dossier-name">${c.name}</span>
+              <span class="mono" style="font-size:0.75rem; color:var(--muted);">${c.domain}</span>
+            </div>
+            <div class="dossier-claim">${c.claim} &bull; Target: ${c.targetUser}</div>
+            <div class="dossier-flaw">
+              <strong>Fatal Flaw:</strong> ${c.vulnerability}
+            </div>
+            <div class="dossier-advantage">
+              <strong>QuanterraOS Advantage:</strong> ${c.quanterraAdvantage}
+            </div>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+
+    <!-- The 5 Sovereign Pillars of QuanterraOS -->
+    <div class="panel">
+      <div class="section-title">
+        <span>The 5 Pillars That Make QuanterraOS a Game-Changer</span>
+        <span class="mono" style="font-size:0.8rem; color:var(--emerald);">Sovereign Moat</span>
+      </div>
+
+      <div class="pillars-grid">
+        <div class="pillar-card">
+          <div class="pillar-num">PILLAR 01</div>
+          <div class="pillar-title">Anti-Friction Reality Check</div>
+          <div class="pillar-body">
+            Exposing the non-linear taker fee ($0.07 × p × (1-p)) and required breakeven hurdle (52.75% on 51¢) before orders are placed.
+          </div>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-num">PILLAR 02</div>
+          <div class="pillar-title">60s Settlement Radar</div>
+          <div class="pillar-body">
+            Reconstructing the second-by-second CME CF BRTI TWAP tape across Coinbase, Kraken, Bitstamp, and Gemini.
+          </div>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-num">PILLAR 03</div>
+          <div class="pillar-title">Falsifiable Science</div>
+          <div class="pillar-body">
+            Empirical Murphy/Yates decomposition across 1,316 settled windows (0.2001 mid Brier) with immutable SHA-256 hashes.
+          </div>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-num">PILLAR 04</div>
+          <div class="pillar-title">Consented Decision Memory</div>
+          <div class="pillar-body">
+            Local encrypted decision journal, pre-trade reflection requirements, and deterministic CSV statement reconciliation.
+          </div>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-num">PILLAR 05</div>
+          <div class="pillar-title">Sovereign Neutrality &amp; MCP</div>
+          <div class="pillar-body">
+            Unconflicted referee status and native Model Context Protocol (/api/mcp/manifest) for autonomous quant agents.
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 6-Dimension Architectural Battlecard Table -->
     <div class="panel">
       <div class="section-title">
-        <span>Architectural Battlecard: QuanterraOS vs. The Market</span>
-        <span class="mono" style="font-size:0.8rem; color:var(--muted);">Full Technical Audit</span>
+        <span>Architectural Comparison: QuanterraOS vs. The Market</span>
+        <span class="mono" style="font-size:0.8rem; color:var(--muted);">Full Technical Matrix</span>
       </div>
       <table class="comp-table">
         <thead>
@@ -568,17 +976,18 @@ export function renderBenchmarkPageHtml(teardown: FrictionTeardownResult): strin
       </table>
     </div>
 
-    <!-- Action Banner -->
+    <!-- Action Banner & Syndication Links -->
     <div class="cta-banner">
       <div>
         <h3 style="font-size:1.25rem; color:#FFFFFF; margin-bottom:6px;">Stop Trading Friction-Blind. Verify Before You Enter.</h3>
         <p style="color:var(--text-dim); font-size:0.9rem;">
-          Use our Free True-Cost Check, practice in Realistic Paper Mode, or audit historical calibration across 1,316 settled windows.
+          Use our Free True-Cost Check, embed verified widgets in your newsletter, or audit historical calibration across 1,316 settled windows.
         </p>
       </div>
-      <div style="display:flex; gap:12px;">
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
         <a href="/calculator" class="btn-gold">Launch Free Check →</a>
-        <a href="/paper" class="btn-gold" style="background:rgba(255,255,255,0.06); color:#FFFFFF; border:1px solid var(--border);">Paper Mode</a>
+        <a href="/widgets" class="btn-gold" style="background:rgba(255,255,255,0.06); color:#FFFFFF; border:1px solid var(--border);">Embed Widgets (#6.5)</a>
+        <a href="/transparency" class="btn-gold" style="background:rgba(16,185,129,0.12); color:var(--emerald); border:1px solid rgba(16,185,129,0.3);">Outcome Audit (#6.6)</a>
       </div>
     </div>
 
@@ -588,10 +997,76 @@ export function renderBenchmarkPageHtml(teardown: FrictionTeardownResult): strin
       <div><strong>SHA-256 Provenance Hash:</strong> ${teardown.provenanceHash}</div>
       <div><strong>Settlement Oracle Basis:</strong> CME CF Bitcoin Real-Time Index (BRTI) 60-Second TWAP</div>
       <div><strong>Rule B5 Safety Lock:</strong> $0.00 Live Capital Deployed · Standby Mode Active</div>
-      <div style="margin-top:6px;"><strong>Non-Affiliation Notice:</strong> Kalshi, Polymarket, Verso, Oddpool, and Dome are registered marks of their respective owners. QuanterraOS is an independent measurement and risk operating system.</div>
+      <div style="margin-top:6px;"><strong>Non-Affiliation Notice (Rule B10):</strong> Kalshi, Polymarket, Verso, Oddpool, Dome, and Unusual Whales are registered marks of their respective owners. QuanterraOS is an independent measurement and risk operating system.</div>
     </div>
   </main>
 
+  <script>
+    function calcKalshiFeeCents(priceCents) {
+      const p = priceCents / 100;
+      return Math.ceil(0.07 * p * (1 - p) * 100 * 10) / 10;
+    }
+
+    function applyCrossPreset(preset) {
+      if (preset === 'btc') {
+        document.getElementById('cross-price-a').value = 48;
+        document.getElementById('cross-price-b').value = 49;
+        document.getElementById('cross-contracts').value = 1000;
+      } else if (preset === 'eth') {
+        document.getElementById('cross-price-a').value = 52;
+        document.getElementById('cross-price-b').value = 45;
+        document.getElementById('cross-contracts').value = 1000;
+      } else if (preset === 'macro') {
+        document.getElementById('cross-price-a').value = 54;
+        document.getElementById('cross-price-b').value = 44;
+        document.getElementById('cross-contracts').value = 1000;
+      }
+      recalcCrossTeardown();
+    }
+
+    function recalcCrossTeardown() {
+      const pA = parseFloat(document.getElementById('cross-price-a').value) || 48;
+      const pB = parseFloat(document.getElementById('cross-price-b').value) || 49;
+      const count = parseInt(document.getElementById('cross-contracts').value) || 1000;
+      const gas = parseFloat(document.getElementById('cross-gas').value) || 1.50;
+
+      const totalPurchase = pA + pB;
+      const spreadCents = (100 - totalPurchase);
+      const grossUsd = (spreadCents / 100) * count;
+
+      const feeACents = calcKalshiFeeCents(pA);
+      const feeAUsd = (feeACents / 100) * count;
+      const feeBUsd = gas + (0.005 * count);
+      const totalFriction = feeAUsd + feeBUsd;
+      const netProfit = grossUsd - totalFriction;
+
+      const feeDragPct = grossUsd > 0 ? Math.min(100, (totalFriction / grossUsd) * 100) : 100;
+
+      document.getElementById('cross-gross-val').textContent = (grossUsd >= 0 ? '+' : '') + '$' + grossUsd.toFixed(2);
+      document.getElementById('cross-gross-cents').textContent = spreadCents.toFixed(2) + '¢ nominal per contract';
+
+      document.getElementById('cross-net-val').textContent = (netProfit >= 0 ? '+' : '') + '$' + netProfit.toFixed(2);
+      document.getElementById('cross-fee-drag').textContent = feeDragPct.toFixed(1) + '% consumed by friction';
+
+      document.getElementById('cross-fee-kalshi').textContent = '-$' + feeAUsd.toFixed(2);
+      document.getElementById('cross-fee-poly').textContent = '-$' + feeBUsd.toFixed(2);
+      document.getElementById('cross-fee-total').textContent = '-$' + totalFriction.toFixed(2);
+
+      const badge = document.getElementById('cross-verdict-badge');
+      if (netProfit <= 0 || feeDragPct >= 75) {
+        badge.className = 'box-badge badge-rose';
+        badge.textContent = 'ILLUSORY SPREAD DESTROYED';
+        document.getElementById('cross-net-val').style.color = '#F43F5E';
+      } else {
+        badge.className = 'box-badge badge-gold';
+        badge.textContent = 'MARGINAL SPREAD SURVIVED (HIGH ORACLE RISK)';
+        document.getElementById('cross-net-val').style.color = '#DFB843';
+      }
+    }
+  </script>
+
+  ${ASSISTANT_WIDGET_HTML}
+  ${renderBetaFeedbackWidgetHtml()}
 </body>
 </html>`;
 }

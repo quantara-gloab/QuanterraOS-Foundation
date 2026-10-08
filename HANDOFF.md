@@ -1126,6 +1126,45 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 - `npm test` — **488/488 tests passing across 109 test suites**.
 - Remote production healthcheck: `GET https://quanterraos.com/healthz` returns `200 OK` (`status: ok, circuit: LOCKED_RULE_B5`).
 
+---
+
+### Session: 2026-10-08 — Competitive Game-Changer Playbook & Cross-Venue Spread Teardown Engine
+
+**Trigger:** "QuanterraOS vs. The Competition: Strategic Analysis & Game-Changer Playbook (2026)" — executing Strategic Move #2 ("True-Cost vs Illusory Spread Teardown Tool"), integrating the 6-competitor dossier, and encoding the 5 Sovereign Pillars directly into `/why` and the public API.
+
+**Delivered Upgrades:**
+- **Cross-Venue Spread Teardown Engine (`src/competitive-benchmark.ts`)**:
+  - `computeCrossVenueSpreadTeardown()`: Debunks aggregator spread claims (e.g. 48¢ Kalshi Yes vs 49¢ Polymarket No claiming a 3.00¢ nominal gross spread).
+  - Deducts Kalshi's parabolic taker fee ($0.07 × p × (1-p)), Polymarket on-chain gas ($1.50) + slippage (0.5¢/ct), revealing fee drag consuming >70% to 100% of the nominal spread.
+  - Flags resolution basis hazard: Kalshi resolves to CME CF BRTI 60-Second TWAP vs Polymarket resolving to UMA dispute oracle (historically ±35 bps discrepancy).
+  - Issues cryptographic 64-char SHA-256 provenance hash.
+- **Competitor Dossier Matrix (`COMPETITOR_DOSSIER_LIST`)**:
+  - Encoded detailed technical profiles, claims, fatal flaws, and QuanterraOS asymmetric advantages for all 6 market incumbents:
+    1. *Verso* (`verso.finance`): Bloomberg terminal clone; fatal friction blindness.
+    2. *Oddpool* (`oddpool.com`): Aggregator captured by Kalshi (Sept 2026).
+    3. *Dome* (`domeapi.io`): Developer SDK captured by Polymarket (Feb 2026).
+    4. *Predly* (`predly.ai`): Uncalibrated LLM headline scanner claiming "89% accuracy".
+    5. *Stand.Trade* (`stand.trade`): Copy-trading retail churn trap.
+    6. *Unusual Whales*: Superficial alert engine lacking delta or TWAP context.
+- **Interactive Web Interface & Battlecard (`/why`, `/vs`)**:
+  - The 3 Fatal Traps in 2026 Prediction Market Tools (Platform Capture, Black-Box Hype, Friction Blindness).
+  - Single-Contract Interactive Friction Teardown Simulator.
+  - Interactive Cross-Venue Spread Teardown Tool with live preset switching (BTC 15M, ETH 15M, Macro Events) and reactive client-side EV recalculation.
+  - The 5 Sovereign Pillars of QuanterraOS.
+  - Full 6-Dimension Architectural Comparison Table.
+- **Server Endpoints (`src/server.ts`)**:
+  - `GET /api/benchmark/cross-venue`: Public JSON endpoint for cross-venue spread friction teardowns.
+  - `GET /api/benchmark/competitors`: Public JSON manifest of the 6 competitor dossiers.
+- **Acceptance Testing Suite (`src/__tests__/competitive-benchmark.test.ts`)**:
+  - 7 comprehensive tests passing verifying arithmetic, competitor dossiers, cross-venue teardown verdicts, SVG receipts, widget HTML, and Rule B4/B5/B10 compliance.
+
+**Verification:**
+- `npx tsc --noEmit` — **0 errors (clean exit 0)**.
+- `node --experimental-strip-types --test src/__tests__/competitive-benchmark.test.ts` — **7/7 passing**.
+- `npm test` — **490/490 tests passing across 109 test suites**.
+- Remote production healthcheck: `GET https://quanterraos.com/healthz` returns `200 OK` (`status: ok, circuit: LOCKED_RULE_B5`).
+
+
 
 
 
