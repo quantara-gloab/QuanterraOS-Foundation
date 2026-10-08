@@ -18,6 +18,8 @@ import {
   evaluateSettlementRisk,
   evaluateLiquidityQuality,
   computeExpiryRadarState,
+  computeOrderbookDepthLadder,
+  renderOrderbookDepthLadderHtml,
   simulateExpiryPayoff,
   generateShareableDebriefCardSvg,
   renderExpiryRadarPageHtml,
@@ -165,5 +167,41 @@ describe("Expiry Radar & Microstructure Terminal Engine", () => {
       assert.doesNotMatch(pageHtml, pat);
       assert.doesNotMatch(widgetHtml, pat);
     }
+  });
+
+  it("8. Wolf Orderbook Depth Ladder: computes 5-level queue, cumulative volumes, spread, and imbalance ratio", () => {
+    const ladder = computeOrderbookDepthLadder(91250, 0.52, 0.49);
+
+    assert.equal(ladder.underlyingStrike, 91250);
+    assert.equal(ladder.ticker, "KXBTC15M-T91250");
+    assert.equal(ladder.levels.length, 5);
+
+    // Levels are strictly 1..5
+    ladder.levels.forEach((lvl, idx) => {
+      assert.equal(lvl.level, idx + 1);
+      assert.ok(lvl.bidPriceCents >= 1 && lvl.bidPriceCents <= 99);
+      assert.ok(lvl.askPriceCents >= 1 && lvl.askPriceCents <= 99);
+      assert.ok(lvl.bidSize > 0);
+      assert.ok(lvl.askSize > 0);
+      assert.ok(lvl.bidCumulative >= lvl.bidSize);
+      assert.ok(lvl.askCumulative >= lvl.askSize);
+    });
+
+    // Spread calculations
+    assert.equal(ladder.spreadCents, 3);
+    assert.ok(ladder.spreadBps > 500 && ladder.spreadBps < 650);
+
+    // Volume and imbalance
+    assert.ok(ladder.bidTotalContracts > 0);
+    assert.ok(ladder.askTotalContracts > 0);
+    assert.ok(ladder.imbalanceRatio >= -1 && ladder.imbalanceRatio <= 1);
+    assert.ok(ladder.imbalancePercent >= 0 && ladder.imbalancePercent <= 100);
+
+    // HTML rendering
+    const ladderHtml = renderOrderbookDepthLadderHtml(ladder);
+    assert.ok(ladderHtml.includes("Wolf Level 2 Microstructure Orderbook Depth"));
+    assert.ok(ladderHtml.includes("BIDS (BUY ORDERS)"));
+    assert.ok(ladderHtml.includes("ASKS (SELL OFFERS)"));
+    assert.ok(ladderHtml.includes("Maker vs. Taker Hurdle"));
   });
 });

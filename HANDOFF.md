@@ -550,9 +550,15 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
   - Dynamic client-side pulse on `/radar` table rows simulating live market heartbeat with subtle green/red liquidity flashes every 3.5s.
 - **Platform-Wide Navigation Interlinking**:
   - Connected `/radar` and `/divergence` across navigation headers, footers, and dashboards: `src/landing-page.ts`, `src/calculator-page.ts`, `src/account-page.ts`, and `src/venue-comparison-page.ts`.
-- **Dedicated Acceptance Test Suite (`src/__tests__/divergence-and-embed-widgets.test.ts`)**:
-  - 5 comprehensive tests validating HTML validity, query param overrides, non-linear CFTC fee calculation precision, Rule B4 (zero banned language: no "arbitrage", "edge", "alpha", "guaranteed"), and Rule B5 ($0.00 capital risk).
+- **Wolf Level 2 Microstructure Orderbook Depth Ladder (`src/expiry-radar.ts`, `/radar`)**:
+  - `computeOrderbookDepthLadder()`: Generates a realistic 5-level resting order queue for the ATM strike.
+  - Computes bid/ask price ladders, contract depth sizes, cumulative depth bars, top-of-book spread (in cents and bps), and the Wolf Liquidity Imbalance Ratio (e.g. `+12.4% Bid Heavy`).
+  - Integrated into `/radar` page markup (`renderOrderbookDepthLadderHtml()`) with visual emerald/rose depth bars and Maker vs Taker educational fee guidance.
+- **Dedicated Acceptance Test Suite (`src/__tests__/divergence-and-embed-widgets.test.ts` & `src/__tests__/expiry-radar.test.ts`)**:
+  - Added test 8 in `src/__tests__/expiry-radar.test.ts` asserting 5-level depth integrity, volume accumulation, spread calculations, and HTML rendering.
+  - 5 comprehensive tests in `src/__tests__/divergence-and-embed-widgets.test.ts`.
 
 **Verification:**
 - `npm run typecheck` (`tsc --noEmit`) — **0 errors (clean exit 0)**.
-- `npm test` — **397/397 passing across 93 suites, 0 failures** (duration ~112s).
+- `npm test` — **398/398 passing across 93 suites, 0 failures**.
+
