@@ -72,4 +72,16 @@ describe("Landing Page — 90-Day Execution Roadmap & Microstructure Cockpit Ver
       assert.doesNotMatch(html, pattern, `Landing page HTML must not contain banned word: ${pattern}`);
     }
   });
+
+  it("4. Competitive Showcase: renders 2026 Competitive Teardown, simulator sliders, and Independent Referee section", () => {
+    assert.ok(html.includes('id="why-quanterraos-showcase"'));
+    assert.ok(html.includes("The Independent Referee in an Acquired Market"));
+    assert.ok(html.includes('id="home-teardown-price"'));
+    assert.ok(html.includes('id="home-teardown-prob"'));
+    assert.ok(html.includes('id="home-teardown-count"'));
+    assert.ok(html.includes('id="home-out-comp-ev"'));
+    assert.ok(html.includes('id="home-out-real-ev"'));
+    assert.ok(html.includes('id="home-out-real-hurdle"'));
+    assert.ok(html.includes('href="/why"'));
+  });
 });

@@ -518,7 +518,10 @@ export function renderMobileInstallPageHtml(): string {
       <img src="/apple-touch-icon.png" alt="QuanterraOS Icon" class="brand-icon">
       <span>QUANTERRAOS</span>
     </a>
-    <a href="/calculator" class="mono" style="color: var(--accent); font-size: 0.78rem; text-decoration: none;">Launch Web Check &rarr;</a>
+    <div style="display:flex; align-items:center; gap:14px;">
+      <a href="/why" class="mono" style="color: var(--accent); font-size: 0.78rem; text-decoration: none;">Why QuanterraOS</a>
+      <a href="/calculator" class="mono" style="color: var(--accent-light); font-size: 0.78rem; text-decoration: none;">Launch Web Check &rarr;</a>
+    </div>
   </header>
 
   <main class="container">
@@ -594,6 +597,27 @@ export function renderMobileInstallPageHtml(): string {
           <div>Confirm <strong>"Install"</strong> to add the icon to your home screen and app launcher.</div>
         </li>
       </ul>
+    </div>
+
+    <!-- 2026 Competitive Moat: The Independent Referee -->
+    <div class="card" id="competitive-moat" style="border-color: rgba(223, 184, 67, 0.35); background: linear-gradient(180deg, rgba(20, 26, 38, 0.85) 0%, rgba(10, 14, 22, 0.95) 100%);">
+      <div class="card-title">
+        <span style="color: var(--accent-light);">✦ The Independent Referee in an Acquired Market</span>
+      </div>
+      <div style="font-size: 0.84rem; color: #CBD5E1; line-height: 1.6;">
+        <div style="margin-bottom: 12px;">
+          <strong style="color: #FFFFFF;">• Unconflicted Independence:</strong> Major prediction tools are now owned by exchanges (Polymarket acquired Dome in Feb 2026; Kalshi acquired Oddpool in Sept 2026). QuanterraOS is 100% venue-neutral with zero exchange volume kickbacks.
+        </div>
+        <div style="margin-bottom: 12px;">
+          <strong style="color: var(--accent);">• Non-Linear Taker Fee Shield:</strong> Competitors conceal the parabolic taker fee ($0.07 &times; P &times; (1&minus;P) = up to 1.75¢/ct on 50¢ contracts), which creates a 52.75% breakeven hurdle and consumes up to 43.8% of gross profit. QuanterraOS audits every cost before order entry.
+        </div>
+        <div style="margin-bottom: 12px;">
+          <strong style="color: #38BDF8;">• Sovereign Local Memory:</strong> Your trade premises, risk boundaries, and journal notes stay encrypted in your local browser cache. Zero telemetry harvesting.
+        </div>
+        <a href="/why" class="btn-gold" style="display: flex; margin-top: 14px; text-decoration: none;">
+          Read Full 2026 Truth vs. Hype Teardown &rarr;
+        </a>
+      </div>
     </div>
 
     <!-- Features & Reliability -->

@@ -1145,6 +1145,103 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
   .cockpit-card:hover .cockpit-cta {
     color: var(--accent-light);
   }
+
+  /* 2026 Competitive Showcase & Friction Teardown */
+  .benchmark-showcase-box {
+    background: linear-gradient(180deg, rgba(17, 23, 34, 0.92) 0%, rgba(10, 14, 20, 0.98) 100%);
+    border: 1px solid rgba(212, 175, 55, 0.32);
+    border-radius: 8px;
+    padding: 32px;
+    box-shadow: inset 0 1px 0 rgba(255, 245, 215, 0.15), 0 24px 50px -15px rgba(0, 0, 0, 0.8);
+  }
+  .teardown-split-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 24px;
+  }
+  @media (max-width: 860px) {
+    .teardown-split-grid { grid-template-columns: 1fr; }
+  }
+  .teardown-slider-group {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: rgba(6, 9, 14, 0.65);
+    border: 1px solid rgba(212, 175, 55, 0.16);
+    border-radius: 6px;
+    padding: 20px;
+  }
+  .teardown-slider-row label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .teardown-slider-row label span.val {
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .teardown-slider {
+    width: 100%;
+    accent-color: var(--accent);
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.1);
+    height: 6px;
+    border-radius: 3px;
+  }
+  .teardown-cards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  @media (max-width: 580px) {
+    .teardown-cards-grid { grid-template-columns: 1fr; }
+  }
+  .teardown-card-competitor {
+    background: rgba(244, 63, 94, 0.05);
+    border: 1px solid rgba(244, 63, 94, 0.28);
+    border-radius: 6px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .teardown-card-quanterra {
+    background: rgba(223, 184, 67, 0.06);
+    border: 1px solid rgba(223, 184, 67, 0.38);
+    border-radius: 6px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 0 20px rgba(223, 184, 67, 0.08);
+  }
+  .pillars-comparison-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 28px;
+  }
+  @media (max-width: 900px) {
+    .pillars-comparison-grid { grid-template-columns: 1fr; }
+  }
+  .pillar-card {
+    background: rgba(14, 20, 30, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: border-color 0.2s;
+  }
+  .pillar-card:hover {
+    border-color: rgba(212, 175, 55, 0.35);
+  }
 </style>
 </head>
 <body>
@@ -1648,6 +1745,160 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
           <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.06); padding-top:12px;">
             <span style="font-family:var(--font-mono); font-size:0.72rem; color:var(--muted);">Empirical Audit</span>
             <a href="/calibration/explorer" class="cockpit-cta">Decompose Brier &rarr;</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2.5. Why QuanterraOS: The Truth vs. Hype Engine & Competitive Teardown -->
+    <section class="section-block" id="why-quanterraos-showcase" style="margin-top: 48px;">
+      <div class="section-heading-group">
+        <div class="section-eyebrow" style="color:var(--accent-light);">2026 Competitive Landscape &bull; Architectural Moat</div>
+        <h2 class="section-heading">The Independent Referee in an Acquired Market</h2>
+        <p class="section-description">
+          While prediction apps get acquired by exchanges and black-box bots promote illusory edges, QuanterraOS operates as the strictly independent, sovereign risk companion.
+        </p>
+      </div>
+
+      <div class="benchmark-showcase-box">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; border-bottom:1px solid rgba(212,175,55,0.15); padding-bottom:16px;">
+          <div>
+            <span style="font-family:var(--font-mono); font-size:0.75rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px;">Microstructure Friction Simulator</span>
+            <div style="font-size:1.15rem; font-weight:700; color:#FFFFFF; margin-top:2px;">Competitor Illusion vs. QuanterraOS Reality Check</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="display:inline-flex; align-items:center; gap:6px; background:rgba(223,184,67,0.1); border:1px solid rgba(223,184,67,0.3); color:var(--accent-light); padding:4px 10px; border-radius:999px; font-family:var(--font-mono); font-size:0.72rem; font-weight:700;">
+              <span style="width:6px; height:6px; border-radius:50%; background:var(--accent); box-shadow:0 0 6px var(--accent);"></span>
+              CFTC TAKER CURVE $0.07&times;P(1-P)
+            </span>
+          </div>
+        </div>
+
+        <div class="teardown-split-grid">
+          <!-- Left: Interactive Controls -->
+          <div class="teardown-slider-group">
+            <div style="font-family:var(--font-mono); font-size:0.75rem; font-weight:700; color:var(--text); text-transform:uppercase; margin-bottom:4px;">
+              Live Scenario Adjuster
+            </div>
+            
+            <div class="teardown-slider-row">
+              <label>
+                <span>Contract Ask Price</span>
+                <span class="val" id="home-teardown-price-val">51¢</span>
+              </label>
+              <input type="range" class="teardown-slider" id="home-teardown-price" min="1" max="99" value="51" oninput="recalcHomeFrictionTeardown()">
+            </div>
+
+            <div class="teardown-slider-row">
+              <label>
+                <span>Your Assessed Win Probability</span>
+                <span class="val" id="home-teardown-prob-val">55.0%</span>
+              </label>
+              <input type="range" class="teardown-slider" id="home-teardown-prob" min="1" max="99" value="55" oninput="recalcHomeFrictionTeardown()">
+            </div>
+
+            <div class="teardown-slider-row">
+              <label>
+                <span>Order Contract Count</span>
+                <span class="val" id="home-teardown-count-val">100 ct</span>
+              </label>
+              <input type="range" class="teardown-slider" id="home-teardown-count" min="10" max="1000" step="10" value="100" oninput="recalcHomeFrictionTeardown()">
+            </div>
+
+            <div id="home-teardown-danger-zone" style="background:rgba(244,63,94,0.12); border:1px solid rgba(244,63,94,0.3); border-radius:4px; padding:10px; font-size:0.73rem; color:#FDA4AF; line-height:1.4;">
+              <strong>⚠ Parabolic Danger Zone:</strong> Contracts near 50¢ generate maximum CFTC taker fee drag (1.75¢/ct). High-frequency taker flipping at this range incurs massive friction.
+            </div>
+          </div>
+
+          <!-- Right: Side-by-Side Reality Cards -->
+          <div class="teardown-cards-grid">
+            <!-- Competitor Claim -->
+            <div class="teardown-card-competitor">
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                  <span style="font-family:var(--font-mono); font-size:0.68rem; font-weight:700; color:#F43F5E; text-transform:uppercase;">Competitor Platform Claim</span>
+                  <span style="font-size:0.65rem; color:#FDA4AF; background:rgba(244,63,94,0.15); padding:2px 6px; border-radius:3px;">NAIVE MODEL</span>
+                </div>
+                <div style="font-size:0.75rem; color:var(--muted); margin-bottom:12px;">Verso / Predly nominal calculation (ignores exchange taker fee):</div>
+                <div style="font-family:var(--font-mono); font-size:1.6rem; font-weight:800; color:#F43F5E;" id="home-out-comp-ev">+$4.00</div>
+                <div style="font-family:var(--font-mono); font-size:0.75rem; color:#FDA4AF; margin-top:4px;" id="home-out-comp-edge">+4.0% nominal spread</div>
+              </div>
+              <div style="margin-top:14px; border-top:1px solid rgba(244,63,94,0.2); padding-top:10px; font-size:0.7rem; color:#FDA4AF; line-height:1.4;">
+                Hides $1.75 in exchange taker fees. Assumes breakeven at nominal 51¢ ask.
+              </div>
+            </div>
+
+            <!-- QuanterraOS Reality -->
+            <div class="teardown-card-quanterra">
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                  <span style="font-family:var(--font-mono); font-size:0.68rem; font-weight:700; color:var(--accent); text-transform:uppercase;">QuanterraOS Verified Reality</span>
+                  <span style="font-size:0.65rem; color:var(--accent-light); background:rgba(223,184,67,0.15); padding:2px 6px; border-radius:3px;">INDEPENDENT REF</span>
+                </div>
+                <div style="font-size:0.75rem; color:var(--muted); margin-bottom:12px;">True net return after non-linear CFTC taker fee drag:</div>
+                <div style="font-family:var(--font-mono); font-size:1.6rem; font-weight:800; color:#10B981;" id="home-out-real-ev">+$2.25</div>
+                <div style="font-family:var(--font-mono); font-size:0.75rem; color:var(--accent); margin-top:4px;">
+                  Real Hurdle: <strong id="home-out-real-hurdle">52.75%</strong>
+                </div>
+              </div>
+              <div style="margin-top:14px; border-top:1px solid rgba(223,184,67,0.2); padding-top:10px;">
+                <div style="display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:0.7rem; color:var(--muted);">
+                  <span>Total Taker Fee:</span>
+                  <span style="color:#F43F5E; font-weight:700;" id="home-out-real-fee">$1.75 (1.75¢/ct)</span>
+                </div>
+                <div style="font-family:var(--font-mono); font-size:0.68rem; color:var(--accent-light); margin-top:4px;" id="home-out-fee-drag">
+                  43.8% of Gross Consumed by Fee
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3 Fatal Traps vs 5 Sovereign Pillars -->
+        <div class="pillars-comparison-grid">
+          <div class="pillar-card">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-family:var(--font-mono); font-size:0.7rem; color:var(--accent); font-weight:700;">TRAP 01 // VENUE CAPTURE</span>
+            </div>
+            <h3 style="font-size:0.92rem; font-weight:700; color:#FFFFFF;">Acquired Referees vs. Sovereign Neutrality</h3>
+            <p style="font-size:0.78rem; color:var(--muted); line-height:1.5;">
+              Dome was acquired by Polymarket (Feb 2026); Oddpool was acquired by Kalshi (Sep 2026). Their analytics are captured by venue volume. QuanterraOS remains 100% independent with zero exchange kickbacks.
+            </p>
+          </div>
+
+          <div class="pillar-card">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-family:var(--font-mono); font-size:0.7rem; color:var(--accent); font-weight:700;">TRAP 02 // TWAP DECEPTION</span>
+            </div>
+            <h3 style="font-size:0.92rem; font-weight:700; color:#FFFFFF;">Spot Illusions vs. 60s TWAP Settlement</h3>
+            <p style="font-size:0.78rem; color:var(--muted); line-height:1.5;">
+              Competitors track spot prices that flip wildly at expiry. Kalshi contracts settle to the CME CF BRTI 60-second TWAP. Our live Settlement Radar maps each constituent tick and basis volatility in real time.
+            </p>
+          </div>
+
+          <div class="pillar-card">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-family:var(--font-mono); font-size:0.7rem; color:var(--accent); font-weight:700;">TRAP 03 // BLACK-BOX HYPE</span>
+            </div>
+            <h3 style="font-size:0.92rem; font-weight:700; color:#FFFFFF;">Vanity Claims vs. Audited Brier Calibration</h3>
+            <p style="font-size:0.78rem; color:var(--muted); line-height:1.5;">
+              Competitor bots claim "85% win rates" without verifiable datasets. We openly publish our empirical calibration across 1,316 settled BTC15M windows (0.2001 Brier), admitting transparently when the market beats models.
+            </p>
+          </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-top:24px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.06);">
+          <div style="font-size:0.78rem; color:var(--muted);">
+            Explore our comprehensive competitive teardown comparing QuanterraOS to Verso, Oddpool, Dome, Predly, and Stand.Trade.
+          </div>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <a href="/why" class="btn-primary" style="background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%); color:#07080B; border:1px solid #DFB843; font-weight:700; padding:8px 16px; font-size:0.8rem;">
+              Full 2026 Competitive Teardown &rarr;
+            </a>
+            <a href="/calculator" class="btn-secondary" style="padding:8px 14px; font-size:0.8rem;">
+              Free True-Cost Check
+            </a>
           </div>
         </div>
       </div>
@@ -2557,10 +2808,69 @@ function loadExampleWedgeCheck() {
   }
 }
 
+function recalcHomeFrictionTeardown() {
+  var priceInput = document.getElementById('home-teardown-price');
+  var probInput = document.getElementById('home-teardown-prob');
+  var countInput = document.getElementById('home-teardown-count');
+  if (!priceInput || !probInput || !countInput) return;
+
+  var price = Math.max(1, Math.min(99, parseInt(priceInput.value, 10) || 51));
+  var prob = Math.max(1, Math.min(99, parseFloat(probInput.value) || 55));
+  var count = Math.max(1, Math.min(1000, parseInt(countInput.value, 10) || 100));
+
+  var priceLabel = document.getElementById('home-teardown-price-val');
+  if (priceLabel) priceLabel.textContent = price + '¢';
+  var probLabel = document.getElementById('home-teardown-prob-val');
+  if (probLabel) probLabel.textContent = prob.toFixed(1) + '%';
+  var countLabel = document.getElementById('home-teardown-count-val');
+  if (countLabel) countLabel.textContent = count + ' ct';
+
+  var p = price / 100;
+  var u = prob / 100;
+
+  var grossDiffPct = (u - p) * 100;
+  var grossEvTotal = (u - p) * count;
+
+  var rawSingleFee = Math.ceil(0.07 * p * (1 - p) * 100) / 100;
+  var exactTotalFee = Math.ceil(0.07 * count * p * (1 - p) * 100) / 100;
+  var feePerContract = exactTotalFee / count;
+
+  var trueBreakevenPct = (p + feePerContract) * 100;
+  var netEvTotal = (u - p - feePerContract) * count;
+  var feeDragRatio = grossEvTotal > 0 ? Math.min(100, (exactTotalFee / (grossEvTotal + exactTotalFee)) * 100) : 100;
+
+  var compEv = document.getElementById('home-out-comp-ev');
+  var compEdge = document.getElementById('home-out-comp-edge');
+  var realHurdle = document.getElementById('home-out-real-hurdle');
+  var realFee = document.getElementById('home-out-real-fee');
+  var realEv = document.getElementById('home-out-real-ev');
+  var feeDragBadge = document.getElementById('home-out-fee-drag');
+  var dangerZoneNotice = document.getElementById('home-teardown-danger-zone');
+
+  if (compEv) compEv.textContent = (grossEvTotal >= 0 ? '+' : '') + '$' + grossEvTotal.toFixed(2);
+  if (compEdge) compEdge.textContent = (grossDiffPct >= 0 ? '+' : '') + grossDiffPct.toFixed(1) + '% nominal spread';
+  if (realHurdle) realHurdle.textContent = trueBreakevenPct.toFixed(2) + '%';
+  if (realFee) realFee.textContent = '$' + exactTotalFee.toFixed(2) + ' (' + (feePerContract * 100).toFixed(2) + '¢/ct)';
+  if (realEv) {
+    realEv.textContent = (netEvTotal >= 0 ? '+' : '') + '$' + netEvTotal.toFixed(2);
+    realEv.style.color = netEvTotal >= 0 ? '#10B981' : '#F43F5E';
+  }
+  if (feeDragBadge) {
+    feeDragBadge.textContent = feeDragRatio.toFixed(1) + '% of Gross Consumed by Fee';
+  }
+  if (dangerZoneNotice) {
+    dangerZoneNotice.style.display = (price >= 40 && price <= 60) ? 'block' : 'none';
+  }
+}
+
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', recalcWedge);
+  document.addEventListener('DOMContentLoaded', function() {
+    recalcWedge();
+    recalcHomeFrictionTeardown();
+  });
 } else {
   recalcWedge();
+  recalcHomeFrictionTeardown();
 }
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/service-worker.js').catch(function() {});

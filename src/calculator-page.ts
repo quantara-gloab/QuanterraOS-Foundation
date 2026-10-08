@@ -340,6 +340,8 @@ export function renderCalculatorPageHtml(): string {
     </div>
     <div style="display:flex; gap:14px; align-items:center;">
       <div style="display:flex; gap:12px; align-items:center; font-size:0.75rem;">
+        <a href="/why" style="color:var(--accent); text-decoration:none; font-weight:600;">Why QuanterraOS</a>
+        <span style="color:rgba(255,255,255,0.15);">|</span>
         <a href="/research" style="color:var(--muted); text-decoration:none;">Research</a>
         <span style="color:rgba(255,255,255,0.15);">|</span>
         <a href="/council" style="color:var(--muted); text-decoration:none;">Institutional</a>
@@ -623,6 +625,21 @@ export function renderCalculatorPageHtml(): string {
         <div class="stat-row">
           <span class="stat-label">Contract Horizon</span>
           <span class="stat-val mono" style="color:var(--accent-light);" id="val-cadence">15-Minute Intraday (KXBTC15M)</span>
+        </div>
+
+        <!-- Truth vs. Hype: Competitor Illusion Teardown Callout -->
+        <div style="margin-top:16px; padding:14px; background:linear-gradient(180deg, rgba(20,26,38,0.95) 0%, rgba(10,14,22,0.98) 100%); border:1px solid rgba(212,175,55,0.28); border-radius:6px; font-size:0.78rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <strong style="color:var(--accent-light); font-family:var(--font-mono); font-size:0.75rem; text-transform:uppercase;">✦ Competitor Illusion vs. QuanterraOS Reality</strong>
+            <span style="font-family:var(--font-mono); font-size:0.65rem; color:#F43F5E; background:rgba(244,63,94,0.12); padding:2px 6px; border-radius:3px;">ANTI-FRICTION</span>
+          </div>
+          <div style="color:var(--muted); line-height:1.45; font-size:0.75rem;">
+            Competitor apps (Verso, Predly) advertise nominal spreads without deducting Kalshi taker fees. At 50¢ mid, the exchange taker fee is 1.75¢/ct—consuming up to <strong>43.8% of your gross profit</strong> and requiring a <strong>52.75% win rate</strong> just to break even.
+          </div>
+          <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-family:var(--font-mono); font-size:0.7rem; color:var(--accent);">Independent Referee &bull; Zero Venue Bias</span>
+            <a href="/why" style="font-family:var(--font-mono); font-size:0.72rem; color:var(--accent-light); text-decoration:underline;">Full Benchmark &rarr;</a>
+          </div>
         </div>
         <!-- Pre-Save Advisory Risk Check Component -->
         <div id="risk-plan-advisory-box" style="display:none; margin-top:16px; padding:14px; background:rgba(14,20,32,0.95); border:1px solid rgba(212,175,55,0.3); border-radius:6px; font-size:0.78rem;">

@@ -1013,6 +1013,34 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 - `node --experimental-strip-types --test src/__tests__/competitive-benchmark.test.ts src/__tests__/study-and-educator-portals.test.ts src/__tests__/forecast-comparison.test.ts src/__tests__/plan.test.ts` — **21/21 tests passing across 4 suites (duration ~2.1s)**.
 - Total Platform Suite: **473 tests passing across 106 suites**.
 
+---
+
+### Session: 2026-10-08 — Competitive Intelligence Applied to Flagship Website & Mobile Web App
+
+**Trigger:** The founder instructed: "now apply that research towards the development of our website and app", translating the 2026 competitive moats (independent venue neutrality, anti-friction reality check, 60s TWAP settlement radar, empirical Brier calibration, and consented decision memory) directly into client-facing upgrades on the flagship website (`src/landing-page.ts`), mobile web app (`src/mobile-install.ts`, `/app`), and calculator (`src/calculator-page.ts`).
+
+**Delivered Upgrades:**
+- **Flagship Website Showcase (`src/landing-page.ts`)**:
+  - Integrated `#why-quanterraos-showcase` ("The Independent Referee in an Acquired Market") directly below the Microstructure Cockpit.
+  - Implemented client-side interactive Friction Teardown Simulator (`recalcHomeFrictionTeardown()`) with reactive range sliders (`#home-teardown-price`, `#home-teardown-prob`, `#home-teardown-count`). Computes Kalshi's parabolic taker fee ($0.07 × p × (1-p)), nominal competitor claim vs real net EV, and exchange fee drag ratio in real time with zero server roundtrip.
+  - Added visual breakdown of 3 Fatal Traps in 2026 prediction market apps (Venue Capture, TWAP Deception, Black-Box Hype) vs QuanterraOS Sovereign Pillars.
+  - Direct CTAs to `/why` (Full 2026 Competitive Teardown), `/calculator`, and `/calibration/explorer`.
+- **Mobile Web App & Installation Portal (`src/mobile-install.ts`, `/install`, `/app`)**:
+  - Added 2026 Competitive Moat card ("The Independent Referee in an Acquired Market") explaining venue neutrality, the non-linear taker fee shield, and local sovereign decision memory.
+  - Updated mobile top navigation bar to feature 1-tap direct access to "Why QuanterraOS" (`/why`).
+- **True-Cost Calculator (`src/calculator-page.ts`, `/calculator`)**:
+  - Added "Competitor Illusion vs. QuanterraOS Reality" callout card directly below the net EV results, educating traders on how competitor tools conceal taker fees and push the required breakeven hurdle to 52.75%.
+  - Added "Why QuanterraOS" link to the primary calculator navigation bar.
+- **Automated Verification & Compliance (`src/__tests__/landing-page-cockpit.test.ts`)**:
+  - Added automated test asserting the rendering of `#why-quanterraos-showcase`, all slider controls, side-by-side card outputs, and `/why` routing.
+  - Strictly verified Rule B4 (zero banned superlatives), Rule B5 ($0.00 capital risk lock), and Rule B10 marks notices.
+
+**Verification:**
+- `npx tsc --noEmit` — **0 errors (clean exit 0)**.
+- `node --experimental-strip-types --test src/__tests__/landing-page-cockpit.test.ts src/__tests__/competitive-benchmark.test.ts src/__tests__/static-copy-guardrails.test.ts src/__tests__/mobile-pwa.test.ts` — **26/26 tests passing across 4 suites**.
+- Remote production healthcheck: `GET https://quanterraos.com/healthz` returns `200 OK` (`status: ok, circuit: LOCKED_RULE_B5`).
+
+
 
 
 
