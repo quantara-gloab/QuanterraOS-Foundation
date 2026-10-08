@@ -1168,6 +1168,8 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
         <a href="/calculator" style="color:var(--accent); font-weight:700;">Check</a>
         <a href="/paper" style="color:var(--accent-light); font-weight:700;">Paper Mode</a>
         <a href="/compare" style="color:var(--accent); font-weight:700;">Compare</a>
+        <a href="/study" style="color:var(--accent-light); font-weight:700;">Study #6.4</a>
+        <a href="/educators" style="color:var(--accent); font-weight:700;">Educators</a>
         <a href="/radar" style="color:var(--accent-light); font-weight:700;">Radar</a>
         <a href="/flow" style="color:var(--accent); font-weight:700;">Flow</a>
         <a href="/matrix" style="color:var(--accent-light); font-weight:700;">Matrix</a>
@@ -1940,6 +1942,8 @@ ${miniCircles}
         <a href="/radar">radar</a>
         <a href="/paper">paper</a>
         <a href="/compare">compare</a>
+        <a href="/study">study</a>
+        <a href="/educators">educators</a>
         <a href="/radar/audio">sonification</a>
         <a href="/flow">flow</a>
         <a href="/matrix">matrix</a>

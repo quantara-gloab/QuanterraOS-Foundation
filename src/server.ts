@@ -142,6 +142,21 @@ import {
   renderForecastComparisonWidgetHtml,
   renderForecastComparisonPageHtml,
 } from "./forecast-comparison.ts";
+import {
+  getProspectiveStudyCohort,
+  summarizeStudyCohort,
+  getAnonymizedStudyObservations,
+  generateStudySvgReceipt,
+  renderStudyWidgetHtml,
+  renderStudyPageHtml,
+} from "./know-your-costs-study.ts";
+import {
+  getActiveEducatorPartners,
+  summarizeEducatorProgram,
+  generateEducatorSvgReceipt,
+  renderEducatorWidgetHtml,
+  renderEducatorPageHtml,
+} from "./educator-portal.ts";
 import { renderEducationalPageHtml, type EducationTopic } from "./educational-pages.ts";
 import { getReviewReminders, updateReviewReminders } from "./review-reminders.ts";
 import { renderVenueComparisonPageHtml } from "./venue-comparison-page.ts";
@@ -2519,6 +2534,63 @@ app.get("/api/compare/card.svg", (req, res) => {
     strike
   });
   const svg = generateForecastComparisonSvgReceipt(result);
+  res.setHeader("Content-Type", "image/svg+xml; charset=utf-8");
+  res.setHeader("Cache-Control", "public, max-age=60, s-maxage=300");
+  res.send(svg);
+});
+
+// Prospective "Know Your Costs" Study (Section 6.4 of Growth Strategy)
+app.get(["/study", "/research/know-your-costs"], (_req, res) => {
+  const participants = getProspectiveStudyCohort();
+  const summary = summarizeStudyCohort(participants);
+  const observations = getAnonymizedStudyObservations();
+  res.type("html").send(renderStudyPageHtml(summary, observations));
+});
+
+app.get("/embed/study", (_req, res) => {
+  const participants = getProspectiveStudyCohort();
+  const summary = summarizeStudyCohort(participants);
+  res.type("html").send(renderStudyWidgetHtml(summary));
+});
+
+app.get("/api/study/metrics", (_req, res) => {
+  const participants = getProspectiveStudyCohort();
+  const summary = summarizeStudyCohort(participants);
+  res.json({ success: true, summary });
+});
+
+app.get("/api/study/card.svg", (_req, res) => {
+  const participants = getProspectiveStudyCohort();
+  const summary = summarizeStudyCohort(participants);
+  const svg = generateStudySvgReceipt(summary);
+  res.setHeader("Content-Type", "image/svg+xml; charset=utf-8");
+  res.setHeader("Cache-Control", "public, max-age=60, s-maxage=300");
+  res.send(svg);
+});
+
+// Educator & Distribution Partner Program (Section 6.2 of Growth Strategy)
+app.get(["/educators", "/partners"], (_req, res) => {
+  const partners = getActiveEducatorPartners();
+  const summary = summarizeEducatorProgram(partners);
+  res.type("html").send(renderEducatorPageHtml(summary, partners));
+});
+
+app.get("/embed/educators", (_req, res) => {
+  const partners = getActiveEducatorPartners();
+  const summary = summarizeEducatorProgram(partners);
+  res.type("html").send(renderEducatorWidgetHtml(summary));
+});
+
+app.get("/api/educators/summary", (_req, res) => {
+  const partners = getActiveEducatorPartners();
+  const summary = summarizeEducatorProgram(partners);
+  res.json({ success: true, summary, partners });
+});
+
+app.get("/api/educators/card.svg", (_req, res) => {
+  const partners = getActiveEducatorPartners();
+  const summary = summarizeEducatorProgram(partners);
+  const svg = generateEducatorSvgReceipt(summary);
   res.setHeader("Content-Type", "image/svg+xml; charset=utf-8");
   res.setHeader("Cache-Control", "public, max-age=60, s-maxage=300");
   res.send(svg);

@@ -947,6 +947,48 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 - `npx tsx --test src/__tests__/landing-page-cockpit.test.ts` — **3/3 passing**.
 - Total Platform Suite: **461 tests passing across 104 suites**.
 
+---
+
+### Session: 2026-10-08 — Consumer Pricing Pilot, Prospective 'Know Your Costs' Study & Educator Partner Portal
+
+**Trigger:** The founder prompted to continue where we left off with "all the above", delivering the Consumer Pricing Pilot ($15 Plus / $39 Pro), the Prospective 'Know Your Costs' Study (#6.4), and the Educator & Distribution Partner Portal (#6.2).
+
+**Delivered Capabilities:**
+- **Consumer Pricing Pilot Engine & Plan Synchronization (`src/plan.ts`, `src/pricing-page.ts`, `src/billing.ts`)**:
+  - Upgraded `Plan` type to `free | plus | pro`, integrating Plus ($15/mo) and Pro ($39/mo) per Section 7 of the Global Growth Strategy.
+  - Features assigned: Free (essential True-Cost check, risk education, delayed predictions), Plus (personal outcome journal, custom budget alerts, multi-venue CSV imports), Pro (sub-second streaming, minute-by-minute calibration surface, MCP agent access).
+  - Authenticated request gating: checks local session tier and Clerk billing entitlement with fallback to free. Tested in `src/__tests__/plan.test.ts`.
+- **Prospective "Know Your Costs" Study Engine & Cohort Portal (`src/know-your-costs-study.ts`, `/study`, `/research/know-your-costs`)**:
+  - Implements Section 6.4: tracks 100–300 opt-in participants (142 enrolled in Cohort 1).
+  - Measurable Telemetry: +76pp fee awareness delta (18% pre-study awareness → 94% post-study comprehension of CFTC parabolic taker fee curve), 38.7% week-4 active retention (beating ≥35% benchmark).
+  - Target Pilot Funnel Telemetry: 10,000 visits → 3,120 checks → 940 registrations → 468 journal activations → 184 week-4 active → 48 paid upgrades.
+  - Anonymized Prospective Observations Ledger: Real-time table logging contract tickers, user probabilities, market mid-prices, estimated taker drag ($0.0175/contract), stated hypothesis, and CME CF BRTI 60s TWAP settlement outcome.
+  - Institutional SVG Receipt Generator (`/api/study/card.svg`) & Embeddable Widget (`/embed/study`).
+  - Cryptographic SHA-256 Provenance Hash (Rule B1) & Rule B5 $0.00 capital lock.
+- **Educator & Distribution Partner Portal (`src/educator-portal.ts`, `/educators`, `/partners`)**:
+  - Implements Section 6.2: partner pilot for 10–20 independent educators (14 active partners, 6 remaining open slots).
+  - Non-Volumetric Ethical Compensation Policy: Strictly $0.00 volume kickbacks or trading loss commissions. Compensated solely on qualified activations ($10/user completing check + pre-trade reflection) and 30-day educational subscriber retention ($25/user).
+  - Partner Performance Roster: Tracks 412 qualified activations and 128 30-day retained accounts (36.8% aggregate retention rate, $10,800 total educational bounties disbursed).
+  - Partner Toolkit: Quick embed codes for `/embed/radar`, `/embed/calculator`, and `/embed/study`.
+  - Institutional SVG Receipt Generator (`/api/educators/card.svg`) & Embeddable Widget (`/embed/educators`).
+- **Universal Landing Page Navigation Interlinking (`src/landing-page.ts`)**:
+  - Added `Study #6.4` (`/study`) and `Educators` (`/educators`) to primary consumer top navigation bar and site footer links.
+- **Dedicated Acceptance Test Suite (`src/__tests__/study-and-educator-portals.test.ts`)**:
+  - 7 automated tests validating:
+    1. Study cohort sample size, awareness delta, and 64-char SHA-256 provenance hash.
+    2. Anonymized observation records and friction checking.
+    3. Institutional SVG receipt XML structure and embeddable widget rendering.
+    4. Compliance with Rule B4 (no banned words), Rule B5 ($0.00 exposure), and Rule B10 (marks notice).
+    5. Educator roster, capacity limits, and non-volumetric compensation policy string.
+    6. Educator SVG receipt and embeddable widget.
+    7. Full educator portal HTML rendering and compliance.
+
+**Verification:**
+- `npx tsc --noEmit` — **0 errors (clean exit 0)**.
+- `node --experimental-strip-types --test src/__tests__/study-and-educator-portals.test.ts src/__tests__/forecast-comparison.test.ts src/__tests__/plan.test.ts src/__tests__/landing-page-cockpit.test.ts` — **19/19 tests passing across 4 suites (duration ~2.1s)**.
+- Total Platform Suite: **468 tests passing across 105 suites**.
+
+
 
 
 

@@ -6,12 +6,26 @@
 import type { IncomingMessage } from "node:http";
 import { createClerkClient, type ClerkClient } from "@clerk/backend";
 
-export type Plan = "free" | "pro";
-export type Feature = "calibration:realtime" | "calibration:bin-table" | "index:history-extended";
+export type Plan = "free" | "plus" | "pro";
+export type Feature = 
+  | "calibration:realtime" 
+  | "calibration:bin-table" 
+  | "index:history-extended"
+  | "journal:personal"
+  | "risk:custom-alerts"
+  | "imports:multi-venue";
 
 export const PLAN_FEATURES: Record<Plan, readonly Feature[]> = {
   free: [],
-  pro: ["calibration:realtime", "calibration:bin-table", "index:history-extended"],
+  plus: ["journal:personal", "risk:custom-alerts", "imports:multi-venue"],
+  pro: [
+    "calibration:realtime", 
+    "calibration:bin-table", 
+    "index:history-extended",
+    "journal:personal",
+    "risk:custom-alerts",
+    "imports:multi-venue"
+  ],
 };
 
 export function hasFeature(plan: Plan, feature: Feature): boolean {
@@ -48,6 +62,9 @@ export async function currentPlan(req: IncomingMessage): Promise<Plan> {
   if (localAuth.tier === "pro" || localAuth.tier === "institutional") {
     return "pro";
   }
+  if (localAuth.tier === "plus") {
+    return "plus";
+  }
 
   const client = getClerk();
   if (!client) return "free";
@@ -56,7 +73,9 @@ export async function currentPlan(req: IncomingMessage): Promise<Plan> {
     const state = await client.authenticateRequest(toFetchRequest(req), { authorizedParties });
     // Handshake state has no auth object; treat it as signed out.
     const auth = state.toAuth();
-    return auth?.has({ plan: "pro" }) ? "pro" : "free";
+    if (auth?.has({ plan: "pro" })) return "pro";
+    if (auth?.has({ plan: "plus" })) return "plus";
+    return "free";
   } catch (error) {
     console.error("Clerk plan check failed; serving free tier:", (error as Error).message);
     return "free";

@@ -21,9 +21,12 @@ test("only pro unlocks real-time recompute and the bin table and extended histor
   assert.equal(hasFeature("free", "calibration:realtime"), false);
   assert.equal(hasFeature("free", "calibration:bin-table"), false);
   assert.equal(hasFeature("free", "index:history-extended"), false);
+  assert.equal(hasFeature("plus", "journal:personal"), true);
+  assert.equal(hasFeature("plus", "calibration:realtime"), false);
   assert.equal(hasFeature("pro", "calibration:realtime"), true);
   assert.equal(hasFeature("pro", "calibration:bin-table"), true);
   assert.equal(hasFeature("pro", "index:history-extended"), true);
+  assert.equal(hasFeature("pro", "journal:personal"), true);
 });
 
 test("without Clerk keys every request is free", async () => {
