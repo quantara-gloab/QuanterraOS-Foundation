@@ -796,6 +796,7 @@ export function renderCorridorTerminalHtml(analysis: CorridorAnalysisResult): st
       <a href="/calculator">Calculator</a>
       <a href="/corridors" class="active" style="color:var(--accent);">Corridors</a>
       <a href="/divergence">Divergence</a>
+      <a href="/flow">Flow</a>
       <a href="/calibration/explorer">Decomposition</a>
       <a href="/settlement">Settlement</a>
       <a href="/schedule">Schedule</a>

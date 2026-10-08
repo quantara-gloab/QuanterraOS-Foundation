@@ -768,6 +768,39 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 - `npx tsx --test src/__tests__/microstructure-audio.test.ts src/__tests__/expiry-radar.test.ts` — **14/14 passing**.
 - Total Platform Suite: **434 tests passing across 99 suites**.
 
+---
+
+### Session: 2026-10-07 — Order Book Liquidity Flow Velocity & Microstructure Pressure Terminal
+
+**Trigger:** The founder prompted "next", advancing development to expand QuanterraOS's real-time order-book intelligence with liquidity replenishment vs drain telemetry.
+
+**Delivered Capabilities:**
+- **Order Book Liquidity Flow & Microstructure Pressure Engine (`src/liquidity-flow.ts`, `/flow`, `/liquidity-flow`)**:
+  - **Replenishment Rate vs Taker Drain Velocity**: Evaluates the contract arrival rate of resting passive limit orders (`ADD`) against aggressive liquidity removal (`FILL` taker hits) over custom rolling windows (e.g. 60s, 180s, 300s).
+  - **Net Microstructure Pressure (NMP)**: Normalized scalar $[-1.0, +1.0]$: $\text{NMP} = \frac{\text{Replenished} - \text{Drained}}{\text{Replenished} + \text{Drained}}$, classifying market state into `NET_REPLENISHING`, `NEUTRAL`, or `NET_DRAINING`.
+  - **Top-3 Queue Depth & Sweep Vulnerability Scoring**: Measures resting bid and ask contract queues across top-3 price levels and flags `HIGH_RISK` when thin liquidity exposes traders to multi-tick market order sweeps.
+  - **Interactive Terminal UI (`/flow`, `/liquidity-flow`)**:
+    - 4 headline stat cards (Net Pressure, Replenish Velocity, Drain Velocity, Sweep Vulnerability).
+    - Live order-flow tape table detailing timestamps, action badges (+ADD, FILL, CANCEL), sides, prices, contract sizes, and notional USD amounts.
+    - Top-3 queue depth breakdown with bid/ask imbalance percentage.
+  - **Institutional SVG Receipt (`/api/flow/card.svg`)**: 640x720 vector verification card featuring volume flow bar distributions, pressure meters, and 64-character SHA-256 provenance hash.
+  - **Embeddable Microstructure Widget (`/embed/flow`, `/embed/liquidity-flow`)**: Lightweight responsive widget suitable for embedding in live dashboards.
+  - **API Endpoints (`src/server.ts`)**:
+    - `GET /flow`, `GET /liquidity-flow`: Full HTML terminal UI.
+    - `GET /embed/flow`: Embeddable iframe widget.
+    - `GET /api/flow/metrics`: Real-time JSON telemetry endpoint.
+    - `GET /api/flow/card.svg`: Vector receipt download.
+- **Platform Navigation Interlinking**:
+  - Connected `/flow` across `/radar`, `/corridors`, `/settlement`, `/schedule`, `/webhooks`, and `/` footer links.
+- **Dedicated Acceptance Test Suite (`src/__tests__/liquidity-flow.test.ts`)**:
+  - 6 automated tests verifying exact replenishment vs drain arithmetic, net draining directional classification, SHA-256 provenance hash generation, SVG receipt formatting, embeddable widget rendering, and strict Rule B4 / Rule B5 compliance.
+
+**Verification:**
+- `npx tsc --noEmit` — **0 errors (clean exit 0)**.
+- `npx tsx --test src/__tests__/liquidity-flow.test.ts` — **6/6 passing**.
+- Total Platform Suite: **440 tests passing across 100 suites**.
+
+
 
 
 

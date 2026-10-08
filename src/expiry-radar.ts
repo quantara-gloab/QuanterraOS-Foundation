@@ -1288,6 +1288,7 @@ export function renderExpiryRadarPageHtml(
       <a href="/calculator">True-Cost Calculator</a>
       <a href="/corridors">Corridors</a>
       <a href="/divergence">Cross-Venue Divergence</a>
+      <a href="/flow">Order Flow</a>
       <a href="/calibration/explorer">Decomposition</a>
       <a href="/settlement">Settlement Dissection</a>
       <a href="/schedule">Schedule</a>

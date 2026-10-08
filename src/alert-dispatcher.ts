@@ -483,6 +483,7 @@ export function renderWebhookDashboardHtml(recentAlerts: AlertEventData[] = []):
       <a href="/calculator">Calculator</a>
       <a href="/corridors">Corridors</a>
       <a href="/divergence">Divergence</a>
+      <a href="/flow">Flow</a>
       <a href="/calibration/explorer">Decomposition</a>
       <a href="/settlement">Settlement</a>
       <a href="/schedule">Schedule</a>

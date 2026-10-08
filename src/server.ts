@@ -116,6 +116,12 @@ import {
   computeAudioTelemetryEvent,
   renderMicrostructureAudioPageHtml,
 } from "./microstructure-audio.ts";
+import {
+  computeLiquidityFlowState,
+  generateLiquidityFlowSvgReceipt,
+  renderLiquidityFlowWidgetHtml,
+  renderLiquidityFlowPageHtml,
+} from "./liquidity-flow.ts";
 import { renderEducationalPageHtml, type EducationTopic } from "./educational-pages.ts";
 import { getReviewReminders, updateReviewReminders } from "./review-reminders.ts";
 import { renderVenueComparisonPageHtml } from "./venue-comparison-page.ts";
@@ -2285,6 +2291,38 @@ app.get("/api/radar/audio/event", (req, res) => {
     outcome
   });
   res.json({ success: true, event });
+});
+
+// Order Book Liquidity Flow & Microstructure Pressure Terminal (/flow, /liquidity-flow)
+app.get(["/flow", "/liquidity-flow"], (req, res) => {
+  const ticker = typeof req.query.ticker === "string" ? req.query.ticker : "KXBTC15M-24OCT07-T91250";
+  const windowSeconds = Number(req.query.window ?? 180);
+  const state = computeLiquidityFlowState(ticker, { windowSeconds });
+  res.type("html").send(renderLiquidityFlowPageHtml(state));
+});
+
+app.get(["/embed/flow", "/embed/liquidity-flow"], (req, res) => {
+  const ticker = typeof req.query.ticker === "string" ? req.query.ticker : "KXBTC15M-24OCT07-T91250";
+  const windowSeconds = Number(req.query.window ?? 180);
+  const state = computeLiquidityFlowState(ticker, { windowSeconds });
+  res.type("html").send(renderLiquidityFlowWidgetHtml(state));
+});
+
+app.get("/api/flow/metrics", (req, res) => {
+  const ticker = typeof req.query.ticker === "string" ? req.query.ticker : "KXBTC15M-24OCT07-T91250";
+  const windowSeconds = Number(req.query.window ?? 180);
+  const state = computeLiquidityFlowState(ticker, { windowSeconds });
+  res.json({ success: true, state });
+});
+
+app.get("/api/flow/card.svg", (req, res) => {
+  const ticker = typeof req.query.ticker === "string" ? req.query.ticker : "KXBTC15M-24OCT07-T91250";
+  const windowSeconds = Number(req.query.window ?? 180);
+  const state = computeLiquidityFlowState(ticker, { windowSeconds });
+  const svg = generateLiquidityFlowSvgReceipt(state);
+  res.setHeader("Content-Type", "image/svg+xml; charset=utf-8");
+  res.setHeader("Cache-Control", "public, max-age=60, s-maxage=300");
+  res.send(svg);
 });
 
 app.get(["/learn", "/education", "/curriculum"], (req, res) => {
