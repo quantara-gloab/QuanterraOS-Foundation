@@ -1,4 +1,5 @@
 import { renderMarketEvidenceCardHtml, type MarketEvidenceCardOptions } from "./market-evidence-card.ts";
+import { calculateKalshiOrderFee } from "./polymarket-engine.ts";
 
 /**
  * QuanterraOS Standalone Embeddable Cost & Friction Widget
@@ -306,3 +307,262 @@ export function renderEmbedCardHtml(opts: MarketEvidenceCardOptions = {}): strin
 </body>
 </html>`;
 }
+
+/**
+ * Renders an embeddable Expiry Radar & Microstructure Widget
+ */
+export function renderEmbedRadarHtml(options?: { series?: "15m" | "1h"; spotPrice?: number }): string {
+  const series = options?.series || "15m";
+  const spotPrice = options?.spotPrice || 91250;
+  const atmStrike = Math.round(spotPrice / 250) * 250;
+  const delta = spotPrice - atmStrike;
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuanterraOS Expiry Radar Widget</title>
+  <style>
+    :root {
+      --bg: #06070A;
+      --card: #0E121B;
+      --accent: #DFB843;
+      --accent-light: #F7E7B4;
+      --border: rgba(212, 175, 55, 0.22);
+      --muted: #94A3B8;
+      --text: #F8FAFC;
+      --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 12px;
+      line-height: 1.4;
+    }
+    .embed-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.12);
+      padding-bottom: 8px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 6px var(--accent);
+    }
+    .badge {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      background: rgba(16, 185, 129, 0.15);
+      color: #34D399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .metric {
+      background: rgba(0,0,0,0.3);
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .lbl { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; font-family: var(--font-mono); }
+    .val { font-size: 1.15rem; font-weight: 800; font-family: var(--font-mono); margin-top: 2px; }
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.72rem;
+      color: var(--muted);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 8px;
+    }
+    .btn {
+      background: linear-gradient(180deg, #F7E7B4 0%, #DFB843 100%);
+      color: #06070A;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 0.7rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="embed-card">
+    <div class="header">
+      <div class="brand">
+        <span class="dot"></span> QUANTERRAOS <span style="color:var(--accent);">RADAR (${series.toUpperCase()})</span>
+      </div>
+      <span class="badge">60s TWAP ACTIVE</span>
+    </div>
+    <div class="grid">
+      <div class="metric">
+        <div class="lbl">Spot Proxy</div>
+        <div class="val">$${spotPrice.toLocaleString()}</div>
+      </div>
+      <div class="metric">
+        <div class="lbl">ATM Strike</div>
+        <div class="val">$${atmStrike.toLocaleString()}</div>
+      </div>
+      <div class="metric">
+        <div class="lbl">Delta</div>
+        <div class="val" style="color:${delta >= 0 ? '#10B981' : '#F43F5E'};">${delta >= 0 ? '+' : ''}$${delta.toFixed(0)}</div>
+      </div>
+    </div>
+    <div class="footer">
+      <span>Settlement Target: CME CF BRTI 60s TWAP</span>
+      <a href="https://quanterraos.com/radar" target="_blank" class="btn">Full Radar &rarr;</a>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+/**
+ * Renders an embeddable Cross-Venue Divergence Widget
+ */
+export function renderEmbedDivergenceHtml(options?: { price?: number; count?: number }): string {
+  const price = options?.price || 0.51;
+  const count = options?.count || 10;
+  const kalshiFee = calculateKalshiOrderFee(price, count).totalFeeUsd;
+  const polyFee = Number(((0.005 * count) + 0.15).toFixed(2));
+  const kalshiBreakeven = ((price * count + kalshiFee) / count * 100).toFixed(1);
+  const polyBreakeven = ((price * count + polyFee) / count * 100).toFixed(1);
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuanterraOS Cross-Venue Divergence Widget</title>
+  <style>
+    :root {
+      --bg: #06070A;
+      --card: #0E121B;
+      --accent: #DFB843;
+      --border: rgba(212, 175, 55, 0.22);
+      --muted: #94A3B8;
+      --text: #F8FAFC;
+      --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 12px;
+      font-size: 13px;
+    }
+    .embed-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.12);
+      padding-bottom: 8px;
+    }
+    .brand { font-size: 0.8rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 6px; }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .v-box {
+      background: rgba(0,0,0,0.3);
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .v-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 4px; display: flex; justify-content: space-between; }
+    .row { display: flex; justify-content: space-between; font-size: 0.72rem; margin-top: 3px; font-family: var(--font-mono); }
+    .k-color { color: var(--accent); }
+    .p-color { color: #38BDF8; }
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.7rem;
+      color: var(--muted);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 8px;
+    }
+    .btn {
+      background: linear-gradient(180deg, #F7E7B4 0%, #DFB843 100%);
+      color: #06070A;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 0.7rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="embed-card">
+    <div class="header">
+      <div class="brand">
+        <span class="dot"></span> QUANTERRAOS <span style="color:var(--accent);">CROSS-VENUE DIVERGENCE</span>
+      </div>
+      <span style="font-family:var(--font-mono); font-size:0.65rem; color:var(--muted);">Price: ${(price*100).toFixed(0)}&cent; &bull; ${count} cts</span>
+    </div>
+    <div class="compare-grid">
+      <div class="v-box">
+        <div class="v-title"><span class="k-color">Kalshi</span> <span style="font-size:0.65rem; color:var(--muted);">CFTC</span></div>
+        <div class="row"><span>Taker Fee:</span> <strong style="color:#F43F5E;">$${kalshiFee.toFixed(2)}</strong></div>
+        <div class="row"><span>Breakeven:</span> <strong>${kalshiBreakeven}%</strong></div>
+        <div class="row"><span>Oracle:</span> <span>CME CF BRTI</span></div>
+      </div>
+      <div class="v-box">
+        <div class="v-title"><span class="p-color">Polymarket</span> <span style="font-size:0.65rem; color:var(--muted);">Polygon</span></div>
+        <div class="row"><span>Friction+Gas:</span> <strong style="color:#F43F5E;">$${polyFee.toFixed(2)}</strong></div>
+        <div class="row"><span>Breakeven:</span> <strong>${polyBreakeven}%</strong></div>
+        <div class="row"><span>Oracle:</span> <span>UMA (0.35% disp)</span></div>
+      </div>
+    </div>
+    <div class="footer">
+      <span>Divergence accounts for all-in friction &bull; Rule B5 $0 live capital</span>
+      <a href="https://quanterraos.com/divergence" target="_blank" class="btn">Full Terminal &rarr;</a>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+

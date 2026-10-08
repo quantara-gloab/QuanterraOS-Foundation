@@ -229,6 +229,68 @@ export function renderVenueComparisonPageHtml(): string {
       margin-bottom: 32px;
       text-align: center;
     }
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.82);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-box {
+      background: #0E121B;
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      border-radius: 12px;
+      max-width: 600px;
+      width: 100%;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+    }
+    .modal-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .close-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-size: 1.3rem;
+      cursor: pointer;
+    }
+    .snippet-box {
+      background: #06070A;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      padding: 12px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: #DFB843;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      margin: 12px 0;
+      user-select: all;
+    }
+    .btn-secondary {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #fff;
+      font-weight: 600;
+      padding: 7px 14px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.12); }
   </style>
 </head>
 <body>
@@ -240,18 +302,20 @@ export function renderVenueComparisonPageHtml(): string {
       <span>/ VENUES</span>
     </a>
     <div class="nav-links">
+      <a href="/radar">Radar</a>
       <a href="/calculator">Calculator</a>
-      <a href="/compare" class="active" style="color:var(--accent); font-weight:600;">Venues</a>
+      <a href="/divergence" class="active" style="color:var(--accent); font-weight:600;">Venues</a>
       <a href="/journal">Journal</a>
       <a href="/dashboard">Terminal</a>
     </div>
-    <div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <button onclick="openEmbedModal()" class="btn-secondary" title="Embed this widget on your Substack, website, or blog">&lt;/&gt; Embed Widget</button>
       <a href="/calculator" class="btn-gold">+ True-Cost Check</a>
     </div>
   </nav>
 
   <main class="container">
-    <div class="eyebrow">Microstructure Intelligence · Cross-Venue Arbitrage</div>
+    <div class="eyebrow">Microstructure Intelligence · Cross-Venue Divergence Calibration</div>
     <h1>Kalshi vs. Polymarket Comparison</h1>
     <p class="lead">
       Real-time friction and settlement comparison across CFTC-regulated exchange contracts and decentralized on-chain prediction markets.
@@ -584,8 +648,48 @@ export function renderVenueComparisonPageHtml(): string {
       window.location.href = '/journal';
     }
 
+    function openEmbedModal() {
+      const price = (Number(document.getElementById('slider-price').value) / 100).toFixed(2);
+      const count = Math.max(1, Number(document.getElementById('input-count').value) || 10);
+      const code = '<iframe src="https://quanterraos.com/embed/divergence?price=' + price + '&count=' + count + '" width="100%" height="240" frameborder="0" style="border-radius:8px; border:1px solid rgba(212,175,55,0.3); overflow:hidden;"></iframe>';
+      document.getElementById('embed-snippet-text').textContent = code;
+      document.getElementById('embed-modal').style.display = 'flex';
+    }
+
+    function closeEmbedModal() {
+      document.getElementById('embed-modal').style.display = 'none';
+    }
+
+    function copyEmbedCode() {
+      const code = document.getElementById('embed-snippet-text').textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        const btn = document.getElementById('copy-embed-btn');
+        btn.textContent = 'Copied to Clipboard!';
+        setTimeout(() => { btn.textContent = 'Copy Code'; }, 2000);
+      });
+    }
+
     recalcCompare();
   </script>
+
+  <!-- Embed Widget Modal -->
+  <div id="embed-modal" class="modal-backdrop" onclick="if(event.target===this) closeEmbedModal()">
+    <div class="modal-box">
+      <div class="modal-title">
+        <span>Embed Divergence Widget</span>
+        <button class="close-btn" onclick="closeEmbedModal()">&times;</button>
+      </div>
+      <p style="font-size:0.85rem; color:var(--text-dim); margin-bottom:12px;">
+        Embed real-time Kalshi vs. Polymarket fee hurdle and oracle divergence telemetry directly onto your Substack, newsletter, research portal, or blog.
+      </p>
+      <div class="snippet-box" id="embed-snippet-text"></div>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:14px;">
+        <button class="btn-secondary" onclick="closeEmbedModal()">Close</button>
+        <button class="btn-gold" id="copy-embed-btn" onclick="copyEmbedCode()">Copy Code</button>
+      </div>
+    </div>
+  </div>
+
   ${ASSISTANT_WIDGET_HTML}
 </body>
 </html>`;

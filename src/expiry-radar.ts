@@ -962,6 +962,60 @@ export function renderExpiryRadarPageHtml(
       cursor: pointer;
       font-size: 0.9rem;
     }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.82);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-box {
+      background: #0E121B;
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      border-radius: 12px;
+      max-width: 600px;
+      width: 100%;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+      text-align: left;
+    }
+    .modal-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .close-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.3rem;
+      cursor: pointer;
+    }
+    .snippet-box {
+      background: #06070A;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      padding: 12px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: #DFB843;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      margin: 12px 0;
+      user-select: all;
+    }
 
     footer.site-footer {
       border-top: 1px solid rgba(255, 255, 255, 0.06);
@@ -982,6 +1036,7 @@ export function renderExpiryRadarPageHtml(
       <a href="/">Overview</a>
       <a href="/radar" class="active">Expiry Radar</a>
       <a href="/calculator">True-Cost Calculator</a>
+      <a href="/divergence">Cross-Venue Divergence</a>
       <a href="/calibration">Calibration Proof</a>
       <a href="/account">Account</a>
     </nav>
@@ -1116,6 +1171,7 @@ export function renderExpiryRadarPageHtml(
       </div>
       <div class="card-actions">
         <button class="btn-gold-action" onclick="copyCardSvg()">Copy SVG to Clipboard</button>
+        <button class="btn-secondary" onclick="openEmbedRadarModal()">&lt;/&gt; Embed Radar Widget</button>
         <button class="btn-secondary" onclick="shareToX()">Share Receipt to X</button>
       </div>
     </div>
@@ -1127,6 +1183,24 @@ export function renderExpiryRadarPageHtml(
       Attribution: CME CF Bitcoin Real-Time Index (BRTI) is a registered trademark of CME Group and CF Benchmarks. Kalshi is a registered mark of Kalshi Inc. QuanterraOS is not affiliated with, endorsed by, or sponsored by these entities.
     </p>
   </footer>
+
+  <!-- Embed Radar Widget Modal -->
+  <div id="embed-radar-modal" class="modal-backdrop" onclick="if(event.target===this) closeEmbedRadarModal()">
+    <div class="modal-box">
+      <div class="modal-title">
+        <span>Embed Expiry Radar Widget</span>
+        <button class="close-btn" onclick="closeEmbedRadarModal()">&times;</button>
+      </div>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">
+        Embed this live 60-second TWAP countdown, ATM strike delta, and spot proxy card directly onto your Substack, newsletter, research portal, or Discord dashboard.
+      </p>
+      <div class="snippet-box" id="embed-radar-snippet"></div>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:14px;">
+        <button class="btn-secondary" onclick="closeEmbedRadarModal()">Close</button>
+        <button class="btn-gold-action" id="copy-radar-btn" onclick="copyEmbedRadarCode()">Copy Code</button>
+      </div>
+    </div>
+  </div>
 
   ${ASSISTANT_WIDGET_HTML}
 
@@ -1184,6 +1258,42 @@ export function renderExpiryRadarPageHtml(
       const url = encodeURIComponent(window.location.origin + '/radar');
       window.open('https://twitter.com/intent/tweet?text=' + text + '&url=' + url, '_blank');
     }
+
+    function openEmbedRadarModal() {
+      const code = '<iframe src="https://quanterraos.com/embed/radar?series=${radar.timeframe}" width="100%" height="220" frameborder="0" style="border-radius:8px; border:1px solid rgba(212,175,55,0.3); overflow:hidden;"></iframe>';
+      document.getElementById('embed-radar-snippet').textContent = code;
+      document.getElementById('embed-radar-modal').style.display = 'flex';
+    }
+
+    function closeEmbedRadarModal() {
+      document.getElementById('embed-radar-modal').style.display = 'none';
+    }
+
+    function copyEmbedRadarCode() {
+      const code = document.getElementById('embed-radar-snippet').textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        const btn = document.getElementById('copy-radar-btn');
+        btn.textContent = 'Copied to Clipboard!';
+        setTimeout(() => { btn.textContent = 'Copy Code'; }, 2000);
+      });
+    }
+
+    // Microstructure tick pulse simulation (subtle green/red glow on random bid/ask every 3.5s)
+    setInterval(() => {
+      const rows = document.querySelectorAll('#strike-table tbody tr');
+      if (rows && rows.length > 0) {
+        const randomIdx = Math.floor(Math.random() * rows.length);
+        const row = rows[randomIdx];
+        const bidCell = row.cells ? row.cells[2] : null;
+        if (bidCell) {
+          bidCell.style.transition = 'background-color 0.4s';
+          bidCell.style.backgroundColor = Math.random() > 0.5 ? 'rgba(16, 185, 129, 0.18)' : 'rgba(244, 63, 94, 0.18)';
+          setTimeout(() => {
+            bidCell.style.backgroundColor = 'transparent';
+          }, 800);
+        }
+      }
+    }, 3500);
   </script>
 </body>
 </html>`;

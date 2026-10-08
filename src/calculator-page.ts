@@ -328,6 +328,7 @@ export function renderCalculatorPageHtml(): string {
       <div class="nav-links">
         <a href="/calculator" class="active" style="color:var(--accent);font-weight:700;">Check</a>
         <a href="/radar" style="color:var(--accent-light);font-weight:600;">Radar</a>
+        <a href="/divergence" style="color:var(--accent);font-weight:600;">Divergence</a>
         <a href="/journal" style="color:#10B981;font-weight:600;">Journal</a>
         <a href="/calibration" style="color:var(--muted);font-weight:500;">Learn</a>
         <a href="/account" style="color:var(--muted);font-weight:500;">Sign in</a>

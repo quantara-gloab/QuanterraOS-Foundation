@@ -530,8 +530,29 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 - `npm run typecheck` (`tsc --noEmit`) — **0 errors (clean exit 0)**.
 - `npm test` — **392/392 passing across 89 suites, 0 failures** (duration ~112s).
 
+### Session: 2026-10-07 — Phase 4 Cross-Venue Divergence Monitor, Embeddable Widgets, 1-Click Embed Snippet Generator & Tick Pulse
 
+**Trigger:** The founder confirmed "excellent work proceed full force", accelerating full-throttle platform buildout with widgets, distribution infrastructure, and market-leading features.
 
+**Delivered Capabilities:**
+- **Phase 4 Cross-Venue Divergence Monitor (`/divergence`, `/compare`, `/venues`)**:
+  - Registered official Phase 4 route `/divergence` in `src/server.ts` aliased to the flagship comparison terminal.
+  - Corrected eyebrow copy from non-compliant marketing phrase to strictly compliant Rule B4 terminology: `Microstructure Intelligence · Cross-Venue Divergence Calibration`.
+  - Side-by-side friction benchmarking: Kalshi (CFTC, USD ACH, CME CF BRTI 60s TWAP, non-linear taker fee) vs Polymarket (Polygon USDC, UMA Optimistic Oracle, amortized gas/bridge friction).
+- **Standalone Embeddable Widgets (`/embed/radar`, `/widget/radar`, `/embed/divergence`, `/widget/divergence`)**:
+  - `renderEmbedRadarHtml()`: Compact, self-contained HTML widget for 15m and 1h series with live spot proxy, ATM strike, delta, TWAP badge, and direct terminal links.
+  - `renderEmbedDivergenceHtml()`: Compact, self-contained HTML widget comparing Kalshi vs Polymarket taker fee drag, Polygon gas, breakeven hurdles, and oracle profiles for any customizable price and contract count.
+  - Fully decoupled and embeddable inside `<iframe>` blocks on Substack, Medium, research portals, Discord bots, and community blogs.
+- **1-Click Embed Snippet Generator Modals**:
+  - Added `<button class="btn-secondary">&lt;/&gt; Embed Widget</button>` and `<button class="btn-secondary">&lt;/&gt; Embed Radar Widget</button>` to the action bars of `/divergence` and `/radar`.
+  - Opens a modal generating ready-to-paste, responsive `<iframe>` code with 1-click clipboard copy and toast notifications.
+- **Microstructure Orderbook Tick Pulse Simulation**:
+  - Dynamic client-side pulse on `/radar` table rows simulating live market heartbeat with subtle green/red liquidity flashes every 3.5s.
+- **Platform-Wide Navigation Interlinking**:
+  - Connected `/radar` and `/divergence` across navigation headers, footers, and dashboards: `src/landing-page.ts`, `src/calculator-page.ts`, `src/account-page.ts`, and `src/venue-comparison-page.ts`.
+- **Dedicated Acceptance Test Suite (`src/__tests__/divergence-and-embed-widgets.test.ts`)**:
+  - 5 comprehensive tests validating HTML validity, query param overrides, non-linear CFTC fee calculation precision, Rule B4 (zero banned language: no "arbitrage", "edge", "alpha", "guaranteed"), and Rule B5 ($0.00 capital risk).
 
-
-
+**Verification:**
+- `npm run typecheck` (`tsc --noEmit`) — **0 errors (clean exit 0)**.
+- `npm test` — **397/397 passing across 93 suites, 0 failures** (duration ~112s).

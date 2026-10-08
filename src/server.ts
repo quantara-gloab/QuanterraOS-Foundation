@@ -72,7 +72,12 @@ import {
 import { getSystemPulseTelemetry } from "./system-pulse.ts";
 import { renderMarketRhythmPageHtml } from "./research/market-rhythm.ts";
 import { renderMobileInstallPageHtml } from "./mobile-install.ts";
-import { renderEmbedCalculatorHtml, renderEmbedCardHtml } from "./embed-widget.ts";
+import {
+  renderEmbedCalculatorHtml,
+  renderEmbedCardHtml,
+  renderEmbedRadarHtml,
+  renderEmbedDivergenceHtml,
+} from "./embed-widget.ts";
 import { renderLearnPageHtml } from "./learn-page.ts";
 import { renderEducationalPageHtml, type EducationTopic } from "./educational-pages.ts";
 import { getReviewReminders, updateReviewReminders } from "./review-reminders.ts";
@@ -1903,7 +1908,20 @@ app.get(["/embed/card", "/widget/card"], (req, res) => {
   res.type("html").send(renderEmbedCardHtml({ ticker, venue, currentAsk, contractCount }));
 });
 
-app.get(["/compare", "/venues"], (_req, res) => {
+app.get(["/embed/radar", "/widget/radar"], (req, res) => {
+  const series = (req.query.series === "1h" ? "1h" : "15m") as any;
+  const spotPrice = req.query.spot ? Number(req.query.spot) : 91250;
+  res.type("html").send(renderEmbedRadarHtml({ series, spotPrice }));
+});
+
+app.get(["/embed/divergence", "/widget/divergence"], (req, res) => {
+  const price = req.query.price ? Number(req.query.price) : 0.51;
+  const count = req.query.count ? Number(req.query.count) : 10;
+  res.type("html").send(renderEmbedDivergenceHtml({ price, count }));
+});
+
+// Phase 4 Cross-Venue Divergence Monitor (HANDOFF.md Section G)
+app.get(["/divergence", "/compare", "/venues"], (_req, res) => {
   res.type("html").send(renderVenueComparisonPageHtml());
 });
 
