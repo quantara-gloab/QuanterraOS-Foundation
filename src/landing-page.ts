@@ -1711,6 +1711,7 @@ ${miniCircles}
     <footer class="page-footer">
       <div class="footer-links">
         <a href="/radar">radar</a>
+        <a href="/radar/audio">sonification</a>
         <a href="/divergence">divergence</a>
         <a href="/calibration">calibration</a>
         <a href="/calibration/explorer">decomposition</a>

@@ -26,6 +26,10 @@ import {
 } from "./kalshi-contracts.ts";
 import { getLiveQuotes, type LiveQuotesReport } from "./live-quotes.ts";
 import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
+import {
+  renderAudioControlWidgetHtml,
+  generateWebAudioClientScript
+} from "./microstructure-audio.ts";
 
 export type ExpiryWindowPhase =
   | "NORMAL_TRADING"
@@ -1287,6 +1291,7 @@ export function renderExpiryRadarPageHtml(
       <a href="/calibration/explorer">Decomposition</a>
       <a href="/settlement">Settlement Dissection</a>
       <a href="/schedule">Schedule</a>
+      <a href="/radar/audio">Audio Telemetry</a>
       <a href="/webhooks">Webhooks</a>
       <a href="/calibration">Calibration Proof</a>
       <a href="/account">Account</a>
@@ -1306,6 +1311,10 @@ export function renderExpiryRadarPageHtml(
     </div>
 
     ${dangerBannerHtml}
+
+    <div style="margin-bottom:24px;">
+      ${renderAudioControlWidgetHtml()}
+    </div>
 
     <div class="radar-cockpit">
       <div class="cockpit-card">
@@ -1548,6 +1557,8 @@ export function renderExpiryRadarPageHtml(
         }
       }
     }, 3500);
+    // Web Audio Synthesizer & Acoustic Telemetry
+    ${generateWebAudioClientScript()}
   </script>
 </body>
 </html>`;

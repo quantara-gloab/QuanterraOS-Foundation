@@ -112,6 +112,10 @@ import {
   type MoneynessFilter,
   type VolatilityFilter,
 } from "./calibration-explorer.ts";
+import {
+  computeAudioTelemetryEvent,
+  renderMicrostructureAudioPageHtml,
+} from "./microstructure-audio.ts";
 import { renderEducationalPageHtml, type EducationTopic } from "./educational-pages.ts";
 import { getReviewReminders, updateReviewReminders } from "./review-reminders.ts";
 import { renderVenueComparisonPageHtml } from "./venue-comparison-page.ts";
@@ -2257,6 +2261,30 @@ app.get("/api/calibration/explore", async (req, res) => {
 
   const result = await computeCalibrationExplorer(session, moneyness, volatility);
   res.json({ success: true, result });
+});
+
+// Acoustic Microstructure Sonification Terminal (/radar/audio, /audio)
+app.get(["/radar/audio", "/audio", "/sonification"], (_req, res) => {
+  res.type("html").send(renderMicrostructureAudioPageHtml());
+});
+
+app.get("/api/radar/audio/event", (req, res) => {
+  const secondsRemaining = Number(req.query.secondsRemaining ?? 45);
+  const spotPrice = Number(req.query.spotPrice ?? 91230);
+  const strikePrice = Number(req.query.strikePrice ?? 91250);
+  const twapProgressSeconds = Number(req.query.twapProgressSeconds ?? 15);
+  const isSettled = req.query.isSettled === "true";
+  const outcome = (req.query.outcome === "YES" ? "YES" : req.query.outcome === "NO" ? "NO" : null);
+
+  const event = computeAudioTelemetryEvent({
+    secondsRemaining,
+    spotPrice,
+    strikePrice,
+    twapProgressSeconds,
+    isSettled,
+    outcome
+  });
+  res.json({ success: true, event });
 });
 
 app.get(["/learn", "/education", "/curriculum"], (req, res) => {

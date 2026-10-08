@@ -734,6 +734,41 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 - `npx tsx --test src/__tests__/settlement-dissection.test.ts src/__tests__/corridor-engine.test.ts src/__tests__/alert-dispatcher.test.ts src/__tests__/market-schedule.test.ts src/__tests__/calibration-explorer.test.ts src/__tests__/calibration-page.test.ts` — **32/32 passing**.
 - Total Platform Suite: **428 tests passing across 98 suites**.
 
+---
+
+### Session: 2026-10-07 — Live Microstructure Sonification & Web Audio Oracle Synthesizer Engine
+
+**Trigger:** The founder reiterated "next" full force, driving QuanterraOS to deliver cutting-edge multi-sensory acoustic telemetry for high-stakes 60-second settlement windows.
+
+**Delivered Capabilities:**
+- **Live Microstructure Sonification & Web Audio Synthesizer Engine (`src/microstructure-audio.ts`, `/radar/audio`, `/audio`)**:
+  - Zero-dependency client-side browser Web Audio API synthesizer (`AudioContext`) with sinusoidal oscillators, exponential gain envelopes, and browser `speechSynthesis` integration.
+  - **Deterministic Frequency & Urgency Derivation (`computeAudioTelemetryEvent`)**:
+    - **Baseline Normal Heartbeat**: 440 Hz cadence tick at -18 dB.
+    - **TWAP Sampling Progression**: Dynamically ramps upward from 600 Hz to 900 Hz across the 60-second CME CF BRTI window ($f = 600 + \frac{t_{\text{progress}}}{60} \times 300$).
+    - **Danger Zone Proximity Modulation**: Inverse linear frequency modulation from 880 Hz to 1,320 Hz as BTC spot approaches pending strikes within $50 threshold.
+    - **Verbal Oracle Callouts**: Synthesized vocal announcements at $t=60\text{s}$ ("TWAP sampling commenced"), $t=30\text{s}$, $t=10\text{s}$, and when spot is within $15 of a strike.
+    - **Settlement Resolution Chimes**: Pure 880 Hz chime for outcome YES vs 330 Hz low chime for outcome NO.
+  - **Cryptographic Provenance (Rule B1)**: 64-character SHA-256 state hash computed across timing, spot, strike, frequency, and urgency level.
+- **Embedded Audio Cockpit Controls in `/radar` (`src/expiry-radar.ts`)**:
+  - Live soundwave oscillator visualization with animated waveform bars.
+  - Interactive volume slider, 1-click active/muted toggle, and test tone synthesizer button.
+  - Injected client-side audio script seamlessly activating on user interaction without audio file asset latency.
+- **Standalone Terminal (`/radar/audio`, `/audio`, `/sonification`)**:
+  - Interactive test bench for all 5 sound states (Normal, TWAP Pulse, Danger Alert, Settlement Lock, Speech Callout).
+  - Mathematical frequency specification matrix and regulatory notices.
+- **API Endpoints (`src/server.ts`)**:
+  - `GET /radar/audio`, `GET /audio`, `GET /sonification`: Standalone sonification terminal UI.
+  - `GET /api/radar/audio/event`: JSON telemetry endpoint returning computed audio event and SHA-256 hash.
+- **Dedicated Acceptance Test Suite (`src/__tests__/microstructure-audio.test.ts`)**:
+  - 6 automated tests validating baseline cadence, danger zone modulation, upward TWAP progression, settlement chimes, Web Audio client scripts, and strict Rule B4 / Rule B5 compliance.
+
+**Verification:**
+- `npx tsc --noEmit` — **0 errors (clean exit 0)**.
+- `npx tsx --test src/__tests__/microstructure-audio.test.ts src/__tests__/expiry-radar.test.ts` — **14/14 passing**.
+- Total Platform Suite: **434 tests passing across 99 suites**.
+
+
 
 
 
