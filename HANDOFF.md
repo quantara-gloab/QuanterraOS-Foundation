@@ -661,6 +661,44 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 - `npx tsx --test src/__tests__/alert-dispatcher.test.ts ...` — **33/33 passing across 8 suites in spot-check**.
 - Total Platform Suite: **418 tests passing across 96 suites**.
 
+---
+
+### Session: 2026-10-07 — 24/7 Market Window Schedule Grid, RFC 5545 iCalendar Engine & Expiry Cadence Matrix
+
+**Trigger:** The founder confirmed "next", advancing development full throttle to establish QuanterraOS as the comprehensive daily operating system for prediction market participants.
+
+**Delivered Capabilities:**
+- **24/7 Market Window Schedule Grid Engine (`src/market-schedule.ts`, `/schedule`, `/calendar`)**:
+  - `generateDailyScheduleMatrix()`: Constructs the complete 96-window daily schedule of Kalshi 15-minute Bitcoin binary contracts (`KXBTC15M-YYMONDD-HHMM`).
+  - Macroeconomic Session Categorization (`getMarketSessionForTime`):
+    - `ASIA_PACIFIC` (00:00 to 07:00 UTC)
+    - `LONDON_EUROPE` (07:00 to 13:30 UTC)
+    - `NEW_YORK_AMERICA` (15:30 to 20:00 UTC)
+    - `LONDON_NY_OVERLAP` (13:30 to 15:30 UTC - designated Peak Liquidity & Spreads)
+    - `DAILY_CLOSE_ROLLOVER` (20:00 to 24:00 UTC)
+  - Real-Time Window Status & Countdown: Dynamically pinpoints the active running 15-minute window (`ACTIVE`), the upcoming window (`NEXT`), settled windows (`SETTLED`), and remaining windows (`SCHEDULED`).
+  - Direct Deep-Linking: Every settled window links directly to `/settlement?ticker=...` for 60s TWAP tape dissection; every active/upcoming window links to `/radar?series=...` for live microstructure radar.
+- **RFC 5545 iCalendar (.ics) Feed Generator (`generateIcsCalendarFeed`)**:
+  - Generates institutional `.ics` calendar subscription feed with VEVENT blocks, start/end timestamps, session descriptions, and VALARM triggers 2 minutes prior to settlement.
+  - 1-click download from `/api/schedule/calendar.ics` for Google Calendar, Apple Calendar, and Outlook.
+- **Interactive 24/7 Matrix Dashboard UI (`/schedule`, `/calendar`)**:
+  - Hour-by-hour grid (00:00 to 23:00) with 4 interactive 15-minute pills (:00, :15, :30, :45) styled in Gold Standard hierarchy.
+  - Active window live countdown, daily settled count (e.g. 58 / 96), and session overlap indicators.
+- **API Endpoints (`src/server.ts`)**:
+  - `GET /schedule`, `GET /calendar`: Matrix terminal UI
+  - `GET /api/schedule/matrix`: JSON API returning full 96-window schedule and active pointer
+  - `GET /api/schedule/calendar.ics`: iCalendar RFC 5545 download
+- **Platform Navigation Interlinking**:
+  - Connected `/schedule` into top navigation across `/radar`, `/`, `/calculator`, `/corridors`, `/divergence`, `/settlement`, `/webhooks`, and `/account`.
+- **Dedicated Acceptance Test Suite (`src/__tests__/market-schedule.test.ts`)**:
+  - 6 automated tests validating 96-window generation, ticker schema matching, session overlap classification, active window location, RFC 5545 .ics formatting, and Rule B4/B5 compliance.
+
+**Verification:**
+- `npm run typecheck` (`tsc --noEmit`) — **0 errors (clean exit 0)**.
+- `npx tsx --test src/__tests__/market-schedule.test.ts ...` — **39/39 passing across 9 suites in spot-check**.
+- Total Platform Suite: **424 tests passing across 97 suites**.
+
+
 
 
 

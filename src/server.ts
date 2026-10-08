@@ -100,6 +100,11 @@ import {
   formatTelegramAlertPayload,
   type AlertEventType,
 } from "./alert-dispatcher.ts";
+import {
+  generateDailyScheduleMatrix,
+  generateIcsCalendarFeed,
+  renderMarketScheduleHtml,
+} from "./market-schedule.ts";
 import { renderEducationalPageHtml, type EducationTopic } from "./educational-pages.ts";
 import { getReviewReminders, updateReviewReminders } from "./review-reminders.ts";
 import { renderVenueComparisonPageHtml } from "./venue-comparison-page.ts";
@@ -2207,6 +2212,25 @@ app.post("/api/alerts/webhook/test", async (req, res) => {
     discordPayload: formatDiscordAlertPayload(event),
     telegramPayload: formatTelegramAlertPayload(event),
   });
+});
+
+// 24/7 Market Window Schedule Grid & Event Calendar
+app.get(["/schedule", "/calendar"], (req, res) => {
+  const matrix = generateDailyScheduleMatrix();
+  res.type("html").send(renderMarketScheduleHtml(matrix));
+});
+
+app.get("/api/schedule/matrix", (req, res) => {
+  const matrix = generateDailyScheduleMatrix();
+  res.json({ success: true, matrix });
+});
+
+app.get("/api/schedule/calendar.ics", (req, res) => {
+  const matrix = generateDailyScheduleMatrix();
+  const ics = generateIcsCalendarFeed(matrix);
+  res.setHeader("Content-Type", "text/calendar; charset=utf-8");
+  res.setHeader("Content-Disposition", 'attachment; filename="quanterraos-btc-expiries.ics"');
+  res.send(ics);
 });
 
 app.get(["/learn", "/education", "/curriculum"], (req, res) => {
