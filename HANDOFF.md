@@ -836,6 +836,44 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 - `npx tsx --test src/__tests__/depth-matrix.test.ts` — **6/6 passing**.
 - Total Platform Suite: **446 tests passing across 101 suites**.
 
+---
+
+### Session: 2026-10-07 — Realistic Paper Mode (90-Day Plan Build Order #5)
+
+**Trigger:** The founder instructed to "stick to the 90 day plan", driving the implementation of item #5 of the Global Growth Strategy Build Order: Realistic Paper Mode ("Practice without deposits — incorporating latency, spreads, depth, non-linear fees, and missed fills").
+
+**Delivered Capabilities:**
+- **Realistic Paper Mode Simulation Engine (`src/realistic-paper-mode.ts`, `/paper`, `/practice`)**:
+  - **Queue Depth & Level-2 Consumption Model**: Consumes resting top-of-book and multi-tier queue depth, calculating realistic slippage if requested order size exceeds available depth.
+  - **CFTC Non-Linear Taker Fee Engine**: Replicates exact Kalshi contract fee schedule ($0.07 \times P(1-P) \times \text{contracts}$ rounded up to the nearest cent) to expose fee drag.
+  - **Simulated Network Latency (50ms / 150ms / 350ms)**: Realistic round-trip transit delay modeling, checking for price movement between order dispatch and execution.
+  - **Adverse Price Movement & Missed Fills**: Detects fast order-book price jumps during transit, accurately simulating limit order rejections and fill failures.
+  - **Risk Plan Advisory Enforcement**: Integrates user voluntary risk limits from `/risk-plan` (max contracts, max loss, cooling periods), rejecting orders violating responsible trading parameters.
+  - **SVG Verification Receipt (`/api/paper/card.svg`)**: 640x720 vector execution ticket with full fill breakdown, slippage, fee impact, net cost, and 64-char SHA-256 cryptographic provenance hash.
+  - **Interactive Terminal UI (`/paper`, `/practice`)**: Live simulation cockpit with real-time order entry form, live simulated book, latency profile selector, execution feedback banner, fill ledger, and SVG receipt preview.
+  - **Embeddable Widget (`/embed/paper`)**: Clean iframe integration for risk education and partner syndicates.
+  - **API Endpoints (`src/server.ts`)**:
+    - `GET /paper`, `GET /practice`: Full interactive terminal UI.
+    - `GET /embed/paper`: Embeddable iframe simulation widget.
+    - `POST /api/paper/order`: JSON execution endpoint evaluating fills, fees, slippage, latency, and risk limits.
+    - `GET /api/paper/card.svg`: Vector receipt card.
+- **Platform Navigation Interlinking**:
+  - Connected `/paper` across `/radar`, `/corridors`, `/settlement`, `/schedule`, `/alerts`, and `/` landing page.
+- **Dedicated Acceptance Test Suite (`src/__tests__/realistic-paper-mode.test.ts`)**:
+  - 6 automated tests validating:
+    1. Realistic execution within available depth with exact fee calculation.
+    2. Slippage calculation when requested contracts exceed top-of-book depth.
+    3. Missed fill simulation on fast adverse price movements.
+    4. Voluntary risk plan limit enforcement (rejection of oversized orders).
+    5. High-resolution SVG receipt generation with SHA-256 hash.
+    6. Compliance with Rule B4 (no banned words) and Rule B5 ($0.00 capital deployed).
+
+**Verification:**
+- `npx tsc --noEmit` — **0 errors (clean exit 0)**.
+- `npx tsx --test src/__tests__/realistic-paper-mode.test.ts` — **6/6 passing**.
+- Total Platform Suite: **452 tests passing across 102 suites**.
+
+
 
 
 

@@ -128,6 +128,12 @@ import {
   renderDepthMatrixWidgetHtml,
   renderDepthMatrixPageHtml,
 } from "./depth-matrix.ts";
+import {
+  simulateRealisticPaperOrder,
+  generatePaperExecutionSvgReceipt,
+  renderRealisticPaperWidgetHtml,
+  renderRealisticPaperPageHtml,
+} from "./realistic-paper-mode.ts";
 import { renderEducationalPageHtml, type EducationTopic } from "./educational-pages.ts";
 import { getReviewReminders, updateReviewReminders } from "./review-reminders.ts";
 import { renderVenueComparisonPageHtml } from "./venue-comparison-page.ts";
@@ -2378,6 +2384,67 @@ app.get("/api/matrix/card.svg", (req, res) => {
     annualizedVol: vol
   });
   const svg = generateDepthMatrixSvgReceipt(snapshot);
+  res.setHeader("Content-Type", "image/svg+xml; charset=utf-8");
+  res.setHeader("Cache-Control", "public, max-age=60, s-maxage=300");
+  res.send(svg);
+});
+
+// Realistic Paper Mode — Practice Without Deposits Terminal (/paper, /practice)
+app.get(["/paper", "/practice", "/paper-mode"], (req, res) => {
+  const ticker = typeof req.query.ticker === "string" ? req.query.ticker : "KXBTC15M-24OCT07-T91250";
+  const side = req.query.side === "NO" ? "NO" : "YES";
+  const orderType = req.query.type === "LIMIT" ? "LIMIT" : "MARKET";
+  const contracts = Number(req.query.contracts ?? 10);
+  const latency = Number(req.query.latency ?? 150);
+
+  const result = simulateRealisticPaperOrder({
+    ticker,
+    side,
+    orderType,
+    contracts,
+    simulatedLatencyMs: latency
+  });
+
+  res.type("html").send(renderRealisticPaperPageHtml(result));
+});
+
+app.get(["/embed/paper", "/embed/practice"], (req, res) => {
+  const ticker = typeof req.query.ticker === "string" ? req.query.ticker : "KXBTC15M-24OCT07-T91250";
+  const result = simulateRealisticPaperOrder({
+    ticker,
+    side: "YES",
+    orderType: "MARKET",
+    contracts: 10
+  });
+  res.type("html").send(renderRealisticPaperWidgetHtml(result));
+});
+
+app.post("/api/paper/order", express.json(), (req, res) => {
+  const { ticker, side, orderType, limitPriceCents, contracts, simulatedLatencyMs, userMaxDailyOutlay, userSingleTradeCap } = req.body;
+  const result = simulateRealisticPaperOrder({
+    ticker: ticker ?? "KXBTC15M-24OCT07-T91250",
+    side: side === "NO" ? "NO" : "YES",
+    orderType: orderType === "LIMIT" ? "LIMIT" : "MARKET",
+    limitPriceCents: limitPriceCents ? Number(limitPriceCents) : undefined,
+    contracts: Number(contracts ?? 10),
+    simulatedLatencyMs: simulatedLatencyMs ? Number(simulatedLatencyMs) : 150,
+    userMaxDailyOutlay: userMaxDailyOutlay ? Number(userMaxDailyOutlay) : undefined,
+    userSingleTradeCap: userSingleTradeCap ? Number(userSingleTradeCap) : undefined
+  });
+  res.json({ success: true, result });
+});
+
+app.get("/api/paper/card.svg", (req, res) => {
+  const ticker = typeof req.query.ticker === "string" ? req.query.ticker : "KXBTC15M-24OCT07-T91250";
+  const side = req.query.side === "NO" ? "NO" : "YES";
+  const contracts = Number(req.query.contracts ?? 10);
+  const result = simulateRealisticPaperOrder({
+    ticker,
+    side,
+    orderType: "MARKET",
+    contracts
+  });
+  const svg = generatePaperExecutionSvgReceipt(result);
   res.setHeader("Content-Type", "image/svg+xml; charset=utf-8");
   res.setHeader("Cache-Control", "public, max-age=60, s-maxage=300");
   res.send(svg);
