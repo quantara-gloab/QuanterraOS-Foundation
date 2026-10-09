@@ -1307,11 +1307,36 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
      2. `decode_whale_flow`: Whale order forensics, contract delta, taker fees paid, and basis intent classification.
      3. `generate_trustos_audit_dossier`: Enterprise AI governance audit dossier with Brier Murphy decomposition and statutory mapping.
 
-6. **Acceptance Testing & Verification**:
-   - Expanded `src/__tests__/competitive-benchmark.test.ts` to 11 comprehensive tests (covering all 12 competitors, Kelly sizing, Whale Forensics, TrustOS preview, and Rule B4/B5/B10 compliance).
-   - Expanded `src/__tests__/mcp-friction.test.ts` to 14 tests (verifying autonomous MCP execution for all new tools).
+7. **Strategic Move #7: Programmatic Dataset & Historical Settlement Export Hub (`/datasets`, `/api/history/download`, `/api/datasets/manifest`)**:
+   - *Competitor strength acquired*: Historical API & order book data exports (OddsPipe, Dome).
+   - *Strengthened with QuanterraOS empirical open-science rigor*:
+     - Counter-positions against $500+/month closed black-box models by publishing canonical open-access datasets with CC-BY-4.0 licensing.
+     - Canonical 19,740-candle multi-venue settlement corpus across 1,316 settled KXBTC15M contracts resolving against the CME CF Bitcoin Real-Time Index (BRTI).
+     - Cryptographic SHA-256 integrity checksums (`dafc101e36d2134d64654d09b52088ace9381755b4feeaec55615b1a60aaab42`).
+     - 10-Decile Brier Probability Calibration & Fee Drag Corpus with Murphy decomposition.
+     - Coinbase Spot Reference 1-Minute Closes (`05b1723bd534d31578b930f63a6bd2ca613b28a145f8dc0285033aa80e9315c3`).
+     - Microstructure Volatility Swing Events & Oracle Drift records.
+     - Live preview tables with copyable Python (pandas), cURL, and Node.js fetch integration snippets.
+     - Machine-readable manifest at `GET /api/datasets/manifest` and CSV/JSONL download streams at `GET /api/history/download`.
+     - Autonomous MCP tool: `export_canonical_dataset`.
+
+8. **Strategic Move #8: High-Friction "Reality Check" Paper Trading Terminal (`/paper`, `/practice`)**:
+   - *Competitor strength acquired*: Paper trading simulator (Predly, Verso, Stand.Trade, Unusual Whales).
+   - *Strengthened with QuanterraOS microstructure reality check*:
+     - Unmasks the "Paper Trading Delusion Gap": competitor naive paper simulators assume 0ms latency, zero slippage, and $0.00 fees, creating phantom profitability.
+     - QuanterraOS Realistic Paper Mode models multi-tier Level-2 queue depth depletion, 150ms-350ms network latency to CFTC matching engines, and Kalshi parabolic taker fee drag ($0.07 \times P \times (1-P)$).
+     - Computes side-by-side Delusion Delta revealing hidden fee drag and required win rate hurdle gaps (+1.5% to +8.5%).
+     - Embedded in interactive `/paper` terminal, REST API at `GET /api/paper/compare`, and SVG execution receipts at `/api/paper/card.svg`.
+     - Autonomous MCP tool: `simulate_realistic_paper_order`.
+
+9. **Acceptance Testing & Verification**:
+   - New suite: `src/__tests__/dataset-hub.test.ts` (5 tests verifying manifest, schemas, sample parsing, and Rule B1/B4/B5/B10 compliance).
+   - Expanded: `src/__tests__/realistic-paper-mode.test.ts` to 7 tests (verifying market fills, queue sweeping, risk caps, SVG receipts, and Delusion Delta).
+   - Expanded: `src/__tests__/mcp-friction.test.ts` to 16 tests (verifying autonomous execution of `export_canonical_dataset` and `simulate_realistic_paper_order`).
    - `npx tsc --noEmit` — **0 errors (clean exit 0)**.
-   - `npm test` — **511/511 tests passing across 110 test suites (0 fails, 0 skipped)**.
+   - `npm test` — **519/519 tests passing across 111 test suites (0 fails, 0 skipped)**.
+   - Live production healthcheck at `https://quanterraos.com/healthz` verified 200 OK (`status: ok, circuit: LOCKED_RULE_B5`).
+
 
 
 
