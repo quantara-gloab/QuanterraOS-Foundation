@@ -1,5 +1,5 @@
 /**
- * Mobile App Download & Installation Portal (/mobile, /download, /app)
+ * Mobile App Download & Installation Portal (/mobile, /download, /app, /pwa)
  *
  * Dedicated high-performance mobile deployment gateway for Apple iPhone (iOS Safari & Universal Links)
  * and Samsung Galaxy / Android (Google Play Store, Samsung Galaxy Store & Trusted Web Activity).
@@ -7,6 +7,8 @@
  * Strictly adheres to:
  * - Rule B4: No banned superlatives or unvalidated marketing claims.
  * - Rule B5: $0.00 live exposure disclosure, hardware execution gate locked in standby.
+ * - Rule B10: Non-affiliation disclaimers for Kalshi, CME Group, CF Benchmarks, Polymarket, Coinbase, Kraken, Bitstamp, Gemini.
+ * - Rule B11: Direct Progressive Web App installation with store scaffolding transparency (no fake store links).
  * - Gold Standard restrained luxury design system: #06070A, #0C0F17, #DFB843, #00F2FE.
  */
 
@@ -70,17 +72,19 @@ export function renderMobilePageHtml(): string {
     background-image: 
       radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 242, 254, 0.12), transparent),
       radial-gradient(ellipse 60% 40% at 50% 120%, rgba(223, 184, 67, 0.08), transparent);
+    padding-bottom: 70px;
   }
 
   /* Header & Navigation */
   header {
     border-bottom: 1px solid var(--border-subtle);
-    padding: 16px 24px;
+    padding: 14px 24px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    backdrop-filter: blur(12px);
-    background: rgba(6, 7, 10, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    background: rgba(6, 7, 10, 0.9);
     position: sticky;
     top: 0;
     z-index: 100;
@@ -95,18 +99,20 @@ export function renderMobilePageHtml(): string {
   }
 
   .brand-logo {
-    width: 36px;
-    height: 36px;
-    border-radius: 9px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid rgba(223, 184, 67, 0.35);
   }
 
   .brand-name {
     font-weight: 800;
-    font-size: 18px;
+    font-size: 17px;
     letter-spacing: -0.02em;
     display: flex;
     align-items: center;
     gap: 8px;
+    font-family: var(--font-mono);
   }
 
   .brand-tag {
@@ -121,10 +127,45 @@ export function renderMobilePageHtml(): string {
     border: 1px solid rgba(0, 242, 254, 0.3);
   }
 
+  .nav-center-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: rgba(223, 184, 67, 0.08);
+    border: 1px solid rgba(223, 184, 67, 0.3);
+    color: #F7E7B4;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+  .nav-center-pill:hover {
+    background: rgba(223, 184, 67, 0.2);
+    color: #FFFFFF;
+    border-color: rgba(223, 184, 67, 0.6);
+  }
+
+  .nav-radar-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--emerald);
+    box-shadow: 0 0 6px var(--emerald);
+    animation: beaconPulse 1.8s infinite ease-in-out;
+  }
+
+  @keyframes beaconPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.85); }
+  }
+
   .nav-actions {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 14px;
   }
 
   .nav-link {
@@ -139,13 +180,17 @@ export function renderMobilePageHtml(): string {
   .btn-outline-gold {
     border: 1px solid var(--gold);
     color: var(--gold);
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: var(--font-mono);
     text-decoration: none;
     transition: all 0.2s ease;
-    background: rgba(223, 184, 67, 0.05);
+    background: rgba(223, 184, 67, 0.06);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
   }
   .btn-outline-gold:hover {
     background: var(--gold);
@@ -155,15 +200,15 @@ export function renderMobilePageHtml(): string {
 
   /* Main Container */
   .container {
-    max-width: 1200px;
+    max-width: 1180px;
     margin: 0 auto;
-    padding: 40px 24px 80px;
+    padding: 36px 20px 80px;
   }
 
   /* Hero Section */
   .hero-section {
     text-align: center;
-    margin-bottom: 56px;
+    margin-bottom: 48px;
   }
 
   .pill-badge {
@@ -173,31 +218,17 @@ export function renderMobilePageHtml(): string {
     padding: 6px 14px;
     border-radius: 9999px;
     background: rgba(223, 184, 67, 0.1);
-    border: 1px solid rgba(223, 184, 67, 0.3);
+    border: 1px solid rgba(223, 184, 67, 0.35);
     color: var(--gold);
     font-family: var(--font-mono);
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0.05em;
     margin-bottom: 20px;
   }
 
-  .pulsing-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--emerald);
-    box-shadow: 0 0 8px var(--emerald);
-    animation: pulse 2s infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(0.85); }
-  }
-
   .hero-title {
-    font-size: clamp(32px, 5vw, 54px);
+    font-size: clamp(30px, 4.8vw, 50px);
     font-weight: 800;
     letter-spacing: -0.03em;
     line-height: 1.15;
@@ -208,27 +239,62 @@ export function renderMobilePageHtml(): string {
   }
 
   .hero-subtitle {
-    font-size: clamp(16px, 2vw, 19px);
+    font-size: clamp(15px, 1.8vw, 18px);
     color: var(--text-muted);
-    max-width: 760px;
-    margin: 0 auto 36px;
+    max-width: 740px;
+    margin: 0 auto 30px;
     line-height: 1.6;
   }
 
-  /* Device Selector Banner */
+  /* Platform Selector Bar */
+  .platform-selector-tabs {
+    display: inline-flex;
+    background: rgba(12, 15, 23, 0.95);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 4px;
+    gap: 6px;
+    margin-bottom: 24px;
+  }
+
+  .platform-tab {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .platform-tab:hover {
+    color: var(--text-primary);
+  }
+  .platform-tab.active {
+    background: rgba(223, 184, 67, 0.15);
+    color: var(--gold);
+    border: 1px solid rgba(223, 184, 67, 0.4);
+    box-shadow: 0 0 12px rgba(223, 184, 67, 0.15);
+  }
+
   .platform-detected-bar {
     display: inline-flex;
     align-items: center;
-    gap: 12px;
-    padding: 10px 20px;
-    border-radius: 12px;
-    background: rgba(12, 15, 23, 0.9);
-    border: 1px solid var(--border-subtle);
-    font-size: 13px;
+    gap: 10px;
+    padding: 8px 18px;
+    border-radius: 10px;
+    background: rgba(12, 15, 23, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 12px;
+    font-family: var(--font-mono);
     color: var(--text-muted);
     margin-bottom: 36px;
   }
-
   .platform-detected-bar strong {
     color: var(--cyan);
   }
@@ -236,16 +302,16 @@ export function renderMobilePageHtml(): string {
   /* Download Action Grid */
   .download-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: 1fr 1fr;
     gap: 24px;
-    margin-bottom: 64px;
+    margin-bottom: 56px;
   }
 
   .download-card {
     background: var(--surface);
     border: 1px solid var(--border-subtle);
     border-radius: 16px;
-    padding: 32px 24px;
+    padding: 32px 28px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -256,13 +322,14 @@ export function renderMobilePageHtml(): string {
 
   .download-card:hover {
     border-color: var(--cyan);
-    transform: translateY(-3px);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4), 0 0 24px var(--cyan-glow);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4), 0 0 20px var(--cyan-glow);
   }
 
   .download-card.highlight {
-    border-color: rgba(223, 184, 67, 0.4);
-    background: linear-gradient(180deg, rgba(223, 184, 67, 0.05) 0%, var(--surface) 100%);
+    border-color: rgba(223, 184, 67, 0.45);
+    background: linear-gradient(180deg, rgba(223, 184, 67, 0.06) 0%, var(--surface) 100%);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4), 0 0 24px rgba(223, 184, 67, 0.15);
   }
 
   .card-top {
@@ -294,7 +361,7 @@ export function renderMobilePageHtml(): string {
     font-family: var(--font-mono);
     font-size: 10px;
     font-weight: 600;
-    padding: 2px 6px;
+    padding: 2px 7px;
     border-radius: 4px;
     background: rgba(255, 255, 255, 0.1);
     color: var(--text-primary);
@@ -308,13 +375,13 @@ export function renderMobilePageHtml(): string {
 
   .card-specs {
     list-style: none;
-    margin-top: 16px;
+    margin-top: 18px;
     font-size: 12px;
     font-family: var(--font-mono);
     color: var(--text-muted);
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
   }
 
   .card-specs li {
@@ -333,26 +400,17 @@ export function renderMobilePageHtml(): string {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: 10px;
     width: 100%;
-    padding: 14px 20px;
-    border-radius: 12px;
-    font-size: 14px;
+    padding: 13px 20px;
+    border-radius: 10px;
+    font-size: 13px;
     font-weight: 700;
+    font-family: var(--font-mono);
     text-decoration: none;
     transition: all 0.2s ease;
     cursor: pointer;
     border: none;
-  }
-
-  .btn-google-play {
-    background: #00875F;
-    color: #FFFFFF;
-    box-shadow: 0 4px 14px rgba(0, 135, 95, 0.3);
-  }
-  .btn-google-play:hover {
-    background: #00A675;
-    box-shadow: 0 6px 20px rgba(0, 135, 95, 0.5);
   }
 
   .btn-apple {
@@ -363,16 +421,6 @@ export function renderMobilePageHtml(): string {
   .btn-apple:hover {
     background: #E2E8F0;
     box-shadow: 0 6px 20px rgba(255, 255, 255, 0.35);
-  }
-
-  .btn-samsung {
-    background: #1428A0;
-    color: #FFFFFF;
-    box-shadow: 0 4px 14px rgba(20, 40, 160, 0.35);
-  }
-  .btn-samsung:hover {
-    background: #1B35D4;
-    box-shadow: 0 6px 20px rgba(20, 40, 160, 0.55);
   }
 
   .btn-pwa {
@@ -388,12 +436,12 @@ export function renderMobilePageHtml(): string {
 
   /* Interactive Device Showcase */
   .showcase-section {
-    margin-bottom: 72px;
+    margin-bottom: 64px;
   }
 
   .showcase-header {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 36px;
   }
 
   .showcase-title {
@@ -411,10 +459,9 @@ export function renderMobilePageHtml(): string {
   .devices-wrapper {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     gap: 48px;
     flex-wrap: wrap;
-    perspective: 1000px;
   }
 
   /* Generic iOS Mobile Mockup Frame */
@@ -422,17 +469,17 @@ export function renderMobilePageHtml(): string {
     width: 320px;
     height: 640px;
     background: #18191C;
-    border-radius: 50px;
-    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 0 10px #2D3036, 0 0 0 12px #18191C;
+    border-radius: 48px;
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 0 8px #2D3036, 0 0 0 10px #18191C;
     position: relative;
     overflow: hidden;
-    border: 3px solid #3E4249;
+    border: 2px solid #3E4249;
     transition: transform 0.4s ease, box-shadow 0.4s ease;
   }
 
   .device-phone:hover {
-    transform: translateY(-8px) rotateY(-3deg);
-    box-shadow: 0 35px 75px -12px rgba(0, 242, 254, 0.3), 0 0 0 10px #2D3036;
+    transform: translateY(-6px);
+    box-shadow: 0 35px 75px -12px rgba(0, 242, 254, 0.25), 0 0 0 8px #2D3036;
   }
 
   /* Generic Android Mobile Frame */
@@ -449,18 +496,18 @@ export function renderMobilePageHtml(): string {
   }
 
   .device-samsung:hover {
-    transform: translateY(-8px) rotateY(3deg);
-    box-shadow: 0 35px 75px -12px rgba(223, 184, 67, 0.3), 0 0 0 8px #22252B;
+    transform: translateY(-6px);
+    box-shadow: 0 35px 75px -12px rgba(223, 184, 67, 0.25), 0 0 0 8px #22252B;
   }
 
   /* Dynamic Island (iPhone) */
   .dynamic-island {
     position: absolute;
-    top: 14px;
+    top: 12px;
     left: 50%;
     transform: translateX(-50%);
-    width: 100px;
-    height: 28px;
+    width: 104px;
+    height: 26px;
     background: #000;
     border-radius: 20px;
     z-index: 20;
@@ -476,7 +523,7 @@ export function renderMobilePageHtml(): string {
     border-radius: 50%;
     background: var(--cyan);
     box-shadow: 0 0 6px var(--cyan);
-    animation: pulse 1.5s infinite;
+    animation: beaconPulse 1.5s infinite;
   }
 
   .island-cam {
@@ -503,21 +550,29 @@ export function renderMobilePageHtml(): string {
 
   /* Internal Screen Cockpit Content */
   .screen-content {
-    padding: 48px 16px 20px;
+    padding: 44px 14px 16px;
     height: 100%;
     overflow-y: auto;
-    font-size: 12px;
+    font-size: 11px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
     background: #06070A;
+  }
+
+  .mockup-header-strip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 6px;
   }
 
   .screen-telemetry-hud {
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid var(--border-subtle);
-    border-radius: 10px;
-    padding: 10px;
+    border-radius: 8px;
+    padding: 8px 10px;
   }
 
   .telemetry-row {
@@ -525,34 +580,97 @@ export function renderMobilePageHtml(): string {
     justify-content: space-between;
     align-items: center;
     font-family: var(--font-mono);
-    font-size: 11px;
-    margin-bottom: 4px;
+    font-size: 10px;
+    margin-bottom: 3px;
   }
-
   .telemetry-row:last-child { margin-bottom: 0; }
 
-  .screen-specialist-card {
-    background: rgba(12, 15, 23, 0.9);
-    border: 1px solid rgba(223, 184, 67, 0.2);
-    border-radius: 10px;
+  /* Interactive Taker Drag Mockup Widget */
+  .mockup-drag-widget {
+    background: rgba(14, 20, 32, 0.95);
+    border: 1px solid rgba(223, 184, 67, 0.3);
+    border-radius: 8px;
     padding: 10px;
   }
 
-  .specialist-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  .mockup-drag-title {
+    font-family: var(--font-mono);
+    font-size: 10px;
     font-weight: 700;
-    font-size: 12px;
     color: var(--gold);
-    margin-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+
+  .mockup-btn-group {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+
+  .mockup-touch-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 600;
+    padding: 5px 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s ease;
+  }
+  .mockup-touch-btn.active {
+    background: rgba(223, 184, 67, 0.25);
+    border-color: var(--gold);
+    color: var(--gold);
+    font-weight: 700;
+  }
+
+  .mockup-calc-result {
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 6px;
+    padding: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .result-line {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    margin-bottom: 3px;
+  }
+
+  /* 60s TWAP Tick Strip */
+  .twap-mockup-strip {
+    display: grid;
+    grid-template-columns: repeat(20, 1fr);
+    gap: 2px;
+    margin: 6px 0;
+  }
+  .twap-mockup-tick {
+    height: 8px;
+    background: rgba(223, 184, 67, 0.2);
+    border-radius: 1px;
+  }
+  .twap-mockup-tick.active {
+    background: var(--emerald);
+    box-shadow: 0 0 4px var(--emerald);
+  }
+  .twap-mockup-tick.danger {
+    background: var(--crimson);
+    box-shadow: 0 0 4px var(--crimson);
   }
 
   .screen-voice-wave {
     display: flex;
     align-items: center;
     gap: 3px;
-    height: 24px;
+    height: 22px;
     padding: 4px 8px;
     background: rgba(0, 242, 254, 0.08);
     border-radius: 6px;
@@ -565,14 +683,14 @@ export function renderMobilePageHtml(): string {
     border-radius: 2px;
     animation: wave 1.2s infinite ease-in-out;
   }
-  .wave-bar:nth-child(2) { animation-delay: 0.2s; height: 16px; }
-  .wave-bar:nth-child(3) { animation-delay: 0.4s; height: 20px; }
-  .wave-bar:nth-child(4) { animation-delay: 0.1s; height: 12px; }
-  .wave-bar:nth-child(5) { animation-delay: 0.5s; height: 18px; }
+  .wave-bar:nth-child(2) { animation-delay: 0.2s; height: 14px; }
+  .wave-bar:nth-child(3) { animation-delay: 0.4s; height: 18px; }
+  .wave-bar:nth-child(4) { animation-delay: 0.1s; height: 10px; }
+  .wave-bar:nth-child(5) { animation-delay: 0.5s; height: 16px; }
 
   @keyframes wave {
-    0%, 100% { height: 6px; }
-    50% { height: 20px; }
+    0%, 100% { height: 5px; }
+    50% { height: 18px; }
   }
 
   .device-label {
@@ -595,12 +713,12 @@ export function renderMobilePageHtml(): string {
     background: var(--surface);
     border: 1px solid var(--border-subtle);
     border-radius: 16px;
-    padding: 36px 32px;
+    padding: 32px 28px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 32px;
-    margin-bottom: 64px;
+    margin-bottom: 56px;
     flex-wrap: wrap;
   }
 
@@ -624,22 +742,18 @@ export function renderMobilePageHtml(): string {
 
   .qr-code-box {
     background: #FFFFFF;
-    padding: 16px;
-    border-radius: 16px;
+    padding: 14px;
+    border-radius: 14px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
-  }
-
-  .qr-code-box svg {
-    display: block;
+    gap: 6px;
   }
 
   .qr-caption {
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
     color: #111;
     letter-spacing: 0.05em;
@@ -648,25 +762,25 @@ export function renderMobilePageHtml(): string {
   /* Features Grid */
   .features-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
-    margin-bottom: 64px;
+    margin-bottom: 56px;
   }
 
   .feature-item {
     background: var(--surface);
     border: 1px solid var(--border-subtle);
     border-radius: 12px;
-    padding: 24px;
+    padding: 22px;
   }
 
   .feature-icon {
-    font-size: 24px;
-    margin-bottom: 12px;
+    font-size: 22px;
+    margin-bottom: 10px;
   }
 
   .feature-item h4 {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 700;
     margin-bottom: 6px;
   }
@@ -685,7 +799,7 @@ export function renderMobilePageHtml(): string {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.85);
     backdrop-filter: blur(8px);
     z-index: 1000;
     align-items: center;
@@ -755,7 +869,7 @@ export function renderMobilePageHtml(): string {
   /* Rule B5 Governance Banner */
   .rule-b5-banner {
     border-top: 1px solid var(--border-subtle);
-    padding: 32px 0 0;
+    padding: 28px 0 0;
     text-align: center;
     color: var(--text-muted);
     font-size: 12px;
@@ -768,31 +882,39 @@ export function renderMobilePageHtml(): string {
   }
 
   @media (max-width: 768px) {
-    .container { padding: 24px 16px 60px; }
-    .hero-title { font-size: 32px; }
+    .container { padding: 20px 14px 60px; }
+    .hero-title { font-size: 28px; }
     .download-grid { grid-template-columns: 1fr; }
     .devices-wrapper { gap: 32px; }
-    .device-phone, .device-samsung { width: 280px; height: 560px; }
+    .device-phone, .device-samsung { width: 290px; height: 580px; }
     .qr-section { flex-direction: column; text-align: center; }
+    .nav-actions .nav-link { display: none; }
   }
 </style>
 </head>
 <body>
 
 <header>
-  <a href="/dashboard" class="nav-brand">
-    <img src="/assets/icon.svg" alt="QuanterraOS Icon" class="brand-logo">
+  <a href="/" class="nav-brand">
+    <img src="/apple-touch-icon.png" alt="QuanterraOS Icon" class="brand-logo">
     <span class="brand-name">
       QUANTERRA<span style="color:var(--cyan)">OS</span>
       <span class="brand-tag">MOBILE</span>
     </span>
   </a>
+
+  <a href="/radar" class="nav-center-pill">
+    <span class="nav-radar-dot"></span>
+    <span>SETTLEMENT RADAR</span>
+  </a>
+
   <div class="nav-actions">
     <a href="/dashboard" class="nav-link">Live Cockpit</a>
-    <a href="/kalshi/15m" class="nav-link">Kalshi 15M</a>
-    <a href="/kalshi/1h" class="nav-link">Kalshi 1H</a>
-    <a href="/council" class="nav-link">Council</a>
-    <a href="/dashboard" class="btn-outline-gold">Open Terminal</a>
+    <a href="/calculator" class="nav-link">Taker Drag</a>
+    <a href="/vs" class="nav-link">Vs Contenders</a>
+    <a href="/dashboard" class="btn-outline-gold">
+      ⚡ Launch Terminal
+    </a>
   </div>
 </header>
 
@@ -800,23 +922,38 @@ export function renderMobilePageHtml(): string {
   <!-- Hero Section -->
   <section class="hero-section">
     <div class="pill-badge">
-      <div class="pulsing-dot"></div>
-      PROGRESSIVE WEB APP • DIRECT MOBILE INSTALL
+      <div class="nav-radar-dot"></div>
+      PWA DIRECT DEPLOYMENT • ZERO STORE INTERMEDIARIES • NO STORE REQUIRED
     </div>
-    <h1 class="hero-title">Empirical Market Telemetry.<br>Installed Directly in Your Browser.</h1>
+    <h1 class="hero-title">Empirical Prediction Intelligence.<br>Installed Directly on iPhone &amp; Samsung.</h1>
     <p class="hero-subtitle">
-      Install QuanterraOS on any iOS or Android device in seconds with no app store required. Runs fullscreen with zero browser chrome, offline asset caching, and direct access to predictive intelligence.
+      Install QuanterraOS on any iOS or Android device in 5 seconds with no app store required. Runs fullscreen with zero browser chrome, offline asset caching, and direct access to predictive intelligence and 60-second settlement telemetry.
     </p>
 
+    <!-- Platform Selector Bar -->
+    <div class="platform-selector-tabs" role="tablist" aria-label="Device Architecture Selection">
+      <button class="platform-tab active" id="tabIos" onclick="selectPlatform('ios')" role="tab">
+        🍏 Apple iPhone (iOS Safari)
+      </button>
+      <button class="platform-tab" id="tabAndroid" onclick="selectPlatform('android')" role="tab">
+        🤖 Samsung Galaxy &amp; Android
+      </button>
+      <button class="platform-tab" id="tabUniversal" onclick="selectPlatform('universal')" role="tab">
+        💻 Universal Web Terminal
+      </button>
+    </div>
+
     <!-- Client-side OS Detection -->
-    <div class="platform-detected-bar" id="platformBanner">
-      <span>Detected Operating System:</span>
-      <strong id="detectedDeviceText">Analyzing Device Architecture...</strong>
+    <div>
+      <div class="platform-detected-bar" id="platformBanner">
+        <span>Detected Operating System:</span>
+        <strong id="detectedDeviceText">Analyzing Device Architecture...</strong>
+      </div>
     </div>
   </section>
 
   <!-- Direct Browser Install Action Cards -->
-  <section class="download-grid" style="grid-template-columns: 1fr 1fr;">
+  <section class="download-grid" id="installSection">
     <!-- Apple iOS Safari WebClip -->
     <div class="download-card highlight" id="iosCard">
       <div class="card-top">
@@ -905,11 +1042,11 @@ export function renderMobilePageHtml(): string {
   <section class="showcase-section">
     <div class="showcase-header">
       <h2 class="showcase-title">Mobile Interface &amp; Telemetry Preview</h2>
-      <p class="showcase-subtitle">Real-time market telemetry, predictive consensus, and voice synthesis formatted for mobile viewports</p>
+      <p class="showcase-subtitle">Live interactive Taker Drag friction calculator and 60-second CME TWAP resolution radar inside mobile viewports</p>
     </div>
 
     <div class="devices-wrapper">
-      <!-- iOS Device Frame -->
+      <!-- iOS Device Frame: Interactive Taker Drag Calculator Preview -->
       <div>
         <div class="device-phone">
           <div class="dynamic-island">
@@ -918,40 +1055,53 @@ export function renderMobilePageHtml(): string {
             <div class="island-cam"></div>
           </div>
           <div class="screen-content">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:6px;">
+            <div class="mockup-header-strip">
               <span style="font-weight:800; font-size:11px; letter-spacing:1px; color:#FFF">QUANTERRA<span style="color:var(--cyan)">OS</span></span>
               <span style="color:var(--emerald); font-size:10px; font-family:var(--font-mono)">● ONLINE</span>
             </div>
 
-            <div class="screen-telemetry-hud">
-              <div class="telemetry-row">
-                <span style="color:var(--text-muted)">CALLSIGN:</span>
-                <span style="color:var(--cyan); font-weight:700">DESK-OPERATOR</span>
+            <!-- Interactive Taker Drag Card on Phone Screen -->
+            <div class="mockup-drag-widget">
+              <div class="mockup-drag-title">
+                <span>TAKER DRAG AUDIT</span>
+                <span id="mockupPriceDisplay" style="color:var(--cyan)">50¢ (PEAK)</span>
               </div>
-              <div class="telemetry-row">
-                <span style="color:var(--text-muted)">CALIBRATION:</span>
-                <span style="color:var(--gold)">0.2001 (vs 0.2500)</span>
+
+              <div style="font-size:9px; color:var(--text-muted); margin-bottom:4px; font-family:var(--font-mono)">CONTRACT PRICE P:</div>
+              <div class="mockup-btn-group">
+                <button type="button" class="mockup-touch-btn" onclick="updateMobileMockupDrag(25, 100)">25¢ (Low)</button>
+                <button type="button" class="mockup-touch-btn active" id="btnPrice50" onclick="updateMobileMockupDrag(50, 100)">50¢ (Peak)</button>
+                <button type="button" class="mockup-touch-btn" onclick="updateMobileMockupDrag(75, 100)">75¢ (High)</button>
               </div>
-              <div class="telemetry-row">
-                <span style="color:var(--text-muted)">DATASET:</span>
-                <span style="color:var(--emerald); font-weight:700">1,316 Settled Mkts</span>
+
+              <div style="font-size:9px; color:var(--text-muted); margin-bottom:4px; font-family:var(--font-mono)">ORDER SIZE:</div>
+              <div class="mockup-btn-group">
+                <button type="button" class="mockup-touch-btn active" id="btnCount100" onclick="updateMobileMockupCount(100)">100 cts</button>
+                <button type="button" class="mockup-touch-btn" id="btnCount250" onclick="updateMobileMockupCount(250)">250 cts</button>
+                <button type="button" class="mockup-touch-btn" id="btnCount500" onclick="updateMobileMockupCount(500)">500 cts</button>
               </div>
-              <div class="telemetry-row">
-                <span style="color:var(--text-muted)">GATE STATUS:</span>
-                <span style="color:var(--cyan)">RULE B5 STANDBY</span>
+
+              <div class="mockup-calc-result">
+                <div class="result-line">
+                  <span style="color:var(--text-muted)">FORMULA:</span>
+                  <span style="color:#CBD5E1">0.07 × P × (1-P)</span>
+                </div>
+                <div class="result-line">
+                  <span style="color:var(--text-muted)">DRAG RATE:</span>
+                  <span id="mockupRate" style="color:var(--gold); font-weight:700">1.75¢ / contract</span>
+                </div>
+                <div class="result-line">
+                  <span style="color:var(--text-muted)">TOTAL TAKER FEE:</span>
+                  <span id="mockupTotalFee" style="color:var(--crimson); font-weight:700">+$1.75</span>
+                </div>
+                <div class="result-line">
+                  <span style="color:var(--text-muted)">PROFIT DRAG:</span>
+                  <span id="mockupProfitDrag" style="color:var(--gold); font-weight:700">35.0% hurdle</span>
+                </div>
               </div>
             </div>
 
-            <div class="screen-specialist-card">
-              <div class="specialist-header">
-                <span>⚡ DR. ELENA VANCE</span>
-                <span style="font-size:9px; background:rgba(223,184,67,0.2); padding:1px 4px; border-radius:3px">CONSENSUS</span>
-              </div>
-              <p style="font-size:11px; color:var(--text-muted); line-height:1.4">
-                "Short-duration Kalshi 15m distribution calibrated. Brier score 0.2001 vs 0.2500 baseline. Rule B5 locked."
-              </p>
-            </div>
-
+            <!-- Specialist Audio HUD -->
             <div class="screen-voice-wave">
               <span style="font-size:10px; font-weight:700; color:var(--cyan)">ARIA VOICE:</span>
               <div class="wave-bar"></div>
@@ -970,46 +1120,79 @@ export function renderMobilePageHtml(): string {
           </div>
         </div>
         <div class="device-label">iOS Safari Standalone Preview</div>
-        <div class="device-sub">Fullscreen WebClip • Home Screen Icon</div>
+        <div class="device-sub">Interactive Taker Drag Calculator • Fullscreen WebClip</div>
       </div>
 
-      <!-- Android Device Frame -->
+      <!-- Android Device Frame: 60s CME TWAP Radar Preview -->
       <div>
         <div class="device-samsung">
           <div class="samsung-cam"></div>
           <div class="screen-content">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:6px;">
+            <div class="mockup-header-strip">
               <span style="font-weight:800; font-size:11px; letter-spacing:1px; color:#FFF">QUANTERRA<span style="color:var(--cyan)">OS</span></span>
               <span style="color:var(--gold); font-size:10px; font-family:var(--font-mono)">ANDROID PWA</span>
             </div>
 
             <div class="screen-telemetry-hud">
               <div class="telemetry-row">
-                <span style="color:var(--text-muted)">COIN-FLIP BASELINE:</span>
-                <span style="color:var(--cyan)">0.2500 (50/50 Chance)</span>
+                <span style="color:var(--text-muted)">STRIKE TARGET:</span>
+                <span style="color:var(--cyan); font-weight:700">BTC > $64,250</span>
               </div>
               <div class="telemetry-row">
-                <span style="color:var(--text-muted)">MARKET MID BRIER:</span>
-                <span style="color:var(--emerald)">0.2001 (Calibrated)</span>
+                <span style="color:var(--text-muted)">CME CF BRTI:</span>
+                <span style="color:var(--emerald); font-weight:700">$64,268.40 (+18.40)</span>
               </div>
               <div class="telemetry-row">
-                <span style="color:var(--text-muted)">FALCON BRIER:</span>
-                <span style="color:var(--crimson); font-weight:700">0.2736 (Underperforming)</span>
+                <span style="color:var(--text-muted)">RESOLUTION STATUS:</span>
+                <span style="color:var(--crimson); font-weight:700">⚠ DANGER ZONE (T - 22s)</span>
               </div>
             </div>
 
-            <div class="screen-specialist-card" style="border-color: rgba(0,242,254,0.25)">
-              <div class="specialist-header" style="color:var(--cyan)">
+            <!-- Animated 60s TWAP sampling bar -->
+            <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:8px; padding:8px;">
+              <div style="display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:9px; color:var(--text-muted);">
+                <span>60s TWAP SAMPLES</span>
+                <span style="color:var(--emerald)">19 / 30 LOGGED</span>
+              </div>
+              <div class="twap-mockup-strip">
+                <div class="twap-mockup-tick active"></div>
+                <div class="twap-mockup-tick active"></div>
+                <div class="twap-mockup-tick active"></div>
+                <div class="twap-mockup-tick active"></div>
+                <div class="twap-mockup-tick active"></div>
+                <div class="twap-mockup-tick active"></div>
+                <div class="twap-mockup-tick active"></div>
+                <div class="twap-mockup-tick active"></div>
+                <div class="twap-mockup-tick active"></div>
+                <div class="twap-mockup-tick active"></div>
+                <div class="twap-mockup-tick active"></div>
+                <div class="twap-mockup-tick active"></div>
+                <div class="twap-mockup-tick active"></div>
+                <div class="twap-mockup-tick active"></div>
+                <div class="twap-mockup-tick active"></div>
+                <div class="twap-mockup-tick active"></div>
+                <div class="twap-mockup-tick active"></div>
+                <div class="twap-mockup-tick active"></div>
+                <div class="twap-mockup-tick danger"></div>
+                <div class="twap-mockup-tick"></div>
+              </div>
+              <div style="font-size:9px; color:var(--text-muted); line-height:1.3; font-family:var(--font-mono);">
+                CF BRTI sub-second index feeds locked into 30 one-second sampling partitions.
+              </div>
+            </div>
+
+            <div class="screen-specialist-card" style="border-color: rgba(0,242,254,0.25); background:rgba(12, 15, 23, 0.9); border:1px solid rgba(0,242,254,0.25); border-radius:8px; padding:8px;">
+              <div style="color:var(--cyan); font-weight:700; font-size:10px; margin-bottom:2px;">
                 <span>🦅 FALCON HEURISTIC AUDIT</span>
               </div>
-              <p style="font-size:11px; color:var(--text-muted); line-height:1.4">
+              <p style="font-size:10px; color:var(--text-muted); line-height:1.35">
                 "Orderbook imbalance heuristic underperforms 0.2500 baseline over n=31 settled markets."
               </p>
             </div>
 
             <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:8px; padding:8px;">
-              <div style="font-size:10px; color:var(--text-muted); margin-bottom:4px; font-family:var(--font-mono)">KALSHI DUAL-FEED SPREAD</div>
-              <div style="display:flex; justify-content:space-between; font-weight:700; font-size:11px; font-family:var(--font-mono)">
+              <div style="font-size:9px; color:var(--text-muted); margin-bottom:2px; font-family:var(--font-mono)">KALSHI DUAL-FEED SPREAD</div>
+              <div style="display:flex; justify-content:space-between; font-weight:700; font-size:10px; font-family:var(--font-mono)">
                 <span style="color:var(--emerald)">YES: 61¢</span>
                 <span style="color:var(--crimson)">NO: 40¢</span>
                 <span style="color:var(--gold)">SPREAD: 1¢</span>
@@ -1024,7 +1207,7 @@ export function renderMobilePageHtml(): string {
           </div>
         </div>
         <div class="device-label">Android PWA Standalone Preview</div>
-        <div class="device-sub">Chrome / Samsung Internet • WebAPK Prompt</div>
+        <div class="device-sub">Live CME TWAP Radar • Chrome &amp; Samsung Internet</div>
       </div>
     </div>
   </section>
@@ -1047,7 +1230,7 @@ export function renderMobilePageHtml(): string {
     </div>
     <div class="qr-code-box">
       <!-- High fidelity SVG QR Code pointing to /mobile -->
-      <svg width="160" height="160" viewBox="0 0 33 33" fill="#000000">
+      <svg width="150" height="150" viewBox="0 0 33 33" fill="#000000">
         <!-- Finder top-left -->
         <rect x="0" y="0" width="7" height="7" fill="#000"/>
         <rect x="1" y="1" width="5" height="5" fill="#FFF"/>
@@ -1172,17 +1355,17 @@ export function renderMobilePageHtml(): string {
       CONSTITUTIONAL GOVERNANCE: <span>RULE B5 ACTIVE</span> • $0.00 LIVE EXPOSURE • EXECUTION GATE LOCKED IN STANDBY
     </div>
     <div style="margin-top: 6px; font-size: 11px;">
-      All models operate in empirical audit and simulated forward-testing mode. QuanterraOS Foundation © 2026.
+      All models operate in empirical audit and simulated forward-testing mode. QuanterraOS Foundation © 2026. Non-affiliated with Kalshi or CME Group.
     </div>
   </footer>
 </main>
 
 <!-- iOS Safari Add to Home Screen Modal Walkthrough -->
-<div class="modal-backdrop" id="iosModal">
+<div class="modal-backdrop" id="iosModal" role="dialog" aria-modal="true">
   <div class="modal-box">
-    <button class="modal-close" onclick="closeIosInstructions()">✕</button>
+    <button class="modal-close" onclick="closeIosInstructions()" aria-label="Close modal">✕</button>
     <div style="text-align: center; margin-bottom: 20px;">
-      <img src="/assets/icon.svg" width="56" height="56" style="border-radius:14px; margin-bottom:10px;">
+      <img src="/apple-touch-icon.png" width="56" height="56" style="border-radius:14px; margin-bottom:10px; border:1px solid var(--gold);">
       <h3 style="font-size:18px; font-weight:800;">Install on Apple iPhone</h3>
       <p style="font-size:13px; color:var(--text-muted);">Add QuanterraOS to your iOS Home Screen in two easy taps:</p>
     </div>
@@ -1249,7 +1432,6 @@ export function renderMobilePageHtml(): string {
         deferredPrompt = null;
       });
     } else {
-      // If prompt already triggered or running in standalone
       window.location.href = '/dashboard';
     }
   }
@@ -1265,37 +1447,98 @@ export function renderMobilePageHtml(): string {
     if (modal) modal.classList.remove('active');
   }
 
-  // Device Architecture Detection
+  // Platform Selector Tab Switching
+  function selectPlatform(platform) {
+    const tabIos = document.getElementById('tabIos');
+    const tabAndroid = document.getElementById('tabAndroid');
+    const tabUniversal = document.getElementById('tabUniversal');
+    const iosCard = document.getElementById('iosCard');
+    const androidCard = document.getElementById('androidCard');
+
+    [tabIos, tabAndroid, tabUniversal].forEach(t => t && t.classList.remove('active'));
+
+    if (platform === 'ios') {
+      if (tabIos) tabIos.classList.add('active');
+      if (iosCard) {
+        iosCard.classList.add('highlight');
+        iosCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      if (androidCard) androidCard.classList.remove('highlight');
+    } else if (platform === 'android') {
+      if (tabAndroid) tabAndroid.classList.add('active');
+      if (androidCard) {
+        androidCard.classList.add('highlight');
+        androidCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      if (iosCard) iosCard.classList.remove('highlight');
+    } else {
+      if (tabUniversal) tabUniversal.classList.add('active');
+      window.location.href = '/dashboard';
+    }
+  }
+
+  // Device Architecture Auto-Detection
   document.addEventListener('DOMContentLoaded', () => {
     const ua = navigator.userAgent || navigator.vendor || window.opera;
     const platformText = document.getElementById('detectedDeviceText');
     const androidCard = document.getElementById('androidCard');
     const iosCard = document.getElementById('iosCard');
-    const samsungCard = document.getElementById('samsungCard');
 
     if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) {
-      if (platformText) platformText.innerHTML = '<span style="color:#FFF">Apple iOS (iPhone/iPad) Detected</span>';
-      if (iosCard) {
-        iosCard.classList.add('highlight');
-        iosCard.style.borderColor = '#FFFFFF';
-      }
-      if (androidCard) androidCard.classList.remove('highlight');
+      if (platformText) platformText.innerHTML = '<span style="color:#FFF">Apple iOS (iPhone / iPad) Detected</span>';
+      selectPlatform('ios');
     } else if (/Samsung|SAMSUNG|SM-|GT-|SCH-|SHV-/i.test(ua)) {
       if (platformText) platformText.innerHTML = '<span style="color:#00F2FE">Samsung Galaxy (One UI) Detected</span>';
-      if (samsungCard) {
-        samsungCard.classList.add('highlight');
-        samsungCard.style.borderColor = 'var(--cyan)';
-      }
+      selectPlatform('android');
     } else if (/Android/i.test(ua)) {
       if (platformText) platformText.innerHTML = '<span style="color:#00E676">Android Google Play Device Detected</span>';
-      if (androidCard) {
-        androidCard.classList.add('highlight');
-        androidCard.style.borderColor = '#00E676';
-      }
+      selectPlatform('android');
     } else {
       if (platformText) platformText.innerHTML = '<span style="color:var(--text-muted)">Desktop / Workstation (Universal Access)</span>';
     }
   });
+
+  // Interactive Taker Drag Mockup Simulator inside Phone Frame
+  let currentMockupPrice = 50;
+  let currentMockupCount = 100;
+
+  function updateMobileMockupDrag(price, count) {
+    if (price !== undefined) currentMockupPrice = price;
+    if (count !== undefined) currentMockupCount = count;
+
+    const p = currentMockupPrice / 100;
+    const n = currentMockupCount;
+
+    // Formula: 0.07 * P * (1 - P)
+    const ratePerContract = Math.ceil(0.07 * p * (1 - p) * 100) / 100;
+    const totalFee = Math.ceil(0.07 * n * p * (1 - p) * 100) / 100;
+
+    // Profit Drag calculation (breakeven hurdle)
+    const profitDragPct = (ratePerContract / (1 - p)) * 100;
+
+    const priceDisplay = document.getElementById('mockupPriceDisplay');
+    const rateDisplay = document.getElementById('mockupRate');
+    const totalFeeDisplay = document.getElementById('mockupTotalFee');
+    const profitDragDisplay = document.getElementById('mockupProfitDrag');
+
+    if (priceDisplay) priceDisplay.textContent = currentMockupPrice + '¢' + (currentMockupPrice === 50 ? ' (PEAK)' : '');
+    if (rateDisplay) rateDisplay.textContent = (ratePerContract * 100).toFixed(2) + '¢ / contract';
+    if (totalFeeDisplay) totalFeeDisplay.textContent = '+$' + totalFee.toFixed(2);
+    if (profitDragDisplay) profitDragDisplay.textContent = profitDragPct.toFixed(1) + '% hurdle';
+
+    // Update active button state
+    document.querySelectorAll('.mockup-drag-widget .mockup-btn-group:first-of-type .mockup-touch-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.textContent.includes(currentMockupPrice + '¢'));
+    });
+  }
+
+  function updateMobileMockupCount(count) {
+    currentMockupCount = count;
+    document.querySelectorAll('.mockup-drag-widget .mockup-btn-group:nth-of-type(2) .mockup-touch-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.textContent.includes(count + ' cts'));
+    });
+    updateMobileMockupDrag();
+  }
 </script>
 </body>
 </html>`;

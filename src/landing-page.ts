@@ -540,14 +540,54 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
   }
   @media (max-width: 860px) {
     .live-ticker-strip { padding: 6px 16px; font-size: 0.65rem; }
-    .top-nav { padding: 12px 16px; flex-wrap: wrap; gap: 12px; }
-    .nav-left { width: 100%; justify-content: space-between; gap: 12px; }
-    .nav-links { overflow-x: auto; white-space: nowrap; gap: 16px; width: 100%; padding: 4px 0 6px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .top-nav {
+      padding: 10px 16px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px 12px;
+      align-items: center;
+    }
+    .nav-left {
+      display: contents;
+    }
+    .nav-brand {
+      grid-column: 1 / 2;
+    }
+    .nav-right {
+      grid-column: 2 / 3;
+      gap: 8px;
+    }
+    .nav-right .nav-cta {
+      padding: 8px 12px;
+      font-size: 0.72rem;
+    }
+    .nav-links {
+      grid-column: 1 / -1;
+      width: 100%;
+      overflow-x: auto;
+      white-space: nowrap;
+      gap: 10px;
+      padding: 4px 0 6px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
     .nav-links::-webkit-scrollbar { display: none; }
-    .page-wrap { padding: 32px 16px 64px; gap: 48px; }
-    .hero-heading { font-size: 2.1rem; line-height: 1.15; }
+    .nav-dropdown-menu {
+      position: fixed;
+      top: 96px;
+      left: 16px;
+      right: 16px;
+      min-width: auto;
+      max-width: calc(100vw - 32px);
+    }
+    .page-wrap { padding: 24px 14px 64px; gap: 40px; }
+    .hero-heading { font-size: 2.05rem; line-height: 1.15; }
+    .hero-subhead { font-size: 0.95rem; margin-bottom: 24px; }
     .hero-actions { flex-direction: column; width: 100%; gap: 10px; }
     .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
+    .drag-calculator-card { padding: 16px; }
+    .twap-radar-card { padding: 14px 16px; }
+    .footer-columns-grid { grid-template-columns: 1fr; gap: 24px; }
   }
 
   .hero-left {
