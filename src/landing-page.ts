@@ -1973,6 +1973,9 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
             <a href="/widgets" class="btn-secondary" style="padding:8px 14px; font-size:0.8rem;">
               Distribution Widgets (#6.5)
             </a>
+            <a href="/guides" class="btn-secondary" style="border-color:rgba(56,189,248,0.4); color:#38BDF8; padding:8px 14px; font-size:0.8rem;">
+              Search Guides (#6.1)
+            </a>
           </div>
         </div>
       </div>

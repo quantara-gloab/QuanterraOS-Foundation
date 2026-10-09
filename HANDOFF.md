@@ -1164,6 +1164,68 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 - `npm test` — **490/490 tests passing across 109 test suites**.
 - Remote production healthcheck: `GET https://quanterraos.com/healthz` returns `200 OK` (`status: ok, circuit: LOCKED_RULE_B5`).
 
+---
+
+### Session: 2026-10-08 — UI Display of 2026 Game-Changer Playbook, Cross-Venue Teardown & Competitor Dossiers (Commit 65e2e77)
+
+**Trigger:** "now apply that research towards the development of our website and app" — translating the 2026 Game-Changer Playbook, Cross-Venue Spread Teardown, and the 6-competitor dossier directly into the primary homepage (`src/landing-page.ts`) and mobile install portal (`src/mobile-install.ts`, `/app`).
+
+**Delivered Upgrades:**
+- **Flagship Homepage Integration (`src/landing-page.ts`)**:
+  - Embedded Strategic Move #2 ("Cross-Venue Illusory Spread Teardown Simulator") directly within the `#why-quanterraos-showcase` block.
+  - Interactive client-side preset selector (`applyHomeCrossPreset()`) for BTC 15M, ETH 15M, and Macro Events, recalculating nominal spread vs real fee drag live.
+  - Competitor Fatal Flaw Grid: Displays profiles of all 6 incumbents (Verso, Oddpool, Dome, Predly, Stand.Trade, Unusual Whales) with highlighted structural deficiencies.
+  - Interlinked CTAs to `/why`, `/calculator`, `/transparency` (#6.6), and `/widgets` (#6.5).
+- **Mobile Web App Integration (`src/mobile-install.ts`, `/app`)**:
+  - Added Mobile Cross-Venue Spread Teardown Quick-Card explaining why claimed 3.0¢ gross spreads suffer 80% fee drag on 1,000 contracts.
+  - Updated mobile top-bar header with direct links to "Why", "Audit", "Widgets", and "Calc".
+- **Verification**:
+  - `npx tsc --noEmit` — 0 errors (clean exit 0).
+  - `node --experimental-strip-types --test src/__tests__/landing-page-cockpit.test.ts src/__tests__/competitive-benchmark.test.ts` — 11/11 passing.
+  - Remote production healthcheck: `GET https://quanterraos.com/healthz` returns `200 OK` (`status: ok, circuit: LOCKED_RULE_B5`).
+
+---
+
+### Session: 2026-10-08 — Programmatic Indexable Content Engine & Search Query Resolution Hub (Growth Strategy Section 6.1)
+
+**Trigger:** "continue where we left off" — completing Section 6.1 of `QuanterraOS_Global_Growth_Strategy.md` ("Indexable Content: Publish cost calculators, settlement explainers, and fee comparisons answering specific search queries"), launching a search engine optimized directory answering high-intent trader queries with exact mathematical formulas, Schema.org JSON-LD structured data, live micro-solvers, and dynamic XML sitemaps.
+
+**Delivered Upgrades:**
+- **Programmatic Indexable Content Engine (`src/indexable-content.ts`)**:
+  - Built 8 comprehensive, quantitative query guides answering high-volume search intents:
+    1. *`kalshi-fee-formula`*: How the $0.07 × p × (1-p) parabolic curve works across the 1¢–99¢ ladder.
+    2. *`kalshi-vs-polymarket-fees`*: Side-by-side fee, gas, and drag comparison between CFTC taker fees and Polygon network costs.
+    3. *`cme-cf-brti-settlement-explained`*: Demystifying the regulated 60-second TWAP settlement window vs single-exchange spot ticks.
+    4. *`prediction-market-breakeven-calculator`*: Exact mathematical derivation of the 52.75% breakeven hurdle for 51¢ contracts.
+    5. *`kalshi-market-calibration-audit`*: Independent 1,316-market Brier score audit (0.2001 market vs 0.2063 model) and 10-decile distribution.
+    6. *`prediction-market-arbitrage-myth`*: Why aggregator cross-venue spreads are consumed by combined fee drag and oracle divergence.
+    7. *`uma-oracle-vs-cme-settlement`*: Decentralized optimistic oracle token voting hazards vs automated institutional benchmark TWAPs.
+    8. *`whale-tracking-fallacy`*: Exposing retail churn traps in copy-trading whale positions without delta and basis context.
+  - Embedded client-side zero-latency interactive micro-solvers on every guide page (`recalcArticleSolver()`).
+  - Implemented Schema.org `FAQPage` and `TechArticle` structured data JSON-LD on all pages for rich Google SERP features.
+  - Generated dynamic XML Sitemap (`/sitemap.xml`) indexing all static platform routes and query guides with `lastmod`, `changefreq`, and `priority`.
+  - Generated search-engine crawler directives via `/robots.txt` pointing to `https://quanterraos.com/sitemap.xml`.
+  - Cryptographic 64-character SHA-256 provenance hashes generated for each guide.
+- **Server Routes & API Integration (`src/server.ts`)**:
+  - `GET /guides`, `GET /compare`, `GET /answers`, `GET /library`: Filterable Query Solver Hub.
+  - `GET /guides/:slug`, `GET /compare/:slug`, `GET /answers/:slug`, `GET /q/:slug`: Programmatic article route.
+  - `GET /sitemap.xml`: XML sitemap with `application/xml; charset=utf-8`.
+  - `GET /robots.txt`: Robots directive with `text/plain; charset=utf-8`.
+  - `GET /api/content/queries`: JSON manifest of all 8 guides.
+  - `GET /api/content/query/:slug`: JSON payload for external agent consumption.
+- **Universal Cross-Platform Navigation Integration**:
+  - `src/landing-page.ts`: Added `/guides` to primary footer action strip and verified `/compare` in main nav.
+  - `src/mobile-install.ts`: Added `/guides` to mobile top-bar header.
+- **Dedicated Acceptance Testing Suite (`src/__tests__/indexable-content.test.ts`)**:
+  - 8 automated tests passing covering catalog completeness (8 guides), canonical slug & alias lookups, formula math, Schema.org JSON-LD, XML sitemap/robots.txt, query hub filtering, manifest API, and strict Rule B4/B5/B10 compliance.
+
+**Verification:**
+- `npx tsc --noEmit` — **0 errors (clean exit 0)**.
+- `node --experimental-strip-types --test src/__tests__/indexable-content.test.ts src/__tests__/landing-page-cockpit.test.ts src/__tests__/competitive-benchmark.test.ts src/__tests__/widget-catalog.test.ts src/__tests__/periodic-outcome-reports.test.ts` — **31/31 passing across 5 suites**.
+- `npm test` — **498/498 tests passing across 110 test suites**.
+- Remote production healthcheck: `GET https://quanterraos.com/healthz` returns `200 OK` (`status: ok, circuit: LOCKED_RULE_B5`).
+
+
 
 
 

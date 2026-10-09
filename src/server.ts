@@ -176,6 +176,15 @@ import {
   WIDGET_CATALOG_LIST,
   renderWidgetCatalogHtml,
 } from "./widget-catalog.ts";
+import {
+  SEARCH_QUERY_ARTICLES,
+  getSearchQueryArticle,
+  renderQueryHubPageHtml,
+  renderSearchQueryPageHtml,
+  generateSitemapXml,
+  generateRobotsTxt,
+  getSearchQueryManifest,
+} from "./indexable-content.ts";
 import { renderEducationalPageHtml, type EducationTopic } from "./educational-pages.ts";
 import { getReviewReminders, updateReviewReminders } from "./review-reminders.ts";
 import { renderVenueComparisonPageHtml } from "./venue-comparison-page.ts";
@@ -2707,6 +2716,45 @@ app.get(["/widgets", "/embeds", "/developers/widgets"], (_req, res) => {
 
 app.get("/api/widgets", (_req, res) => {
   res.json({ success: true, count: WIDGET_CATALOG_LIST.length, widgets: WIDGET_CATALOG_LIST });
+});
+
+// Programmatic Indexable Content Engine & Search Queries (Section 6.1 of Global Growth Strategy)
+app.get(["/guides", "/compare", "/answers", "/library"], (_req, res) => {
+  res.type("html").send(renderQueryHubPageHtml());
+});
+
+app.get(["/guides/:slug", "/compare/:slug", "/answers/:slug", "/q/:slug"], (req, res) => {
+  const article = getSearchQueryArticle(req.params.slug);
+  if (!article) {
+    return res.status(404).type("html").send(`<!DOCTYPE html><html><body style="background:#07080B;color:#FFF;font-family:sans-serif;padding:40px;text-align:center;"><h2>Guide Not Found</h2><p>The requested query guide does not exist.</p><a href="/guides" style="color:#DFB843;">&larr; Return to Prediction Market Guides</a></body></html>`);
+  }
+  res.type("html").send(renderSearchQueryPageHtml(article));
+});
+
+app.get("/sitemap.xml", (_req, res) => {
+  const xml = generateSitemapXml();
+  res.setHeader("Content-Type", "application/xml; charset=utf-8");
+  res.setHeader("Cache-Control", "public, max-age=3600, s-maxage=86400");
+  res.send(xml);
+});
+
+app.get("/robots.txt", (_req, res) => {
+  const robots = generateRobotsTxt();
+  res.setHeader("Content-Type", "text/plain; charset=utf-8");
+  res.setHeader("Cache-Control", "public, max-age=86400");
+  res.send(robots);
+});
+
+app.get("/api/content/queries", (_req, res) => {
+  res.json({ success: true, count: SEARCH_QUERY_ARTICLES.length, queries: getSearchQueryManifest() });
+});
+
+app.get("/api/content/query/:slug", (req, res) => {
+  const article = getSearchQueryArticle(req.params.slug);
+  if (!article) {
+    return res.status(404).json({ error: "Guide not found", slug: req.params.slug });
+  }
+  res.json({ success: true, article });
 });
 
 app.get(["/learn", "/education", "/curriculum"], (req, res) => {

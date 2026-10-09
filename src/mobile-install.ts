@@ -518,8 +518,9 @@ export function renderMobileInstallPageHtml(): string {
       <img src="/apple-touch-icon.png" alt="QuanterraOS Icon" class="brand-icon">
       <span>QUANTERRAOS</span>
     </a>
-    <div style="display:flex; align-items:center; gap:12px;">
+    <div style="display:flex; align-items:center; gap:10px;">
       <a href="/why" class="mono" style="color: var(--accent); font-size: 0.76rem; text-decoration: none; font-weight:600;">Why</a>
+      <a href="/guides" class="mono" style="color: #38BDF8; font-size: 0.76rem; text-decoration: none; font-weight:600;">Guides</a>
       <a href="/transparency" class="mono" style="color: #10B981; font-size: 0.76rem; text-decoration: none; font-weight:600;">Audit</a>
       <a href="/widgets" class="mono" style="color: var(--muted); font-size: 0.76rem; text-decoration: none;">Widgets</a>
       <a href="/calculator" class="mono" style="color: var(--accent-light); font-size: 0.76rem; text-decoration: none;">Calc &rarr;</a>
