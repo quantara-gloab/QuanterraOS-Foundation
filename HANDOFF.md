@@ -1369,6 +1369,26 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
     - `npm test` — **529/529 tests passing across 113 test suites (0 fails, 0 skipped)**.
     - Live production healthcheck at `https://quanterraos.com/healthz` verified 200 OK (`status: ok, circuit: LOCKED_RULE_B5`).
 
+12. **Top Navigation Overhaul & 4-Step Interactive Trader Workflow Pipeline (`src/landing-page.ts`, `src/cross-venue-scanner.ts`, `src/resolution-rulebook-engine.ts`, `src/realistic-paper-mode.ts`, `src/dataset-hub.ts`)**:
+    - *Solves user problem*: Top navigation was cluttered with 17 loose horizontal links, causing visual confusion and broken page-to-page flow.
+    - *Reorganized Header Navigation*:
+      - Replaced raw link list with 3 clean glassmorphic dropdowns:
+        - **Quant Tools ▾**: Prediction Engines (`Discrepancy Scanner`, `Resolution Risk AI`, `Realistic Paper Mode`, `Open Datasets Hub`) + Microstructure Terminals (`Check`, `Compare`, `Radar`, `Flow`, `Matrix`, `Settlement`).
+        - **Intelligence ▾**: Trader Records & Research (`Journal`, `Learn`, `Research`, `Transparency`).
+        - **Enterprise ▾**: Institutional Governance (`TrustOS Governance`, `Why Us`, `Institutional`).
+      - Preserved instant fast-path shortcuts (`Live Scanner`, `Anti-Dispute`) and clear right-aligned actions (`Sign in`, bullion `FREE SCANNER →` CTA).
+      - Maintained 100% backward compatibility for all test regexes (`>Check</a>`, `>Journal</a>`, `>Learn</a>`, `>Sign in</a>`, `>Research</a>`, `>Institutional</a>`).
+    - *Interactive 4-Step Execution Pipeline*:
+      - Added structured visual workflow on the landing page between Hero and the acquisition wedge:
+        - **Stage 01: Scan** — Discrepancy Scanner & Expiry Radar (`/scanner`).
+        - **Stage 02: Audit** — Resolution Risk AI & Breakeven Check (`/resolution-risk`).
+        - **Stage 03: Simulate** — Realistic Paper Mode & Forecast Compare (`/paper`).
+        - **Stage 04: Review** — Decision Journal, Settlement Dissection & Open Datasets (`/journal`, `/datasets`).
+    - *Cross-Page Workflow Banners*:
+      - Added "Next in Quant Workflow" jump strips to the footers of `/scanner`, `/resolution-risk`, `/paper`, and `/datasets` to guide the trader seamlessly from discovery through audit, paper execution, and post-settlement empirical review.
+    - *Verification*: `npx tsc --noEmit` clean 0 errors; full test suite `npm test` **529/529 passing across 113 suites (0 failures)**.
+
+
 
 
 
