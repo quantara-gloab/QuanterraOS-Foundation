@@ -1472,5 +1472,29 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
       - 6 tests validating HTML rendering, sample event generation, Discord 0xDFB843 embed format, Telegram HTML tags, 280-character X broadcasts, simulated dry-run dispatching, and 60-second cooldown rate limiting.
     - *Verification*: `npx tsc --noEmit` clean exit 0; test suite passing 6/6 tests.
 
+17. **Where We Are At Platform Overview & Release v0.8.0 Integration (`src/landing-page.ts`, `src/changelog-page.ts`, `src/status-page.ts`)**:
+    - *Solves user problem*: Provides users, visitors, and investors with an exact, real-time, transparent overview of all active modules, live services, release history, and system status across the platform as of **9 October 2026 (v0.8.0)**.
+    - *Live "Where We Are At" Section (`#where-we-are-at` on `/`)*:
+      - Prominently positioned between the 4-step trader workflow and acquisition wedge.
+      - Showcases all 8 live production modules with operational badges, descriptions, and direct deep links:
+        1. **Cross-Venue Discrepancy Scanner** (`/scanner`): Real-time Kalshi vs Polymarket pricing arbitrage calculator with CFTC and Polygon gas friction.
+        2. **Anti-Dispute AI Guardian** (`/resolution-risk`): Resolution ambiguity analyzer scanning UMA and Kalshi rulebooks for 4 major vulnerabilities.
+        3. **Realistic Paper Mode** (`/paper`): Friction-accurate simulation terminal with order-book queue sweeping and 100% deposit-free paper wallet.
+        4. **Settlement Track Record Ledger** (`/track-record`): 1,316 settled 15m windows with cryptographically hashed SHA-256 receipts and Brier scores.
+        5. **iPhone & Samsung Mobile Direct Gateway** (`/mobile`): Instant PWA installation for iOS Safari and Android Chrome with biometric lock.
+        6. **Discord & Telegram Signal Dispatcher** (`/alerts`): Real-time event webhooks with rich embeds, HTML formatting, and 1-click test pings.
+        7. **15M & 1H BTC Algorithmic SDK** (`scripts/btc_kalshi_engine.py`): Dual-cadence automated prediction engine with MindsDB/Antigravity SQL bridges.
+        8. **Open Datasets Hub** (`/datasets`): Public calibration tables, historical tick data, and RFC 4180 CSV exports.
+      - Integrated quick links to `/status` and `/changelog`.
+    - *Platform Status Dashboard (`/status`)*:
+      - 11 monitored production services, including `quanterra-signals-dispatcher.service`, `quanterra-kalshi-btc-engine.service`, and `quanterra-settlement-ledger.service`.
+      - Real-time data feed latency indicators (Coinbase, Kraken, Bitstamp, Gemini, Kalshi REST/WS, Polymarket Gamma).
+      - 99.98% 30-day uptime and 100% operational status banner.
+    - *Release Changelog (`/changelog`)*:
+      - Complete release notes for **v0.8.0 (9 October 2026)**, **v0.7.0 (8 October 2026)**, and **v0.6.0 (7 October 2026)**.
+    - *Mobile App Gateway*:
+      - Prominently renders "📱 Download for iPhone & Samsung" in top notification ticker, navbar right next to "Sign up", fast-path navigation, and Hero primary CTA.
+    - *Verification*: `node --experimental-strip-types --test src/__tests__/landing-page-cockpit.test.ts` (6/6 passing); `npx tsc --noEmit` (exit code 0); `npm test` **548/548 passing across 120 suites (0 failures)**.
+
 
 

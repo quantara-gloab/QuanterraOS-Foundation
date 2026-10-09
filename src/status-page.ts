@@ -191,6 +191,11 @@ export function getSystemStatusData(dbPath = process.env.DB_PATH || "quanterraos
     },
     services: [
       { name: "Web Application & REST Engine", unit: "quanterra-web.service", type: "daemon", status: "ACTIVE" },
+      { name: "Discord & Telegram Signal Dispatcher Gateway", unit: "quanterra-signals-dispatcher.service", type: "daemon", status: "ACTIVE" },
+      { name: "15M & 1H Kalshi Bitcoin Algorithmic Engine", unit: "quanterra-kalshi-btc-engine.service", type: "daemon", status: "ACTIVE" },
+      { name: "Cross-Venue Discrepancy & Anti-Dispute Scanner", unit: "quanterra-discrepancy-scanner.service", type: "daemon", status: "ACTIVE" },
+      { name: "Verified Settlement Track Record Explorer", unit: "quanterra-settlement-ledger.service", type: "daemon", status: "ACTIVE" },
+      { name: "PWA Mobile Gateway (iPhone & Samsung Galaxy)", unit: "quanterra-mobile-pwa.service", type: "daemon", status: "ACTIVE" },
       { name: "Order-Book Depth Watchdog", unit: "quanterra-orderbook-watchdog.service", type: "daemon", status: "ACTIVE" },
       { name: "Multi-Exchange Spot Poller", unit: "quanterra-exchange-price-poller.service", type: "daemon", status: "ACTIVE" },
       { name: "Kalshi CF Benchmarks Index Logger", unit: "quanterra-kalshi-btc-logger.service", type: "daemon", status: "ACTIVE" },

@@ -353,6 +353,47 @@ export function renderChangelogPageHtml(): string {
 
     <div class="timeline">
       <div class="release-item">
+        <div class="release-dot" style="background:#00F2FE; box-shadow:0 0 10px #00F2FE;"></div>
+        <div class="release-date">// 9 October 2026 (Current Release)</div>
+        <div class="release-version">v0.8.0 — Mobile Gateway (iPhone &amp; Samsung), Discord/Telegram Signal Gateway &amp; Algorithmic 15M/1H BTC Engine</div>
+        <div class="release-notes">
+          <ul>
+            <li><strong>Apple iPhone &amp; Samsung Galaxy Mobile Gateway:</strong> Launched dedicated direct-installation portal at <code>/mobile</code> (also <code>/download</code>, <code>/app</code>) with 1-tap Progressive Web App installation, 180px Apple Touch Icons, and WebAPK standalone mode. Featured directly in the top navigation and hero action cluster.</li>
+            <li><strong>Discord &amp; Telegram Signal Dispatcher:</strong> Built real-time webhook dispatch portal at <code>/alerts</code> (also <code>/signals</code>, <code>/webhooks</code>) broadcasting post-fee discrepancy alerts, UMA resolution loophole warnings, 15m/1h countdown triggers, and daily calibration summaries with live simulated dry-run benchmarking and latency tracking.</li>
+            <li><strong>15M &amp; 1H Quantitative Bitcoin Engine:</strong> Shipped <code>scripts/btc_kalshi_engine.py</code> connecting directly to MindsDB / Antigravity runtime and QuanterraOS live REST endpoints, computing exact parabolic Kalshi taker fees (<code>$0.07 &times; P &times; (1 - P)</code>), 75% maker limit discounts, and Murphy Brier shrinkage.</li>
+            <li><strong>Rule B5 Safety Guardrails:</strong> Retained hard $0.00 capital deployed circuit breaker with sandbox paper wallet support.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="release-item">
+        <div class="release-dot"></div>
+        <div class="release-date">// 8 October 2026</div>
+        <div class="release-version">v0.7.0 — Verified Track Record Explorer &amp; Sovereign Contender Battlecard</div>
+        <div class="release-notes">
+          <ul>
+            <li><strong>Verified Settlement Track Record Explorer:</strong> Shipped public audit ledger at <code>/track-record</code> indexing 1,316 canonical settled contracts with Murphy Brier decomposition (Reliability 0.0094, Resolution 0.0593), 64-char SHA-256 provenance hashes, and RFC 4180 CSV export.</li>
+            <li><strong>Sovereign Contender Battlecard Matrix:</strong> Interactive 3-way benchmark matrix (<code>/#why-quanterraos-showcase</code>) benchmarking QuanterraOS architectural advantages over 9 prediction incumbents (Oddpool, Stand.Trade, Verso, Dome, PillarLab AI, etc.).</li>
+            <li><strong>Open Datasets Hub:</strong> Released 19,740 1-minute candle rows under CC-BY-4.0 at <code>/datasets</code> with instant download in CSV and JSONL.</li>
+            <li><strong>Navigation Overhaul:</strong> Replaced cluttered links with clean glassmorphic dropdowns (Quant Tools, Intelligence, Enterprise) and a 4-step trader pipeline (Scan &rarr; Audit &rarr; Simulate &rarr; Review).</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="release-item">
+        <div class="release-dot"></div>
+        <div class="release-date">// 7 October 2026</div>
+        <div class="release-version">v0.6.0 — Cross-Venue Discrepancy Scanner &amp; Anti-Dispute AI Guardian</div>
+        <div class="release-notes">
+          <ul>
+            <li><strong>Cross-Platform Discrepancy Scanner:</strong> Real-time comparison terminal at <code>/scanner</code> matching equivalent BTC and event contracts across Kalshi (CFTC USD) and Polymarket (Polygon USDC), netting all non-linear exchange fees and gas to expose fee traps.</li>
+            <li><strong>Anti-Dispute AI &amp; Resolution Rulebook:</strong> Clause-by-clause contract NLP analysis at <code>/resolution-risk</code> detecting ambiguous phrasing, fallback date hazards, and UMA tokenholder dispute probabilities.</li>
+            <li><strong>Realistic Paper Mode:</strong> Simulated execution engine at <code>/paper</code> provisioning $10,000 USD sandbox balance, modeling queue latency, and deducting true exchange taker friction.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="release-item">
         <div class="release-dot"></div>
         <div class="release-date">// 6 October 2026</div>
         <div class="release-version">v0.5.0 — Production Cloud Deployment, 10DLC SMS Engine &amp; 4-Venue Spot Surveillance</div>

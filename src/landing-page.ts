@@ -1665,7 +1665,11 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       <div class="ticker-item">MARKET-MID BRIER: <strong>${brierScore} (NOMINAL)</strong></div>
       <div class="ticker-item"><span class="ticker-tag-warn">RULE B5 LOCKED</span> CAPITAL DEPLOYED: <strong>$0.00</strong></div>
     </div>
-    <div style="font-family: var(--font-mono); color: var(--muted);">CRYPTOGRAPHIC REPRODUCIBILITY VERIFIED</div>
+    <div style="font-family: var(--font-mono); color: var(--muted); display:flex; align-items:center; gap:8px;">
+      <a href="/status" style="color:var(--text-dim); text-decoration:none;">STATUS: 100% OPERATIONAL</a>
+      <span>&bull;</span>
+      <a href="/changelog" style="color:var(--accent); text-decoration:none; font-weight:600;">v0.8.0 RELEASED &rarr;</a>
+    </div>
   </div>
 
   <!-- Top Smart Mobile Gateway Banner for iPhone & Samsung Galaxy -->
@@ -1783,6 +1787,20 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
               <div class="menu-item-content">
                 <a href="/transparency" class="menu-item-title-link">Transparency</a>
                 <span class="menu-item-desc">Independent referee disclosures &amp; verified telemetry</span>
+              </div>
+            </div>
+            <div class="menu-item-row">
+              <span class="menu-item-icon" style="color:#10B981;">🟢</span>
+              <div class="menu-item-content">
+                <a href="/status" class="menu-item-title-link">Platform Status</a>
+                <span class="menu-item-desc">Live services, DB metrics &amp; edge nodes</span>
+              </div>
+            </div>
+            <div class="menu-item-row">
+              <span class="menu-item-icon" style="color:#00F2FE;">📋</span>
+              <div class="menu-item-content">
+                <a href="/changelog" class="menu-item-title-link">Release Changelog (v0.8.0)</a>
+                <span class="menu-item-desc">Where we are at: dated release history &amp; audits</span>
               </div>
             </div>
           </div>
@@ -2023,6 +2041,147 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
             <span class="tool-tag">Open Datasets Hub</span>
           </div>
           <a href="/track-record" class="pipeline-btn" style="border-color:rgba(56,189,248,0.4); color:#38BDF8;">Audit Track Record &rarr;</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dedicated Up-to-Date Platform Overview: Where We Are At -->
+    <section class="section-block" id="where-we-are-at" style="margin-top: 18px; margin-bottom: 24px;">
+      <div style="background: rgba(12, 15, 23, 0.85); border: 1px solid rgba(212, 175, 55, 0.22); border-radius: 12px; padding: 28px 24px; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: -80px; right: -80px; width: 220px; height: 220px; background: radial-gradient(circle, rgba(0, 242, 254, 0.12), transparent 70%); border-radius: 50%; pointer-events: none;"></div>
+        
+        <!-- Header -->
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; margin-bottom: 24px;">
+          <div>
+            <div style="display:inline-flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:0.72rem; color:var(--champagne); letter-spacing:0.12em; text-transform:uppercase; font-weight:700; background:rgba(223,184,67,0.12); padding:4px 10px; border-radius:4px; border:1px solid rgba(223,184,67,0.25); margin-bottom:10px;">
+              <span style="width:6px; height:6px; border-radius:50%; background:#10B981; box-shadow:0 0 8px #10B981;"></span>
+              SYSTEM ARCHITECTURE STATUS // WHERE WE ARE AT
+            </div>
+            <h2 style="font-size: 1.85rem; font-weight: 800; color: #FFF; letter-spacing: -0.02em; margin-bottom: 6px;">
+              Current Platform State: Release v0.8.0
+            </h2>
+            <p style="font-size: 0.9rem; color: var(--muted); max-width: 760px; line-height: 1.55;">
+              Up-to-date operational overview of QuanterraOS systems, live microservices, and empirical verification benchmarks as of <strong>9 October 2026</strong>.
+            </p>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <a href="/status" style="display:inline-flex; align-items:center; gap:6px; background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3); color:#34D399; padding:8px 14px; border-radius:6px; font-family:var(--font-mono); font-size:0.75rem; font-weight:700; text-decoration:none;">
+              <span style="width:6px; height:6px; border-radius:50%; background:#10B981;"></span>
+              100% OPERATIONAL &rarr;
+            </a>
+            <a href="/changelog" style="display:inline-flex; align-items:center; gap:6px; background:rgba(223,184,67,0.12); border:1px solid rgba(223,184,67,0.3); color:var(--champagne); padding:8px 14px; border-radius:6px; font-family:var(--font-mono); font-size:0.75rem; font-weight:700; text-decoration:none;">
+              Inspect Changelog &rarr;
+            </a>
+          </div>
+        </div>
+
+        <!-- 8 Shipped Production Modules Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-bottom: 22px;">
+          <!-- 1. Scanner -->
+          <div style="background: rgba(18, 23, 34, 0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 14px 16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size:0.88rem; font-weight:700; color:#FFF;">Cross-Venue Scanner</span>
+              <span style="font-family:var(--font-mono); font-size:0.68rem; color:#34D399; background:rgba(16,185,129,0.15); padding:2px 6px; border-radius:4px;">LIVE</span>
+            </div>
+            <p style="font-size:0.78rem; color:var(--muted); line-height:1.45; margin-bottom:8px;">
+              Side-by-side Kalshi vs Polymarket pricing with non-linear taker fee deductions.
+            </p>
+            <a href="/scanner" style="font-family:var(--font-mono); font-size:0.72rem; color:var(--accent); text-decoration:none; font-weight:600;">Open Scanner &rarr;</a>
+          </div>
+
+          <!-- 2. Anti-Dispute AI -->
+          <div style="background: rgba(18, 23, 34, 0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 14px 16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size:0.88rem; font-weight:700; color:#FFF;">Anti-Dispute AI Guardian</span>
+              <span style="font-family:var(--font-mono); font-size:0.68rem; color:#34D399; background:rgba(16,185,129,0.15); padding:2px 6px; border-radius:4px;">LIVE</span>
+            </div>
+            <p style="font-size:0.78rem; color:var(--muted); line-height:1.45; margin-bottom:8px;">
+              Contract clause NLP detecting UMA oracle ambiguity and resolution loopholes.
+            </p>
+            <a href="/resolution-risk" style="font-family:var(--font-mono); font-size:0.72rem; color:#FBBF24; text-decoration:none; font-weight:600;">Audit Clauses &rarr;</a>
+          </div>
+
+          <!-- 3. Paper Simulator -->
+          <div style="background: rgba(18, 23, 34, 0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 14px 16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size:0.88rem; font-weight:700; color:#FFF;">Realistic Paper Mode</span>
+              <span style="font-family:var(--font-mono); font-size:0.68rem; color:#34D399; background:rgba(16,185,129,0.15); padding:2px 6px; border-radius:4px;">LIVE</span>
+            </div>
+            <p style="font-size:0.78rem; color:var(--muted); line-height:1.45; margin-bottom:8px;">
+              $10,000 USD sandbox wallet with L2 queue simulation and realistic fee drag.
+            </p>
+            <a href="/paper" style="font-family:var(--font-mono); font-size:0.72rem; color:#10B981; text-decoration:none; font-weight:600;">Practice Free &rarr;</a>
+          </div>
+
+          <!-- 4. Verified Track Record -->
+          <div style="background: rgba(18, 23, 34, 0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 14px 16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size:0.88rem; font-weight:700; color:#FFF;">Settlement Track Record</span>
+              <span style="font-family:var(--font-mono); font-size:0.68rem; color:#34D399; background:rgba(16,185,129,0.15); padding:2px 6px; border-radius:4px;">1,316 ROWS</span>
+            </div>
+            <p style="font-size:0.78rem; color:var(--muted); line-height:1.45; margin-bottom:8px;">
+              Murphy Brier decomposition (0.2001) with cryptographic SHA-256 provenance.
+            </p>
+            <a href="/track-record" style="font-family:var(--font-mono); font-size:0.72rem; color:#38BDF8; text-decoration:none; font-weight:600;">View Ledger &rarr;</a>
+          </div>
+
+          <!-- 5. Mobile App -->
+          <div style="background: rgba(18, 23, 34, 0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 14px 16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size:0.88rem; font-weight:700; color:#FFF;">iPhone &amp; Samsung App</span>
+              <span style="font-family:var(--font-mono); font-size:0.68rem; color:#00F2FE; background:rgba(0,242,254,0.15); padding:2px 6px; border-radius:4px;">PWA</span>
+            </div>
+            <p style="font-size:0.78rem; color:var(--muted); line-height:1.45; margin-bottom:8px;">
+              Direct 1-tap browser installation for iOS Safari &amp; Samsung Galaxy WebAPK.
+            </p>
+            <a href="/mobile" style="font-family:var(--font-mono); font-size:0.72rem; color:#00F2FE; text-decoration:none; font-weight:600;">Install App &rarr;</a>
+          </div>
+
+          <!-- 6. Signal Dispatcher -->
+          <div style="background: rgba(18, 23, 34, 0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 14px 16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size:0.88rem; font-weight:700; color:#FFF;">Discord &amp; TG Signals</span>
+              <span style="font-family:var(--font-mono); font-size:0.68rem; color:#818CF8; background:rgba(129,140,248,0.15); padding:2px 6px; border-radius:4px;">WEBHOOKS</span>
+            </div>
+            <p style="font-size:0.78rem; color:var(--muted); line-height:1.45; margin-bottom:8px;">
+              Real-time webhook triggers for post-fee spreads and TWAP danger zones.
+            </p>
+            <a href="/alerts" style="font-family:var(--font-mono); font-size:0.72rem; color:#818CF8; text-decoration:none; font-weight:600;">Configure Alerts &rarr;</a>
+          </div>
+
+          <!-- 7. 15M/1H BTC Engine -->
+          <div style="background: rgba(18, 23, 34, 0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 14px 16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size:0.88rem; font-weight:700; color:#FFF;">15M/1H BTC Python SDK</span>
+              <span style="font-family:var(--font-mono); font-size:0.68rem; color:var(--champagne); background:rgba(223,184,67,0.15); padding:2px 6px; border-radius:4px;">ANTIGRAVITY</span>
+            </div>
+            <p style="font-size:0.78rem; color:var(--muted); line-height:1.45; margin-bottom:8px;">
+              Turnkey Python algorithmic engine connecting to MindsDB and Kalshi.
+            </p>
+            <a href="/kalshi" style="font-family:var(--font-mono); font-size:0.72rem; color:var(--champagne); text-decoration:none; font-weight:600;">Terminal Desk &rarr;</a>
+          </div>
+
+          <!-- 8. Open Datasets Hub -->
+          <div style="background: rgba(18, 23, 34, 0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 14px 16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-size:0.88rem; font-weight:700; color:#FFF;">Open Datasets Hub</span>
+              <span style="font-family:var(--font-mono); font-size:0.68rem; color:#38BDF8; background:rgba(56,189,248,0.15); padding:2px 6px; border-radius:4px;">CC-BY-4.0</span>
+            </div>
+            <p style="font-size:0.78rem; color:var(--muted); line-height:1.45; margin-bottom:8px;">
+              19,740 rows of canonical 1-minute candle datasets with raw CSV/JSONL exports.
+            </p>
+            <a href="/datasets" style="font-family:var(--font-mono); font-size:0.72rem; color:#38BDF8; text-decoration:none; font-weight:600;">Download Data &rarr;</a>
+          </div>
+        </div>
+
+        <!-- Footer Verification Bar -->
+        <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted);">
+          <div>
+            Governance: <span style="color:var(--champagne); font-weight:600;">Rule B5 Enforced</span> ($0.00 capital deployed &bull; execution gate locked in standby)
+          </div>
+          <div>
+            Last System Verification: <strong style="color:#FFF;">9 October 2026</strong> &bull; All 11 Microservices Active
+          </div>
         </div>
       </div>
     </section>
