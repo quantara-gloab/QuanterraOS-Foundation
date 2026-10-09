@@ -1329,13 +1329,46 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
      - Embedded in interactive `/paper` terminal, REST API at `GET /api/paper/compare`, and SVG execution receipts at `/api/paper/card.svg`.
      - Autonomous MCP tool: `simulate_realistic_paper_order`.
 
-9. **Acceptance Testing & Verification**:
-   - New suite: `src/__tests__/dataset-hub.test.ts` (5 tests verifying manifest, schemas, sample parsing, and Rule B1/B4/B5/B10 compliance).
-   - Expanded: `src/__tests__/realistic-paper-mode.test.ts` to 7 tests (verifying market fills, queue sweeping, risk caps, SVG receipts, and Delusion Delta).
-   - Expanded: `src/__tests__/mcp-friction.test.ts` to 16 tests (verifying autonomous execution of `export_canonical_dataset` and `simulate_realistic_paper_order`).
-   - `npx tsc --noEmit` — **0 errors (clean exit 0)**.
-   - `npm test` — **519/519 tests passing across 111 test suites (0 fails, 0 skipped)**.
-   - Live production healthcheck at `https://quanterraos.com/healthz` verified 200 OK (`status: ok, circuit: LOCKED_RULE_B5`).
+9. **Strategic Move #9: The "Resolution Rulebook" Engine (Anti-Dispute AI) (`/resolution-risk`, `/anti-dispute`)**:
+   - *Directly solves prediction market traders' #1 anxiety*: Ambiguous resolution criteria, UMA optimistic oracle voting disputes on Polymarket, and TWAP index pinning on Kalshi.
+   - Evaluates 5 core dimensions:
+     1. Primary Source Specificity (authoritative government agency / CFTC-regulated benchmark vs vague media consensus).
+     2. Timestamp & Timezone Determinism (second-accurate vs ambiguous "by midnight").
+     3. Oracle Vulnerability (UMA tokenholder voting dispute hazard vs CFTC designated clearing).
+     4. Ambiguous Rule Loophole Detection (data revision clauses, government shutdown contingencies, definition mismatch).
+     5. Historical Precedent & Case Law.
+   - Outputs:
+     - Deterministic Ambiguity Score (0-100).
+     - Dispute Risk Severity (`LOW`, `MODERATE`, `HIGH`, `CRITICAL`).
+     - Specific highlighted clause loopholes.
+     - Sentinel Pre-Trade Risk Checklist.
+   - Pre-audited canonical catalog: FOMC Rate Cut, US CPI Headline, Kalshi BTC 15M TWAP, Geopolitical Ceasefire.
+   - Dedicated portal at `/resolution-risk`, REST API `GET /api/resolution/audit` and `POST /api/resolution/analyze`.
+   - Autonomous MCP tool: `audit_resolution_rules`.
+
+10. **Strategic Move #10: Cross-Platform Discrepancy & Net Spread Scanner (`/scanner`, `/cross-venue-scanner`)**:
+    - *Solves the retail quant core disconnect*: Real-time side-by-side scanner of parallel contracts across Kalshi (CFTC USD) and Polymarket (Polygon USDC).
+    - Calculates:
+      - Kalshi Best Bid/Ask vs Polymarket Best Bid/Ask.
+      - Gross Implied Probability Spread.
+      - Exact multi-venue fee deduction (Kalshi parabolic taker fee $0.07 \times P \times (1-P)$ + Polymarket gas/slippage).
+      - Realized Net Discrepancy after ALL fees.
+      - Exposes "Fee Traps" where apparent positive gross spreads yield negative net returns.
+      - Oracle Divergence & Hazard Warning (e.g. CME CF BRTI 60s TWAP vs Binance spot / UMA).
+    - Dual-Mode Operational Switcher:
+      - `Retail Quantitative Cockpit` (Scanner, Resolution Guardian, Paper Simulator, Open Datasets).
+      - `Enterprise TrustOS Mode` (Model Governance, Statutory Audits, Risk Registers).
+    - Dedicated portal at `/scanner`, REST API `GET /api/scanner/discrepancies` and `POST /api/scanner/calculate`.
+    - Autonomous MCP tool: `scan_cross_venue_discrepancies`.
+
+11. **Acceptance Testing & Verification**:
+    - New suite: `src/__tests__/resolution-rulebook.test.ts` (3 tests verifying canonical audits, custom NLP clause analysis, and Rule B1/B4/B5/B10 compliance).
+    - New suite: `src/__tests__/cross-venue-scanner.test.ts` (5 tests verifying canonical discrepancies, fee trap detection, custom calculator, and Rule B1/B4/B5/B10 compliance).
+    - Expanded: `src/__tests__/mcp-friction.test.ts` to 18 tests (verifying autonomous execution of all 18 MCP tools).
+    - `npx tsc --noEmit` — **0 errors (clean exit 0)**.
+    - `npm test` — **529/529 tests passing across 113 test suites (0 fails, 0 skipped)**.
+    - Live production healthcheck at `https://quanterraos.com/healthz` verified 200 OK (`status: ok, circuit: LOCKED_RULE_B5`).
+
 
 
 
