@@ -10,6 +10,7 @@ import { renderLandingPage } from "./landing-page.ts";
 import "dotenv/config";
 import express from "express";
 import path from "node:path";
+import fs from "node:fs";
 import { randomUUID } from "node:crypto";
 import { eq, and, gte, asc, desc, sql } from "drizzle-orm";
 import { db, runMigrations } from "./db.ts";
@@ -133,7 +134,15 @@ import {
   generatePaperExecutionSvgReceipt,
   renderRealisticPaperWidgetHtml,
   renderRealisticPaperPageHtml,
+  compareRealisticVsFantasyPaper,
 } from "./realistic-paper-mode.ts";
+import {
+  getDatasetsManifest,
+  getDatasetMetadata,
+  getDatasetSampleRows,
+  getDecileCsvContent,
+  renderDatasetsPageHtml,
+} from "./dataset-hub.ts";
 import {
   evaluateForecastComparison,
   getMockProspectiveStudyCohort,
@@ -2506,6 +2515,112 @@ app.get("/api/paper/card.svg", (req, res) => {
   res.setHeader("Content-Type", "image/svg+xml; charset=utf-8");
   res.setHeader("Cache-Control", "public, max-age=60, s-maxage=300");
   res.send(svg);
+});
+
+app.get("/api/paper/compare", (req, res) => {
+  const ticker = typeof req.query.ticker === "string" ? req.query.ticker : "KXBTC15M-24OCT07-T91250";
+  const side = req.query.side === "NO" ? "NO" : "YES";
+  const orderType = req.query.type === "LIMIT" ? "LIMIT" : "MARKET";
+  const contracts = Number(req.query.contracts ?? 10);
+  const latency = Number(req.query.latency ?? 150);
+  const limitPriceCents = req.query.limitPrice ? Number(req.query.limitPrice) : undefined;
+
+  const comparison = compareRealisticVsFantasyPaper({
+    ticker,
+    side,
+    orderType,
+    limitPriceCents,
+    contracts,
+    simulatedLatencyMs: latency,
+  });
+
+  res.json({ success: true, comparison });
+});
+
+// Strategic Move #7: Programmatic Dataset & Historical Settlement Export Hub (/datasets)
+app.get(["/datasets", "/data-hub", "/open-data"], (req, res) => {
+  res.type("html").send(renderDatasetsPageHtml());
+});
+
+app.get("/api/datasets/manifest", (req, res) => {
+  res.json(getDatasetsManifest());
+});
+
+app.get("/api/datasets/preview", (req, res) => {
+  const datasetId = typeof req.query.dataset === "string" ? req.query.dataset : "kalshi-btc15m-candles";
+  const limit = Math.min(50, Math.max(1, Number(req.query.limit ?? 10)));
+  const rows = getDatasetSampleRows(datasetId, limit);
+  res.json({ success: true, datasetId, limit, count: rows.length, rows });
+});
+
+app.get("/api/datasets/deciles", (req, res) => {
+  const rows = getDatasetSampleRows("decile-calibration-benchmark", 10);
+  res.json({ success: true, datasetId: "decile-calibration-benchmark", rows });
+});
+
+app.get("/api/history/download", (req, res) => {
+  const datasetId = typeof req.query.dataset === "string" ? req.query.dataset : "kalshi-btc15m-candles";
+  const format = req.query.format === "jsonl" ? "jsonl" : "csv";
+  const meta = getDatasetMetadata(datasetId);
+
+  if (!meta) {
+    res.status(404).json({
+      error: "Dataset not found",
+      available: ["kalshi-btc15m-candles", "coinbase-btc-1m", "decile-calibration-benchmark", "swing-events-volatility"]
+    });
+    return;
+  }
+
+  res.setHeader("X-Dataset-SHA256", meta.sha256);
+  res.setHeader("X-Dataset-Rows", meta.rowCount.toString());
+  res.setHeader("X-License", "CC-BY-4.0");
+
+  if (datasetId === "decile-calibration-benchmark") {
+    if (format === "jsonl") {
+      const rows = getDatasetSampleRows("decile-calibration-benchmark", 10);
+      const jsonl = rows.map(r => JSON.stringify(r)).join("\n");
+      res.setHeader("Content-Type", "application/x-ndjson; charset=utf-8");
+      res.setHeader("Content-Disposition", `attachment; filename="${datasetId}.jsonl"`);
+      res.send(jsonl);
+      return;
+    }
+    const csv = getDecileCsvContent();
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader("Content-Disposition", `attachment; filename="${datasetId}.csv"`);
+    res.send(csv);
+    return;
+  }
+
+  const filePath = path.join(process.cwd(), "data", meta.filename);
+  if (!fs.existsSync(filePath)) {
+    res.status(404).json({ error: `Dataset file ${meta.filename} missing on disk` });
+    return;
+  }
+
+  if (format === "jsonl") {
+    const csvContent = fs.readFileSync(filePath, "utf8");
+    const lines = csvContent.trim().split("\n");
+    const headers = lines[0].split(",").map(h => h.trim());
+    const jsonlLines = lines.slice(1).map(line => {
+      const cols = line.split(",").map(c => c.trim());
+      const row: Record<string, unknown> = {};
+      headers.forEach((h, i) => {
+        const val = cols[i] ?? "";
+        const num = Number(val);
+        row[h] = !isNaN(num) && val !== "" ? num : val;
+      });
+      return JSON.stringify(row);
+    });
+    res.setHeader("Content-Type", "application/x-ndjson; charset=utf-8");
+    res.setHeader("Content-Disposition", `attachment; filename="${datasetId}.jsonl"`);
+    res.send(jsonlLines.join("\n"));
+    return;
+  }
+
+  res.setHeader("Content-Type", "text/csv; charset=utf-8");
+  res.setHeader("Content-Disposition", `attachment; filename="${meta.filename}"`);
+  const stream = fs.createReadStream(filePath);
+  stream.pipe(res);
 });
 
 // Validated Forecast Comparison & Prospective Outcome Evaluation (90-Day Plan Build Order #6)

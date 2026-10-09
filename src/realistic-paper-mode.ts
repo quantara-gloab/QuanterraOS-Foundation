@@ -251,6 +251,97 @@ export function simulateRealisticPaperOrder(
   };
 }
 
+export interface RealisticVsFantasyComparison {
+  orderRequest: PaperOrderRequest;
+  realistic: PaperExecutionResult;
+  fantasy: {
+    assumedPriceCents: number;
+    assumedSlippageCents: number;
+    assumedLatencyMs: number;
+    assumedTakerFeeUsd: number;
+    assumedNetOutlayUsd: number;
+    assumedBreakevenHurdlePct: number;
+    status: string;
+  };
+  delusionDelta: {
+    hiddenSlippageCents: number;
+    hiddenFeeDragUsd: number;
+    hurdleGapPct: number;
+    competitorTrapSeverity: "LOW" | "MODERATE" | "SEVERE" | "CATASTROPHIC";
+    counterIntelligenceWarning: string;
+  };
+  provenanceHash: string;
+}
+
+/**
+ * Compares Quanterra realistic microstructure fill against naive competitor paper simulators
+ * (e.g. Predly, Verso, Stand.Trade, Unusual Whales) which assume 0ms latency, zero taker fees,
+ * and instant 100% fills at mid-price.
+ */
+export function compareRealisticVsFantasyPaper(
+  request: PaperOrderRequest,
+  book?: SimulatedOrderBook
+): RealisticVsFantasyComparison {
+  const simBook = book ?? getSimulatedOrderBook();
+  const realistic = simulateRealisticPaperOrder(request, simBook);
+  const requestedPrice = request.limitPriceCents ?? 50;
+
+  // Competitor Fantasy Model:
+  // 1. 0ms latency
+  // 2. 0¢ slippage
+  // 3. $0.00 taker fees
+  // 4. Mid-price breakeven without fee drag
+  const fantasyPrice = requestedPrice;
+  const fantasySlippage = 0;
+  const fantasyLatency = 0;
+  const fantasyFee = 0;
+  const fantasyGross = Number(((request.contracts * fantasyPrice) / 100).toFixed(2));
+  const fantasyBreakeven = fantasyPrice;
+
+  const hiddenSlippage = Number((realistic.executedPriceCents - fantasyPrice).toFixed(2));
+  const hiddenFeeDrag = realistic.takerFeeUsd;
+  const hurdleGap = Number((realistic.breakevenHurdlePct - fantasyBreakeven).toFixed(1));
+
+  let trapSeverity: "LOW" | "MODERATE" | "SEVERE" | "CATASTROPHIC" = "LOW";
+  if (hurdleGap > 6.0 || hiddenFeeDrag > 4.0) {
+    trapSeverity = "CATASTROPHIC";
+  } else if (hurdleGap > 3.0 || hiddenFeeDrag > 1.5) {
+    trapSeverity = "SEVERE";
+  } else if (hurdleGap > 1.0 || hiddenFeeDrag > 0.4) {
+    trapSeverity = "MODERATE";
+  }
+
+  const counterIntelligenceWarning =
+    `Competitor paper simulators conceal $${hiddenFeeDrag.toFixed(2)} in parabolic taker fees ` +
+    `and ${hiddenSlippage >= 0 ? '+' : ''}${hiddenSlippage}¢ in order book depth slippage. ` +
+    `A participant expecting a ${fantasyBreakeven}% breakeven actually requires a ${realistic.breakevenHurdlePct}% win frequency on live order books.`;
+
+  const rawHash = `${realistic.orderId}:FANTASY_VS_REALITY:${hiddenFeeDrag}:${hurdleGap}`;
+  const provenanceHash = createHash("sha256").update(rawHash).digest("hex");
+
+  return {
+    orderRequest: request,
+    realistic,
+    fantasy: {
+      assumedPriceCents: fantasyPrice,
+      assumedSlippageCents: fantasySlippage,
+      assumedLatencyMs: fantasyLatency,
+      assumedTakerFeeUsd: fantasyFee,
+      assumedNetOutlayUsd: fantasyGross,
+      assumedBreakevenHurdlePct: fantasyBreakeven,
+      status: "FILLED (FANTASY)"
+    },
+    delusionDelta: {
+      hiddenSlippageCents: hiddenSlippage,
+      hiddenFeeDragUsd: hiddenFeeDrag,
+      hurdleGapPct: hurdleGap,
+      competitorTrapSeverity: trapSeverity,
+      counterIntelligenceWarning
+    },
+    provenanceHash
+  };
+}
+
 /**
  * Generates an institutional SVG Verification Receipt (640x720) for simulated paper executions.
  */
@@ -508,25 +599,21 @@ export function renderRealisticPaperPageHtml(sampleResult?: PaperExecutionResult
     </a>
     <nav class="nav-links">
       <a href="/">Overview</a>
-      <a href="/radar">Radar</a>
-      <a href="/calculator">Calculator</a>
+      <a href="/why">Why Us</a>
+      <a href="/datasets">Open Datasets</a>
       <a href="/paper" class="active" style="color:var(--accent);">Paper Mode</a>
-      <a href="/compare">Forecast Comparison</a>
-      <a href="/risk-plan">Risk Plan</a>
-      <a href="/journal">Journal</a>
-      <a href="/corridors">Corridors</a>
-      <a href="/matrix">Matrix</a>
-      <a href="/flow">Flow</a>
-      <a href="/settlement">Settlement</a>
+      <a href="/trustos">TrustOS Audit</a>
+      <a href="/radar">Radar</a>
+      <a href="/pricing">Pricing</a>
     </nav>
   </header>
 
   <main class="container">
     <div class="hero">
-      <div class="eyebrow">&Sigma; 90-Day Plan Build Order #5 &bull; Realistic Paper Mode &bull; $0.00 Capital Risk</div>
+      <div class="eyebrow">&Sigma; 90-Day Plan Build Order #5 &bull; Strategic Move #8 &bull; Realistic Paper Mode &bull; Zero Capital Risk Practice</div>
       <h1>Practice Without Deposits</h1>
       <p class="lead">
-        Realistic prediction market simulation that accurately models what standard paper simulators ignore: matching-engine network latency, multi-level queue depth depletion, CFTC non-linear taker fees, and missed fills when prices jump.
+        Prediction market simulation counter-positioned against naive competitor paper trading. Accurately models what standard simulators ignore: matching-engine latency, multi-tier queue depth depletion, parabolic CFTC taker fees, and quote jump risk.
       </p>
     </div>
 
@@ -537,22 +624,22 @@ export function renderRealisticPaperPageHtml(sampleResult?: PaperExecutionResult
         <form id="paper-form" onsubmit="event.preventDefault(); triggerSimulation();">
           <div class="form-group">
             <label class="form-label">Contract Ticker</label>
-            <input type="text" id="order-ticker" class="form-control" value="KXBTC15M-24OCT07-T91250" />
+            <input type="text" id="order-ticker" class="form-control" value="${res.ticker}" />
           </div>
 
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
             <div class="form-group">
               <label class="form-label">Position Side</label>
               <select id="order-side" class="form-control">
-                <option value="YES">BUY YES</option>
-                <option value="NO">BUY NO</option>
+                <option value="YES" ${res.side === 'YES' ? 'selected' : ''}>BUY YES</option>
+                <option value="NO" ${res.side === 'NO' ? 'selected' : ''}>BUY NO</option>
               </select>
             </div>
             <div class="form-group">
               <label class="form-label">Order Type</label>
               <select id="order-type" class="form-control">
-                <option value="MARKET">Market Order</option>
-                <option value="LIMIT">Limit Order</option>
+                <option value="MARKET" ${res.orderType === 'MARKET' ? 'selected' : ''}>Market Order</option>
+                <option value="LIMIT" ${res.orderType === 'LIMIT' ? 'selected' : ''}>Limit Order</option>
               </select>
             </div>
           </div>
@@ -560,14 +647,14 @@ export function renderRealisticPaperPageHtml(sampleResult?: PaperExecutionResult
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
             <div class="form-group">
               <label class="form-label">Contracts</label>
-              <input type="number" id="order-contracts" class="form-control" value="10" min="1" max="500" />
+              <input type="number" id="order-contracts" class="form-control" value="${res.requestedContracts}" min="1" max="500" />
             </div>
             <div class="form-group">
               <label class="form-label">Simulated Latency</label>
               <select id="order-latency" class="form-control">
-                <option value="50">Low Latency (50 ms Fiber)</option>
-                <option value="150" selected>Typical Desktop (150 ms)</option>
-                <option value="350">Mobile / Wi-Fi (350 ms)</option>
+                <option value="50" ${res.latencyDelayMs === 50 ? 'selected' : ''}>Low Latency (50 ms Fiber)</option>
+                <option value="150" ${res.latencyDelayMs === 150 ? 'selected' : ''}>Typical Desktop (150 ms)</option>
+                <option value="350" ${res.latencyDelayMs === 350 ? 'selected' : ''}>Mobile / Wi-Fi (350 ms)</option>
               </select>
             </div>
           </div>
@@ -624,6 +711,58 @@ export function renderRealisticPaperPageHtml(sampleResult?: PaperExecutionResult
         <div style="margin-top:16px; font-family:var(--font-mono); font-size:0.72rem; color:var(--muted); line-height:1.4;">
           Provenance: SHA-256 <code style="color:var(--champagne)">${res.provenanceHash.substring(0, 32)}...</code>
         </div>
+      </div>
+    </div>
+
+    <!-- Strategic Move #8: Reality Check (Fantasy Paper vs. Microstructure Reality) -->
+    <div style="margin-top:36px; background:var(--card-bg); border:1px solid var(--border); border-radius:12px; padding:28px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:10px;">
+        <div>
+          <span style="font-family:var(--font-mono); font-size:0.72rem; color:var(--accent); text-transform:uppercase; letter-spacing:0.1em;">Institutional Reality Check</span>
+          <h2 style="font-size:1.3rem; font-weight:800; color:#FFF; margin-top:4px;">The Paper Trading Delusion Gap</h2>
+        </div>
+        <span style="font-family:var(--font-mono); font-size:0.75rem; padding:4px 10px; border-radius:4px; background:rgba(239,68,68,0.15); color:#F87171; border:1px solid rgba(239,68,68,0.3);">
+          ${res.takerFeeUsd > 1.5 ? 'SEVERE FRICTION DISCREPANCY' : 'FRICTION DISCREPANCY DETECTED'}
+        </span>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+        <!-- Competitor Naive Model -->
+        <div style="background:var(--card-inner); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:20px;">
+          <div style="font-size:0.9rem; font-weight:700; color:#94A3B8; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+            <span style="color:#EF4444;">&times;</span> Competitor Fantasy Paper (Verso / Predly / Whales)
+          </div>
+          <div style="font-family:var(--font-mono); font-size:0.82rem; line-height:1.8; color:var(--muted);">
+            <div>Executed Fill: <span style="color:#FFF;">${res.requestedContracts} ct @ ${res.requestedPriceCents}&cent; (100% Top-of-Book)</span></div>
+            <div>Order Slippage: <span style="color:#10B981;">0.0&cent; (Assumes infinite depth)</span></div>
+            <div>Matching Latency: <span style="color:#10B981;">0 ms (Instant fantasy fill)</span></div>
+            <div>Taker Fee Deducted: <span style="color:#EF4444;">$0.00 (Zero-fee myth)</span></div>
+            <div style="border-top:1px solid rgba(255,255,255,0.06); padding-top:6px; margin-top:6px;">
+              Apparent Breakeven: <strong style="color:#FFF;">${res.requestedPriceCents}.0% Win Rate</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quanterra Microstructure Engine -->
+        <div style="background:var(--card-inner); border:1px solid var(--border); border-radius:8px; padding:20px;">
+          <div style="font-size:0.9rem; font-weight:700; color:var(--champagne); margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+            <span style="color:var(--accent);">&#10003;</span> Quanterra Realistic Microstructure Engine
+          </div>
+          <div style="font-family:var(--font-mono); font-size:0.82rem; line-height:1.8; color:var(--muted);">
+            <div>Executed Fill: <span style="color:var(--champagne);">${res.executedContracts} ct @ ${res.executedPriceCents}&cent; (Depth swept)</span></div>
+            <div>Order Slippage: <span style="color:${res.slippageCents > 0 ? '#F59E0B' : '#10B981'};">${res.slippageCents >= 0 ? '+' : ''}${res.slippageCents}&cent; per contract</span></div>
+            <div>Matching Latency: <span style="color:var(--accent);">${res.latencyDelayMs} ms delay</span></div>
+            <div>CFTC Taker Fee: <span style="color:#EF4444;">-$${res.takerFeeUsd.toFixed(2)} ($0.07 &times; P(1-P))</span></div>
+            <div style="border-top:1px solid rgba(255,255,255,0.06); padding-top:6px; margin-top:6px;">
+              True Breakeven: <strong style="color:var(--accent);">${res.breakevenHurdlePct}% Win Rate (+${(res.breakevenHurdlePct - res.requestedPriceCents).toFixed(1)}% hurdle)</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Counter-Intelligence Note -->
+      <div style="margin-top:16px; background:rgba(223,184,67,0.05); border:1px solid rgba(223,184,67,0.2); border-radius:6px; padding:14px; font-size:0.85rem; color:var(--champagne); line-height:1.5;">
+        <strong>Microstructure Alert:</strong> Competitor paper accounts deceive participants by hiding non-linear CFTC fees and book exhaustion. A trading strategy that shows positive returns in competitor software frequently experiences severe capital attrition on live CFTC order books due to the +${(res.breakevenHurdlePct - res.requestedPriceCents).toFixed(1)}% breakeven hurdle gap.
       </div>
     </div>
 

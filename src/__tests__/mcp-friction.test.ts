@@ -198,4 +198,30 @@ describe("MCP Pre-Trade Risk Coprocessor & Friction Simulator", () => {
     assert.strictEqual(dossier.commercialPilotTerms.fixedFeeUsd, 20000);
     assert.strictEqual(dossier.auditSealSha256.length, 64);
   });
+
+  it("executes export_canonical_dataset through executeMcpTool", async () => {
+    const ds = await executeMcpTool("export_canonical_dataset", {
+      datasetId: "kalshi-btc15m-candles",
+      limit: 5,
+    });
+    assert.strictEqual(ds.manifestVersion, "1.0.0");
+    assert.strictEqual(ds.dataset.id, "kalshi-btc15m-candles");
+    assert.strictEqual(ds.sampleCount, 5);
+    assert.strictEqual(ds.previewRows.length, 5);
+    assert.ok(ds.downloadUrlCsv.includes("dataset=kalshi-btc15m-candles"));
+  });
+
+  it("executes simulate_realistic_paper_order through executeMcpTool", async () => {
+    const paper = await executeMcpTool("simulate_realistic_paper_order", {
+      ticker: "KXBTC15M-TEST",
+      side: "YES",
+      orderType: "MARKET",
+      contracts: 50,
+      simulatedLatencyMs: 150,
+    });
+    assert.strictEqual(paper.realistic.executedContracts, 50);
+    assert.strictEqual(paper.fantasy.assumedPriceCents, 50);
+    assert.ok(paper.delusionDelta.hiddenFeeDragUsd > 0.5);
+    assert.strictEqual(paper.provenanceHash.length, 64);
+  });
 });

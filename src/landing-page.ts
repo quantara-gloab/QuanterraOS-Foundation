@@ -1280,6 +1280,8 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     <div class="nav-right" style="display:flex; gap:12px; align-items:center;">
       <a href="/transparency" style="color:#10B981; font-size:0.78rem; text-decoration:none; font-weight:600;">Transparency</a>
       <a href="/why" style="color:var(--accent); font-size:0.78rem; text-decoration:none; font-weight:600;">Why QuanterraOS</a>
+      <a href="/datasets" style="color:var(--champagne); font-size:0.78rem; text-decoration:none; font-weight:600;">Open Datasets</a>
+      <a href="/trustos" style="color:#38BDF8; font-size:0.78rem; text-decoration:none; font-weight:600;">TrustOS</a>
       <a href="/widgets" style="color:var(--text-dim); font-size:0.78rem; text-decoration:none;">Widgets</a>
       <a href="/research" style="color:var(--muted); font-size:0.78rem; text-decoration:none;">Research</a>
       <a href="/access" style="color:var(--muted); font-size:0.78rem; text-decoration:none;">Institutional</a>
@@ -1975,6 +1977,12 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
             </a>
             <a href="/trustos" class="btn-secondary" style="border-color:rgba(56,189,248,0.4); color:#38BDF8; padding:8px 14px; font-size:0.8rem;">
               TrustOS Audit ($20k / 6-Wk)
+            </a>
+            <a href="/datasets" class="btn-secondary" style="border-color:rgba(223,184,67,0.4); color:var(--champagne); padding:8px 14px; font-size:0.8rem;">
+              Open Datasets (Move #7)
+            </a>
+            <a href="/paper" class="btn-secondary" style="border-color:rgba(16,185,129,0.4); color:#10B981; padding:8px 14px; font-size:0.8rem;">
+              Reality Paper (Move #8)
             </a>
             <a href="/transparency" class="btn-secondary" style="border-color:rgba(16,185,129,0.4); color:#10B981; padding:8px 14px; font-size:0.8rem;">
               Outcome Transparency (#6.6)

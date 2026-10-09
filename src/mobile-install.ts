@@ -659,6 +659,14 @@ export function renderMobileInstallPageHtml(): string {
             TrustOS Audit ($20k)
           </a>
         </div>
+        <div style="display:flex; gap:10px; margin-top:8px;">
+          <a href="/datasets" class="btn-gold" style="flex:1; background:rgba(223,184,67,0.15); color:var(--champagne); border-color:rgba(223,184,67,0.4); text-decoration:none; font-size:0.75rem; padding:10px;">
+            Open Datasets (#7)
+          </a>
+          <a href="/paper" class="btn-gold" style="flex:1; background:rgba(16,185,129,0.15); color:#10B981; border-color:rgba(16,185,129,0.4); text-decoration:none; font-size:0.75rem; padding:10px;">
+            Reality Paper (#8)
+          </a>
+        </div>
       </div>
     </div>
 

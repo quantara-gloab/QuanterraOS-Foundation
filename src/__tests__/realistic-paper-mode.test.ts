@@ -5,7 +5,8 @@ import {
   generatePaperExecutionSvgReceipt,
   renderRealisticPaperWidgetHtml,
   renderRealisticPaperPageHtml,
-  getSimulatedOrderBook
+  getSimulatedOrderBook,
+  compareRealisticVsFantasyPaper
 } from "../realistic-paper-mode.ts";
 
 describe("Realistic Paper Mode — Practice Without Deposits Engine", () => {
@@ -135,5 +136,36 @@ describe("Realistic Paper Mode — Practice Without Deposits Engine", () => {
         `Page HTML violates Rule B4 with banned pattern: ${pattern}`
       );
     }
+  });
+
+  it("7. Competitor Reality Check: accurately computes delusion delta, hidden taker fees, and hurdle gap", () => {
+    const book = getSimulatedOrderBook(50); // Ask 51¢ (30 ct), 52¢ (65 ct)
+    const comparison = compareRealisticVsFantasyPaper(
+      {
+        ticker: "KXBTC15M-TEST",
+        side: "YES",
+        orderType: "MARKET",
+        contracts: 50,
+        simulatedLatencyMs: 150
+      },
+      book
+    );
+
+    // Realistic swept 30 ct @ 51¢ and 20 ct @ 52¢ -> avg 51.4¢
+    assert.strictEqual(comparison.realistic.executedContracts, 50);
+    assert.strictEqual(comparison.realistic.executedPriceCents, 51.4);
+    assert.ok(comparison.realistic.takerFeeUsd > 0.8);
+
+    // Fantasy assumed 50¢ flat with 0 fees
+    assert.strictEqual(comparison.fantasy.assumedPriceCents, 50);
+    assert.strictEqual(comparison.fantasy.assumedTakerFeeUsd, 0);
+    assert.strictEqual(comparison.fantasy.assumedBreakevenHurdlePct, 50);
+
+    // Delusion Delta
+    assert.strictEqual(comparison.delusionDelta.hiddenSlippageCents, 1.4);
+    assert.ok(comparison.delusionDelta.hurdleGapPct > 1.0);
+    assert.ok(["MODERATE", "SEVERE", "CATASTROPHIC"].includes(comparison.delusionDelta.competitorTrapSeverity));
+    assert.ok(comparison.delusionDelta.counterIntelligenceWarning.includes("Competitor paper simulators"));
+    assert.strictEqual(comparison.provenanceHash.length, 64);
   });
 });

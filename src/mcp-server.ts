@@ -9,6 +9,15 @@ import {
   COMPETITOR_BENCHMARK_ROWS,
 } from "./competitive-benchmark.ts";
 import { SEARCH_QUERY_ARTICLES, getSearchQueryArticle } from "./indexable-content.ts";
+import {
+  getDatasetsManifest,
+  getDatasetMetadata,
+  getDatasetSampleRows,
+} from "./dataset-hub.ts";
+import {
+  simulateRealisticPaperOrder,
+  compareRealisticVsFantasyPaper,
+} from "./realistic-paper-mode.ts";
 
 /**
  * Model Context Protocol (MCP) Manifest & Agent Integration Layer
@@ -178,6 +187,38 @@ export const MCP_SERVER_MANIFEST = {
           modelDomain: { type: "string", enum: ["algorithmic_underwriting", "binary_options_pricing", "credit_risk"], default: "algorithmic_underwriting", description: "Model domain" },
           sampleDecisionsCount: { type: "number", default: 1316, description: "Number of scored decisions" },
           targetBrierScore: { type: "number", default: 0.2001, description: "Target empirical Brier score" }
+        }
+      }
+    },
+    {
+      name: "export_canonical_dataset",
+      description: "Exports canonical prediction market dataset metadata, schema, and sample rows (19,740 candles, 1,316 settled windows) with SHA-256 cryptographic provenance.",
+      parameters: {
+        type: "object",
+        properties: {
+          datasetId: {
+            type: "string",
+            enum: ["kalshi-btc15m-candles", "coinbase-btc-1m", "decile-calibration-benchmark", "swing-events-volatility"],
+            default: "kalshi-btc15m-candles",
+            description: "Canonical dataset identifier"
+          },
+          limit: { type: "number", default: 10, description: "Maximum sample rows to inspect (1-50)" }
+        }
+      }
+    },
+    {
+      name: "simulate_realistic_paper_order",
+      description: "Simulates realistic paper order execution incorporating network latency, multi-tier queue depth depletion, parabolic CFTC taker fees, and competitor fantasy delusion delta.",
+      parameters: {
+        type: "object",
+        required: ["ticker", "side", "orderType", "contracts"],
+        properties: {
+          ticker: { type: "string", description: "Contract ticker" },
+          side: { type: "string", enum: ["YES", "NO"], description: "Order side" },
+          orderType: { type: "string", enum: ["MARKET", "LIMIT"], description: "Order type" },
+          contracts: { type: "number", description: "Number of contracts" },
+          limitPriceCents: { type: "number", description: "Limit price in cents (optional)" },
+          simulatedLatencyMs: { type: "number", default: 150, description: "Simulated network latency in milliseconds" }
         }
       }
     }
@@ -672,12 +713,12 @@ export async function executeMcpTool(name: string, params: Record<string, any> =
       const priceCents = Number(params.nominalPriceCents ?? 50);
       const winRatePct = Number(params.userStatedWinRatePct ?? 60);
       const bankroll = Number(params.bankrollUsd ?? 1000);
-      const alpha = Number(params.shrinkageFactor ?? 0.35);
+      const shrinkage = Number(params.shrinkageFactor ?? 0.35);
       return computeCalibrationAdjustedKelly({
         nominalPriceCents: priceCents,
         userStatedWinRatePct: winRatePct,
         bankrollUsd: bankroll,
-        shrinkageFactor: alpha,
+        shrinkageFactor: shrinkage,
       });
     }
     case "decode_whale_flow": {
@@ -709,6 +750,39 @@ export async function executeMcpTool(name: string, params: Record<string, any> =
         sampleDecisionsCount: samples,
         targetBrierScore: brier,
       });
+    }
+    case "export_canonical_dataset": {
+      const datasetId = String(params.datasetId || "kalshi-btc15m-candles");
+      const limit = Math.min(50, Math.max(1, Number(params.limit ?? 10)));
+      const meta = getDatasetMetadata(datasetId);
+      const rows = getDatasetSampleRows(datasetId, limit);
+      return {
+        manifestVersion: "1.0.0",
+        dataset: meta,
+        sampleCount: rows.length,
+        previewRows: rows,
+        downloadUrlCsv: `https://quanterraos.com/api/history/download?dataset=${datasetId}&format=csv`,
+        downloadUrlJsonl: `https://quanterraos.com/api/history/download?dataset=${datasetId}&format=jsonl`
+      };
+    }
+    case "simulate_realistic_paper_order": {
+      const ticker = String(params.ticker || "KXBTC15M-SAMPLE");
+      const side = (String(params.side || "YES").toUpperCase() === "NO" ? "NO" : "YES") as "YES" | "NO";
+      const orderType = (String(params.orderType || "MARKET").toUpperCase() === "LIMIT" ? "LIMIT" : "MARKET") as "MARKET" | "LIMIT";
+      const contracts = Math.max(1, Number(params.contracts ?? 10));
+      const limitPrice = params.limitPriceCents !== undefined ? Number(params.limitPriceCents) : undefined;
+      const latency = Number(params.simulatedLatencyMs ?? 150);
+
+      const comparison = compareRealisticVsFantasyPaper({
+        ticker,
+        side,
+        orderType,
+        contracts,
+        limitPriceCents: limitPrice,
+        simulatedLatencyMs: latency
+      });
+
+      return comparison;
     }
     default:
       throw new Error(`Unknown MCP tool: ${name}`);
