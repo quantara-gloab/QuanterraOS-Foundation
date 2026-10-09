@@ -514,6 +514,39 @@ export function renderCrossVenueScannerPageHtml(filterCategory?: string): string
       `).join("")}
     </div>
 
+    <!-- Seamless Workflow Navigation -->
+    <div style="margin: 40px 0 24px; background: rgba(14,20,30,0.85); border: 1px solid rgba(223,184,67,0.25); border-radius: 8px; padding: 18px 24px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:12px;">
+        <div style="font-family:var(--font-mono); font-size:0.75rem; color:var(--champagne); font-weight:700; letter-spacing:0.06em;">
+          ✦ QUANT PIPELINE &bull; STEP 1 OF 4: SCAN &bull; NEXT RECOMMENDED ACTIONS
+        </div>
+        <div style="font-size:0.75rem; color:var(--muted);">Continuous Cross-Venue Telemetry</div>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px;">
+        <a href="/resolution-risk" style="display:flex; align-items:center; gap:12px; background:rgba(245,158,11,0.06); border:1px solid rgba(245,158,11,0.3); padding:12px 16px; border-radius:6px; text-decoration:none; transition:all 0.2s ease;">
+          <span style="font-size:1.3rem;">🛡️</span>
+          <div>
+            <div style="font-size:0.84rem; font-weight:700; color:#FBBF24;">Step 2: Audit Resolution Rules &rarr;</div>
+            <div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">Check UMA oracle disputes &amp; rulebook traps</div>
+          </div>
+        </a>
+        <a href="/paper" style="display:flex; align-items:center; gap:12px; background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.3); padding:12px 16px; border-radius:6px; text-decoration:none; transition:all 0.2s ease;">
+          <span style="font-size:1.3rem;">🧪</span>
+          <div>
+            <div style="font-size:0.84rem; font-weight:700; color:#10B981;">Step 3: Simulate Order Fills &rarr;</div>
+            <div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">Test with queue depth, latency &amp; CFTC fees</div>
+          </div>
+        </a>
+        <a href="/calculator" style="display:flex; align-items:center; gap:12px; background:rgba(223,184,67,0.06); border:1px solid rgba(223,184,67,0.3); padding:12px 16px; border-radius:6px; text-decoration:none; transition:all 0.2s ease;">
+          <span style="font-size:1.3rem;">🧮</span>
+          <div>
+            <div style="font-size:0.84rem; font-weight:700; color:var(--champagne);">Check Breakeven Hurdle &rarr;</div>
+            <div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">Compute non-linear fee curve per contract</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
     <!-- Regulatory Footnote -->
     <div class="disclaimer">
       <p>

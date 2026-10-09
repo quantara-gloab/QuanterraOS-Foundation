@@ -585,6 +585,39 @@ console.log("Ingested observations:", records.length);</pre>
       </div>
     </div>
 
+    <!-- Seamless Workflow Navigation -->
+    <div style="margin: 40px 0 24px; background: rgba(14,20,30,0.85); border: 1px solid rgba(56,189,248,0.25); border-radius: 8px; padding: 18px 24px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:12px;">
+        <div style="font-family:var(--font-mono); font-size:0.75rem; color:#38BDF8; font-weight:700; letter-spacing:0.06em;">
+          ✦ QUANT PIPELINE &bull; STEP 4 OF 4: REVIEW &bull; REPEAT OR DEEP-DIVE
+        </div>
+        <div style="font-size:0.75rem; color:var(--muted);">Empirical Historical Settlement Ground Truth</div>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px;">
+        <a href="/scanner" style="display:flex; align-items:center; gap:12px; background:rgba(223,184,67,0.06); border:1px solid rgba(223,184,67,0.3); padding:12px 16px; border-radius:6px; text-decoration:none; transition:all 0.2s ease;">
+          <span style="font-size:1.3rem;">📡</span>
+          <div>
+            <div style="font-size:0.84rem; font-weight:700; color:var(--champagne);">Step 1: Scan Live Markets &rarr;</div>
+            <div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">Compare cross-venue pricing discrepancies</div>
+          </div>
+        </a>
+        <a href="/compare" style="display:flex; align-items:center; gap:12px; background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.3); padding:12px 16px; border-radius:6px; text-decoration:none; transition:all 0.2s ease;">
+          <span style="font-size:1.3rem;">⚖️</span>
+          <div>
+            <div style="font-size:0.84rem; font-weight:700; color:#10B981;">Validate Model Forecasts &rarr;</div>
+            <div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">Benchmark against market mid &amp; 50/50 baseline</div>
+          </div>
+        </a>
+        <a href="/journal" style="display:flex; align-items:center; gap:12px; background:rgba(56,189,248,0.06); border:1px solid rgba(56,189,248,0.3); padding:12px 16px; border-radius:6px; text-decoration:none; transition:all 0.2s ease;">
+          <span style="font-size:1.3rem;">📓</span>
+          <div>
+            <div style="font-size:0.84rem; font-weight:700; color:#38BDF8;">Personal Decision Journal &rarr;</div>
+            <div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">Log trades, reasonings, and personal Brier scores</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
     <!-- Regulatory & Attribution Disclaimers -->
     <div class="disclaimer">
       <p>

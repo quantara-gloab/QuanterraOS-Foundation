@@ -634,6 +634,39 @@ export function renderResolutionRiskPageHtml(selectedMarketId?: string): string 
       </div>
     </div>
 
+    <!-- Seamless Workflow Navigation -->
+    <div style="margin: 40px 0 24px; background: rgba(14,20,30,0.85); border: 1px solid rgba(245,158,11,0.25); border-radius: 8px; padding: 18px 24px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:12px;">
+        <div style="font-family:var(--font-mono); font-size:0.75rem; color:#FBBF24; font-weight:700; letter-spacing:0.06em;">
+          ✦ QUANT PIPELINE &bull; STEP 2 OF 4: AUDIT &bull; NEXT RECOMMENDED ACTIONS
+        </div>
+        <div style="font-size:0.75rem; color:var(--muted);">Sentinel Ambiguity &amp; Oracle Verification</div>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px;">
+        <a href="/paper" style="display:flex; align-items:center; gap:12px; background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.3); padding:12px 16px; border-radius:6px; text-decoration:none; transition:all 0.2s ease;">
+          <span style="font-size:1.3rem;">🧪</span>
+          <div>
+            <div style="font-size:0.84rem; font-weight:700; color:#10B981;">Step 3: Simulate Order Fills &rarr;</div>
+            <div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">Test with queue depth, latency &amp; CFTC fees</div>
+          </div>
+        </a>
+        <a href="/scanner" style="display:flex; align-items:center; gap:12px; background:rgba(223,184,67,0.06); border:1px solid rgba(223,184,67,0.3); padding:12px 16px; border-radius:6px; text-decoration:none; transition:all 0.2s ease;">
+          <span style="font-size:1.3rem;">📡</span>
+          <div>
+            <div style="font-size:0.84rem; font-weight:700; color:var(--champagne);">&larr; Return to Live Scanner</div>
+            <div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">Compare cross-venue pricing discrepancies</div>
+          </div>
+        </a>
+        <a href="/datasets" style="display:flex; align-items:center; gap:12px; background:rgba(56,189,248,0.06); border:1px solid rgba(56,189,248,0.3); padding:12px 16px; border-radius:6px; text-decoration:none; transition:all 0.2s ease;">
+          <span style="font-size:1.3rem;">💾</span>
+          <div>
+            <div style="font-size:0.84rem; font-weight:700; color:#38BDF8;">Historical Datasets &rarr;</div>
+            <div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">Export 19,740 settled resolution candles</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
     <!-- Regulatory Footnote -->
     <div class="disclaimer">
       <p>

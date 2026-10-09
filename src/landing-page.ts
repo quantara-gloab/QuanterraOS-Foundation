@@ -178,17 +178,171 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
   .nav-links {
     display: flex;
     align-items: center;
-    gap: 28px;
+    gap: 10px;
     font-size: 0.84rem;
   }
 
-  .nav-links a {
-    color: var(--muted);
-    transition: color 0.15s;
-    font-weight: 400;
+  /* Dropdown Menus */
+  .nav-dropdown {
+    position: relative;
+    display: inline-block;
   }
-  .nav-links a:hover {
+
+  .nav-dropdown-btn {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 0.84rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+    font-family: inherit;
+  }
+  .nav-dropdown-btn:hover,
+  .nav-dropdown:hover .nav-dropdown-btn,
+  .nav-dropdown:focus-within .nav-dropdown-btn {
+    color: #FFFFFF;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .nav-dropdown-btn svg {
+    transition: transform 0.2s ease;
+  }
+  .nav-dropdown:hover .nav-dropdown-btn svg,
+  .nav-dropdown:focus-within .nav-dropdown-btn svg {
+    transform: rotate(180deg);
+  }
+
+  .nav-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    min-width: 320px;
+    background: rgba(8, 11, 18, 0.98);
+    backdrop-filter: blur(28px) saturate(220%);
+    border: 1px solid rgba(223, 184, 67, 0.25);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8), 0 0 20px rgba(223, 184, 67, 0.08);
+    border-radius: 10px;
+    padding: 12px;
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 1000;
+  }
+  .nav-dropdown:hover .nav-dropdown-menu,
+  .nav-dropdown:focus-within .nav-dropdown-menu {
+    display: flex;
+  }
+
+  .menu-category-title {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--champagne);
+    text-transform: uppercase;
+    padding: 6px 8px 4px;
+  }
+
+  .menu-item-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    transition: background 0.15s ease;
+  }
+  .menu-item-row:hover {
+    background: rgba(223, 184, 67, 0.1);
+  }
+
+  .menu-item-icon {
+    font-size: 0.95rem;
+    line-height: 1.2;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .menu-item-content {
+    display: flex;
+    flex-direction: column;
+  }
+  .menu-item-title-link {
+    font-size: 0.84rem;
+    font-weight: 600;
     color: var(--text);
+    text-decoration: none;
+    display: inline-block;
+    transition: color 0.15s ease;
+  }
+  .menu-item-title-link:hover {
+    color: var(--champagne);
+  }
+  .menu-item-desc {
+    font-size: 0.71rem;
+    color: var(--muted);
+    line-height: 1.3;
+    margin-top: 2px;
+  }
+
+  .menu-grid-pills {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+    padding: 6px 4px 2px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    margin-top: 4px;
+  }
+  .menu-pill-link {
+    display: block;
+    text-align: center;
+    padding: 5px 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--accent-light);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 4px;
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+  .menu-pill-link:hover {
+    background: rgba(223, 184, 67, 0.15);
+    color: #FFFFFF;
+    border-color: rgba(223, 184, 67, 0.4);
+  }
+
+  .nav-pill-highlight {
+    color: var(--champagne) !important;
+    font-weight: 700 !important;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: rgba(223, 184, 67, 0.08);
+    border: 1px solid rgba(223, 184, 67, 0.25);
+    transition: all 0.15s ease;
+  }
+  .nav-pill-highlight:hover {
+    background: rgba(223, 184, 67, 0.18);
+    border-color: rgba(223, 184, 67, 0.5);
+  }
+
+  .nav-link-subtle {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 500;
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+  }
+  .nav-link-subtle:hover {
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.04);
   }
 
   .nav-right {
@@ -216,6 +370,113 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     background: linear-gradient(180deg, #FFFFFF 0%, #F7E7B4 25%, #E5C158 65%, #C29627 100%);
     box-shadow: 0 6px 24px rgba(229, 193, 88, 0.5), inset 0 1px 0 #FFFFFF;
     transform: translateY(-1px);
+  }
+
+  /* Interactive 4-Stage Execution Pipeline */
+  .workflow-pipeline-section {
+    width: 100%;
+  }
+  .pipeline-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+    align-items: center;
+    gap: 12px;
+  }
+  @media (max-width: 1100px) {
+    .pipeline-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .pipeline-connector {
+      display: none;
+    }
+  }
+  @media (max-width: 650px) {
+    .pipeline-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .pipeline-connector {
+    color: rgba(223, 184, 67, 0.4);
+    font-size: 1.4rem;
+    font-weight: 700;
+  }
+  .pipeline-card {
+    background: rgba(14, 20, 30, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 20px 18px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: all 0.2s ease;
+  }
+  .pipeline-card:hover {
+    border-color: rgba(223, 184, 67, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 16px rgba(223, 184, 67, 0.08);
+  }
+  .pipeline-badge {
+    align-self: flex-start;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--champagne);
+    background: rgba(223, 184, 67, 0.08);
+    border: 1px solid rgba(223, 184, 67, 0.25);
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-bottom: 12px;
+    letter-spacing: 0.06em;
+  }
+  .pipeline-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin-bottom: 6px;
+  }
+  .pipeline-desc {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.45;
+    margin-bottom: 14px;
+    flex-grow: 1;
+  }
+  .pipeline-tools {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .tool-tag {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 2px 7px;
+    border-radius: 3px;
+  }
+  .pipeline-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: var(--champagne);
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(223, 184, 67, 0.3);
+    padding: 8px 12px;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+  .pipeline-btn:hover {
+    background: rgba(223, 184, 67, 0.12);
+    border-color: rgba(223, 184, 67, 0.6);
+    color: #FFFFFF;
   }
 
   /* Main Page Container */
@@ -1257,31 +1518,140 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     <div style="font-family: var(--font-mono); color: var(--muted);">CRYPTOGRAPHIC REPRODUCIBILITY VERIFIED</div>
   </div>
 
-  <!-- Primary Consumer Navigation: Check · Journal · Learn · Sign in -->
+  <!-- Primary Tiered Navigation: Quant Tools · Intelligence · Enterprise · Sign in -->
   <nav class="top-nav">
     <div class="nav-left">
       <a href="/" class="nav-brand"><span class="brand-dot"></span> quanterraos</a>
+
       <div class="nav-links">
-        <a href="/scanner" style="color:var(--champagne); font-weight:700;">Discrepancy Scanner</a>
-        <a href="/resolution-risk" style="color:#F59E0B; font-weight:700;">Resolution Risk</a>
-        <a href="/paper" style="color:var(--accent-light); font-weight:700;">Paper Mode</a>
-        <a href="/datasets" style="color:var(--champagne); font-weight:700;">Open Datasets</a>
-        <a href="/calculator" style="color:var(--accent); font-weight:700;">Check</a>
-        <a href="/compare" style="color:var(--accent); font-weight:700;">Compare</a>
-        <a href="/radar" style="color:var(--accent-light); font-weight:700;">Radar</a>
-        <a href="/flow" style="color:var(--accent); font-weight:700;">Flow</a>
-        <a href="/settlement" style="color:var(--accent-light); font-weight:700;">Settlement</a>
-        <a href="/journal" style="color:#10B981; font-weight:700;">Journal</a>
-        <a href="/learn" style="color:var(--accent-light); font-weight:700;">Learn</a>
-        <a href="/trustos" style="color:#38BDF8; font-weight:700;">TrustOS</a>
-        <a href="/access" style="color:var(--text); font-weight:500;">Sign in</a>
+        <!-- Dropdown 1: Quant Tools -->
+        <div class="nav-dropdown">
+          <button class="nav-dropdown-btn" type="button" aria-haspopup="true">
+            <span>Quant Tools</span>
+            <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+          </button>
+          <div class="nav-dropdown-menu">
+            <div class="menu-category-title">Core Prediction Engines</div>
+            <div class="menu-item-row">
+              <span class="menu-item-icon" style="color:var(--champagne);">📡</span>
+              <div class="menu-item-content">
+                <a href="/scanner" class="menu-item-title-link" style="color:var(--champagne);">Discrepancy Scanner</a>
+                <span class="menu-item-desc">Polymarket vs Kalshi live spreads &amp; net fee deductions</span>
+              </div>
+            </div>
+            <div class="menu-item-row">
+              <span class="menu-item-icon" style="color:#F59E0B;">🛡️</span>
+              <div class="menu-item-content">
+                <a href="/resolution-risk" class="menu-item-title-link" style="color:#FBBF24;">Resolution Risk AI</a>
+                <span class="menu-item-desc">Anti-dispute contract NLP &amp; UMA oracle audits</span>
+              </div>
+            </div>
+            <div class="menu-item-row">
+              <span class="menu-item-icon" style="color:#10B981;">🧪</span>
+              <div class="menu-item-content">
+                <a href="/paper" class="menu-item-title-link" style="color:#10B981;">Paper Mode</a>
+                <span class="menu-item-desc">Execution simulator with realistic fee drag</span>
+              </div>
+            </div>
+            <div class="menu-item-row">
+              <span class="menu-item-icon" style="color:#38BDF8;">💾</span>
+              <div class="menu-item-content">
+                <a href="/datasets" class="menu-item-title-link" style="color:#38BDF8;">Open Datasets Hub</a>
+                <span class="menu-item-desc">19,740 settled candles &amp; decile calibration</span>
+              </div>
+            </div>
+
+            <div class="menu-category-title" style="margin-top:6px;">Microstructure Diagnostics</div>
+            <div class="menu-grid-pills">
+              <a href="/calculator" class="menu-pill-link">Check</a>
+              <a href="/compare" class="menu-pill-link">Compare</a>
+              <a href="/radar" class="menu-pill-link">Radar</a>
+              <a href="/flow" class="menu-pill-link">Flow</a>
+              <a href="/matrix" class="menu-pill-link">Matrix</a>
+              <a href="/settlement" class="menu-pill-link">Settlement</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dropdown 2: Intelligence & Research -->
+        <div class="nav-dropdown">
+          <button class="nav-dropdown-btn" type="button" aria-haspopup="true">
+            <span>Intelligence</span>
+            <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+          </button>
+          <div class="nav-dropdown-menu">
+            <div class="menu-category-title">Trader Records &amp; Methodology</div>
+            <div class="menu-item-row">
+              <span class="menu-item-icon" style="color:#10B981;">📓</span>
+              <div class="menu-item-content">
+                <a href="/journal" class="menu-item-title-link">Journal</a>
+                <span class="menu-item-desc">Systematic trade logger &amp; bias audit</span>
+              </div>
+            </div>
+            <div class="menu-item-row">
+              <span class="menu-item-icon" style="color:var(--champagne);">🎓</span>
+              <div class="menu-item-content">
+                <a href="/learn" class="menu-item-title-link">Learn</a>
+                <span class="menu-item-desc">Brier decomposition &amp; probability calibration</span>
+              </div>
+            </div>
+            <div class="menu-item-row">
+              <span class="menu-item-icon" style="color:#A78BFA;">📄</span>
+              <div class="menu-item-content">
+                <a href="/research" class="menu-item-title-link">Research</a>
+                <span class="menu-item-desc">Empirical market structure whitepapers</span>
+              </div>
+            </div>
+            <div class="menu-item-row">
+              <span class="menu-item-icon" style="color:#34D399;">🔍</span>
+              <div class="menu-item-content">
+                <a href="/transparency" class="menu-item-title-link">Transparency</a>
+                <span class="menu-item-desc">Independent referee disclosures &amp; verified telemetry</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dropdown 3: Enterprise Governance -->
+        <div class="nav-dropdown">
+          <button class="nav-dropdown-btn" type="button" aria-haspopup="true">
+            <span>Enterprise</span>
+            <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+          </button>
+          <div class="nav-dropdown-menu">
+            <div class="menu-category-title">Governance &amp; Council</div>
+            <div class="menu-item-row">
+              <span class="menu-item-icon" style="color:#38BDF8;">🏛️</span>
+              <div class="menu-item-content">
+                <a href="/trustos" class="menu-item-title-link">TrustOS Governance</a>
+                <span class="menu-item-desc">Council oversight &amp; SR 11-7 model risk management</span>
+              </div>
+            </div>
+            <div class="menu-item-row">
+              <span class="menu-item-icon" style="color:var(--champagne);">⚖️</span>
+              <div class="menu-item-content">
+                <a href="/why" class="menu-item-title-link">Why Us</a>
+                <span class="menu-item-desc">Independent referee vs broker-owned terminals</span>
+              </div>
+            </div>
+            <div class="menu-item-row">
+              <span class="menu-item-icon" style="color:var(--muted);">💼</span>
+              <div class="menu-item-content">
+                <a href="/access" class="menu-item-title-link">Institutional</a>
+                <span class="menu-item-desc">Dedicated enterprise deployment &amp; bridge API</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Direct Fast-Path Highlights -->
+        <a href="/scanner" class="nav-pill-highlight">Live Scanner</a>
+        <a href="/resolution-risk" class="nav-link-subtle" style="color:#FBBF24;">Anti-Dispute</a>
       </div>
     </div>
-    <div class="nav-right" style="display:flex; gap:12px; align-items:center;">
-      <a href="/transparency" style="color:#10B981; font-size:0.78rem; text-decoration:none; font-weight:600;">Transparency</a>
-      <a href="/why" style="color:var(--accent); font-size:0.78rem; text-decoration:none; font-weight:600;">Why Us</a>
-      <a href="/research" style="color:var(--muted); font-size:0.78rem; text-decoration:none;">Research</a>
-      <a href="/access" style="color:var(--muted); font-size:0.78rem; text-decoration:none;">Institutional</a>
+
+    <div class="nav-right" style="display:flex; gap:14px; align-items:center;">
+      <a href="/access" class="nav-link-subtle" style="font-weight:600;">Sign in</a>
       <a href="/scanner" class="nav-cta" style="background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%); color:#07080B; border:1px solid rgba(255,248,220,0.8); box-shadow:0 4px 16px rgba(212,175,55,0.4), inset 0 1px 0 #FFF; font-weight:800;">FREE SCANNER &rarr;</a>
     </div>
   </nav>
@@ -1357,6 +1727,85 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
         <div style="border-top: 1px solid var(--panel-border); padding-top: 14px; display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.72rem;">
           <span style="color: var(--muted);">Random Baseline: 0.2500</span>
           <span style="color: var(--warning);">Market Baseline: 0.2001 (Model: 0.2063)</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4-Step Interactive Execution Pipeline & Platform Flow -->
+    <section class="workflow-pipeline-section" id="platform-workflow" style="margin-top: -30px; margin-bottom: 10px;">
+      <div style="text-align: center; max-width: 780px; margin: 0 auto 32px;">
+        <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--champagne); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; margin-bottom: 8px;">
+          ✦ Systematic Trader Workflow
+        </div>
+        <h2 style="font-size: 2.1rem; font-weight: 700; color: #FFF; letter-spacing: -0.02em; margin-bottom: 10px;">
+          How QuanterraOS Engines Flow Together
+        </h2>
+        <p style="font-size: 0.92rem; color: var(--muted); line-height: 1.6;">
+          From discovering venue probability spreads to auditing contract resolution text and simulating fills with non-linear CFTC fees — follow the complete 4-stage pipeline.
+        </p>
+      </div>
+
+      <div class="pipeline-grid">
+        <!-- Step 1: Scan -->
+        <div class="pipeline-card">
+          <div class="pipeline-badge">STAGE 01 &bull; SCAN</div>
+          <h3 class="pipeline-title">Discrepancy Scanner</h3>
+          <p class="pipeline-desc">
+            Monitor real-time probability divergences between Polymarket &amp; Kalshi with automatic CFTC taker fee &amp; Polygon gas deductions.
+          </p>
+          <div class="pipeline-tools">
+            <span class="tool-tag">Cross-Venue Scanner</span>
+            <span class="tool-tag">Expiry Radar</span>
+          </div>
+          <a href="/scanner" class="pipeline-btn">Launch Scanner &rarr;</a>
+        </div>
+
+        <div class="pipeline-connector">&rarr;</div>
+
+        <!-- Step 2: Audit -->
+        <div class="pipeline-card">
+          <div class="pipeline-badge" style="color:#FBBF24; border-color:rgba(245,158,11,0.3); background:rgba(245,158,11,0.08);">STAGE 02 &bull; AUDIT</div>
+          <h3 class="pipeline-title">Resolution Risk AI</h3>
+          <p class="pipeline-desc">
+            Audit ambiguous contract rules, UMA oracle voting risks, and government data revision loopholes before entering positions.
+          </p>
+          <div class="pipeline-tools">
+            <span class="tool-tag">Anti-Dispute AI</span>
+            <span class="tool-tag">Breakeven Check</span>
+          </div>
+          <a href="/resolution-risk" class="pipeline-btn" style="border-color:rgba(245,158,11,0.4); color:#FBBF24;">Audit Rules &rarr;</a>
+        </div>
+
+        <div class="pipeline-connector">&rarr;</div>
+
+        <!-- Step 3: Simulate -->
+        <div class="pipeline-card">
+          <div class="pipeline-badge" style="color:#10B981; border-color:rgba(16,185,129,0.3); background:rgba(16,185,129,0.08);">STAGE 03 &bull; SIMULATE</div>
+          <h3 class="pipeline-title">Realistic Paper Mode</h3>
+          <p class="pipeline-desc">
+            Close the "paper delusion gap." Simulate fills against Level-2 book depth, network latency, and non-linear fee drag.
+          </p>
+          <div class="pipeline-tools">
+            <span class="tool-tag">Order Simulator</span>
+            <span class="tool-tag">Forecast Compare</span>
+          </div>
+          <a href="/paper" class="pipeline-btn" style="border-color:rgba(16,185,129,0.4); color:#10B981;">Practice Sandbox &rarr;</a>
+        </div>
+
+        <div class="pipeline-connector">&rarr;</div>
+
+        <!-- Step 4: Review -->
+        <div class="pipeline-card">
+          <div class="pipeline-badge" style="color:#38BDF8; border-color:rgba(56,189,248,0.3); background:rgba(56,189,248,0.08);">STAGE 04 &bull; REVIEW</div>
+          <h3 class="pipeline-title">Journal &amp; Datasets</h3>
+          <p class="pipeline-desc">
+            Commit decisions to your immutable journal, dissect 60s TWAP mechanics, and export 19,740 canonical settled candles.
+          </p>
+          <div class="pipeline-tools">
+            <span class="tool-tag">Decision Journal</span>
+            <span class="tool-tag">Open Datasets Hub</span>
+          </div>
+          <a href="/journal" class="pipeline-btn" style="border-color:rgba(56,189,248,0.4); color:#38BDF8;">View Journal &rarr;</a>
         </div>
       </div>
     </section>

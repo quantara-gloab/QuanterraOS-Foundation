@@ -766,6 +766,39 @@ export function renderRealisticPaperPageHtml(sampleResult?: PaperExecutionResult
       </div>
     </div>
 
+    <!-- Seamless Workflow Navigation -->
+    <div style="margin: 40px 0 24px; background: rgba(14,20,30,0.85); border: 1px solid rgba(16,185,129,0.25); border-radius: 8px; padding: 18px 24px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:12px;">
+        <div style="font-family:var(--font-mono); font-size:0.75rem; color:#10B981; font-weight:700; letter-spacing:0.06em;">
+          ✦ QUANT PIPELINE &bull; STEP 3 OF 4: SIMULATE &bull; NEXT RECOMMENDED ACTIONS
+        </div>
+        <div style="font-size:0.75rem; color:var(--muted);">Friction-Aware Order Execution Sandbox</div>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px;">
+        <a href="/journal" style="display:flex; align-items:center; gap:12px; background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.3); padding:12px 16px; border-radius:6px; text-decoration:none; transition:all 0.2s ease;">
+          <span style="font-size:1.3rem;">📓</span>
+          <div>
+            <div style="font-size:0.84rem; font-weight:700; color:#10B981;">Step 4: Record Decision in Journal &rarr;</div>
+            <div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">Track hypothesis, reasoning &amp; outcomes</div>
+          </div>
+        </a>
+        <a href="/datasets" style="display:flex; align-items:center; gap:12px; background:rgba(56,189,248,0.06); border:1px solid rgba(56,189,248,0.3); padding:12px 16px; border-radius:6px; text-decoration:none; transition:all 0.2s ease;">
+          <span style="font-size:1.3rem;">💾</span>
+          <div>
+            <div style="font-size:0.84rem; font-weight:700; color:#38BDF8;">Export Historical Candles &rarr;</div>
+            <div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">19,740 1-minute settled candles dataset</div>
+          </div>
+        </a>
+        <a href="/resolution-risk" style="display:flex; align-items:center; gap:12px; background:rgba(245,158,11,0.06); border:1px solid rgba(245,158,11,0.3); padding:12px 16px; border-radius:6px; text-decoration:none; transition:all 0.2s ease;">
+          <span style="font-size:1.3rem;">🛡️</span>
+          <div>
+            <div style="font-size:0.84rem; font-weight:700; color:#FBBF24;">&larr; Back to Resolution Risk</div>
+            <div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">Audit UMA dispute risk for this contract</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
     <!-- Regulatory Footnote -->
     <div style="margin-top:36px; padding-top:18px; border-top:1px solid var(--border-subtle); font-size:0.75rem; color:var(--muted); line-height:1.6;">
       <p>
