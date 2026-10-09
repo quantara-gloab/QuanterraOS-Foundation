@@ -132,9 +132,14 @@ function sentToday(db: DB, now: Date): number {
   return Number(r.n);
 }
 
-function log(db: DB, c: Contact, kind: string, status: string, detail: string, subject?: string, body?: string, providerId?: string) {
-  db.prepare("INSERT INTO outreach_log (contact_id, channel, kind, subject, body, provider_id, status, detail) VALUES (?,?,?,?,?,?,?,?)")
-    .run(c.id, "email", kind, subject ?? null, body ?? null, providerId ?? null, status, detail);
+function log(db: DB, c: Contact, kind: string, status: string, detail: string, subject?: string, body?: string, providerId?: string, at?: string) {
+  if (at) {
+    db.prepare("INSERT INTO outreach_log (contact_id, channel, kind, subject, body, provider_id, status, detail, at) VALUES (?,?,?,?,?,?,?,?,?)")
+      .run(c.id, "email", kind, subject ?? null, body ?? null, providerId ?? null, status, detail, at);
+  } else {
+    db.prepare("INSERT INTO outreach_log (contact_id, channel, kind, subject, body, provider_id, status, detail) VALUES (?,?,?,?,?,?,?,?)")
+      .run(c.id, "email", kind, subject ?? null, body ?? null, providerId ?? null, status, detail);
+  }
 }
 
 export interface OutreachSummary {
@@ -167,7 +172,7 @@ export async function runOutreach(db: DB, cfg: GrowthConfig, send: SendEmail, ll
     const d = canEmail(db, cfg, c, "cold");
     if (!d.allow) {
       s.blocked++;
-      log(db, c, c.touches === 0 ? "cold" : "follow_up", "blocked", d.reason);
+      log(db, c, c.touches === 0 ? "cold" : "follow_up", "blocked", d.reason, undefined, undefined, undefined, nowIso(now));
       db.prepare("UPDATE contacts SET next_touch_at = NULL, status = CASE WHEN touches=0 THEN 'held' ELSE 'done' END WHERE id = ?").run(c.id);
       continue;
     }
@@ -186,10 +191,10 @@ export async function runOutreach(db: DB, cfg: GrowthConfig, send: SendEmail, ll
       const next = touch < cfg.maxColdTouches && gap ? new Date(now.getTime() + gap * DAY).toISOString() : null;
       db.prepare("UPDATE contacts SET touches = ?, last_touch_at = ?, next_touch_at = ?, status = ? WHERE id = ?")
         .run(touch, nowIso(now), next, next ? "contacted" : "done", c.id);
-      log(db, c, touch === 1 ? "cold" : "follow_up", cfg.emailProvider === "console" ? "dry_run" : "sent", d.reason, mail.subject, mail.text, r.id);
+      log(db, c, touch === 1 ? "cold" : "follow_up", cfg.emailProvider === "console" ? "dry_run" : "sent", d.reason, mail.subject, mail.text, r.id, nowIso(now));
     } else {
       s.failed++;
-      log(db, c, touch === 1 ? "cold" : "follow_up", "failed", r.error ?? "unknown error", mail.subject);
+      log(db, c, touch === 1 ? "cold" : "follow_up", "failed", r.error ?? "unknown error", mail.subject, undefined, undefined, nowIso(now));
     }
   }
   return s;
