@@ -1451,5 +1451,26 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
       - Fixed `log()` to persist `nowIso(now)` to `outreach_log.at` instead of defaulting to SQLite `CURRENT_TIMESTAMP`, ensuring deterministic multi-day simulated test evaluation in `src/__tests__/growth.test.ts`.
     - *Verification*: Full test suite `npm test` 541/541 passing across 120 suites; `npx tsc --noEmit` clean exit 0.
 
+16. **Discord & Telegram Signal Dispatcher & Webhook Gateway (`src/signals-page.ts`, `src/alert-dispatcher.ts`, `src/server.ts`, `src/__tests__/signals-page.test.ts`)**:
+    - *Solves user problem*: Real-time distribution of high-probability execution signals directly into trader Discord servers and Telegram private syndicates without black-box enterprise opacity.
+    - *Dedicated Gateway Portal at `/alerts` (also `/signals`, `/webhooks`)*:
+      - Multi-platform dispatch switcher: **Discord Rich Embeds**, **Telegram HTML Bot**, and **Standardized JSON Webhooks**.
+      - Subscription filters for:
+        - Post-fee cross-venue discrepancies (Kalshi vs Polymarket net EV > hurdle).
+        - Resolution clause vulnerabilities & UMA dispute probabilities (Ambiguity score > 40).
+        - 15-Minute & 1-Hour BTC countdown triggers (window open, minute 4, minute 10, final 60s TWAP danger zone).
+        - Sovereign calibration digests and Brier score tracking.
+      - Interactive 1-click Test Ping harness with live simulated dry-run benchmarking, latency calculation, and visual Discord Embed / Telegram message mockup renders.
+      - Ready-to-deploy bot starter code in Python (`discord.py`), Node.js (Express), and cURL.
+    - *Server Endpoints*:
+      - `GET /alerts`, `GET /signals`, `GET /webhooks` (UI portal).
+      - `GET /api/alerts/recent` (recent dispatched signals with SHA-256 provenance).
+      - `POST /api/alerts/webhook/test` and `POST /api/alerts/test` (live or dry-run test dispatcher).
+      - `POST /api/alerts/dispatch` (protected programmatic event dispatcher).
+      - `GET /api/alerts/sample-payloads` (format schemas for external developers).
+    - *Acceptance Test Suite (`src/__tests__/signals-page.test.ts`)*:
+      - 6 tests validating HTML rendering, sample event generation, Discord 0xDFB843 embed format, Telegram HTML tags, 280-character X broadcasts, simulated dry-run dispatching, and 60-second cooldown rate limiting.
+    - *Verification*: `npx tsc --noEmit` clean exit 0; test suite passing 6/6 tests.
+
 
 
