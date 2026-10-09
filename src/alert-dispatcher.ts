@@ -281,6 +281,68 @@ export function createResolutionRiskAlert(params: {
 }
 
 /**
+ * Generates an authentic sample AlertEventData for test dispatching or simulation.
+ */
+export function createSampleAlertEvent(eventType: string = "DISCREPANCY_SCANNER_DETECTED"): AlertEventData {
+  if (eventType === "RESOLUTION_RISK_SPIKE") {
+    return createResolutionRiskAlert({
+      marketId: "POLY-FED-RATE-CUT-NOV26",
+      title: "Polymarket Fed Rate Cut in November 2026",
+      ambiguityScore: 45,
+      severity: "HIGH",
+      umaDisputeProbabilityPct: 34.2
+    });
+  }
+
+  if (eventType === "SETTLEMENT_ORACLE_DANGER") {
+    return createAlertEvent(
+      "SETTLEMENT_ORACLE_DANGER",
+      "BTC",
+      "Kalshi 15M Settlement TWAP Danger Trigger",
+      "Bitcoin composite spot is $85,518.00 (distance -$2.00 from $85,520.00 strike) at minute 14:15. 60-second BRTI TWAP averaging underway.",
+      {
+        SPOT: "$85,518.00",
+        STRIKE: "$85,520.00",
+        DISTANCE: "-$2.00",
+        TIME_LEFT: "45s",
+        RISK_ZONE: "TWAP_CROSSING_HAZARD"
+      },
+      "https://quanterraos.com/kalshi",
+      "WARNING",
+      "KXBTC15M-CURRENT"
+    );
+  }
+
+  if (eventType === "DAILY_DISCIPLINE_DIGEST") {
+    return createAlertEvent(
+      "DAILY_DISCIPLINE_DIGEST",
+      "BTC",
+      "Daily Sovereign Calibration & Track Record Digest",
+      "1,316 settled windows verified. Market mid achieves 0.2001 Brier score vs 0.2500 naive climatological baseline. Execution gate locked in standby ($0.00 deployed).",
+      {
+        SETTLED_WINDOWS: 1316,
+        MARKET_BRIER: "0.2001",
+        RELIABILITY: "0.0094",
+        CAPITAL_DEPLOYED: "$0.00",
+        GATE_STATUS: "CALIBRATED_STANDBY"
+      },
+      "https://quanterraos.com/track-record",
+      "INFO"
+    );
+  }
+
+  // Default: Discrepancy scanner
+  return createDiscrepancyAlert({
+    pairTicker: "BTC-26OCT09-15M",
+    grossSpreadCents: 5.0,
+    netDiscrepancyCents: 3.8,
+    kalshiPriceCents: 48,
+    polymarketPriceCents: 53,
+    hazardLevel: "LOW"
+  });
+}
+
+/**
  * Evaluates whether an event should be deduplicated due to an active cooldown window.
  */
 export function isAlertRateLimited(event: AlertEventData, nowMs = Date.now()): boolean {

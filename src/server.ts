@@ -99,8 +99,10 @@ import {
   renderWebhookDashboardHtml,
   formatDiscordAlertPayload,
   formatTelegramAlertPayload,
+  createSampleAlertEvent,
   type AlertEventType,
 } from "./alert-dispatcher.ts";
+import { renderSignalsPageHtml } from "./signals-page.ts";
 import {
   generateDailyScheduleMatrix,
   generateIcsCalendarFeed,
@@ -5425,6 +5427,61 @@ app.get("/api/kalshi/bids", (req, res) => {
   const userId = auth.user?.id || "demo-subscriber";
   const bids = getUserKalshiBids(userId);
   res.json(bids);
+});
+
+// ==============================================================================
+// DISCORD & TELEGRAM SIGNAL DISPATCHER & WEBHOOK PORTAL
+// ==============================================================================
+
+app.get(["/alerts", "/signals", "/webhooks"], (req, res) => {
+  const auth = getUserAuth(req);
+  res.type("html").send(renderSignalsPageHtml(auth.user?.email, auth.tier));
+});
+
+app.get("/api/alerts/recent", (_req, res) => {
+  const alerts = getRecentDispatchedAlerts();
+  res.json({
+    count: alerts.length,
+    alerts,
+    timestamp: new Date().toISOString(),
+  });
+});
+
+app.post(["/api/alerts/webhook/test", "/api/alerts/test"], async (req, res) => {
+  try {
+    const { eventType, webhookUrl } = req.body || {};
+    const event = createSampleAlertEvent(eventType || "DISCREPANCY_SCANNER_DETECTED");
+    const dryRun = !webhookUrl || typeof webhookUrl !== "string" || !webhookUrl.trim();
+    const targetUrl = dryRun ? "https://discord.com/api/webhooks/dry-run" : webhookUrl.trim();
+
+    const result = await dispatchAlertWebhook(event, targetUrl, dryRun);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
+app.post("/api/alerts/dispatch", async (req, res) => {
+  try {
+    const { event, webhookUrl, dryRun } = req.body || {};
+    if (!event || !event.eventType || !event.title) {
+      return res.status(400).json({ error: "Missing required event fields: eventType, title" });
+    }
+    const targetUrl = webhookUrl || "https://discord.com/api/webhooks/dry-run";
+    const result = await dispatchAlertWebhook(event, targetUrl, Boolean(dryRun || !webhookUrl));
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+});
+
+app.get("/api/alerts/sample-payloads", (_req, res) => {
+  const sampleEvent = createSampleAlertEvent("DISCREPANCY_SCANNER_DETECTED");
+  res.json({
+    event: sampleEvent,
+    discord: formatDiscordAlertPayload(sampleEvent),
+    telegram: formatTelegramAlertPayload(sampleEvent),
+  });
 });
 
 const port = Number(process.env.PORT ?? 3000);

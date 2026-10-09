@@ -1710,6 +1710,13 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
                 <span class="menu-item-desc">19,740 settled candles &amp; decile calibration</span>
               </div>
             </div>
+            <div class="menu-item-row">
+              <span class="menu-item-icon" style="color:#5865F2;">⚡</span>
+              <div class="menu-item-content">
+                <a href="/alerts" class="menu-item-title-link" style="color:#818CF8;">Signal Alerts</a>
+                <span class="menu-item-desc">Discord &amp; Telegram real-time execution signals</span>
+              </div>
+            </div>
 
             <div class="menu-category-title" style="margin-top:6px;">Microstructure Diagnostics</div>
             <div class="menu-grid-pills">
@@ -1719,6 +1726,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
               <a href="/flow" class="menu-pill-link">Flow</a>
               <a href="/matrix" class="menu-pill-link">Matrix</a>
               <a href="/settlement" class="menu-pill-link">Settlement</a>
+              <a href="/alerts" class="menu-pill-link">Alerts</a>
             </div>
           </div>
         </div>
