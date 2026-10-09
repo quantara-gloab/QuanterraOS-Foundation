@@ -1262,51 +1262,72 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     <div class="nav-left">
       <a href="/" class="nav-brand"><span class="brand-dot"></span> quanterraos</a>
       <div class="nav-links">
-        <a href="/calculator" style="color:var(--accent); font-weight:700;">Check</a>
+        <a href="/scanner" style="color:var(--champagne); font-weight:700;">Discrepancy Scanner</a>
+        <a href="/resolution-risk" style="color:#F59E0B; font-weight:700;">Resolution Risk</a>
         <a href="/paper" style="color:var(--accent-light); font-weight:700;">Paper Mode</a>
+        <a href="/datasets" style="color:var(--champagne); font-weight:700;">Open Datasets</a>
+        <a href="/calculator" style="color:var(--accent); font-weight:700;">Check</a>
         <a href="/compare" style="color:var(--accent); font-weight:700;">Compare</a>
-        <a href="/study" style="color:var(--accent-light); font-weight:700;">Study #6.4</a>
-        <a href="/educators" style="color:var(--accent); font-weight:700;">Educators</a>
         <a href="/radar" style="color:var(--accent-light); font-weight:700;">Radar</a>
         <a href="/flow" style="color:var(--accent); font-weight:700;">Flow</a>
-        <a href="/matrix" style="color:var(--accent-light); font-weight:700;">Matrix</a>
-        <a href="/corridors" style="color:var(--accent); font-weight:700;">Corridors</a>
         <a href="/settlement" style="color:var(--accent-light); font-weight:700;">Settlement</a>
         <a href="/journal" style="color:#10B981; font-weight:700;">Journal</a>
         <a href="/learn" style="color:var(--accent-light); font-weight:700;">Learn</a>
+        <a href="/trustos" style="color:#38BDF8; font-weight:700;">TrustOS</a>
         <a href="/access" style="color:var(--text); font-weight:500;">Sign in</a>
       </div>
     </div>
     <div class="nav-right" style="display:flex; gap:12px; align-items:center;">
       <a href="/transparency" style="color:#10B981; font-size:0.78rem; text-decoration:none; font-weight:600;">Transparency</a>
-      <a href="/why" style="color:var(--accent); font-size:0.78rem; text-decoration:none; font-weight:600;">Why QuanterraOS</a>
-      <a href="/datasets" style="color:var(--champagne); font-size:0.78rem; text-decoration:none; font-weight:600;">Open Datasets</a>
-      <a href="/trustos" style="color:#38BDF8; font-size:0.78rem; text-decoration:none; font-weight:600;">TrustOS</a>
-      <a href="/widgets" style="color:var(--text-dim); font-size:0.78rem; text-decoration:none;">Widgets</a>
+      <a href="/why" style="color:var(--accent); font-size:0.78rem; text-decoration:none; font-weight:600;">Why Us</a>
       <a href="/research" style="color:var(--muted); font-size:0.78rem; text-decoration:none;">Research</a>
       <a href="/access" style="color:var(--muted); font-size:0.78rem; text-decoration:none;">Institutional</a>
-      <a href="/calculator" class="nav-cta" style="background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%); color:#07080B; border:1px solid rgba(255,248,220,0.8); box-shadow:0 4px 16px rgba(212,175,55,0.4), inset 0 1px 0 #FFF; font-weight:800;">FREE CHECK &rarr;</a>
+      <a href="/scanner" class="nav-cta" style="background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%); color:#07080B; border:1px solid rgba(255,248,220,0.8); box-shadow:0 4px 16px rgba(212,175,55,0.4), inset 0 1px 0 #FFF; font-weight:800;">FREE SCANNER &rarr;</a>
     </div>
   </nav>
 
   <div class="page-wrap">
 
+    <!-- Dual Mode Profile Switcher -->
+    <div style="max-width:1300px; margin: 20px auto 0; padding: 0 24px;">
+      <div style="background:rgba(14,20,30,0.8); border:1px solid var(--border-subtle); border-radius:8px; padding:10px 16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; align-items:center; gap:8px; font-size:0.82rem; color:#FFF; font-weight:600;">
+          <span style="width:7px; height:7px; border-radius:50%; background:#10B981; box-shadow:0 0 8px #10B981;"></span>
+          Operational Profile: <strong style="color:var(--champagne);">Retail Quantitative Cockpit</strong> (Polymarket &amp; Kalshi)
+        </div>
+        <div style="display:flex; background:rgba(6,7,10,0.8); padding:3px; border-radius:6px; border:1px solid var(--border-subtle); gap:4px;">
+          <a href="/scanner" style="background:rgba(223,184,67,0.15); color:var(--champagne); padding:4px 12px; border-radius:4px; font-family:var(--font-mono); font-size:0.75rem; font-weight:700; text-decoration:none;">
+            Retail Quant Terminal
+          </a>
+          <a href="/trustos" style="color:var(--muted); padding:4px 12px; border-radius:4px; font-family:var(--font-mono); font-size:0.75rem; font-weight:600; text-decoration:none;">
+            Enterprise TrustOS Mode
+          </a>
+        </div>
+      </div>
+    </div>
+
     <!-- Hero Section -->
     <section class="hero-section">
       <div class="hero-left">
         <div class="hero-badge">
-          <span class="pulse-beacon"></span> Independent Decision &amp; Risk Companion
+          <span class="pulse-beacon"></span> The Multi-Agent Quantitative Engine for Prediction Markets
         </div>
         <h1 class="hero-heading">
-          Understand the real cost. Control your risk. Learn from every decision.
+          Audited prediction intelligence. Real-time spreads. Zero dispute surprises.
         </h1>
         <p class="hero-subhead">
-          The independent companion you consult before entering any prediction-market position. Verify executable taker fees, true breakeven odds, and settlement friction across Kalshi and Polymarket before risking capital.
+          The independent quantitative engine built for Polymarket and Kalshi traders. Scan cross-platform discrepancies, deduct non-linear CFTC taker fees and Polygon gas, and audit UMA oracle resolution loopholes before entering positions.
         </p>
         <div class="hero-actions">
-          <a href="/calculator" class="btn-primary" style="background:linear-gradient(180deg, #10B981 0%, #059669 100%); border-color:#34D399; box-shadow:0 0 20px rgba(16,185,129,0.35); font-weight:700;">Free True-Cost &amp; Breakeven Check &rarr;</a>
-          <a href="/journal?preview=true" class="btn-secondary" style="border-color:rgba(212,175,55,0.4); color:var(--accent-light);">Preview Decision Journal &rarr;</a>
-          <a href="/pricing" class="btn-secondary">Plans &amp; Pricing</a>
+          <a href="/scanner" class="btn-primary" style="background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%); color:#07080B; border:1px solid #DFB843; font-weight:800; box-shadow:0 0 20px rgba(223,184,67,0.35);">
+            Launch Discrepancy Scanner (Free) &rarr;
+          </a>
+          <a href="/resolution-risk" class="btn-secondary" style="border-color:rgba(245,158,11,0.4); color:#FBBF24;">
+            Anti-Dispute AI Auditor &rarr;
+          </a>
+          <a href="/paper" class="btn-secondary" style="border-color:rgba(16,185,129,0.4); color:#10B981;">
+            Realistic Paper Mode &rarr;
+          </a>
         </div>
 
         <div style="background: rgba(14, 20, 30, 0.7); border: 1px solid rgba(212, 175, 55, 0.25); border-radius: 6px; padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 24px; width: 100%; font-family: var(--font-mono); font-size: 0.74rem;">

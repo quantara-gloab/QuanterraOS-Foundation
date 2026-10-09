@@ -224,4 +224,22 @@ describe("MCP Pre-Trade Risk Coprocessor & Friction Simulator", () => {
     assert.ok(paper.delusionDelta.hiddenFeeDragUsd > 0.5);
     assert.strictEqual(paper.provenanceHash.length, 64);
   });
+
+  it("executes audit_resolution_rules through executeMcpTool", async () => {
+    const audit = await executeMcpTool("audit_resolution_rules", {
+      marketId: "FED-FUNDS-RATE-CUT-2026",
+    });
+    assert.strictEqual(audit.marketId, "FED-FUNDS-RATE-CUT-2026");
+    assert.strictEqual(audit.disputeRiskSeverity, "LOW");
+    assert.strictEqual(audit.provenanceHash.length, 64);
+  });
+
+  it("executes scan_cross_venue_discrepancies through executeMcpTool", async () => {
+    const scan = await executeMcpTool("scan_cross_venue_discrepancies", {
+      category: "all",
+    });
+    assert.strictEqual(scan.category, "all");
+    assert.strictEqual(scan.totalPairsScanned, 4);
+    assert.ok(scan.discrepancies.length === 4);
+  });
 });

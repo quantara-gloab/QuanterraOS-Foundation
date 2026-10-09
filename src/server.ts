@@ -144,6 +144,17 @@ import {
   renderDatasetsPageHtml,
 } from "./dataset-hub.ts";
 import {
+  getResolutionAudit,
+  getAllResolutionAudits,
+  analyzeCustomResolutionText,
+  renderResolutionRiskPageHtml,
+} from "./resolution-rulebook-engine.ts";
+import {
+  getCrossVenueDiscrepancies,
+  computeCustomCrossVenueSpread,
+  renderCrossVenueScannerPageHtml,
+} from "./cross-venue-scanner.ts";
+import {
   evaluateForecastComparison,
   getMockProspectiveStudyCohort,
   summarizeCohortEvaluation,
@@ -2621,6 +2632,60 @@ app.get("/api/history/download", (req, res) => {
   res.setHeader("Content-Disposition", `attachment; filename="${meta.filename}"`);
   const stream = fs.createReadStream(filePath);
   stream.pipe(res);
+});
+
+// Strategic Move #9: The "Resolution Rulebook" Engine (Anti-Dispute AI)
+app.get(["/resolution-risk", "/anti-dispute", "/oracle-guardian"], (req, res) => {
+  const marketId = typeof req.query.market === "string" ? req.query.market : undefined;
+  res.type("html").send(renderResolutionRiskPageHtml(marketId));
+});
+
+app.get("/api/resolution/audit", (req, res) => {
+  const marketId = typeof req.query.market === "string" ? req.query.market : "FED-FUNDS-RATE-CUT-2026";
+  const audit = getResolutionAudit(marketId);
+  if (!audit) {
+    res.status(404).json({ error: "Market audit not found", availableMarkets: getAllResolutionAudits().map(a => a.marketId) });
+    return;
+  }
+  res.json({ success: true, audit });
+});
+
+app.post("/api/resolution/analyze", express.json(), (req, res) => {
+  const { title, resolutionText, primarySourceUrl, venue } = req.body;
+  if (!title || !resolutionText) {
+    res.status(400).json({ error: "Missing required fields: title, resolutionText" });
+    return;
+  }
+  const audit = analyzeCustomResolutionText({
+    title,
+    resolutionText,
+    primarySourceUrl,
+    venue: venue === "polymarket" ? "polymarket" : "kalshi"
+  });
+  res.json({ success: true, audit });
+});
+
+// Strategic Move #10: Cross-Platform Discrepancy & Net Spread Scanner (Polymarket vs. Kalshi)
+app.get(["/scanner", "/cross-venue-scanner", "/spread-scanner"], (req, res) => {
+  const cat = typeof req.query.cat === "string" ? req.query.cat : undefined;
+  res.type("html").send(renderCrossVenueScannerPageHtml(cat));
+});
+
+app.get("/api/scanner/discrepancies", (req, res) => {
+  const cat = typeof req.query.cat === "string" ? req.query.cat : undefined;
+  const discrepancies = getCrossVenueDiscrepancies(cat);
+  res.json({ success: true, count: discrepancies.length, discrepancies });
+});
+
+app.post("/api/scanner/calculate", express.json(), (req, res) => {
+  const { kalshiPriceCents, polymarketPriceCents, contracts, settlementMatchCategory } = req.body;
+  const result = computeCustomCrossVenueSpread({
+    kalshiPriceCents: Number(kalshiPriceCents ?? 50),
+    polymarketPriceCents: Number(polymarketPriceCents ?? 50),
+    contracts: contracts ? Number(contracts) : undefined,
+    settlementMatchCategory
+  });
+  res.json({ success: true, result });
 });
 
 // Validated Forecast Comparison & Prospective Outcome Evaluation (90-Day Plan Build Order #6)

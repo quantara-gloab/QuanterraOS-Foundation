@@ -18,6 +18,15 @@ import {
   simulateRealisticPaperOrder,
   compareRealisticVsFantasyPaper,
 } from "./realistic-paper-mode.ts";
+import {
+  getResolutionAudit,
+  getAllResolutionAudits,
+  analyzeCustomResolutionText,
+} from "./resolution-rulebook-engine.ts";
+import {
+  getCrossVenueDiscrepancies,
+  computeCustomCrossVenueSpread,
+} from "./cross-venue-scanner.ts";
 
 /**
  * Model Context Protocol (MCP) Manifest & Agent Integration Layer
@@ -219,6 +228,28 @@ export const MCP_SERVER_MANIFEST = {
           contracts: { type: "number", description: "Number of contracts" },
           limitPriceCents: { type: "number", description: "Limit price in cents (optional)" },
           simulatedLatencyMs: { type: "number", default: 150, description: "Simulated network latency in milliseconds" }
+        }
+      }
+    },
+    {
+      name: "audit_resolution_rules",
+      description: "Executes Strategic Move #9 Anti-Dispute AI analysis on prediction market contract resolution clauses, calculating clause ambiguity scores, identifying loopholes, and estimating UMA dispute risks.",
+      parameters: {
+        type: "object",
+        properties: {
+          marketId: { type: "string", description: "Market identifier (e.g. FED-FUNDS-RATE-CUT-2026, US-CPI-HEADLINE-OCT26, KXBTC15M-SETTLEMENT-INDEX, GEOPOLITICAL-CEASEFIRE-DEC26)" },
+          customTitle: { type: "string", description: "Optional custom contract title" },
+          customResolutionText: { type: "string", description: "Optional raw resolution clause text to audit" }
+        }
+      }
+    },
+    {
+      name: "scan_cross_venue_discrepancies",
+      description: "Executes Strategic Move #10 Cross-Platform Discrepancy & Net Spread Scanner across Kalshi and Polymarket, calculating gross spreads, deducting fees, and evaluating oracle hazards.",
+      parameters: {
+        type: "object",
+        properties: {
+          category: { type: "string", enum: ["all", "macro", "crypto", "elections"], default: "all", description: "Category filter" }
         }
       }
     }
@@ -783,6 +814,36 @@ export async function executeMcpTool(name: string, params: Record<string, any> =
       });
 
       return comparison;
+    }
+    case "audit_resolution_rules": {
+      const marketId = params.marketId ? String(params.marketId) : undefined;
+      const customText = params.customResolutionText ? String(params.customResolutionText) : undefined;
+      const customTitle = params.customTitle ? String(params.customTitle) : "Custom Prediction Contract";
+
+      if (customText) {
+        return analyzeCustomResolutionText({
+          title: customTitle,
+          resolutionText: customText,
+        });
+      }
+
+      const audit = marketId ? getResolutionAudit(marketId) : getResolutionAudit("FED-FUNDS-RATE-CUT-2026");
+      if (!audit) {
+        return {
+          error: "Market audit not found",
+          availableMarkets: getAllResolutionAudits().map(a => a.marketId),
+        };
+      }
+      return audit;
+    }
+    case "scan_cross_venue_discrepancies": {
+      const category = params.category ? String(params.category).toLowerCase() : "all";
+      const discrepancies = getCrossVenueDiscrepancies(category);
+      return {
+        category,
+        totalPairsScanned: discrepancies.length,
+        discrepancies,
+      };
     }
     default:
       throw new Error(`Unknown MCP tool: ${name}`);
