@@ -1500,8 +1500,158 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     gap: 10px;
     transition: border-color 0.2s;
   }
-  .pillar-card:hover {
-    border-color: rgba(212, 175, 55, 0.35);
+  /* Contender Battlecard Matrix */
+  .battlecard-matrix-wrap {
+    margin-top: 32px;
+    background: rgba(12, 16, 25, 0.75);
+    border: 1px solid rgba(223, 184, 67, 0.28);
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  }
+  .battlecard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .battlecard-tabs {
+    display: flex;
+    gap: 6px;
+    background: rgba(6, 8, 12, 0.8);
+    padding: 4px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .battlecard-tab {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .battlecard-tab.active {
+    background: rgba(223, 184, 67, 0.18);
+    color: var(--champagne);
+    font-weight: 700;
+  }
+  .battlecard-table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .battlecard-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    text-align: left;
+  }
+  .battlecard-table th {
+    background: rgba(20, 27, 40, 0.7);
+    padding: 12px 16px;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 1px solid rgba(223, 184, 67, 0.2);
+  }
+  .battlecard-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  .battlecard-table tr:hover td {
+    background: rgba(223, 184, 67, 0.03);
+  }
+  .battlecard-dim-title {
+    font-weight: 700;
+    color: #FFFFFF;
+    margin-bottom: 4px;
+  }
+  .battlecard-dim-sub {
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+  .badge-superior {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    color: #10B981;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-bottom: 6px;
+  }
+  .badge-vuln {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(244, 63, 94, 0.12);
+    border: 1px solid rgba(244, 63, 94, 0.35);
+    color: #FDA4AF;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-bottom: 6px;
+  }
+
+  /* Hero Contender Proof Strip */
+  .hero-contender-proof-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+    margin-top: 24px;
+    width: 100%;
+  }
+  .proof-pill {
+    background: rgba(14, 20, 30, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    transition: border-color 0.2s ease;
+  }
+  .proof-pill:hover {
+    border-color: rgba(223, 184, 67, 0.35);
+  }
+  .proof-pill-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.76rem;
+    color: #FFFFFF;
+  }
+  .proof-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+  .proof-dot.gold { background: #DFB843; box-shadow: 0 0 6px #DFB843; }
+  .proof-dot.green { background: #10B981; box-shadow: 0 0 6px #10B981; }
+  .proof-dot.blue { background: #38BDF8; box-shadow: 0 0 6px #38BDF8; }
+  .proof-dot.amber { background: #F59E0B; box-shadow: 0 0 6px #F59E0B; }
+  .proof-sub {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--muted);
   }
 </style>
 </head>
@@ -1705,6 +1855,35 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
           <a href="/paper" class="btn-secondary" style="border-color:rgba(16,185,129,0.4); color:#10B981;">
             Realistic Paper Mode &rarr;
           </a>
+        <div class="hero-contender-proof-strip">
+          <div class="proof-pill">
+            <div class="proof-pill-header">
+              <span class="proof-dot gold"></span>
+              <strong>1,316 Settled Contracts</strong>
+            </div>
+            <span class="proof-sub">0.2001 Brier Benchmark Verified</span>
+          </div>
+          <div class="proof-pill">
+            <div class="proof-pill-header">
+              <span class="proof-dot green"></span>
+              <strong>Rule B5 Circuit Breaker</strong>
+            </div>
+            <span class="proof-sub">$0.00 Live Risk &bull; $10k Sandbox</span>
+          </div>
+          <div class="proof-pill">
+            <div class="proof-pill-header">
+              <span class="proof-dot blue"></span>
+              <strong>100% Venue-Neutral</strong>
+            </div>
+            <span class="proof-sub">Zero Exchange Kickbacks</span>
+          </div>
+          <div class="proof-pill">
+            <div class="proof-pill-header">
+              <span class="proof-dot amber"></span>
+              <strong>Anti-Dispute AI</strong>
+            </div>
+            <span class="proof-sub">UMA Loophole &amp; Basis Audit</span>
+          </div>
         </div>
 
         <div style="background: rgba(14, 20, 30, 0.7); border: 1px solid rgba(212, 175, 55, 0.25); border-radius: 6px; padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 24px; width: 100%; font-family: var(--font-mono); font-size: 0.74rem;">
@@ -2404,36 +2583,281 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
           </div>
         </div>
 
-        <!-- 6-Competitor Dossier Summary Strip -->
-        <div style="margin-top:24px; display:grid; grid-template-columns:repeat(3, 1fr); gap:12px;">
-          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:12px;">
-            <div style="font-size:0.8rem; font-weight:700; color:#FFFFFF;">Verso &bull; verso.finance</div>
-            <div style="font-size:0.72rem; color:#F43F5E; margin:2px 0;">Fatal Flaw: Friction Blindness</div>
+        <!-- Architectural Contender Battlecard Matrix -->
+        <div class="battlecard-matrix-wrap">
+          <div class="battlecard-header">
+            <div>
+              <span style="font-family:var(--font-mono); font-size:0.7rem; color:var(--champagne); text-transform:uppercase; font-weight:700; letter-spacing:0.08em;">
+                ARCHITECTURAL SUPERIORITY // 2026 BENCHMARK MATRIX
+              </span>
+              <div style="font-size:1.15rem; font-weight:700; color:#FFFFFF; margin-top:2px;">
+                Why QuanterraOS Leads the Field
+              </div>
+            </div>
+            <div class="battlecard-tabs">
+              <button type="button" class="battlecard-tab active" data-cat="all" onclick="filterBattlecard('all')">All Dimensions</button>
+              <button type="button" class="battlecard-tab" data-cat="prediction" onclick="filterBattlecard('prediction')">Prediction Terminals</button>
+              <button type="button" class="battlecard-tab" data-cat="governance" onclick="filterBattlecard('governance')">AI Governance</button>
+            </div>
+          </div>
+
+          <div class="battlecard-table-scroll">
+            <table class="battlecard-table">
+              <thead>
+                <tr>
+                  <th style="width:24%;">Evaluation Dimension</th>
+                  <th style="width:36%;">Traditional Incumbents (Oddpool, Stand, Verso, Credo)</th>
+                  <th style="width:40%;">QuanterraOS Sovereign Architecture</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="battlecard-row" data-cat="prediction">
+                  <td>
+                    <div class="battlecard-dim-title">Taker Fee Drag &amp; Net Spreads</div>
+                    <div class="battlecard-dim-sub">Exchange Friction Economics</div>
+                  </td>
+                  <td>
+                    <span class="badge-vuln">FRICTION BLIND</span>
+                    <div style="color:var(--muted); font-size:0.8rem;">
+                      Displays nominal spreads, concealing Kalshi's parabolic taker fee ($0.07 &times; p &times; (1-p)) and Polygon gas. Pushes users into trades that mathematically lose money after fills.
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge-superior">100% EXECUTABLE TRUTH</span>
+                    <div style="color:#FFF; font-size:0.82rem; font-weight:600;">
+                      Parabolic Fee Deduction Engine
+                    </div>
+                    <div style="color:var(--muted); font-size:0.8rem; margin-top:2px;">
+                      Live Discrepancy Scanner (<a href="/scanner" style="color:var(--champagne);">/scanner</a>) deducts exact taker fees and gas before trade entry. Proves naive trading loses -2.15¢/contract.
+                    </div>
+                  </td>
+                </tr>
+
+                <tr class="battlecard-row" data-cat="prediction">
+                  <td>
+                    <div class="battlecard-dim-title">Calibration &amp; Track Record</div>
+                    <div class="battlecard-dim-sub">Statistical Verification</div>
+                  </td>
+                  <td>
+                    <span class="badge-vuln">UNCALIBRATED HYPE</span>
+                    <div style="color:var(--muted); font-size:0.8rem;">
+                      Claims subjective "89% win rates" or LLM letter grades (A+, B) without pre-registered predictions, Brier decomposition, or out-of-sample walk-forward validation.
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge-superior">RADICAL TRANSPARENCY</span>
+                    <div style="color:#FFF; font-size:0.82rem; font-weight:600;">
+                      Empirical Murphy Brier Decomposition
+                    </div>
+                    <div style="color:var(--muted); font-size:0.8rem; margin-top:2px;">
+                      Audited Proof Ledger (<a href="/track-record" style="color:var(--champagne);">/track-record</a>) across 1,316 settled windows (0.2001 market vs 0.2063 model) with 64-char cryptographic SHA-256 fingerprints.
+                    </div>
+                  </td>
+                </tr>
+
+                <tr class="battlecard-row" data-cat="prediction">
+                  <td>
+                    <div class="battlecard-dim-title">Dispute &amp; Oracle Hazard AI</div>
+                    <div class="battlecard-dim-sub">Resolution Rulebook Integrity</div>
+                  </td>
+                  <td>
+                    <span class="badge-vuln">BLIND EXECUTION</span>
+                    <div style="color:var(--muted); font-size:0.8rem;">
+                      Zero analysis of contract resolution clauses; routes orders blindly into ambiguous wording that gets contested in UMA oracle votes or Kalshi rulebook disputes.
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge-superior">ANTI-DISPUTE AI AUDIT</span>
+                    <div style="color:#FFF; font-size:0.82rem; font-weight:600;">
+                      NLP Clause Ambiguity Scoring
+                    </div>
+                    <div style="color:var(--muted); font-size:0.8rem; margin-top:2px;">
+                      Anti-Dispute AI Auditor (<a href="/resolution-risk" style="color:var(--champagne);">/resolution-risk</a>) parses legal clauses, detects loopholes, and computes empirical UMA dispute probabilities pre-trade.
+                    </div>
+                  </td>
+                </tr>
+
+                <tr class="battlecard-row" data-cat="prediction">
+                  <td>
+                    <div class="battlecard-dim-title">Capital Safety &amp; Ruin Prevention</div>
+                    <div class="battlecard-dim-sub">Position Sizing &amp; Circuit Breakers</div>
+                  </td>
+                  <td>
+                    <span class="badge-vuln">RETAIL RUIN RISK</span>
+                    <div style="color:var(--muted); font-size:0.8rem;">
+                      Pushes automated copy-trading into high slippage; promotes naive Kelly sizing that ignores estimation error and carries >50% drawdown risk.
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge-superior">CIRCUIT BREAKER PRESERVATION</span>
+                    <div style="color:#FFF; font-size:0.82rem; font-weight:600;">
+                      Rule B5 Locked Standby ($0.00 Live Risk)
+                    </div>
+                    <div style="color:var(--muted); font-size:0.8rem; margin-top:2px;">
+                      Practice safely in our Realistic Paper Simulator (<a href="/paper" style="color:var(--champagne);">/paper</a>) with $10,000 USD sandbox wallet and Brier-shrunk fractional Kelly sizing.
+                    </div>
+                  </td>
+                </tr>
+
+                <tr class="battlecard-row" data-cat="prediction">
+                  <td>
+                    <div class="battlecard-dim-title">Venue Neutrality &amp; Independence</div>
+                    <div class="battlecard-dim-sub">Conflict of Interest</div>
+                  </td>
+                  <td>
+                    <span class="badge-vuln">PLATFORM CAPTURED</span>
+                    <div style="color:var(--muted); font-size:0.8rem;">
+                      Dome was acquired by Polymarket (Feb 2026); Oddpool was acquired by Kalshi (Sep 2026). Their analytics are captured by venue commercial interests and volume quotas.
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge-superior">100% SOVEREIGN REFEREE</span>
+                    <div style="color:#FFF; font-size:0.82rem; font-weight:600;">
+                      Zero Exchange Equity or Kickbacks
+                    </div>
+                    <div style="color:var(--muted); font-size:0.8rem; margin-top:2px;">
+                      Independent measurement system powered by an 8-Specialist Council. Uncompromised auditor of spreads, basis differences, and execution friction.
+                    </div>
+                  </td>
+                </tr>
+
+                <tr class="battlecard-row" data-cat="prediction">
+                  <td>
+                    <div class="battlecard-dim-title">Open Data &amp; Academic Integrity</div>
+                    <div class="battlecard-dim-sub">Research Accessibility</div>
+                  </td>
+                  <td>
+                    <span class="badge-vuln">EXPENSIVE PAYWALLS</span>
+                    <div style="color:var(--muted); font-size:0.8rem;">
+                      Locks historical settlement candles and decile tables behind expensive enterprise paywalls or closed bespoke APIs.
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge-superior">OPEN RESEARCH COMMONS</span>
+                    <div style="color:#FFF; font-size:0.82rem; font-weight:600;">
+                      CC-BY-4.0 Canonical Datasets Hub
+                    </div>
+                    <div style="color:var(--muted); font-size:0.8rem; margin-top:2px;">
+                      Download 19,740 1-minute settled candles and calibration decile tables (<a href="/datasets" style="color:var(--champagne);">/datasets</a>) in CSV and JSONL with SHA-256 provenance hashes.
+                    </div>
+                  </td>
+                </tr>
+
+                <tr class="battlecard-row" data-cat="governance">
+                  <td>
+                    <div class="battlecard-dim-title">AI Governance Methodology</div>
+                    <div class="battlecard-dim-sub">Model Auditing Approach</div>
+                  </td>
+                  <td>
+                    <span class="badge-vuln">QUALITATIVE SURVEY TRAP</span>
+                    <div style="color:var(--muted); font-size:0.8rem;">
+                      Credo AI and Holistic AI rely on manual checklists, subjective questionnaires, and static point-in-time PDFs without empirical mathematical proof.
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge-superior">MATHEMATICAL CALIBRATION PROOF</span>
+                    <div style="color:#FFF; font-size:0.82rem; font-weight:600;">
+                      TrustOS Empirical Audit Engine
+                    </div>
+                    <div style="color:var(--muted); font-size:0.8rem; margin-top:2px;">
+                      Replaces questionnaires with Murphy reliability-resolution decomposition, statistical drift tests, and automated adverse-action reason codes (<a href="/trustos" style="color:var(--champagne);">/trustos</a>).
+                    </div>
+                  </td>
+                </tr>
+
+                <tr class="battlecard-row" data-cat="governance">
+                  <td>
+                    <div class="battlecard-dim-title">Statutory Legal Alignment</div>
+                    <div class="battlecard-dim-sub">Regulatory Examination</div>
+                  </td>
+                  <td>
+                    <span class="badge-vuln">GENERIC DRIFT METRICS</span>
+                    <div style="color:var(--muted); font-size:0.8rem;">
+                      Fiddler AI and Arize provide engineering graphs without explicit statutory mapping to state insurance bulletins or consumer credit laws.
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge-superior">EXAMINER-READY STATUTORY MAPPING</span>
+                    <div style="color:#FFF; font-size:0.82rem; font-weight:600;">
+                      NAIC, Colorado SB 26-189 &amp; ECOA Reg B
+                    </div>
+                    <div style="color:var(--muted); font-size:0.8rem; margin-top:2px;">
+                      Generates regulatory audit dossiers tailored directly for insurance commissioners, OCC/CFPB examiners, and bank risk committees.
+                    </div>
+                  </td>
+                </tr>
+
+                <tr class="battlecard-row" data-cat="governance">
+                  <td>
+                    <div class="battlecard-dim-title">Commercial Structure</div>
+                    <div class="battlecard-dim-sub">Engagement Speed &amp; Pricing</div>
+                  </td>
+                  <td>
+                    <span class="badge-vuln">$150K ACV / 6-MONTH CONSULTING</span>
+                    <div style="color:var(--muted); font-size:0.8rem;">
+                      Demands massive annual enterprise contracts ($100k-$250k/yr) and complex procurement before delivering any actionable audit evidence.
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge-superior">FIXED $20,000 / 6-WEEK PILOT</span>
+                    <div style="color:#FFF; font-size:0.82rem; font-weight:600;">
+                      Fixed-Price Scope &amp; Delivery
+                    </div>
+                    <div style="color:var(--muted); font-size:0.8rem; margin-top:2px;">
+                      Complete mathematical audit dossier in 6 weeks for a fixed $20k fee, with 100% credited toward annual deployment. Zero open-ended consulting.
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 9-Competitor Dossier Summary Strip -->
+        <div style="margin-top:24px; display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:12px;">
+          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:14px;">
+            <div style="font-size:0.82rem; font-weight:700; color:#FFFFFF;">Verso &bull; verso.finance</div>
+            <div style="font-size:0.72rem; color:#F43F5E; margin:3px 0; font-weight:600;">Fatal Flaw: Friction Blindness</div>
             <div style="font-size:0.72rem; color:var(--muted); line-height:1.4;">Hides $0.07&times;P(1-P) taker fee. Pushes high-frequency execution into retail churn.</div>
           </div>
-          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:12px;">
-            <div style="font-size:0.8rem; font-weight:700; color:#FFFFFF;">Oddpool &bull; oddpool.com</div>
-            <div style="font-size:0.72rem; color:#F43F5E; margin:2px 0;">Fatal Flaw: Platform Captured</div>
+          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:14px;">
+            <div style="font-size:0.82rem; font-weight:700; color:#FFFFFF;">Oddpool &bull; oddpool.com</div>
+            <div style="font-size:0.72rem; color:#F43F5E; margin:3px 0; font-weight:600;">Fatal Flaw: Platform Captured</div>
             <div style="font-size:0.72rem; color:var(--muted); line-height:1.4;">Acquired by Kalshi (Sep 2026). No longer an independent referee of spreads or fees.</div>
           </div>
-          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:12px;">
-            <div style="font-size:0.8rem; font-weight:700; color:#FFFFFF;">Dome &bull; domeapi.io</div>
-            <div style="font-size:0.72rem; color:#F43F5E; margin:2px 0;">Fatal Flaw: Platform Captured</div>
+          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:14px;">
+            <div style="font-size:0.82rem; font-weight:700; color:#FFFFFF;">Dome &bull; domeapi.io</div>
+            <div style="font-size:0.72rem; color:#F43F5E; margin:3px 0; font-weight:600;">Fatal Flaw: Platform Captured</div>
             <div style="font-size:0.72rem; color:var(--muted); line-height:1.4;">Acquired by Polymarket (Feb 2026). Locked into single venue; ignores CFTC compliance.</div>
           </div>
-          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:12px;">
-            <div style="font-size:0.8rem; font-weight:700; color:#FFFFFF;">Predly &bull; predly.ai</div>
-            <div style="font-size:0.72rem; color:#F43F5E; margin:2px 0;">Fatal Flaw: Uncalibrated AI Claims</div>
-            <div style="font-size:0.72rem; color:var(--muted); line-height:1.4;">Claims 89% accuracy scraping news. Market mid beats models (0.2001 vs 0.2063).</div>
-          </div>
-          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:12px;">
-            <div style="font-size:0.8rem; font-weight:700; color:#FFFFFF;">Stand.Trade &bull; stand.trade</div>
-            <div style="font-size:0.72rem; color:#F43F5E; margin:2px 0;">Fatal Flaw: Retail Churn Trap</div>
+          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:14px;">
+            <div style="font-size:0.82rem; font-weight:700; color:#FFFFFF;">Stand.Trade &bull; stand.trade</div>
+            <div style="font-size:0.72rem; color:#F43F5E; margin:3px 0; font-weight:600;">Fatal Flaw: Retail Churn Trap</div>
             <div style="font-size:0.72rem; color:var(--muted); line-height:1.4;">Promotes copy-trading whales hedging basis off-exchange without risk plans.</div>
           </div>
-          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:12px;">
-            <div style="font-size:0.8rem; font-weight:700; color:#FFFFFF;">Unusual Whales</div>
-            <div style="font-size:0.72rem; color:#F43F5E; margin:2px 0;">Fatal Flaw: Superficial Alerts</div>
+          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:14px;">
+            <div style="font-size:0.82rem; font-weight:700; color:#FFFFFF;">The 7 Oracles &bull; 7oracles.io</div>
+            <div style="font-size:0.72rem; color:#F43F5E; margin:3px 0; font-weight:600;">Fatal Flaw: Naive Kelly Over-Betting</div>
+            <div style="font-size:0.72rem; color:var(--muted); line-height:1.4;">Assumes uncalibrated win rates; pushes full-Kelly sizing carrying &gt;50% ruin risk.</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:14px;">
+            <div style="font-size:0.82rem; font-weight:700; color:#FFFFFF;">PillarLab AI &bull; pillarlab.ai</div>
+            <div style="font-size:0.72rem; color:#F43F5E; margin:3px 0; font-weight:600;">Fatal Flaw: LLM Hallucinations</div>
+            <div style="font-size:0.72rem; color:var(--muted); line-height:1.4;">Assigns subjective letter grades (A+, B) with zero Brier calibration or pre-registration.</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:14px;">
+            <div style="font-size:0.82rem; font-weight:700; color:#FFFFFF;">OddsPipe &bull; oddspipe.com</div>
+            <div style="font-size:0.72rem; color:#F43F5E; margin:3px 0; font-weight:600;">Fatal Flaw: Paywalled Passive Dump</div>
+            <div style="font-size:0.72rem; color:var(--muted); line-height:1.4;">Passive CSV dump behind steep paywalls without real-time UMA dispute surveillance.</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:14px;">
+            <div style="font-size:0.82rem; font-weight:700; color:#FFFFFF;">Predly &bull; predly.ai</div>
+            <div style="font-size:0.72rem; color:#F43F5E; margin:3px 0; font-weight:600;">Fatal Flaw: Uncalibrated AI Claims</div>
+            <div style="font-size:0.72rem; color:var(--muted); line-height:1.4;">Claims 89% accuracy scraping news. Market mid beats models (0.2001 vs 0.2063).</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:14px;">
+            <div style="font-size:0.82rem; font-weight:700; color:#FFFFFF;">Unusual Whales</div>
+            <div style="font-size:0.72rem; color:#F43F5E; margin:3px 0; font-weight:600;">Fatal Flaw: Superficial Alerts</div>
             <div style="font-size:0.72rem; color:var(--muted); line-height:1.4;">Alerts on raw block sizes without contract delta, TWAP context, or fee drag audits.</div>
           </div>
         </div>
@@ -3456,6 +3880,25 @@ function applyHomeCrossPreset(preset) {
     netEl.style.color = net >= 0 ? '#DFB843' : '#F43F5E';
   }
   if (dragEl) dragEl.textContent = drag.toFixed(1) + '% consumed by exchange fees';
+}
+
+function filterBattlecard(cat) {
+  var rows = document.querySelectorAll('.battlecard-row');
+  var tabs = document.querySelectorAll('.battlecard-tab');
+  tabs.forEach(function(t) {
+    if (t.getAttribute('data-cat') === cat) {
+      t.classList.add('active');
+    } else {
+      t.classList.remove('active');
+    }
+  });
+  rows.forEach(function(r) {
+    if (cat === 'all' || r.getAttribute('data-cat') === cat) {
+      r.style.display = '';
+    } else {
+      r.style.display = 'none';
+    }
+  });
 }
 
 if (document.readyState === 'loading') {

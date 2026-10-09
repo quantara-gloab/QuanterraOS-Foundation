@@ -84,4 +84,29 @@ describe("Landing Page — 90-Day Execution Roadmap & Microstructure Cockpit Ver
     assert.ok(html.includes('id="home-out-real-hurdle"'));
     assert.ok(html.includes('href="/why"'));
   });
+
+  it("5. Contender Matrix & Hero Proof Strip: verifies leading contender architectural superiority", () => {
+    // Hero proof strip
+    assert.ok(html.includes("hero-contender-proof-strip"));
+    assert.ok(html.includes("1,316 Settled Contracts"));
+    assert.ok(html.includes("0.2001 Brier Benchmark Verified"));
+    assert.ok(html.includes("100% Venue-Neutral"));
+
+    // Battlecard matrix
+    assert.ok(html.includes("ARCHITECTURAL SUPERIORITY // 2026 BENCHMARK MATRIX"));
+    assert.ok(html.includes("Why QuanterraOS Leads the Field"));
+    assert.ok(html.includes("battlecard-matrix-wrap"));
+    assert.ok(html.includes("filterBattlecard"));
+    assert.ok(html.includes("Parabolic Fee Deduction Engine"));
+    assert.ok(html.includes("Empirical Murphy Brier Decomposition"));
+    assert.ok(html.includes("Anti-Dispute AI Auditor"));
+    assert.ok(html.includes("CC-BY-4.0 Canonical Datasets Hub"));
+
+    // Key Competitors represented
+    assert.ok(html.includes("Oddpool"));
+    assert.ok(html.includes("Stand.Trade"));
+    assert.ok(html.includes("The 7 Oracles"));
+    assert.ok(html.includes("PillarLab AI"));
+    assert.ok(html.includes("OddsPipe"));
+  });
 });

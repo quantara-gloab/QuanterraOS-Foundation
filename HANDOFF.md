@@ -1412,4 +1412,28 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
       - 11 automated tests validating Murphy decomposition, 64-char SHA-256 hashes, category/outcome filtering, CSV export, SVG generation, HTML rendering, MCP execution, social broadcasts, and strict Rule B4/B5/B10 compliance.
     - *Verification*: `npx tsc --noEmit` clean 0 errors; full test suite `npm test` **540/540 passing across 120 suites (0 failures)**.
 
+14. **Sovereign Contender Battlecard & Leading Positioning Matrix (`src/landing-page.ts`, `src/__tests__/landing-page-cockpit.test.ts`)**:
+    - *Solves user problem*: Establishes QuanterraOS as the undisputed leading contender over acquired, black-box, and friction-blind incumbents across Prediction Markets (Oddpool, Stand.Trade, PillarLab AI, The 7 Oracles, OddsPipe, Verso) and Enterprise AI Governance (Credo AI, Fiddler, Arize).
+    - *Hero Contender Proof Strip*:
+      - Integrated instant credibility badges directly beneath the hero CTAs:
+        - 1,316 Settled Contracts Audited (0.2001 Brier Benchmark Verified)
+        - Rule B5 Circuit Breaker ($0.00 Live Risk • $10,000 Sandbox Wallet)
+        - 100% Venue-Neutral Sovereign Referee (Zero Exchange Ownership or Kickbacks)
+        - Anti-Dispute AI (UMA Loophole & Resolution Rulebook Audit)
+    - *Architectural Contender Battlecard Matrix (`#why-quanterraos-showcase`)*:
+      - Interactive 3-way tabbed comparison (`All Dimensions`, `Prediction Terminals`, `AI Governance`):
+        - **Taker Fee Drag**: Parabolic curve ($0.07 × p × (1-p)) deduction vs competitor friction-blindness.
+        - **Model Calibration**: Murphy Brier decomposition across 1,316 settled windows vs uncalibrated "89% accuracy" or LLM letter grades.
+        - **Dispute & Oracle Hazard**: Pre-trade NLP loophole detection & UMA dispute probabilities vs blind order execution.
+        - **Capital Safety**: Rule B5 circuit breaker ($0.00 live exposure) + Brier-shrunk fractional Kelly vs live copy-trading ruin.
+        - **Data Transparency**: CC-BY-4.0 Open Datasets (19,740 candles) in CSV/JSONL vs closed paywalls.
+        - **Sovereign Independence**: 100% unconflicted referee vs venue-acquired platforms (Oddpool by Kalshi, Dome by Polymarket).
+        - **AI Model Governance (TrustOS)**: Mathematical calibration proof vs qualitative GRC questionnaires; statutory legal citations (Colorado SB 26-189, NAIC AI Bulletin, ECOA Reg B); and fixed $20,000 / 6-week turnaround vs $150k ACVs.
+    - *Expanded 9-Competitor Dossier Strip*:
+      - Detailed fatal flaw and Quanterra asymmetric advantage for: Verso, Oddpool, Dome, Stand.Trade, The 7 Oracles, PillarLab AI, OddsPipe, Predly, and Unusual Whales.
+    - *Dedicated Acceptance Test Suite*:
+      - Added Test 5 to `src/__tests__/landing-page-cockpit.test.ts` verifying all matrix elements, tabs, and competitor coverage.
+    - *Verification*: `npx tsc --noEmit` clean 0 errors; full test suite `npm test` **541/541 passing across 120 suites (0 failures)**.
+
+
 
