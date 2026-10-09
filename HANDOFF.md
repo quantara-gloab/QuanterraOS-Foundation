@@ -1435,5 +1435,21 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
       - Added Test 5 to `src/__tests__/landing-page-cockpit.test.ts` verifying all matrix elements, tabs, and competitor coverage.
     - *Verification*: `npx tsc --noEmit` clean 0 errors; full test suite `npm test` **541/541 passing across 120 suites (0 failures)**.
 
+15. **Quantitative 15-Minute & 1-Hour Bitcoin AI Engine & Antigravity/MindsDB Integration (`scripts/btc_kalshi_engine.py`, `src/growth/email.ts`)**:
+    - *Solves user problem*: Provides turnkey algorithmic prediction and verification for short-duration Bitcoin contracts (`KXBTC15M` 15-minute and `KXBTCD` 1-hour series), bridgeable to Python and MindsDB / Antigravity data environments.
+    - *15M & 1H Algorithmic Architecture (`scripts/btc_kalshi_engine.py`)*:
+      - **15-Minute Above/Below (`KXBTC15M`)**: Fetches active window, computes time to expiry ($\tau$), evaluates continuous barrier drift against open strike, and shrinks raw model probability toward the empirical market mid-price ($0.35 \times P_{\text{model}} + 0.65 \times P_{\text{market}}$) based on the 1,316-window Murphy Brier decomposition benchmark.
+      - **1-Hour Multi-Strike Ladder (`KXBTCD`)**: Evaluates full strike ladder (80+ strikes) spaced around current composite spot ($85,520), calculating implied probabilities, distance in bps, and non-linear taker fees for each strike.
+      - **Kalshi Non-Linear Fee Accounting**: Computes exact exchange friction $\lceil 0.07 \times P \times (1-P) \rceil$ (max $1.75¢$ at 50¢ for takers) and incorporates the 75% maker limit order discount (max $0.44¢$ at 50¢).
+      - **Net EV Hurdle Gate**: Recommends order placement (`BUY_YES`, `BUY_NO`, or `HOLD / LOCKED_STANDBY`) only when expected value strictly exceeds the entry price plus exchange fee by a configurable hurdle (default 1.5%).
+      - **Dual-Mode Order Execution**:
+        - `sandbox` (default, Rule B5 compliant): Deducts total cost from subscriber's $10,000 USD paper wallet, generates unique transaction hash, and stores auditable trade in `paper_trades`.
+        - `live`: Direct cryptographically signed RSA-PSS API submission to Kalshi, requiring `KALSHI_LIVE=true`, whitelisted operator email in `KALSHI_LIVE_OPERATOR_EMAILS`, and contract cap $\le 10$.
+    - *Antigravity / MindsDB SQL Compatibility*:
+      - Formulates standard `CREATE DATABASE`, `CREATE MODEL`, and `CREATE JOB` blueprints interfacing with `/api/kalshi/active` and `/api/kalshi/bid`.
+    - *Growth Multi-Touch Outreach Determinism Fix (`src/growth/email.ts`)*:
+      - Fixed `log()` to persist `nowIso(now)` to `outreach_log.at` instead of defaulting to SQLite `CURRENT_TIMESTAMP`, ensuring deterministic multi-day simulated test evaluation in `src/__tests__/growth.test.ts`.
+    - *Verification*: Full test suite `npm test` 541/541 passing across 120 suites; `npx tsc --noEmit` clean exit 0.
+
 
 
