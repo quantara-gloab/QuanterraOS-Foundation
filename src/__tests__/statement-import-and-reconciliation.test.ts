@@ -20,7 +20,10 @@ import { users, userDecisionJournal, importedStatementRecords } from "../schema.
 import { createUser } from "../auth.ts";
 import {
   previewKalshiStatement,
+  previewPolymarketStatement,
+  previewStatementCsv,
   commitKalshiStatement,
+  commitStatement,
   exportImportedStatementsCsv,
   deleteImportedStatements,
   getFinalizedPerformanceTotals,
@@ -279,5 +282,112 @@ kalshi_tx_103,KXSOL15M-T145,yes,buy,5,0.55,0.09,2.75,5.00,2.16,2026-10-07T01:10:
     process.env.FEATURE_STATEMENT_IMPORT = "true";
     const flagsEnabled = getFeatureFlags({});
     assert.equal(flagsEnabled.statementImport, true);
+  });
+
+  it("7. Polymarket CSV import preview: detects venue, maps tokens/USDC/gas, and prevents duplicate hash collisions", () => {
+    // Insert a Polymarket-oriented saved check
+    const polyCheckId = `jrn_poly_${randomUUID().slice(0, 8)}`;
+    db.insert(userDecisionJournal)
+      .values({
+        id: polyCheckId,
+        userId: testUserId,
+        venue: "polymarket",
+        contractTicker: "WILL-BTC-HIT-100K",
+        contractType: "binary_above_below",
+        side: "yes",
+        pricingBasis: "executable_orderbook",
+        contractPrice: 0.52,
+        contractCount: 50,
+        purchaseCost: 26.00,
+        exchangeFee: 0.01,
+        halfSpreadDrag: 0.0,
+        totalDrag: 0.0002,
+        breakevenWinProb: 52.02,
+        assessedWinProb: 58.0,
+        netExpectedValue: 0.06,
+        settlementSource: "UMA Optimistic Oracle",
+        decisionAction: "paper_trade",
+        status: "saved_check",
+        reconciliationStatus: "user_entered",
+        createdAt: "2026-10-07T00:55:00Z",
+        updatedAt: "2026-10-07T00:55:00Z",
+      })
+      .run();
+
+    const samplePolymarketCsv = `txHash,market,outcome,type,tokens,price,usdc,fee,date
+0x3a91f82c0192e478b123,WILL-BTC-HIT-100K,Yes,BUY,50,0.52,26.00,0.01,2026-10-07T01:30:00Z
+0x8c72190bb4129d23a542,ETH-ABOVE-4K-2026,No,BUY,25,0.47,11.75,0.01,2026-10-07T01:35:00Z`;
+
+    // Test automatic venue detection via previewStatementCsv
+    const preview = previewStatementCsv(samplePolymarketCsv, testUserId);
+    assert.equal(preview.success, true);
+    assert.equal(preview.detectedVenue, "polymarket");
+    assert.equal(preview.totalRows, 2);
+    assert.equal(preview.validRows.length, 2);
+    assert.equal(preview.validRows[0].venue, "polymarket");
+    assert.equal(preview.validRows[0].externalTradeId, "0x3a91f82c0192e478b123");
+    assert.equal(preview.validRows[0].quantity, 50);
+    assert.equal(preview.validRows[0].fillPrice, 0.52);
+    assert.equal(preview.validRows[0].fees, 0.01);
+    assert.equal(preview.totalFees, 0.02);
+    assert.equal(preview.totalOutlay, 37.77); // (26.00+0.01) + (11.75+0.01) = 37.77
+
+    // Verify suggested match to polyCheckId
+    assert.ok(preview.validRows[0].suggestedMatch);
+    assert.equal(preview.validRows[0].suggestedMatch?.journalId, polyCheckId);
+    assert.equal(preview.validRows[0].suggestedMatch?.confidence, "HIGH");
+
+    // Also verify dedicated previewPolymarketStatement function
+    const polyPreviewDirect = previewPolymarketStatement(samplePolymarketCsv, testUserId);
+    assert.equal(polyPreviewDirect.detectedVenue, "polymarket");
+    assert.equal(polyPreviewDirect.validRows.length, 2);
+  });
+
+  it("8. Multi-venue commit: commits Polymarket trades, attributes UMA oracle, prevents re-import duplicates", () => {
+    const polyTxCsv = `txHash,market,outcome,type,tokens,price,usdc,fee,date
+0xdeadbeef101,SOL-ABOVE-200-OCT26,Yes,BUY,100,0.60,60.00,0.02,2026-10-07T02:00:00Z`;
+
+    const preview = previewPolymarketStatement(polyTxCsv, testUserId);
+    assert.equal(preview.validRows.length, 1);
+
+    const commitResult = commitStatement(testUserId, preview.batchId, preview.validRows);
+    assert.equal(commitResult.success, true);
+    assert.equal(commitResult.importedCount, 1);
+    assert.equal(commitResult.skippedDuplicates, 0);
+
+    // Verify database record has venue: "polymarket" and settlementSource: "UMA Optimistic Oracle"
+    const importedRow = db
+      .select()
+      .from(importedStatementRecords)
+      .where(and(eq(importedStatementRecords.userId, testUserId), eq(importedStatementRecords.externalTradeId, "0xdeadbeef101")))
+      .get();
+    assert.ok(importedRow);
+    assert.equal(importedRow.venue, "polymarket");
+    assert.equal(importedRow.quantity, 100);
+    assert.equal(importedRow.fillPrice, 0.60);
+    assert.equal(importedRow.fees, 0.02);
+
+    const journalRow = db
+      .select()
+      .from(userDecisionJournal)
+      .where(and(eq(userDecisionJournal.userId, testUserId), eq(userDecisionJournal.contractTicker, "SOL-ABOVE-200-OCT26")))
+      .get();
+    assert.ok(journalRow);
+    assert.equal(journalRow.venue, "polymarket");
+    assert.equal(journalRow.settlementSource, "UMA Optimistic Oracle");
+    assert.equal(journalRow.pricingBasis, "executable_orderbook");
+
+    // Test re-import duplicate prevention for Polymarket
+    const reimportPreview = previewPolymarketStatement(polyTxCsv, testUserId);
+    assert.equal(reimportPreview.duplicateCount, 1);
+    assert.equal(reimportPreview.newRowsCount, 0);
+    assert.equal(reimportPreview.validRows[0].isDuplicate, true);
+
+    const reimportCommit = commitStatement(testUserId, reimportPreview.batchId, reimportPreview.validRows);
+    assert.equal(reimportCommit.importedCount, 0);
+    assert.equal(reimportCommit.skippedDuplicates, 1);
+
+    // Clean up created records
+    deleteImportedStatements(testUserId, preview.batchId);
   });
 });

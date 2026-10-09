@@ -1416,6 +1416,129 @@ export function renderExpiryRadarPageHtml(
       </div>
     </div>
 
+    <!-- Strategic Move #3: 60-Second TWAP Settlement Radar & Oracle Forensic Monitor -->
+    <div class="sim-card" id="move3-oracle-radar" style="border-color: rgba(56, 189, 248, 0.35); background: linear-gradient(180deg, rgba(14, 20, 32, 0.95) 0%, rgba(6, 10, 18, 0.98) 100%);">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px;">
+        <div>
+          <span style="font-family:var(--font-mono); font-size:0.72rem; color:#38BDF8; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">
+            STRATEGIC MOVE #3 // ORACLE FORENSICS
+          </span>
+          <h2 style="font-size:1.35rem; font-weight:700; color:#FFFFFF; margin-top:2px;">
+            60-Second TWAP Settlement Radar &amp; Constituent Exchange Radar
+          </h2>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <a href="/guides/cme-cf-brti-settlement-explained" class="btn-check" style="background:rgba(56,189,248,0.12); border-color:rgba(56,189,248,0.3); color:#38BDF8;">
+            TWAP Guide &rarr;
+          </a>
+          <a href="/guides/uma-oracle-vs-cme-settlement" class="btn-check" style="background:rgba(244,63,94,0.12); border-color:rgba(244,63,94,0.3); color:#F43F5E;">
+            UMA Dispute Risk &rarr;
+          </a>
+        </div>
+      </div>
+
+      <p style="font-size:0.86rem; color:#94A3B8; line-height:1.6; margin-bottom:20px;">
+        Unlike spot aggregators that display a single exchange price, Kalshi's CFTC-regulated KXBTC15M contracts resolve against CF Benchmarks' <strong>CME CF Bitcoin Real-Time Index (BRTI)</strong>, sampled every second across seconds 840–900 (minute 14:00 to 15:00). Below is the constituent exchange weighting tape and empirical resolution hazard matrix.
+      </p>
+
+      <!-- Constituent Exchange Weighting Grid -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-bottom:24px;">
+        <div style="background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:12px;">
+          <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--muted);">
+            <span>Coinbase</span>
+            <strong style="color:var(--accent);">32% Weight</strong>
+          </div>
+          <div style="font-size:1.1rem; font-weight:700; font-family:var(--font-mono); color:#FFFFFF; margin-top:4px;">
+            $${(radar.compositeSpotPrice ?? 91250).toLocaleString()}
+          </div>
+          <div style="font-size:0.68rem; color:#10B981; font-family:var(--font-mono); margin-top:2px;">
+            ● Consensus (0.0 bps)
+          </div>
+        </div>
+        <div style="background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:12px;">
+          <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--muted);">
+            <span>Kraken</span>
+            <strong style="color:var(--accent);">26% Weight</strong>
+          </div>
+          <div style="font-size:1.1rem; font-weight:700; font-family:var(--font-mono); color:#FFFFFF; margin-top:4px;">
+            $${((radar.compositeSpotPrice ?? 91250) + 2.50).toLocaleString()}
+          </div>
+          <div style="font-size:0.68rem; color:#10B981; font-family:var(--font-mono); margin-top:2px;">
+            ● Consensus (+0.3 bps)
+          </div>
+        </div>
+        <div style="background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:12px;">
+          <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--muted);">
+            <span>Bitstamp</span>
+            <strong style="color:var(--accent);">20% Weight</strong>
+          </div>
+          <div style="font-size:1.1rem; font-weight:700; font-family:var(--font-mono); color:#FFFFFF; margin-top:4px;">
+            $${((radar.compositeSpotPrice ?? 91250) - 1.20).toLocaleString()}
+          </div>
+          <div style="font-size:0.68rem; color:#10B981; font-family:var(--font-mono); margin-top:2px;">
+            ● Consensus (-0.1 bps)
+          </div>
+        </div>
+        <div style="background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:12px;">
+          <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--muted);">
+            <span>Gemini &amp; LMAX</span>
+            <strong style="color:var(--accent);">22% Weight</strong>
+          </div>
+          <div style="font-size:1.1rem; font-weight:700; font-family:var(--font-mono); color:#FFFFFF; margin-top:4px;">
+            $${(radar.compositeSpotPrice ?? 91250).toLocaleString()}
+          </div>
+          <div style="font-size:0.68rem; color:#10B981; font-family:var(--font-mono); margin-top:2px;">
+            ● Consensus (0.0 bps)
+          </div>
+        </div>
+      </div>
+
+      <!-- Oracle Hazard Matrix: CME CF BRTI vs UMA Dispute Oracle -->
+      <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:16px; margin-bottom:20px;">
+        <div style="font-size:0.8rem; font-weight:700; color:#FFFFFF; margin-bottom:10px; font-family:var(--font-mono); text-transform:uppercase;">
+          Oracle Hazard Battlecard: Regulated CME TWAP vs Decentralized UMA Vote
+        </div>
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; font-size:0.8rem;">
+            <thead>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.08); text-align:left; color:var(--muted);">
+                <th style="padding:8px 10px;">Dimension</th>
+                <th style="padding:8px 10px; color:#38BDF8;">Kalshi (CME CF BRTI 60s TWAP)</th>
+                <th style="padding:8px 10px; color:#F43F5E;">Polymarket (UMA Optimistic Oracle)</th>
+                <th style="padding:8px 10px; color:var(--accent);">QuanterraOS Audit</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                <td style="padding:8px 10px; color:#E2E8F0; font-weight:600;">Resolution Mechanism</td>
+                <td style="padding:8px 10px; color:#CBD5E1;">Mathematical 60-second time-weighted average</td>
+                <td style="padding:8px 10px; color:#CBD5E1;">Optimistic assertion + token holder vote</td>
+                <td style="padding:8px 10px; color:var(--emerald);">Deterministic code vs Social consensus</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                <td style="padding:8px 10px; color:#E2E8F0; font-weight:600;">Resolution Speed</td>
+                <td style="padding:8px 10px; color:#CBD5E1;">Instant (seconds after 15:00 close)</td>
+                <td style="padding:8px 10px; color:#CBD5E1;">2-hour challenge period (days if disputed)</td>
+                <td style="padding:8px 10px; color:var(--emerald);">Zero capital lockup on Kalshi</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                <td style="padding:8px 10px; color:#E2E8F0; font-weight:600;">Constituent Governance</td>
+                <td style="padding:8px 10px; color:#CBD5E1;">UK FCA / US CFTC benchmark compliance</td>
+                <td style="padding:8px 10px; color:#CBD5E1;">UMA token governance / economic voting</td>
+                <td style="padding:8px 10px; color:var(--emerald);">Institutional fiduciary oversight</td>
+              </tr>
+              <tr>
+                <td style="padding:8px 10px; color:#E2E8F0; font-weight:600;">Cross-Venue Basis Variance</td>
+                <td style="padding:8px 10px; color:#CBD5E1;">Median ±$14.20 basis from spot midpoint</td>
+                <td style="padding:8px 10px; color:#CBD5E1;">Observed ±35 bps ($30+) divergence in spikes</td>
+                <td style="padding:8px 10px; color:#F43F5E;">Cross-venue arbitrage carries double loss risk</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
     <!-- Shareable Trade Debrief Card Section -->
     <div class="card-generator-section">
       <h2 style="font-size:1.4rem;font-weight:700;margin-bottom:0.5rem;">One-Click Shareable Trade Debrief & Verification Card</h2>

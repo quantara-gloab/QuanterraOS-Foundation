@@ -204,4 +204,16 @@ describe("Expiry Radar & Microstructure Terminal Engine", () => {
     assert.ok(ladderHtml.includes("ASKS (SELL OFFERS)"));
     assert.ok(ladderHtml.includes("Maker vs. Taker Hurdle"));
   });
+
+  it("9. Strategic Move #3: 60-Second TWAP & Oracle Forensics verification", () => {
+    const radar = computeExpiryRadarState({ series: "15m", spotPrice: 91250 });
+    const pageHtml = renderExpiryRadarPageHtml(radar);
+
+    assert.ok(pageHtml.includes("STRATEGIC MOVE #3 // ORACLE FORENSICS"), "Must render Strategic Move #3 heading");
+    assert.ok(pageHtml.includes("Coinbase") && pageHtml.includes("32% Weight"), "Must show Coinbase weighting");
+    assert.ok(pageHtml.includes("Kraken") && pageHtml.includes("26% Weight"), "Must show Kraken weighting");
+    assert.ok(pageHtml.includes("Bitstamp") && pageHtml.includes("20% Weight"), "Must show Bitstamp weighting");
+    assert.ok(pageHtml.includes("Oracle Hazard Battlecard"), "Must render Oracle Hazard Battlecard");
+    assert.ok(pageHtml.includes("UMA Optimistic Oracle"), "Must cite Polymarket UMA Oracle");
+  });
 });

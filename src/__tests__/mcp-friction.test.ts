@@ -126,4 +126,34 @@ describe("MCP Pre-Trade Risk Coprocessor & Friction Simulator", () => {
     assert.strictEqual(battlecard.dimensions.length, 6);
     assert.ok(battlecard.dimensions.some((d: any) => d.dimension.includes("Venue Neutrality")));
   });
+
+  it("executes search_prediction_market_knowledge_base through executeMcpTool", async () => {
+    const search = await executeMcpTool("search_prediction_market_knowledge_base", { query: "kalshi fee formula" });
+    assert.strictEqual(search.query, "kalshi fee formula");
+    assert.ok(search.totalMatches >= 1, "Should find at least 1 guide");
+    assert.strictEqual(search.results[0].slug, "kalshi-fee-formula");
+    assert.ok(search.results[0].canonicalUrl.includes("/guides/kalshi-fee-formula"));
+  });
+
+  it("executes get_cme_settlement_explainer through executeMcpTool", async () => {
+    const explainer = await executeMcpTool("get_cme_settlement_explainer", {});
+    assert.strictEqual(explainer.benchmark, "CME CF Bitcoin Real-Time Index (BRTI)");
+    assert.strictEqual(explainer.administrator, "CF Benchmarks Ltd (FCA authorized)");
+    assert.ok(explainer.constituentExchanges.includes("Coinbase"));
+    assert.ok(explainer.averagingRule.includes("60-Second"));
+  });
+
+  it("executes teardown_cross_venue_spread through executeMcpTool", async () => {
+    const cross = await executeMcpTool("teardown_cross_venue_spread", {
+      priceKalshiCents: 48,
+      pricePolymarketCents: 49,
+      contracts: 1000,
+    });
+    assert.strictEqual(cross.claimedNominalSpreadCents, 3);
+    assert.strictEqual(cross.claimedGrossProfitUsd, 30);
+    assert.strictEqual(cross.venueATakerFeeUsd, 17.5);
+    assert.strictEqual(cross.netRealizedProfitUsd, 6);
+    assert.strictEqual(cross.feeDragRatioPct, 80);
+    assert.strictEqual(cross.provenanceHash.length, 64);
+  });
 });

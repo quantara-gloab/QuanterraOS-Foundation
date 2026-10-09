@@ -1056,21 +1056,26 @@ export function renderJournalPageHtml(
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid var(--border-subtle); padding-bottom:12px;">
           <div style="font-family:var(--font-mono); font-size:0.95rem; font-weight:700; color:#FFFFFF; display:flex; align-items:center; gap:8px;">
             <span>📥</span> Statement Import &amp; Reconciliation
-            <span class="mono" style="font-size:0.7rem; color:var(--accent); font-weight:600; background:rgba(223,184,67,0.12); padding:2px 6px; border-radius:3px;">KALSHI SUPPORTED</span>
+            <span class="mono" style="font-size:0.7rem; color:var(--accent); font-weight:600; background:rgba(223,184,67,0.12); padding:2px 6px; border-radius:3px;">KALSHI &amp; POLYMARKET</span>
           </div>
           <button type="button" onclick="closeImportModal()" style="background:none; border:none; color:var(--muted); font-size:1.4rem; cursor:pointer;">&times;</button>
         </div>
         
         <div id="import-step-input">
           <p style="font-size:0.82rem; color:var(--text-dim); margin-bottom:14px; line-height:1.5;">
-            Import your official <strong>Kalshi fills or settlements export CSV</strong>. We will map your fields, detect duplicates, and suggest matches with your pre-trade saved checks.
+            Import your official <strong>Kalshi fills export</strong> or <strong>Polymarket transaction CSV</strong>. We will automatically detect your venue, map fields (tokens, USDC, fees/gas, outcomes), prevent duplicate imports, and suggest matches with your pre-trade saved checks.
           </p>
 
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
             <label style="font-family:var(--font-mono); font-size:0.75rem; color:var(--muted);">Select .CSV File:</label>
-            <button type="button" onclick="loadKalshiSample()" style="background:none; border:none; color:var(--accent); font-size:0.75rem; cursor:pointer; text-decoration:underline;">
-              ⚡ Load Redacted Kalshi Sample
-            </button>
+            <div style="display:flex; gap:12px;">
+              <button type="button" onclick="loadKalshiSample()" style="background:none; border:none; color:var(--accent); font-size:0.75rem; cursor:pointer; text-decoration:underline;">
+                ⚡ Kalshi Sample
+              </button>
+              <button type="button" onclick="loadPolymarketSample()" style="background:none; border:none; color:var(--cyan); font-size:0.75rem; cursor:pointer; text-decoration:underline;">
+                ⚡ Polymarket Sample
+              </button>
+            </div>
           </div>
 
           <div style="margin-bottom:16px;">
@@ -1399,6 +1404,17 @@ export function renderJournalPageHtml(
       if (textarea) textarea.value = sample;
     }
 
+    function loadPolymarketSample() {
+      const sample = [
+        'txHash,market,outcome,type,tokens,price,usdc,fee,date',
+        '0x3a91f82c0192e478b123,Will Bitcoin hit $100k before Dec 31?,Yes,BUY,50,0.52,26.00,0.01,2026-10-06T14:30:00Z',
+        '0x8c72190bb4129d23a542,Will Ethereum hit $4k in 2026?,No,BUY,25,0.47,11.75,0.01,2026-10-06T15:15:00Z',
+        '0x1f54ab98032c8172901a,Fed cuts rates by 25bps in Nov 2026,Yes,BUY,100,0.61,61.00,0.02,2026-10-06T16:00:00Z'
+      ].join('\n');
+      const textarea = document.getElementById('csv-raw-textarea');
+      if (textarea) textarea.value = sample;
+    }
+
     async function previewCsvStatement() {
       const textarea = document.getElementById('csv-raw-textarea');
       const btn = document.getElementById('btn-preview-csv');
@@ -1486,7 +1502,7 @@ export function renderJournalPageHtml(
       container.innerHTML =
         '<div style="background:rgba(223,184,67,0.08); border:1px solid rgba(223,184,67,0.3); border-radius:6px; padding:12px 16px; margin-bottom:16px;">' +
           '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">' +
-            '<div style="font-family:var(--font-mono); font-size:0.75rem; font-weight:700; color:var(--accent);">PARSED STATEMENT PREVIEW</div>' +
+            '<div style="font-family:var(--font-mono); font-size:0.75rem; font-weight:700; color:var(--accent);">PARSED ' + (data.detectedVenue ? data.detectedVenue.toUpperCase() : 'STATEMENT') + ' PREVIEW</div>' +
             '<div class="mono" style="font-size:0.75rem; color:#FFFFFF;">' + validCount + ' new trade(s) · ' + dupCount + ' duplicate(s) · $' + totalFees + ' total fees</div>' +
           '</div>' +
           '<div style="font-size:0.72rem; color:var(--text-dim); margin-bottom:4px;">Field Mappings: ' + (mappedList || 'Automatic standard headers matched') + '</div>' +

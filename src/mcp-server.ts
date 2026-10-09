@@ -1,6 +1,7 @@
 import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
 import { getLiveQuotes } from "./live-quotes.ts";
-import { computeFrictionTeardown, COMPETITOR_BENCHMARK_ROWS } from "./competitive-benchmark.ts";
+import { computeFrictionTeardown, computeCrossVenueSpreadTeardown, COMPETITOR_BENCHMARK_ROWS } from "./competitive-benchmark.ts";
+import { SEARCH_QUERY_ARTICLES, getSearchQueryArticle } from "./indexable-content.ts";
 
 /**
  * Model Context Protocol (MCP) Manifest & Agent Integration Layer
@@ -92,6 +93,41 @@ export const MCP_SERVER_MANIFEST = {
       parameters: {
         type: "object",
         properties: {}
+      }
+    },
+    {
+      name: "search_prediction_market_knowledge_base",
+      description: "Queries the Section 6.1 independent research repository for exact fee formulas, 60s TWAP settlement rules, and calibration empirical audits.",
+      parameters: {
+        type: "object",
+        required: ["query"],
+        properties: {
+          query: { type: "string", description: "Search term or concept (e.g. 'kalshi fees', 'twap', 'breakeven', 'arbitrage')" },
+          category: { type: "string", enum: ["fees", "settlement", "calibration", "divergence", "governance"], description: "Optional category filter" }
+        }
+      }
+    },
+    {
+      name: "get_cme_settlement_explainer",
+      description: "Returns the official CME CF BRTI 60-second TWAP settlement mechanics, constituent venue weighting, and basis hazard analysis against spot exchanges.",
+      parameters: {
+        type: "object",
+        properties: {
+          strikePrice: { type: "number", description: "Optional strike price in dollars to evaluate danger zone proximity" }
+        }
+      }
+    },
+    {
+      name: "teardown_cross_venue_spread",
+      description: "Executes Strategic Move #2 cross-venue spread teardown between Kalshi and Polymarket, deducting parabolic taker fees and gas/slippage to reveal real net return and fee drag %.",
+      parameters: {
+        type: "object",
+        required: ["priceKalshiCents", "pricePolymarketCents"],
+        properties: {
+          priceKalshiCents: { type: "number", description: "Kalshi contract price in cents (e.g. 48 for 48¢)" },
+          pricePolymarketCents: { type: "number", description: "Polymarket opposing contract price in cents (e.g. 49 for 49¢)" },
+          contracts: { type: "number", default: 1000, description: "Number of contracts" }
+        }
       }
     }
   ]
@@ -528,6 +564,58 @@ export async function executeMcpTool(name: string, params: Record<string, any> =
           empiricalFinding: "The market is well calibrated; fees ($0.07*P*(1-P)) create high hurdle for gross predictive edge.",
         },
       };
+    }
+    case "search_prediction_market_knowledge_base": {
+      const q = String(params.query || "").toLowerCase().trim();
+      const cat = params.category ? String(params.category).toLowerCase().trim() : null;
+
+      const matches = SEARCH_QUERY_ARTICLES.filter((art) => {
+        const matchesCat = !cat || art.category === cat;
+        const matchesQuery = !q ||
+          art.title.toLowerCase().includes(q) ||
+          art.summary.toLowerCase().includes(q) ||
+          art.targetQueries.some((tq) => tq.toLowerCase().includes(q));
+        return matchesCat && matchesQuery;
+      }).map((art) => ({
+        slug: art.slug,
+        title: art.title,
+        category: art.category,
+        canonicalUrl: `https://quanterraos.com${art.canonicalPath}`,
+        readTimeMinutes: art.readTimeMinutes,
+        summary: art.summary,
+        formula: art.formulaMath || null,
+        keyTakeaways: art.keyTakeaways,
+      }));
+
+      return {
+        query: params.query,
+        category: cat,
+        totalMatches: matches.length,
+        results: matches,
+      };
+    }
+    case "get_cme_settlement_explainer": {
+      const guide = getSearchQueryArticle("cme-cf-brti-settlement-explained");
+      return {
+        benchmark: "CME CF Bitcoin Real-Time Index (BRTI)",
+        administrator: "CF Benchmarks Ltd (FCA authorized)",
+        averagingRule: "60-Second Time-Weighted Average Price (TWAP) sampled every 1 second between minute 14:00 and 15:00",
+        constituentExchanges: ["Coinbase", "Kraken", "Bitstamp", "Gemini", "LMAX", "itBit"],
+        keyFinding: "Sudden spot exchange spikes in final seconds have only 1/60th impact on settlement; single-venue spot at 14:59 does not equal the settlement index.",
+        canonicalUrl: "https://quanterraos.com/guides/cme-cf-brti-settlement-explained",
+        summary: guide?.summary,
+        takeaways: guide?.keyTakeaways,
+      };
+    }
+    case "teardown_cross_venue_spread": {
+      const pKalshi = Number(params.priceKalshiCents ?? 48);
+      const pPoly = Number(params.pricePolymarketCents ?? 49);
+      const count = Number(params.contracts ?? 1000);
+      return computeCrossVenueSpreadTeardown({
+        venueAPriceCents: pKalshi,
+        venueBPriceCents: pPoly,
+        contracts: count,
+      });
     }
     default:
       throw new Error(`Unknown MCP tool: ${name}`);

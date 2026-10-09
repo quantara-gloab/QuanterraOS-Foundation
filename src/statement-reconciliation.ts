@@ -35,6 +35,7 @@ export interface StatementRowData {
   executedAt: string;
   rawCsvRow: string;
   fingerprint: string;
+  venue?: "kalshi" | "polymarket";
 }
 
 export interface SuggestedJournalMatch {
@@ -52,6 +53,7 @@ export interface SuggestedJournalMatch {
 export interface StatementPreviewResult {
   success: boolean;
   batchId: string;
+  detectedVenue: "kalshi" | "polymarket";
   mappedHeaders: MappedHeader[];
   totalRows: number;
   validRows: Array<StatementRowData & { rowIndex: number; isDuplicate: boolean; suggestedMatch?: SuggestedJournalMatch | null }>;
@@ -93,9 +95,14 @@ export function computeTradeFingerprint(userId: string, venue: string, trade: {
 }
 
 /**
- * Standardizes Kalshi CSV headers and parses rows into preview format.
+ * Standardizes Kalshi or Polymarket CSV headers and parses rows into preview format.
+ * Features automated venue detection, field mapping, and pre-trade saved check matching.
  */
-export function previewKalshiStatement(csvText: string, userId: string): StatementPreviewResult {
+export function previewStatementCsv(
+  csvText: string,
+  userId: string,
+  forcedVenue?: "kalshi" | "polymarket"
+): StatementPreviewResult {
   const batchId = `bat_${randomUUID().slice(0, 12)}`;
   const lines = csvText
     .split(/\r?\n/)
@@ -106,6 +113,7 @@ export function previewKalshiStatement(csvText: string, userId: string): Stateme
     return {
       success: false,
       batchId,
+      detectedVenue: forcedVenue || "kalshi",
       mappedHeaders: [],
       totalRows: 0,
       validRows: [],
@@ -121,6 +129,16 @@ export function previewKalshiStatement(csvText: string, userId: string): Stateme
   const rawHeaders = lines[0].split(",").map((h) => h.replace(/^["']|["']$/g, "").trim());
   const lowerHeaders = rawHeaders.map((h) => h.toLowerCase().replace(/[^a-z0-9]/g, ""));
 
+  // Detect venue if not forced
+  const polySignals = ["txhash", "transactionhash", "hash", "polygon", "usdc", "tokenamount", "tokentype", "tokens", "pricepertoken", "polygongas", "conditionid"];
+  const hasPolyHeader = lowerHeaders.some((h) => polySignals.includes(h));
+  const hasPolyTxInLines = lines.slice(1, 10).some((l) => /0x[a-fA-F0-9]{40,64}/.test(l));
+  const detectedVenue: "kalshi" | "polymarket" =
+    forcedVenue ||
+    (hasPolyHeader || hasPolyTxInLines || csvText.toLowerCase().includes("polymarket")
+      ? "polymarket"
+      : "kalshi");
+
   const mappedHeaders: MappedHeader[] = [];
   const findCol = (candidates: string[], mappedName: string): number => {
     for (const c of candidates) {
@@ -133,17 +151,17 @@ export function previewKalshiStatement(csvText: string, userId: string): Stateme
     return -1;
   };
 
-  const idIdx = findCol(["tradeid", "orderid", "fillid", "id", "externalid"], "externalTradeId");
-  const tickerIdx = findCol(["marketticker", "ticker", "market", "contractticker", "contract", "symbol"], "contractTicker");
-  const sideIdx = findCol(["side", "position", "outcome", "contractside"], "side");
-  const actionIdx = findCol(["action", "type", "ordertype", "sideaction"], "action");
-  const countIdx = findCol(["count", "quantity", "contracts", "shares", "size"], "quantity");
-  const priceIdx = findCol(["price", "fillprice", "yesprice", "avgprice", "unitprice", "contractprice"], "fillPrice");
-  const feesIdx = findCol(["fees", "fee", "exchangefee", "transactionfee"], "fees");
-  const costIdx = findCol(["totalcost", "cost", "outlay", "total"], "totalCost");
-  const proceedsIdx = findCol(["exitproceeds", "proceeds", "settlementvalue", "payout", "settlementproceeds"], "exitProceeds");
-  const pnlIdx = findCol(["realizedpnl", "pnl", "profitloss", "netpnl"], "realizedPnl");
-  const timeIdx = findCol(["executedat", "date", "timestamp", "createdtime", "ordertime", "time", "createdat"], "executedAt");
+  const idIdx = findCol(["tradeid", "orderid", "fillid", "id", "externalid", "txhash", "transactionhash", "hash", "txid"], "externalTradeId");
+  const tickerIdx = findCol(["marketticker", "ticker", "market", "contractticker", "contract", "symbol", "title", "markettitle", "question", "conditionid", "marketslug", "slug"], "contractTicker");
+  const sideIdx = findCol(["side", "position", "outcome", "contractside", "token", "tokentype"], "side");
+  const actionIdx = findCol(["action", "type", "ordertype", "sideaction", "transactiontype"], "action");
+  const countIdx = findCol(["count", "quantity", "contracts", "shares", "size", "tokens", "tokenamount", "amount"], "quantity");
+  const priceIdx = findCol(["price", "fillprice", "yesprice", "avgprice", "unitprice", "contractprice", "pricepertoken", "tokenprice"], "fillPrice");
+  const feesIdx = findCol(["fees", "fee", "exchangefee", "transactionfee", "gas", "gasfee", "polygongas", "gaseth", "networkfee", "gasusd"], "fees");
+  const costIdx = findCol(["totalcost", "cost", "outlay", "total", "usdc", "totalusdc", "amountusdc", "value"], "totalCost");
+  const proceedsIdx = findCol(["exitproceeds", "proceeds", "settlementvalue", "payout", "settlementproceeds", "usdcproceeds"], "exitProceeds");
+  const pnlIdx = findCol(["realizedpnl", "pnl", "profitloss", "netpnl", "netprofit"], "realizedPnl");
+  const timeIdx = findCol(["executedat", "date", "timestamp", "createdtime", "ordertime", "time", "createdat", "blocktime", "datetime"], "executedAt");
 
   // Fetch user's existing fingerprints to check duplicates
   const existingRecords = db
@@ -176,24 +194,25 @@ export function previewKalshiStatement(csvText: string, userId: string): Stateme
 
     const getVal = (idx: number, fallback: string = "") => (idx >= 0 && idx < cols.length ? cols[idx] : fallback);
 
-    const tickerRaw = getVal(tickerIdx, "KXBTC15M");
+    const defaultTicker = detectedVenue === "polymarket" ? "POLY-MARKET" : "KXBTC15M";
+    const tickerRaw = getVal(tickerIdx, defaultTicker);
     if (!tickerRaw) {
-      errors.push(`Row ${i}: Missing contract ticker.`);
+      errors.push(`Row ${i}: Missing contract ticker or market.`);
       continue;
     }
 
     const sideRaw = getVal(sideIdx, "yes").toLowerCase();
-    const side: "yes" | "no" = sideRaw.includes("no") ? "no" : "yes";
+    const side: "yes" | "no" = (sideRaw.includes("no") || sideRaw === "0" || sideRaw === "down" || sideRaw === "short") ? "no" : "yes";
 
     const actionRaw = getVal(actionIdx, "buy").toLowerCase();
     const action: "buy" | "sell" | "settlement" = actionRaw.includes("sell")
       ? "sell"
-      : actionRaw.includes("settle")
+      : (actionRaw.includes("settle") || actionRaw.includes("redeem"))
       ? "settlement"
       : "buy";
 
-    const countRaw = parseInt(getVal(countIdx, "1"), 10);
-    const quantity = isNaN(countRaw) || countRaw <= 0 ? 1 : countRaw;
+    const countRaw = parseFloat(getVal(countIdx, "1"));
+    const quantity = isNaN(countRaw) || countRaw <= 0 ? 1 : Math.round(countRaw);
 
     let priceRaw = parseFloat(getVal(priceIdx, "0.50"));
     if (isNaN(priceRaw)) priceRaw = 0.50;
@@ -201,9 +220,14 @@ export function previewKalshiStatement(csvText: string, userId: string): Stateme
     if (priceRaw > 1.0) priceRaw = priceRaw / 100.0;
     if (priceRaw <= 0 || priceRaw >= 1.0) priceRaw = 0.50;
 
-    let feeRaw = parseFloat(getVal(feesIdx, "0"));
+    let feeRaw = parseFloat(getVal(feesIdx, "-1"));
     if (isNaN(feeRaw) || feeRaw < 0) {
-      feeRaw = Math.ceil(0.07 * quantity * priceRaw * (1 - priceRaw) * 100) / 100;
+      if (detectedVenue === "kalshi") {
+        feeRaw = Math.ceil(0.07 * quantity * priceRaw * (1 - priceRaw) * 100) / 100;
+      } else {
+        // Polymarket: standard orderbook transactions incur 0% protocol fee; Polygon gas is nominal
+        feeRaw = 0.00;
+      }
     }
 
     let costRaw = parseFloat(getVal(costIdx, "0"));
@@ -225,10 +249,10 @@ export function previewKalshiStatement(csvText: string, userId: string): Stateme
       pnlRaw = parseFloat((proceedsRaw - costRaw - feeRaw).toFixed(2));
     }
 
-    const externalTradeId = getVal(idIdx, `kalshi_${i}_${Date.now()}`);
+    const externalTradeId = getVal(idIdx, `${detectedVenue}_${i}_${Date.now()}`);
     const executedAt = getVal(timeIdx, new Date().toISOString());
 
-    const fingerprint = computeTradeFingerprint(userId, "kalshi", {
+    const fingerprint = computeTradeFingerprint(userId, detectedVenue, {
       externalTradeId,
       contractTicker: tickerRaw,
       side,
@@ -250,7 +274,9 @@ export function previewKalshiStatement(csvText: string, userId: string): Stateme
     let suggestedMatch: SuggestedJournalMatch | null = null;
     if (!isDuplicate) {
       const candidate = savedChecks.find((c) => {
-        const sameTicker = c.contractTicker.toUpperCase() === tickerRaw.toUpperCase();
+        const cTicker = c.contractTicker.toUpperCase();
+        const tRaw = tickerRaw.toUpperCase();
+        const sameTicker = cTicker === tRaw || cTicker.includes(tRaw) || tRaw.includes(cTicker);
         const sameSide = (c.side || "yes").toLowerCase() === side;
         return sameTicker && sameSide;
       });
@@ -289,6 +315,7 @@ export function previewKalshiStatement(csvText: string, userId: string): Stateme
       executedAt,
       rawCsvRow: rawLine,
       fingerprint,
+      venue: detectedVenue,
       isDuplicate,
       suggestedMatch,
     });
@@ -297,6 +324,7 @@ export function previewKalshiStatement(csvText: string, userId: string): Stateme
   return {
     success: validRows.length > 0,
     batchId,
+    detectedVenue,
     mappedHeaders,
     totalRows: lines.length - 1,
     validRows,
@@ -306,6 +334,20 @@ export function previewKalshiStatement(csvText: string, userId: string): Stateme
     totalOutlay: parseFloat(totalOutlay.toFixed(2)),
     errors,
   };
+}
+
+/**
+ * Preview Kalshi CSV statements (backwards-compatible alias for previewStatementCsv).
+ */
+export function previewKalshiStatement(csvText: string, userId: string): StatementPreviewResult {
+  return previewStatementCsv(csvText, userId, "kalshi");
+}
+
+/**
+ * Preview Polymarket CSV statements with automated column and fee handling.
+ */
+export function previewPolymarketStatement(csvText: string, userId: string): StatementPreviewResult {
+  return previewStatementCsv(csvText, userId, "polymarket");
 }
 
 /**
@@ -339,6 +381,12 @@ export function commitKalshiStatement(
     const matchedJournalId = reconcileMap[row.externalTradeId] || reconcileMap[row.fingerprint];
 
     const statementRecordId = `stmt_${randomUUID().slice(0, 16)}`;
+    const rowVenue = row.venue || "kalshi";
+    const isPoly = rowVenue === "polymarket";
+    const journalVenue = isPoly ? "polymarket" : "kalshi-15m";
+    const settlementSource = isPoly ? "UMA Optimistic Oracle" : "CME CF BRTI 60s TWAP";
+    const pricingBasis = isPoly ? "executable_orderbook" : "executable_ask";
+    const venueLabel = isPoly ? "Polymarket" : "Kalshi";
 
     try {
       if (matchedJournalId) {
@@ -381,7 +429,7 @@ export function commitKalshiStatement(
               batchId,
               externalTradeId: row.externalTradeId,
               fingerprint: row.fingerprint,
-              venue: "kalshi",
+              venue: rowVenue,
               contractTicker: row.contractTicker,
               side: row.side,
               action: row.action,
@@ -414,7 +462,7 @@ export function commitKalshiStatement(
           batchId,
           externalTradeId: row.externalTradeId,
           fingerprint: row.fingerprint,
-          venue: "kalshi",
+          venue: rowVenue,
           contractTicker: row.contractTicker,
           side: row.side,
           action: row.action,
@@ -442,11 +490,11 @@ export function commitKalshiStatement(
         .values({
           id: jrnId,
           userId,
-          venue: "kalshi-15m",
+          venue: journalVenue as any,
           contractTicker: row.contractTicker,
           contractType: "binary_above_below",
           side: row.side,
-          pricingBasis: "executable_ask",
+          pricingBasis,
           contractPrice: row.fillPrice,
           contractCount: row.quantity,
           purchaseCost: row.totalCost,
@@ -456,7 +504,7 @@ export function commitKalshiStatement(
           breakevenWinProb,
           assessedWinProb: breakevenWinProb,
           netExpectedValue: 0.0,
-          settlementSource: "CME CF BRTI 60s TWAP",
+          settlementSource,
           decisionAction: "actual_trade",
           status: "executed_live",
           outcome: row.realizedPnl !== null ? (row.realizedPnl > 0 ? "WON" : row.realizedPnl < 0 ? "LOST" : "VOID") : "PENDING",
@@ -469,7 +517,7 @@ export function commitKalshiStatement(
           reconciliationStatus: "imported",
           matchedStatementId: statementRecordId,
           statementReconciledAt: now,
-          notes: `Imported via Kalshi Statement (Trade ID: ${row.externalTradeId})`,
+          notes: `Imported via ${venueLabel} Statement (Trade ID: ${row.externalTradeId})`,
           createdAt: row.executedAt || now,
           updatedAt: now,
         })
@@ -498,6 +546,8 @@ export function commitKalshiStatement(
     errors,
   };
 }
+
+export const commitStatement = commitKalshiStatement;
 
 /**
  * Data Controls: Exports all imported statement records for a user into RFC 4180 CSV.

@@ -216,7 +216,10 @@ import {
 } from "./journal-import.ts";
 import {
   previewKalshiStatement,
+  previewPolymarketStatement,
+  previewStatementCsv,
   commitKalshiStatement,
+  commitStatement,
   exportImportedStatementsCsv,
   deleteImportedStatements,
 } from "./statement-reconciliation.ts";
@@ -3247,7 +3250,7 @@ app.post("/api/statement/preview", (req, res) => {
     return res.status(400).json({ error: "No CSV content provided in request body" });
   }
 
-  const result = previewKalshiStatement(csvText, userId);
+  const result = previewStatementCsv(csvText, userId);
   res.json(result);
 });
 
@@ -3268,7 +3271,7 @@ app.post("/api/statement/commit", (req, res) => {
     return res.status(400).json({ error: "Missing required fields: batchId, rows" });
   }
 
-  const result = commitKalshiStatement(userId, batchId, rows, reconcileMap || {});
+  const result = commitStatement(userId, batchId, rows, reconcileMap || {});
   res.json(result);
 });
 

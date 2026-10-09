@@ -1225,6 +1225,47 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 - `npm test` — **498/498 tests passing across 110 test suites**.
 - Remote production healthcheck: `GET https://quanterraos.com/healthz` returns `200 OK` (`status: ok, circuit: LOCKED_RULE_B5`).
 
+---
+
+### Session Log (8 October 2026) — Autonomous MCP Tools, Move #3 Settlement Radar & Polymarket Multi-Venue Statement Reconciliation
+
+#### 1. Autonomous Agent MCP Expansion (`src/mcp-server.ts`)
+- Registered 3 new high-value analytical tools into `MCP_SERVER_MANIFEST` and `executeMcpTool`:
+  1. `search_prediction_market_knowledge_base`: Semantic keyword and category search over Section 6.1 programmatic guides catalog with JSON-LD metadata and formula specifications.
+  2. `get_cme_settlement_explainer`: Programmatic explainer for the CME CF Bitcoin Real-Time Index (BRTI) 60-second TWAP calculation, constituent exchange weights, Itô's lemma variance drift corrections, and oracle dispute risks.
+  3. `teardown_cross_venue_spread`: Mathematical teardown of cross-venue prediction market spreads (e.g. Kalshi vs Polymarket), evaluating fee drag ratios, oracle divergence hazards, and net realized payoff after parabolic fees.
+- Verified in `src/__tests__/mcp-friction.test.ts` (11/11 tests passing).
+
+#### 2. Move #3: 60-Second TWAP Settlement Radar & Oracle Forensic Monitor (`src/expiry-radar.ts`)
+- Upgraded the `/radar` microstructure terminal with `#move3-oracle-radar`:
+  - **Constituent Exchange Weighting**: Real-time weighting visualizer for CME CF BRTI inputs (Coinbase 32%, Kraken 26%, Bitstamp 20%, Gemini/LMAX 22%).
+  - **Cross-Venue Basis Dispersion**: Measurement of spot price variance across constituent exchanges during the final 60-second sampling window.
+  - **Oracle Hazard Battlecard**: Side-by-side institutional comparison between CME 60-second TWAP (deterministic algorithmic execution) and UMA Optimistic Oracle (2-hour to 48-hour decentralized tokenholder voting, re-proposals, and token-weighted bribe vectors).
+- Verified in `src/__tests__/expiry-radar.test.ts` (9/9 tests passing).
+
+#### 3. Multi-Venue Statement Reconciliation Engine (`src/statement-reconciliation.ts`, `src/journal-page.ts`, `src/server.ts`)
+- **Automated Multi-Venue Detection**: Intelligently identifies Polymarket statements (`txHash`, `tokens`, `usdc`, `gas`, `polygon`, `0x...` hex hashes) vs Kalshi statements (`marketticker`, `fillprice`, `tradeid`).
+- **Flexible Field Normalization**:
+  - Maps Polymarket headers (`txHash`/`hash`, `market`/`title`/`question`, `tokens`/`shares`, `usdc`/`totalCost`, `gas`/`fee`).
+  - Distinguishes 0% protocol taker fee on Polymarket from Polygon gas friction ($0.01 - $0.02) without distorting PnL totals.
+  - Normalizes prices in cents or USDC into standard unit range `[0.0, 1.0]`.
+- **Database & Audit Attribution**:
+  - Tags records in `imported_statement_records` with `venue: "polymarket"` or `venue: "kalshi"`.
+  - Links corresponding `user_decision_journal` records to `venue: "polymarket"`, `pricingBasis: "executable_orderbook"`, and `settlementSource: "UMA Optimistic Oracle"`.
+- **Duplicate Prevention & Clean Reversion**:
+  - Generates SHA-256 transaction fingerprints preventing double-counting on repeated CSV uploads.
+  - Clean deletion controls that safely revert reconciled checks to `user_entered` while preserving original user-entered figures.
+- **Frontend UI & Sample Loaders**:
+  - Updated `/journal` import modal to support both Kalshi and Polymarket with one-click test sample loaders for both formats.
+  - Dynamic venue badges in preview table (`PARSED POLYMARKET PREVIEW` / `PARSED KALSHI PREVIEW`).
+- Verified in `src/__tests__/statement-import-and-reconciliation.test.ts` (8/8 tests passing).
+
+**Verification Baseline:**
+- `npx tsc --noEmit` — **0 errors (clean exit 0)**.
+- `node --experimental-strip-types --test src/__tests__/mcp-friction.test.ts src/__tests__/expiry-radar.test.ts src/__tests__/statement-import-and-reconciliation.test.ts src/__tests__/indexable-content.test.ts` — **36/36 passing across 4 suites**.
+- Remote production healthcheck: `GET https://quanterraos.com/healthz` returns `200 OK` (`status: ok, circuit: LOCKED_RULE_B5`).
+
+
 
 
 
