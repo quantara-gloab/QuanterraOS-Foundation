@@ -1496,5 +1496,29 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
       - Prominently renders "📱 Download for iPhone & Samsung" in top notification ticker, navbar right next to "Sign up", fast-path navigation, and Hero primary CTA.
     - *Verification*: `node --experimental-strip-types --test src/__tests__/landing-page-cockpit.test.ts` (6/6 passing); `npx tsc --noEmit` (exit code 0); `npm test` **548/548 passing across 120 suites (0 failures)**.
 
+18. **Site Declutter, Navigation Redesign, Interactive Hero Hook & 4-Column Footer (`src/landing-page.ts`)**:
+    - *Solves user problem*: Eliminates horizontal navigation clutter (previously 14 loose links) and high-level academic obscurity, surfacing the primary hook: stopping prediction market traders from losing capital to hidden taker fees and pricing slippage on Kalshi and Polymarket.
+    - *4-Phase Site Cleanup Architecture*:
+      - **Phase 1: Header Declutter & Navigation Refactoring**:
+        - Condensed 14 scattered links into 3 structured dropdown groups:
+          - `Engines ▾`: Live Discrepancy Scanner, Pricing Matrix, Corridors, Order Flow & Depth, Paper Mode, Taker Friction Calculator (Check).
+          - `Settlement Truth ▾`: 60s Expiry Radar, Tape Reconstruction, Settlement Danger Zone, Anti-Dispute AI, Cross-Venue Divergence.
+          - `Research & Records ▾`: 1,316-Window Settlement Ledger, Murphy Calibration, Systematic Decision Journal, Study #6.4, Learn, Research Whitepapers, MCP Agent API, Institutional Access.
+        - Primary Header Bar remains single-row (`white-space: nowrap; overflow-x: auto;`): Logo (`QuanterraOS`), 3 clean dropdowns, center Settlement Radar pill (`/radar`), direct mobile app gateway (`📱 iPhone & Samsung App` / `/mobile`), `Check Friction` link, `Sign in` / `Sign up`, and Imperial Gold `LAUNCH TERMINAL →` CTA.
+        - Top Monospace Verification Ribbon: `1,316 SETTLED WINDOWS (19,740 ROWS) • MARKET-MID BRIER: 0.2001 • SHA-256 PROVENANCE • RULE B5 LOCKED $0.00 • Why QuanterraOS vs Oddpool → • STATUS: 100% OPERATIONAL`.
+      - **Phase 2: High-Converting Hero Section & Interactive Hook**:
+        - Punchy Headline: *"Prediction Market Pricing Isn't 50/50. Know Your True Odds Before You Trade."*
+        - Subheadline: *"Kalshi and Polymarket taker fees and final-minute TWAP slippage eat 3% to 7% of your edge. QuanterraOS computes your real-time breakeven hurdles and flags settlement danger zones."*
+        - Dual-Cockpit Hero Right Container:
+          - **Interactive Taker Drag Audit**: Slider controls for contract ask (51¢) and perceived win rate (55%), real-time non-linear CFTC fee drag computation, true breakeven win rate (52.75%), net expected return ($2.25 vs $4.00 gross), and ROI callout *"51¢ doesn't mean 51¢. A 55% win rate loses money on Kalshi after 3.5% taker drag. We calculate the exact breakeven tick before you enter."*
+          - **Live Danger Zone (60s CME TWAP Radar)**: Real-time constituent exchange weighting (Coinbase 34%, Kraken 28%, Bitstamp 21%, Gemini 17%), strike proximity alerts (`+2.3 bps ATM Flip Hazard High`), and 60-second micro tick visualizer.
+      - **Phase 3: "Why QuanterraOS" Comparison Matrix (`/vs` & on page)**:
+        - Structured 3-column table comparing QuanterraOS against Kalshi Native UI, Oddpool, and Dome across 4 core dimensions: Real-time Taker Drag Calculation, 60s TWAP Danger Zone Radar, Falsifiable Calibration (Brier Scores), and Sovereign MCP Server Support.
+        - Gold Standard Obsidian palette (`#06070A`, IBM Plex Mono tabular numbers, `#DFB843` bullion accents).
+      - **Phase 4: Clean 4-Column Footer & Footprint Migration**:
+        - Migrated 27 loose inline links into 4 structured columns: `Terminal Engines`, `Settlement Truth`, `Provenance & Data`, and `Institutional & Legal`.
+        - Compact 11px monospace regulatory block housing CFTC Rule 4.41 disclosures, Rule B10 marks notices, and Rule B5 zero live capital assertions.
+    - *Verification*: `node --experimental-strip-types --test src/__tests__/landing-page-cockpit.test.ts` (6/6 passing); `src/__tests__/council-chat-client-wiring.test.ts`, `src/__tests__/pilot-onboarding-tools.test.ts`, `src/__tests__/static-copy-guardrails.test.ts` (18/18 passing); `npx tsc --noEmit` (clean 0 errors).
+
 
 

@@ -144,42 +144,81 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 18px 48px;
+    padding: 12px 32px;
     border-bottom: 1px solid var(--panel-border);
-    background: rgba(6, 7, 10, 0.88);
-    backdrop-filter: blur(20px) saturate(190%);
+    background: rgba(6, 7, 10, 0.94);
+    backdrop-filter: blur(24px) saturate(200%);
     position: sticky;
     top: 0;
     z-index: 100;
+    white-space: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
+  .top-nav::-webkit-scrollbar { display: none; }
 
   .nav-left {
     display: flex;
     align-items: center;
-    gap: 36px;
+    gap: 24px;
+    flex-shrink: 0;
   }
 
   .nav-brand {
-    font-size: 0.95rem;
+    font-size: 1.05rem;
     font-weight: 700;
     letter-spacing: -0.02em;
     display: flex;
     align-items: center;
     gap: 8px;
+    font-family: var(--font-mono);
   }
   .brand-dot {
-    width: 6px;
-    height: 6px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     background: var(--accent);
-    box-shadow: 0 0 8px var(--accent);
+    box-shadow: 0 0 10px var(--accent);
   }
 
   .nav-links {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     font-size: 0.84rem;
+    flex-shrink: 0;
+  }
+
+  /* Center Pill: Settlement Radar */
+  .nav-radar-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: rgba(223, 184, 67, 0.08);
+    border: 1px solid rgba(223, 184, 67, 0.35);
+    color: var(--champagne);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.18s ease;
+  }
+  .nav-radar-pill:hover {
+    background: rgba(223, 184, 67, 0.2);
+    border-color: rgba(223, 184, 67, 0.65);
+    box-shadow: 0 0 14px rgba(223, 184, 67, 0.25);
+    color: #FFFFFF;
+  }
+  .nav-radar-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #10B981;
+    box-shadow: 0 0 6px #10B981;
+    animation: beaconPulse 1.8s infinite ease-in-out;
   }
 
   /* Dropdown Menus */
@@ -679,6 +718,129 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     line-height: 1.5;
     margin-bottom: 24px;
   }
+
+  /* Dual Interactive Hero Right Cards */
+  .hero-dual-cockpit {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+  }
+
+  .drag-calculator-card {
+    background: linear-gradient(180deg, rgba(20, 25, 36, 0.92) 0%, rgba(10, 13, 19, 0.98) 100%);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 8px;
+    padding: 22px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 245, 215, 0.2);
+    position: relative;
+    overflow: hidden;
+  }
+  .drag-calculator-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(247, 231, 180, 0.8), transparent);
+  }
+
+  .drag-roi-callout {
+    background: rgba(223, 184, 67, 0.08);
+    border-left: 3px solid var(--accent);
+    padding: 8px 12px;
+    border-radius: 0 4px 4px 0;
+    font-size: 0.76rem;
+    color: #F1F5F9;
+    line-height: 1.45;
+    margin-bottom: 16px;
+  }
+
+  .twap-radar-card {
+    background: linear-gradient(180deg, rgba(14, 20, 30, 0.85) 0%, rgba(8, 11, 18, 0.95) 100%);
+    border: 1px solid rgba(223, 184, 67, 0.22);
+    border-radius: 8px;
+    padding: 18px 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+
+  .radar-sampling-grid {
+    display: grid;
+    grid-template-columns: repeat(30, 1fr);
+    gap: 2px;
+    margin: 10px 0;
+  }
+  .radar-sample-tick {
+    height: 10px;
+    background: rgba(223, 184, 67, 0.15);
+    border-radius: 1px;
+    transition: background 0.2s;
+  }
+  .radar-sample-tick.active {
+    background: #10B981;
+    box-shadow: 0 0 4px #10B981;
+  }
+  .radar-sample-tick.danger {
+    background: #F43F5E;
+    box-shadow: 0 0 4px #F43F5E;
+  }
+
+  /* 4-Column Structured Institutional Footer */
+  .page-footer {
+    border-top: 1px solid rgba(212, 175, 55, 0.18);
+    padding: 48px 0 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    margin-top: 48px;
+  }
+  .footer-columns-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+  }
+  @media (max-width: 900px) {
+    .footer-columns-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+  }
+  @media (max-width: 520px) {
+    .footer-columns-grid { grid-template-columns: 1fr; gap: 20px; }
+  }
+  .footer-col-title {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--champagne);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .footer-col-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .footer-col-link {
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+  .footer-col-link:hover {
+    color: #FFFFFF;
+  }
+  .footer-regulatory-box {
+    background: rgba(8, 11, 18, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: #64748B;
+    line-height: 1.6;
+  }
+  .footer-regulatory-box strong { color: #94A3B8; }
+  .footer-regulatory-box a { color: var(--accent); text-decoration: underline; }
 
   /* Section Styles */
   .section-block {
@@ -1660,12 +1822,14 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
   <!-- Top Live Ticker Strip -->
   <div class="live-ticker-strip">
     <div class="ticker-items">
-      <div class="ticker-item"><span class="ticker-tag-green">● LIVE AUDIT</span> SPOT DISPERSION: <strong>+1.4 BPS</strong></div>
-      <div class="ticker-item">CANONICAL CORPUS: <strong>1,316 SETTLED WINDOWS (19,740 ROWS)</strong></div>
-      <div class="ticker-item">MARKET-MID BRIER: <strong>${brierScore} (NOMINAL)</strong></div>
+      <div class="ticker-item"><span class="ticker-tag-green">● 1,316 SETTLED WINDOWS (19,740 ROWS)</span></div>
+      <div class="ticker-item">MARKET-MID BRIER: <strong style="color:var(--accent);">${brierScore}</strong></div>
+      <div class="ticker-item">SHA-256 PROVENANCE: <strong>8f3c...b29a</strong></div>
       <div class="ticker-item"><span class="ticker-tag-warn">RULE B5 LOCKED</span> CAPITAL DEPLOYED: <strong>$0.00</strong></div>
     </div>
     <div style="font-family: var(--font-mono); color: var(--muted); display:flex; align-items:center; gap:8px;">
+      <a href="/vs" style="color:var(--champagne); text-decoration:none; font-weight:600;">Why QuanterraOS vs Oddpool &rarr;</a>
+      <span>&bull;</span>
       <a href="/status" style="color:var(--text-dim); text-decoration:none;">STATUS: 100% OPERATIONAL</a>
       <span>&bull;</span>
       <a href="/changelog" style="color:var(--accent); text-decoration:none; font-weight:600;">v0.8.0 RELEASED &rarr;</a>
@@ -1683,153 +1847,170 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     </a>
   </div>
 
-  <!-- Primary Tiered Navigation: Quant Tools · Intelligence · Enterprise · Sign in -->
+  <!-- Streamlined Top Navigation Bar: Engines ▾ · Settlement ▾ · Research ▾ · Radar · CTAs -->
   <nav class="top-nav">
     <div class="nav-left">
-      <a href="/" class="nav-brand"><span class="brand-dot"></span> quanterraos</a>
+      <a href="/" class="nav-brand"><span class="brand-dot"></span> Quanterra<span style="color:var(--accent);">OS</span></a>
 
       <div class="nav-links">
-        <!-- Dropdown 1: Quant Tools -->
+        <!-- Dropdown 1: Engines -->
         <div class="nav-dropdown">
           <button class="nav-dropdown-btn" type="button" aria-haspopup="true">
-            <span>Quant Tools</span>
+            <span>Engines</span>
             <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
           </button>
           <div class="nav-dropdown-menu">
-            <div class="menu-category-title">Core Prediction Engines</div>
+            <div class="menu-category-title">Execution &amp; Pricing Engines</div>
             <div class="menu-item-row">
               <span class="menu-item-icon" style="color:var(--champagne);">📡</span>
               <div class="menu-item-content">
-                <a href="/scanner" class="menu-item-title-link" style="color:var(--champagne);">Discrepancy Scanner</a>
+                <a href="/scanner" class="menu-item-title-link" style="color:var(--champagne);">Live Discrepancy Scanner</a>
                 <span class="menu-item-desc">Polymarket vs Kalshi live spreads &amp; net fee deductions</span>
               </div>
             </div>
             <div class="menu-item-row">
-              <span class="menu-item-icon" style="color:#F59E0B;">🛡️</span>
+              <span class="menu-item-icon" style="color:#38BDF8;">📊</span>
               <div class="menu-item-content">
-                <a href="/resolution-risk" class="menu-item-title-link" style="color:#FBBF24;">Resolution Risk AI</a>
-                <span class="menu-item-desc">Anti-dispute contract NLP &amp; UMA oracle audits</span>
+                <a href="/matrix" class="menu-item-title-link">Pricing Matrix</a>
+                <span class="menu-item-desc">Cross-strike liquidity wall &amp; depth matrix</span>
+              </div>
+            </div>
+            <div class="menu-item-row">
+              <span class="menu-item-icon" style="color:#F59E0B;">⚡</span>
+              <div class="menu-item-content">
+                <a href="/corridors" class="menu-item-title-link">Corridors</a>
+                <span class="menu-item-desc">Multi-strike binary corridor &amp; vertical spreads</span>
+              </div>
+            </div>
+            <div class="menu-item-row">
+              <span class="menu-item-icon" style="color:#A78BFA;">🌊</span>
+              <div class="menu-item-content">
+                <a href="/flow" class="menu-item-title-link">Flow &amp; Depth</a>
+                <span class="menu-item-desc">Real-time order flow imbalances &amp; whale activity</span>
               </div>
             </div>
             <div class="menu-item-row">
               <span class="menu-item-icon" style="color:#10B981;">🧪</span>
               <div class="menu-item-content">
                 <a href="/paper" class="menu-item-title-link" style="color:#10B981;">Paper Mode</a>
-                <span class="menu-item-desc">Execution simulator with realistic fee drag</span>
+                <span class="menu-item-desc">Latency-simulated execution testbed ($10k sandbox)</span>
               </div>
             </div>
             <div class="menu-item-row">
-              <span class="menu-item-icon" style="color:#38BDF8;">💾</span>
+              <span class="menu-item-icon" style="color:var(--accent);">🧮</span>
               <div class="menu-item-content">
-                <a href="/datasets" class="menu-item-title-link" style="color:#38BDF8;">Open Datasets Hub</a>
-                <span class="menu-item-desc">19,740 settled candles &amp; decile calibration</span>
+                <a href="/calculator" class="menu-item-title-link">Check</a>
+                <span class="menu-item-desc">Non-linear taker fee &amp; true breakeven calculator</span>
               </div>
-            </div>
-            <div class="menu-item-row">
-              <span class="menu-item-icon" style="color:#5865F2;">⚡</span>
-              <div class="menu-item-content">
-                <a href="/alerts" class="menu-item-title-link" style="color:#818CF8;">Signal Alerts</a>
-                <span class="menu-item-desc">Discord &amp; Telegram real-time execution signals</span>
-              </div>
-            </div>
-
-            <div class="menu-category-title" style="margin-top:6px;">Microstructure Diagnostics</div>
-            <div class="menu-grid-pills">
-              <a href="/calculator" class="menu-pill-link">Check</a>
-              <a href="/compare" class="menu-pill-link">Compare</a>
-              <a href="/radar" class="menu-pill-link">Radar</a>
-              <a href="/flow" class="menu-pill-link">Flow</a>
-              <a href="/matrix" class="menu-pill-link">Matrix</a>
-              <a href="/settlement" class="menu-pill-link">Settlement</a>
-              <a href="/alerts" class="menu-pill-link">Alerts</a>
             </div>
           </div>
         </div>
 
-        <!-- Dropdown 2: Intelligence & Research -->
+        <!-- Dropdown 2: Settlement Truth -->
         <div class="nav-dropdown">
           <button class="nav-dropdown-btn" type="button" aria-haspopup="true">
-            <span>Intelligence</span>
+            <span>Settlement Truth</span>
             <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
           </button>
           <div class="nav-dropdown-menu">
-            <div class="menu-category-title">Trader Records &amp; Methodology</div>
+            <div class="menu-category-title">Settlement Verification</div>
+            <div class="menu-item-row">
+              <span class="menu-item-icon" style="color:#10B981;">🎯</span>
+              <div class="menu-item-content">
+                <a href="/radar" class="menu-item-title-link">60s Expiry Radar</a>
+                <span class="menu-item-desc">CME CF BRTI final TWAP window &amp; constituent ticks</span>
+              </div>
+            </div>
+            <div class="menu-item-row">
+              <span class="menu-item-icon" style="color:var(--champagne);">📜</span>
+              <div class="menu-item-content">
+                <a href="/settlement" class="menu-item-title-link">Tape Reconstruction</a>
+                <span class="menu-item-desc">Constituent second-by-second weights &amp; post-mortems</span>
+              </div>
+            </div>
+            <div class="menu-item-row">
+              <span class="menu-item-icon" style="color:#F43F5E;">⚠️</span>
+              <div class="menu-item-content">
+                <a href="/radar#danger" class="menu-item-title-link" style="color:#FDA4AF;">Settlement Danger Zone</a>
+                <span class="menu-item-desc">ATM strike proximity &amp; expiry pinning hazard</span>
+              </div>
+            </div>
+            <div class="menu-item-row">
+              <span class="menu-item-icon" style="color:#F59E0B;">🛡️</span>
+              <div class="menu-item-content">
+                <a href="/resolution-risk" class="menu-item-title-link" style="color:#FBBF24;">Anti-Dispute AI</a>
+                <span class="menu-item-desc">UMA oracle dispute probabilities &amp; rulebook hazards</span>
+              </div>
+            </div>
+            <div class="menu-item-row">
+              <span class="menu-item-icon" style="color:#38BDF8;">⚖️</span>
+              <div class="menu-item-content">
+                <a href="/compare" class="menu-item-title-link">Cross-Venue Divergence</a>
+                <span class="menu-item-desc">Kalshi vs Polymarket fee-adjusted spread auditor</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dropdown 3: Research & Verification -->
+        <div class="nav-dropdown">
+          <button class="nav-dropdown-btn" type="button" aria-haspopup="true">
+            <span>Research &amp; Records</span>
+            <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+          </button>
+          <div class="nav-dropdown-menu">
+            <div class="menu-category-title">Empirical Evidence &amp; Tools</div>
             <div class="menu-item-row">
               <span class="menu-item-icon" style="color:var(--champagne);">📊</span>
               <div class="menu-item-content">
-                <a href="/track-record" class="menu-item-title-link" style="color:var(--champagne);">Verified Track Record</a>
-                <span class="menu-item-desc">1,316 settled windows, Brier scores &amp; SHA-256 ledger</span>
+                <a href="/track-record" class="menu-item-title-link" style="color:var(--champagne);">1,316 Settled Ledger</a>
+                <span class="menu-item-desc">Cryptographic SHA-256 settlement track record</span>
+              </div>
+            </div>
+            <div class="menu-item-row">
+              <span class="menu-item-icon" style="color:#A78BFA;">📈</span>
+              <div class="menu-item-content">
+                <a href="/calibration/explorer" class="menu-item-title-link">Murphy Calibration</a>
+                <span class="menu-item-desc">Brier score decomposition (0.2001 market baseline)</span>
               </div>
             </div>
             <div class="menu-item-row">
               <span class="menu-item-icon" style="color:#10B981;">📓</span>
               <div class="menu-item-content">
                 <a href="/journal" class="menu-item-title-link">Journal</a>
-                <span class="menu-item-desc">Systematic trade logger &amp; bias audit</span>
+                <span class="menu-item-desc">Systematic trade logger &amp; broker reconciliation</span>
               </div>
             </div>
             <div class="menu-item-row">
-              <span class="menu-item-icon" style="color:var(--champagne);">🎓</span>
+              <span class="menu-item-icon" style="color:#38BDF8;">🔬</span>
+              <div class="menu-item-content">
+                <a href="/study" class="menu-item-title-link">Study #6.4</a>
+                <span class="menu-item-desc">Prospective cost awareness cohort evaluation</span>
+              </div>
+            </div>
+            <div class="menu-item-row">
+              <span class="menu-item-icon" style="color:#FBBF24;">🎓</span>
               <div class="menu-item-content">
                 <a href="/learn" class="menu-item-title-link">Learn</a>
-                <span class="menu-item-desc">Brier decomposition &amp; probability calibration</span>
+                <span class="menu-item-desc">Prediction market math, fee drag &amp; calibration guides</span>
               </div>
             </div>
             <div class="menu-item-row">
-              <span class="menu-item-icon" style="color:#A78BFA;">📄</span>
+              <span class="menu-item-icon" style="color:#64748B;">📄</span>
               <div class="menu-item-content">
                 <a href="/research" class="menu-item-title-link">Research</a>
-                <span class="menu-item-desc">Empirical market structure whitepapers</span>
+                <span class="menu-item-desc">Empirical market microstructure whitepapers</span>
               </div>
             </div>
             <div class="menu-item-row">
-              <span class="menu-item-icon" style="color:#34D399;">🔍</span>
+              <span class="menu-item-icon" style="color:#10B981;">🤖</span>
               <div class="menu-item-content">
-                <a href="/transparency" class="menu-item-title-link">Transparency</a>
-                <span class="menu-item-desc">Independent referee disclosures &amp; verified telemetry</span>
+                <a href="/mcp" class="menu-item-title-link">MCP Agent API</a>
+                <span class="menu-item-desc">Model Context Protocol endpoint for LLM &amp; Python bots</span>
               </div>
             </div>
             <div class="menu-item-row">
-              <span class="menu-item-icon" style="color:#10B981;">🟢</span>
-              <div class="menu-item-content">
-                <a href="/status" class="menu-item-title-link">Platform Status</a>
-                <span class="menu-item-desc">Live services, DB metrics &amp; edge nodes</span>
-              </div>
-            </div>
-            <div class="menu-item-row">
-              <span class="menu-item-icon" style="color:#00F2FE;">📋</span>
-              <div class="menu-item-content">
-                <a href="/changelog" class="menu-item-title-link">Release Changelog (v0.8.0)</a>
-                <span class="menu-item-desc">Where we are at: dated release history &amp; audits</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Dropdown 3: Enterprise Governance -->
-        <div class="nav-dropdown">
-          <button class="nav-dropdown-btn" type="button" aria-haspopup="true">
-            <span>Enterprise</span>
-            <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-          </button>
-          <div class="nav-dropdown-menu">
-            <div class="menu-category-title">Governance &amp; Council</div>
-            <div class="menu-item-row">
-              <span class="menu-item-icon" style="color:#38BDF8;">🏛️</span>
-              <div class="menu-item-content">
-                <a href="/trustos" class="menu-item-title-link">TrustOS Governance</a>
-                <span class="menu-item-desc">Council oversight &amp; SR 11-7 model risk management</span>
-              </div>
-            </div>
-            <div class="menu-item-row">
-              <span class="menu-item-icon" style="color:var(--champagne);">⚖️</span>
-              <div class="menu-item-content">
-                <a href="/why" class="menu-item-title-link">Why Us</a>
-                <span class="menu-item-desc">Independent referee vs broker-owned terminals</span>
-              </div>
-            </div>
-            <div class="menu-item-row">
-              <span class="menu-item-icon" style="color:var(--muted);">💼</span>
+              <span class="menu-item-icon" style="color:#34D399;">🏛️</span>
               <div class="menu-item-content">
                 <a href="/access" class="menu-item-title-link">Institutional</a>
                 <span class="menu-item-desc">Dedicated enterprise deployment &amp; bridge API</span>
@@ -1838,21 +2019,24 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
           </div>
         </div>
 
-        <!-- Direct Fast-Path Highlights -->
-        <a href="/scanner" class="nav-pill-highlight">Live Scanner</a>
-        <a href="/resolution-risk" class="nav-link-subtle" style="color:#FBBF24;">Anti-Dispute</a>
-        <a href="/mobile" class="nav-link-subtle" style="color:#00F2FE; font-weight:600; display:inline-flex; align-items:center; gap:4px;">📱 Mobile App</a>
+        <!-- Center Pill: Settlement Radar -->
+        <a href="/radar" class="nav-radar-pill" title="Live CME CF BRTI Expiry Radar">
+          <span class="nav-radar-dot"></span>
+          <span>Settlement Radar</span>
+        </a>
       </div>
     </div>
 
+    <!-- Right Header Controls: Mobile App · Sign in · Launch Terminal CTA -->
     <div class="nav-right" style="display:flex; gap:12px; align-items:center;">
       <a href="/mobile" class="nav-pill-mobile-app" style="display:inline-flex; align-items:center; gap:6px; background:rgba(0, 242, 254, 0.12); border:1px solid rgba(0, 242, 254, 0.35); color:#00F2FE; padding:6px 13px; border-radius:6px; font-size:0.8rem; font-weight:700; text-decoration:none; transition:all 0.15s;" title="Direct Install for Apple iPhone &amp; Samsung Galaxy">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
         <span>📱 iPhone &amp; Samsung App</span>
       </a>
+      <a href="/calculator" class="nav-link-subtle" style="font-weight:600; color:var(--text-dim);" title="Audit Contract Friction">Check Friction</a>
       <a href="/access" class="nav-link-subtle" style="font-weight:600;">Sign in</a>
       <a href="/account?flow=sign-up" class="nav-link-subtle" style="color:var(--champagne); font-weight:700;">Sign up</a>
-      <a href="/scanner" class="nav-cta" style="background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%); color:#07080B; border:1px solid rgba(255,248,220,0.8); box-shadow:0 4px 16px rgba(212,175,55,0.4), inset 0 1px 0 #FFF; font-weight:800;">FREE SCANNER &rarr;</a>
+      <a href="/scanner" class="nav-cta" style="background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%); color:#07080B; border:1px solid rgba(255,248,220,0.8); box-shadow:0 4px 16px rgba(212,175,55,0.4), inset 0 1px 0 #FFF; font-weight:800;">LAUNCH TERMINAL &rarr;</a>
     </div>
   </nav>
 
@@ -1876,27 +2060,25 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       </div>
     </div>
 
-    <!-- Hero Section -->
+    <!-- High-Converting Hero Section & Interactive Hook -->
     <section class="hero-section">
       <div class="hero-left">
         <div class="hero-badge">
-          <span class="pulse-beacon"></span> The Multi-Agent Quantitative Engine for Prediction Markets
+          <span class="pulse-beacon"></span> Prediction Market Settlement Truth &amp; Fee Friction Engine
         </div>
         <h1 class="hero-heading">
-          Audited prediction intelligence. Real-time spreads. Zero dispute surprises.
+          Prediction Market Pricing Isn&#039;t 50/50.<br>
+          <span style="background: linear-gradient(135deg, #FFF 30%, #DFB843 70%, #F7E7B4 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Know Your True Odds Before You Trade.</span>
         </h1>
         <p class="hero-subhead">
-          The independent quantitative engine built for Polymarket and Kalshi traders. Scan cross-platform discrepancies, deduct non-linear CFTC taker fees and Polygon gas, and audit UMA oracle resolution loopholes before entering positions.
+          Kalshi and Polymarket taker fees and final-minute TWAP slippage eat 3% to 7% of your edge. QuanterraOS computes your real-time breakeven hurdles and flags settlement danger zones.
         </p>
         <div class="hero-actions">
           <a href="/scanner" class="btn-primary" style="background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%); color:#07080B; border:1px solid #DFB843; font-weight:800; box-shadow:0 0 20px rgba(223,184,67,0.35);">
-            Launch Discrepancy Scanner (Free) &rarr;
+            Launch Terminal (Free) &rarr;
           </a>
-          <a href="/resolution-risk" class="btn-secondary" style="border-color:rgba(245,158,11,0.4); color:#FBBF24;">
-            Anti-Dispute AI Auditor &rarr;
-          </a>
-          <a href="/paper" class="btn-secondary" style="border-color:rgba(16,185,129,0.4); color:#10B981;">
-            Realistic Paper Mode &rarr;
+          <a href="/calculator" class="btn-secondary" style="border-color:rgba(223,184,67,0.4); color:var(--champagne);">
+            Check Taker Friction &rarr;
           </a>
           <a href="/mobile" class="btn-secondary" style="border-color:rgba(0,242,254,0.45); color:#00F2FE; background:rgba(0,242,254,0.06); display:inline-flex; align-items:center; gap:8px;">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
@@ -1945,22 +2127,105 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
         </div>
       </div>
 
-      <!-- Hero Right: Vault Card -->
-      <div class="hero-right">
-        <div class="vault-header">
-          <span class="vault-title">Empirical Benchmark Vault</span>
-          <span class="vault-status">● VERIFIED BASELINE</span>
+      <!-- Hero Right: Dual Interactive Cockpit (Fee Drag Audit + 60s TWAP Danger Zone Radar) -->
+      <div class="hero-dual-cockpit">
+        <!-- Card 1: Interactive Taker Drag Audit -->
+        <div class="drag-calculator-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid rgba(212,175,55,0.2); padding-bottom:8px;">
+            <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--champagne); font-weight:700; text-transform:uppercase; letter-spacing:0.06em;">
+              ⚡ Interactive Widget // Fee Drag Audit
+            </div>
+            <div style="font-family:var(--font-mono); font-size:0.68rem; color:#10B981;">
+              ● REAL-TIME KALSHI FORMULA
+            </div>
+          </div>
+
+          <div class="drag-roi-callout">
+            <strong style="color:var(--champagne);">51¢ doesn&#039;t mean 51¢.</strong> A 55% win rate loses money on Kalshi after 3.5% taker drag. We calculate the exact breakeven tick before you enter.
+          </div>
+
+          <!-- Controls: Price & Prob -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px;">
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:0.72rem; font-family:var(--font-mono); color:var(--muted); margin-bottom:4px;">
+                <span>Contract Ask</span>
+                <span id="hero-drag-price-val" style="color:#FFF; font-weight:700;">51¢</span>
+              </div>
+              <input type="range" id="hero-drag-price" min="1" max="99" value="51" oninput="recalcHeroTakerDrag()" style="width:100%; accent-color:#DFB843; cursor:pointer;">
+            </div>
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:0.72rem; font-family:var(--font-mono); color:var(--muted); margin-bottom:4px;">
+                <span>Perceived Win Rate</span>
+                <span id="hero-drag-prob-val" style="color:#FFF; font-weight:700;">55.0%</span>
+              </div>
+              <input type="range" id="hero-drag-prob" min="1" max="99" value="55" oninput="recalcHeroTakerDrag()" style="width:100%; accent-color:#10B981; cursor:pointer;">
+            </div>
+          </div>
+
+          <!-- Quick Presets -->
+          <div style="display:flex; gap:6px; margin-bottom:14px; font-family:var(--font-mono); font-size:0.68rem;">
+            <button type="button" onclick="setHeroDragPreset(51, 55)" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:var(--champagne); padding:2px 8px; border-radius:3px; cursor:pointer;">51¢ ATM (High Drag)</button>
+            <button type="button" onclick="setHeroDragPreset(45, 52)" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:var(--muted); padding:2px 8px; border-radius:3px; cursor:pointer;">45¢ OTM</button>
+            <button type="button" onclick="setHeroDragPreset(70, 78)" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:var(--muted); padding:2px 8px; border-radius:3px; cursor:pointer;">70¢ ITM</button>
+          </div>
+
+          <!-- Real-Time Metrics Output Grid -->
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; background:rgba(6,7,10,0.7); border:1px solid rgba(212,175,55,0.2); border-radius:6px; padding:10px 12px; font-family:var(--font-mono);">
+            <div>
+              <div style="font-size:0.62rem; color:var(--muted); text-transform:uppercase;">True Breakeven</div>
+              <div id="hero-drag-breakeven" style="font-size:1.15rem; font-weight:800; color:var(--champagne); margin-top:2px;">52.75%</div>
+              <div style="font-size:0.6rem; color:var(--muted);">was 50.00%</div>
+            </div>
+            <div>
+              <div style="font-size:0.62rem; color:var(--muted); text-transform:uppercase;">Taker Fee (100 ct)</div>
+              <div id="hero-drag-fee" style="font-size:1.15rem; font-weight:800; color:#F43F5E; margin-top:2px;">+$1.75</div>
+              <div style="font-size:0.6rem; color:var(--muted);">1.75¢ / contract</div>
+            </div>
+            <div>
+              <div style="font-size:0.62rem; color:var(--muted); text-transform:uppercase;">Net Real Return</div>
+              <div id="hero-drag-ev" style="font-size:1.15rem; font-weight:800; color:#10B981; margin-top:2px;">+$2.25</div>
+              <div id="hero-drag-drag" style="font-size:0.6rem; color:#F43F5E;">43.8% fee drag</div>
+            </div>
+          </div>
         </div>
-        <div class="vault-brier-display">
-          <div class="vault-brier-num" id="hero-brier-val">${brierScore}</div>
-          <div class="vault-brier-unit">Brier Score</div>
-        </div>
-        <div class="vault-desc">
-          Murphy decomposition of minute-4 market mid-price across ${sampleN.toLocaleString()} settled contracts. The market benchmark outscores our internal models (0.2063).
-        </div>
-        <div style="border-top: 1px solid var(--panel-border); padding-top: 14px; display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.72rem;">
-          <span style="color: var(--muted);">Random Baseline: 0.2500</span>
-          <span style="color: var(--warning);">Market Baseline: 0.2001 (Model: 0.2063)</span>
+
+        <!-- Card 2: Live Danger Zone: 60s CME TWAP Radar -->
+        <div class="twap-radar-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div style="font-family:var(--font-mono); font-size:0.72rem; color:#F43F5E; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; display:flex; align-items:center; gap:6px;">
+              <span style="width:6px; height:6px; border-radius:50%; background:#F43F5E; box-shadow:0 0 8px #F43F5E; animation:beaconPulse 1s infinite;"></span>
+              Live Danger Zone // 60s CME TWAP Radar
+            </div>
+            <a href="/radar" style="font-family:var(--font-mono); font-size:0.68rem; color:var(--accent); text-decoration:none;">Open Full Radar &rarr;</a>
+          </div>
+
+          <div style="font-size:0.75rem; color:#CBD5E1; margin-bottom:6px;">
+            <strong style="color:#FFF;">Strike Proximity:</strong> Spot $85,520 vs Strike $85,500 (+2.3 bps) &bull; <span style="color:#F43F5E; font-weight:700;">ATM FLIP HAZARD HIGH</span>
+          </div>
+
+          <!-- Micro Tick Sampling Grid (60 ticks) -->
+          <div class="radar-sampling-grid" title="Second-by-second sampling blocks (60s TWAP window)">
+            <span class="radar-sample-tick active"></span><span class="radar-sample-tick active"></span><span class="radar-sample-tick active"></span><span class="radar-sample-tick active"></span><span class="radar-sample-tick active"></span>
+            <span class="radar-sample-tick active"></span><span class="radar-sample-tick active"></span><span class="radar-sample-tick active"></span><span class="radar-sample-tick active"></span><span class="radar-sample-tick active"></span>
+            <span class="radar-sample-tick active"></span><span class="radar-sample-tick active"></span><span class="radar-sample-tick active"></span><span class="radar-sample-tick active"></span><span class="radar-sample-tick active"></span>
+            <span class="radar-sample-tick active"></span><span class="radar-sample-tick active"></span><span class="radar-sample-tick active"></span><span class="radar-sample-tick danger"></span><span class="radar-sample-tick danger"></span>
+            <span class="radar-sample-tick danger"></span><span class="radar-sample-tick active"></span><span class="radar-sample-tick active"></span><span class="radar-sample-tick active"></span><span class="radar-sample-tick active"></span>
+            <span class="radar-sample-tick active"></span><span class="radar-sample-tick active"></span><span class="radar-sample-tick active"></span><span class="radar-sample-tick active"></span><span class="radar-sample-tick active"></span>
+            <span class="radar-sample-tick active"></span><span class="radar-sample-tick active"></span><span class="radar-sample-tick active"></span><span class="radar-sample-tick active"></span><span class="radar-sample-tick active"></span>
+            <span class="radar-sample-tick active"></span><span class="radar-sample-tick active"></span><span class="radar-sample-tick active"></span><span class="radar-sample-tick active"></span><span class="radar-sample-tick active"></span>
+            <span class="radar-sample-tick active"></span><span class="radar-sample-tick active"></span><span class="radar-sample-tick"></span><span class="radar-sample-tick"></span><span class="radar-sample-tick"></span>
+            <span class="radar-sample-tick"></span><span class="radar-sample-tick"></span><span class="radar-sample-tick"></span><span class="radar-sample-tick"></span><span class="radar-sample-tick"></span>
+            <span class="radar-sample-tick"></span><span class="radar-sample-tick"></span><span class="radar-sample-tick"></span><span class="radar-sample-tick"></span><span class="radar-sample-tick"></span>
+            <span class="radar-sample-tick"></span><span class="radar-sample-tick"></span><span class="radar-sample-tick"></span><span class="radar-sample-tick"></span><span class="radar-sample-tick"></span>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; font-family:var(--font-mono); font-size:0.65rem; color:var(--muted);">
+            <span>Constituents: Coinbase 34% &bull; Kraken 28% &bull; Bitstamp 21% &bull; Gemini 17%</span>
+            <span style="color:var(--champagne);">42 / 60 ticks recorded</span>
+          </div>
+
+          <!-- Hidden telemetry holder for automated Brier polling -->
+          <span id="hero-brier-val" style="display:none;">${brierScore}</span>
         </div>
       </div>
     </section>
@@ -2606,8 +2871,98 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
         <div class="section-eyebrow" style="color:var(--accent-light);">2026 Competitive Landscape &bull; Architectural Moat</div>
         <h2 class="section-heading">The Independent Referee in an Acquired Market</h2>
         <p class="section-description">
-          While prediction apps get acquired by exchanges and black-box bots promote illusory edges, QuanterraOS operates as the strictly independent, sovereign risk companion.
+          While prediction apps get acquired by exchanges (Dome by Polymarket, Oddpool by Kalshi) and black-box bots promote illusory edges, QuanterraOS operates as the strictly independent, sovereign risk companion.
         </p>
+      </div>
+
+      <!-- High-Impact Competitor Teardown Table: QuanterraOS vs Kalshi, Oddpool, Dome -->
+      <div style="background:#06070A; border:1px solid rgba(212,175,55,0.3); border-radius:10px; padding:24px; box-shadow:0 16px 40px rgba(0,0,0,0.8); margin-bottom:28px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:18px; border-bottom:1px solid rgba(212,175,55,0.18); padding-bottom:12px;">
+          <div>
+            <span style="font-family:var(--font-mono); font-size:0.7rem; color:var(--champagne); text-transform:uppercase; font-weight:700; letter-spacing:0.08em;">
+              SOVEREIGN ARCHITECTURAL ADVANTAGE // COMPETITOR TEARDOWN
+            </span>
+            <div style="font-size:1.15rem; font-weight:700; color:#FFFFFF; margin-top:2px;">
+              QuanterraOS vs. Kalshi Native UI, Oddpool &amp; Dome
+            </div>
+          </div>
+          <a href="/vs" class="btn-secondary" style="font-size:0.72rem; padding:6px 14px; color:var(--champagne); border-color:rgba(212,175,55,0.4);">
+            View Full Competitive Dossier (/vs) &rarr;
+          </a>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; font-size:0.82rem; text-align:left;">
+            <thead>
+              <tr style="border-bottom:1px solid rgba(212,175,55,0.25); background:rgba(20,25,36,0.6); font-family:var(--font-mono); font-size:0.7rem; color:var(--muted); text-transform:uppercase;">
+                <th style="padding:12px 14px; width:22%;">Feature</th>
+                <th style="padding:12px 14px; width:38%; color:#FDA4AF;">Competitor Approach (Kalshi / Oddpool / Dome)</th>
+                <th style="padding:12px 14px; width:40%; color:var(--accent-light);">The QuanterraOS Truth</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+                <td style="padding:14px; vertical-align:top;">
+                  <strong style="color:#FFF;">Real-time Taker Drag Calculation</strong>
+                  <div style="font-size:0.72rem; color:var(--muted); font-family:var(--font-mono); margin-top:2px;">Parabolic Friction Curve</div>
+                </td>
+                <td style="padding:14px; vertical-align:top; color:#CBD5E1; line-height:1.45;">
+                  <span style="display:inline-block; font-family:var(--font-mono); font-size:0.65rem; color:#F43F5E; background:rgba(244,63,94,0.12); padding:2px 6px; border-radius:3px; margin-bottom:4px; font-weight:700;">FRICTION BLIND</span><br>
+                  Displays nominal 50¢/50¢ quotes, concealing Kalshi's parabolic taker fee. Users enter trades believing 51% is breakeven when it actually requires 52.75%.
+                </td>
+                <td style="padding:14px; vertical-align:top; color:#FFF; line-height:1.45; background:rgba(223,184,67,0.02);">
+                  <span style="display:inline-block; font-family:var(--font-mono); font-size:0.65rem; color:#10B981; background:rgba(16,185,129,0.12); padding:2px 6px; border-radius:3px; margin-bottom:4px; font-weight:700;">REAL-TIME HURDLE AUDIT</span><br>
+                  Live non-linear CFTC fee arithmetic &#x2308;0.07 &times; P &times; (1-P)&#x2309;. Computes the exact breakeven tick and displays net EV after taker friction before order entry.
+                </td>
+              </tr>
+
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+                <td style="padding:14px; vertical-align:top;">
+                  <strong style="color:#FFF;">60s TWAP Danger Zone Radar</strong>
+                  <div style="font-size:0.72rem; color:var(--muted); font-family:var(--font-mono); margin-top:2px;">Settlement Index Integrity</div>
+                </td>
+                <td style="padding:14px; vertical-align:top; color:#CBD5E1; line-height:1.45;">
+                  <span style="display:inline-block; font-family:var(--font-mono); font-size:0.65rem; color:#F43F5E; background:rgba(244,63,94,0.12); padding:2px 6px; border-radius:3px; margin-bottom:4px; font-weight:700;">SINGLE-FEED ILLUSION</span><br>
+                  Shows a single exchange spot price or lagging 1-minute candle, concealing constituent exchange dispersion and last-second settlement pinning manipulation.
+                </td>
+                <td style="padding:14px; vertical-align:top; color:#FFF; line-height:1.45; background:rgba(223,184,67,0.02);">
+                  <span style="display:inline-block; font-family:var(--font-mono); font-size:0.65rem; color:#10B981; background:rgba(16,185,129,0.12); padding:2px 6px; border-radius:3px; margin-bottom:4px; font-weight:700;">CONSTITUENT RECONSTRUCTION</span><br>
+                  Reconstructs all 60 second-by-second sampling ticks across the 4 CME CF BRTI constituents (Coinbase 34%, Kraken 28%, Bitstamp 21%, Gemini 17%) with ATM strike flip warnings.
+                </td>
+              </tr>
+
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+                <td style="padding:14px; vertical-align:top;">
+                  <strong style="color:#FFF;">Falsifiable Calibration (Brier Scores)</strong>
+                  <div style="font-size:0.72rem; color:var(--muted); font-family:var(--font-mono); margin-top:2px;">Out-of-Sample Verification</div>
+                </td>
+                <td style="padding:14px; vertical-align:top; color:#CBD5E1; line-height:1.45;">
+                  <span style="display:inline-block; font-family:var(--font-mono); font-size:0.65rem; color:#F43F5E; background:rgba(244,63,94,0.12); padding:2px 6px; border-radius:3px; margin-bottom:4px; font-weight:700;">UNVERIFIED HYPE</span><br>
+                  Marketing claims of "80% win rates" or subjective bot grades without public datasets, walk-forward logs, or statistical reliability calibration curves.
+                </td>
+                <td style="padding:14px; vertical-align:top; color:#FFF; line-height:1.45; background:rgba(223,184,67,0.02);">
+                  <span style="display:inline-block; font-family:var(--font-mono); font-size:0.65rem; color:#10B981; background:rgba(16,185,129,0.12); padding:2px 6px; border-radius:3px; margin-bottom:4px; font-weight:700;">1,316 SETTLED LEDGER</span><br>
+                  Full Murphy Brier decomposition (0.2001 market benchmark) published across 1,316 settled windows, backed by immutable SHA-256 provenance hashes and open CSV data.
+                </td>
+              </tr>
+
+              <tr>
+                <td style="padding:14px; vertical-align:top;">
+                  <strong style="color:#FFF;">Sovereign MCP Server Support</strong>
+                  <div style="font-size:0.72rem; color:var(--muted); font-family:var(--font-mono); margin-top:2px;">Agent &amp; Bot Integration</div>
+                </td>
+                <td style="padding:14px; vertical-align:top; color:#CBD5E1; line-height:1.45;">
+                  <span style="display:inline-block; font-family:var(--font-mono); font-size:0.65rem; color:#F43F5E; background:rgba(244,63,94,0.12); padding:2px 6px; border-radius:3px; margin-bottom:4px; font-weight:700;">CLOSED WALLED GARDEN</span><br>
+                  Closed consumer web applications with no programmatic context endpoints for autonomous LLM agents, quantitative scrapers, or Python models.
+                </td>
+                <td style="padding:14px; vertical-align:top; color:#FFF; line-height:1.45; background:rgba(223,184,67,0.02);">
+                  <span style="display:inline-block; font-family:var(--font-mono); font-size:0.65rem; color:#10B981; background:rgba(16,185,129,0.12); padding:2px 6px; border-radius:3px; margin-bottom:4px; font-weight:700;">NATIVE MCP SPECIFICATION</span><br>
+                  Standardized Model Context Protocol manifest at <code style="color:var(--champagne); font-family:var(--font-mono);">/api/mcp/manifest</code> enabling Claude, Antigravity, and custom trading bots to query live friction in real time.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <div class="benchmark-showcase-box">
@@ -3367,42 +3722,92 @@ ${miniCircles}
       </div>
     </div>
 
-    <!-- Footer -->
+    <!-- 4-Column Structured Institutional Footer -->
     <footer class="page-footer">
-      <div class="footer-links">
-        <a href="/transparency">transparency</a>
-        <a href="/widgets">widgets</a>
-        <a href="/why">why</a>
-        <a href="/radar">radar</a>
-        <a href="/paper">paper</a>
-        <a href="/compare">compare</a>
-        <a href="/study">study</a>
-        <a href="/educators">educators</a>
-        <a href="/radar/audio">sonification</a>
-        <a href="/flow">flow</a>
-        <a href="/matrix">matrix</a>
-        <a href="/divergence">divergence</a>
-        <a href="/calibration">calibration</a>
-        <a href="/calibration/explorer">decomposition</a>
-        <a href="/council">council</a>
-        <a href="/predictions">predictions</a>
-        <a href="/autopilot">autopilot</a>
-        <a href="/wallet">wallet</a>
-        <a href="/growth">growth</a>
-        <a href="/index">index</a>
-        <a href="/spread">spread</a>
-        <a href="/methodology">methodology</a>
-        <a href="/research">research</a>
-        <a href="/changelog">changelog</a>
-        <a href="/legal">legal</a>
-        <a href="/status">status</a>
+      <div class="footer-columns-grid">
+        <!-- Col 1: Terminal Engines -->
+        <div class="footer-col">
+          <div class="footer-col-title">
+            <span>⚡</span> Terminal Engines
+          </div>
+          <div class="footer-col-links">
+            <a href="/calculator" class="footer-col-link">Taker Friction Calculator</a>
+            <a href="/paper" class="footer-col-link">Realistic Paper Mode</a>
+            <a href="/scanner" class="footer-col-link">Live Discrepancy Scanner</a>
+            <a href="/matrix" class="footer-col-link">Liquidity Depth Matrix</a>
+            <a href="/flow" class="footer-col-link">Order Flow &amp; Tension</a>
+            <a href="/corridors" class="footer-col-link">Binary Corridors Engine</a>
+            <a href="/mobile" class="footer-col-link">iPhone &amp; Samsung Mobile App</a>
+            <a href="/widgets" class="footer-col-link">Widget Embed Catalog</a>
+          </div>
+        </div>
+
+        <!-- Col 2: Settlement & Microstructure -->
+        <div class="footer-col">
+          <div class="footer-col-title">
+            <span>🎯</span> Settlement Truth
+          </div>
+          <div class="footer-col-links">
+            <a href="/radar" class="footer-col-link">60s Expiry Radar</a>
+            <a href="/settlement" class="footer-col-link">Tape Reconstruction</a>
+            <a href="/resolution-risk" class="footer-col-link">Anti-Dispute AI Guardian</a>
+            <a href="/radar/audio" class="footer-col-link">Microstructure Sonification</a>
+            <a href="/divergence" class="footer-col-link">Cross-Venue Divergence</a>
+            <a href="/compare" class="footer-col-link">Venue Comparison Terminal</a>
+            <a href="/index" class="footer-col-link">Composite Index Proxy</a>
+            <a href="/spread" class="footer-col-link">Cross-Venue Spread Monitor</a>
+          </div>
+        </div>
+
+        <!-- Col 3: Data Provenance & Research -->
+        <div class="footer-col">
+          <div class="footer-col-title">
+            <span>🔬</span> Provenance &amp; Data
+          </div>
+          <div class="footer-col-links">
+            <a href="/track-record" class="footer-col-link">1,316-Window Settlement Ledger</a>
+            <a href="/study" class="footer-col-link">Study #6.4 Cohort Portal</a>
+            <a href="/calibration" class="footer-col-link">Calibration Explorer</a>
+            <a href="/calibration/explorer" class="footer-col-link">Murphy Decomposition</a>
+            <a href="/datasets" class="footer-col-link">Open Datasets Hub (19,740 rows)</a>
+            <a href="/journal" class="footer-col-link">Systematic Decision Journal</a>
+            <a href="/learn" class="footer-col-link">Market Math &amp; Bias Guides</a>
+            <a href="/research" class="footer-col-link">Empirical Whitepapers</a>
+            <a href="/methodology" class="footer-col-link">Research Methodology</a>
+            <a href="/status" class="footer-col-link">System Status (11 Services)</a>
+            <a href="/changelog" class="footer-col-link">Release Changelog (v0.8.0)</a>
+          </div>
+        </div>
+
+        <!-- Col 4: Legal & Institutional -->
+        <div class="footer-col">
+          <div class="footer-col-title">
+            <span>🏛️</span> Institutional &amp; Legal
+          </div>
+          <div class="footer-col-links">
+            <a href="/trustos" class="footer-col-link">TrustOS Model Governance</a>
+            <a href="/why" class="footer-col-link">Why QuanterraOS vs Competitors (/vs)</a>
+            <a href="/mcp" class="footer-col-link">Model Context Protocol (MCP API)</a>
+            <a href="/educators" class="footer-col-link">Distribution &amp; Partner Portal</a>
+            <a href="/access" class="footer-col-link">Institutional Desk Access</a>
+            <a href="/transparency" class="footer-col-link">Transparency &amp; Referee Charter</a>
+            <a href="/council" class="footer-col-link">Council Specialists</a>
+            <a href="/wallet" class="footer-col-link">Subscriber Sandbox Wallet</a>
+            <a href="/predictions" class="footer-col-link">Predictions Ledger Replay</a>
+            <a href="/autopilot" class="footer-col-link">Autopilot Simulation</a>
+            <a href="/growth" class="footer-col-link">Growth Telemetry</a>
+            <a href="/legal" class="footer-col-link">Legal Notices &amp; Terms</a>
+          </div>
+        </div>
       </div>
-      <div class="footer-disclaimer">
+
+      <!-- Compact 11px Monospace Regulatory & Safety Disclaimers -->
+      <div class="footer-regulatory-box">
         <p style="margin-bottom: 8px;">
           <strong>Regulatory &amp; Non-Affiliation Notice (Rule B10):</strong> Kalshi, CME Group, CF Benchmarks, Coinbase, Kraken, Bitstamp, Gemini, and Polymarket are trademarks of their respective owners. QuanterraOS is an independent measurement and statistical verification system operated by Quantara Global LLC and is not affiliated with, endorsed by, or sponsored by any exchange, index provider, or market operator.
         </p>
         <p>
-          <strong>Not Investment Advice (Rule B5):</strong> QuanterraOS does not provide investment, financial, or trading advice, and does not route or execute live orders. In accordance with internal safety Rule B5, zero live capital is deployed ($0.00 exposure). Simulated and historical calibration results have inherent limitations under CFTC Rule 4.41. Past performance does not guarantee future results. <a href="/legal" style="color:var(--accent); text-decoration:underline;">Read full Legal Notices, Terms &amp; Regulatory Disclaimers &rarr;</a>
+          <strong>Not Investment Advice &amp; Zero Live Capital (Rule B5):</strong> QuanterraOS does not provide investment, financial, or trading advice, and does not route or execute live orders. In accordance with internal safety Rule B5, zero live capital is deployed ($0.00 exposure). Simulated and historical calibration results have inherent limitations under CFTC Rule 4.41. Past performance does not guarantee future results. <a href="/legal">Read full Legal Notices, Terms &amp; Regulatory Disclaimers &rarr;</a>
         </p>
       </div>
     </footer>
@@ -4090,14 +4495,63 @@ function filterBattlecard(cat) {
   });
 }
 
+function recalcHeroTakerDrag() {
+  var priceInput = document.getElementById('hero-drag-price');
+  var probInput = document.getElementById('hero-drag-prob');
+  if (!priceInput || !probInput) return;
+
+  var price = Math.max(1, Math.min(99, parseInt(priceInput.value, 10) || 51));
+  var prob = Math.max(1, Math.min(99, parseFloat(probInput.value) || 55));
+  var count = 100;
+
+  var priceLabel = document.getElementById('hero-drag-price-val');
+  if (priceLabel) priceLabel.textContent = price + '¢';
+  var probLabel = document.getElementById('hero-drag-prob-val');
+  if (probLabel) probLabel.textContent = prob.toFixed(1) + '%';
+
+  var p = price / 100;
+  var u = prob / 100;
+
+  var exactTotalFee = Math.ceil(0.07 * count * p * (1 - p) * 100) / 100;
+  var feePerContract = exactTotalFee / count;
+
+  var trueBreakevenPct = (p + feePerContract) * 100;
+  var grossEv = (u - p) * count;
+  var netEv = (u - p - feePerContract) * count;
+  var feeDragRatio = grossEv > 0 ? Math.min(100, (exactTotalFee / (grossEv + exactTotalFee)) * 100) : 100;
+
+  var feeEl = document.getElementById('hero-drag-fee');
+  var beEl = document.getElementById('hero-drag-breakeven');
+  var evEl = document.getElementById('hero-drag-ev');
+  var dragEl = document.getElementById('hero-drag-drag');
+
+  if (feeEl) feeEl.textContent = '+$' + exactTotalFee.toFixed(2);
+  if (beEl) beEl.textContent = trueBreakevenPct.toFixed(2) + '%';
+  if (evEl) {
+    evEl.textContent = (netEv >= 0 ? '+' : '') + '$' + netEv.toFixed(2);
+    evEl.style.color = netEv >= 0 ? '#10B981' : '#F43F5E';
+  }
+  if (dragEl) dragEl.textContent = feeDragRatio.toFixed(1) + '% fee drag';
+}
+
+function setHeroDragPreset(price, prob) {
+  var priceInput = document.getElementById('hero-drag-price');
+  var probInput = document.getElementById('hero-drag-prob');
+  if (priceInput) priceInput.value = price;
+  if (probInput) probInput.value = prob;
+  recalcHeroTakerDrag();
+}
+
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', function() {
     recalcWedge();
     recalcHomeFrictionTeardown();
+    recalcHeroTakerDrag();
   });
 } else {
   recalcWedge();
   recalcHomeFrictionTeardown();
+  recalcHeroTakerDrag();
 }
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/service-worker.js').catch(function() {});
