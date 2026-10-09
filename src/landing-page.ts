@@ -1961,20 +1961,23 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
         <!-- Footer Actions -->
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-top:24px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.06);">
           <div style="font-size:0.78rem; color:var(--muted);">
-            Explore our comprehensive competitive teardown comparing QuanterraOS to Verso, Oddpool, Dome, Predly, and Stand.Trade.
+            Explore our comprehensive competitive teardown comparing QuanterraOS to 12 incumbents across prediction terminals and enterprise AI governance.
           </div>
           <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
             <a href="/why" class="btn-primary" style="background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%); color:#07080B; border:1px solid #DFB843; font-weight:700; padding:8px 16px; font-size:0.8rem;">
               Full 2026 Competitive Teardown &rarr;
             </a>
+            <a href="/why#move4-kelly-engine" class="btn-secondary" style="border-color:rgba(212,175,55,0.4); color:var(--accent-light); padding:8px 14px; font-size:0.8rem;">
+              Kelly Anti-Ruin (Move #4)
+            </a>
+            <a href="/why#move5-whale-forensics" class="btn-secondary" style="border-color:rgba(16,185,129,0.4); color:#10B981; padding:8px 14px; font-size:0.8rem;">
+              Whale Forensics (Move #5)
+            </a>
+            <a href="/trustos" class="btn-secondary" style="border-color:rgba(56,189,248,0.4); color:#38BDF8; padding:8px 14px; font-size:0.8rem;">
+              TrustOS Audit ($20k / 6-Wk)
+            </a>
             <a href="/transparency" class="btn-secondary" style="border-color:rgba(16,185,129,0.4); color:#10B981; padding:8px 14px; font-size:0.8rem;">
-              Outcome Transparency Audit (#6.6)
-            </a>
-            <a href="/widgets" class="btn-secondary" style="padding:8px 14px; font-size:0.8rem;">
-              Distribution Widgets (#6.5)
-            </a>
-            <a href="/guides" class="btn-secondary" style="border-color:rgba(56,189,248,0.4); color:#38BDF8; padding:8px 14px; font-size:0.8rem;">
-              Search Guides (#6.1)
+              Outcome Transparency (#6.6)
             </a>
           </div>
         </div>

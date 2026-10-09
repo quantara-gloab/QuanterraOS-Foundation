@@ -160,6 +160,10 @@ import {
 import {
   computeFrictionTeardown,
   computeCrossVenueSpreadTeardown,
+  computeCalibrationAdjustedKelly,
+  decodeWhaleFlow,
+  generateTrustOsAuditPreview,
+  renderTrustOsPageHtml,
   COMPETITOR_DOSSIER_LIST,
   generateBenchmarkSvgReceipt,
   renderBenchmarkWidgetHtml,
@@ -2667,6 +2671,74 @@ app.get("/api/benchmark/cross-venue", (req, res) => {
 
 app.get("/api/benchmark/competitors", (_req, res) => {
   res.json({ success: true, competitors: COMPETITOR_DOSSIER_LIST });
+});
+
+// Strategic Move #4: Calibration-Adjusted Fractional Kelly & Capital Preservation Engine
+app.all(["/api/benchmark/kelly", "/api/kelly"], (req, res) => {
+  const q = req.method === "POST" ? req.body : req.query;
+  const nominalPriceCents = q.p ? Number(q.p) : (q.nominalPriceCents ? Number(q.nominalPriceCents) : 50);
+  const userStatedWinRatePct = q.w ? Number(q.w) : (q.userStatedWinRatePct ? Number(q.userStatedWinRatePct) : 60);
+  const bankrollUsd = q.b ? Number(q.b) : (q.bankrollUsd ? Number(q.bankrollUsd) : 1000);
+  const shrinkageFactor = q.alpha ? Number(q.alpha) : (q.shrinkageFactor ? Number(q.shrinkageFactor) : 0.35);
+
+  const result = computeCalibrationAdjustedKelly({
+    nominalPriceCents,
+    userStatedWinRatePct,
+    bankrollUsd,
+    shrinkageFactor,
+  });
+  res.json({ success: true, result });
+});
+
+// Strategic Move #5: Whale Forensics & Institutional Delta/Basis Decoder
+app.all(["/api/benchmark/whale-forensics", "/api/whales"], (req, res) => {
+  const q = req.method === "POST" ? req.body : req.query;
+  const contractTicker = String(q.ticker || q.contractTicker || "KXBTC15M-SAMPLE");
+  const venue = (String(q.venue || "kalshi").toLowerCase() === "polymarket" ? "polymarket" : "kalshi") as "kalshi" | "polymarket";
+  const priceCents = q.price ? Number(q.price) : (q.priceCents ? Number(q.priceCents) : 51);
+  const contracts = q.contracts ? Number(q.contracts) : (q.size ? Number(q.size) : 5000);
+  const spotPriceUsd = q.spot ? Number(q.spot) : (q.spotPriceUsd ? Number(q.spotPriceUsd) : 68485);
+  const strikePriceUsd = q.strike ? Number(q.strike) : (q.strikePriceUsd ? Number(q.strikePriceUsd) : 68500);
+  const timeRemainingSeconds = q.timeRemaining ? Number(q.timeRemaining) : (q.timeRemainingSeconds ? Number(q.timeRemainingSeconds) : 180);
+
+  const result = decodeWhaleFlow({
+    contractTicker,
+    venue,
+    priceCents,
+    contracts,
+    spotPriceUsd,
+    strikePriceUsd,
+    timeRemainingSeconds,
+  });
+  res.json({ success: true, result });
+});
+
+// Strategic Move #6: TrustOS Empirical Mathematical Audit Dossier Engine
+app.all(["/api/trustos/audit-preview", "/api/audit/dossier"], (req, res) => {
+  const q = req.method === "POST" ? req.body : req.query;
+  const institutionName = String(q.institution || q.institutionName || "Enterprise Risk Committee / Design Partner");
+  const modelDomain = (q.domain || q.modelDomain || "algorithmic_underwriting") as "algorithmic_underwriting" | "binary_options_pricing" | "credit_risk";
+  const sampleDecisionsCount = q.samples ? Number(q.samples) : (q.sampleDecisionsCount ? Number(q.sampleDecisionsCount) : 1316);
+  const targetBrierScore = q.brier ? Number(q.brier) : (q.targetBrierScore ? Number(q.targetBrierScore) : 0.2001);
+
+  const result = generateTrustOsAuditPreview({
+    institutionName,
+    modelDomain,
+    sampleDecisionsCount,
+    targetBrierScore,
+  });
+  res.json({ success: true, result });
+});
+
+// Executive Enterprise TrustOS Portal
+app.get(["/trustos", "/enterprise/trustos", "/audit-pilot"], (_req, res) => {
+  const preview = generateTrustOsAuditPreview({
+    institutionName: "Frontier Risk Analytics / Regional Insurer",
+    modelDomain: "algorithmic_underwriting",
+    sampleDecisionsCount: 1316,
+    targetBrierScore: 0.2001,
+  });
+  res.type("html").send(renderTrustOsPageHtml(preview));
 });
 
 app.get("/api/benchmark/card.svg", (req, res) => {

@@ -1,6 +1,13 @@
 import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
 import { getLiveQuotes } from "./live-quotes.ts";
-import { computeFrictionTeardown, computeCrossVenueSpreadTeardown, COMPETITOR_BENCHMARK_ROWS } from "./competitive-benchmark.ts";
+import {
+  computeFrictionTeardown,
+  computeCrossVenueSpreadTeardown,
+  computeCalibrationAdjustedKelly,
+  decodeWhaleFlow,
+  generateTrustOsAuditPreview,
+  COMPETITOR_BENCHMARK_ROWS,
+} from "./competitive-benchmark.ts";
 import { SEARCH_QUERY_ARTICLES, getSearchQueryArticle } from "./indexable-content.ts";
 
 /**
@@ -127,6 +134,50 @@ export const MCP_SERVER_MANIFEST = {
           priceKalshiCents: { type: "number", description: "Kalshi contract price in cents (e.g. 48 for 48¢)" },
           pricePolymarketCents: { type: "number", description: "Polymarket opposing contract price in cents (e.g. 49 for 49¢)" },
           contracts: { type: "number", default: 1000, description: "Number of contracts" }
+        }
+      }
+    },
+    {
+      name: "calculate_calibration_adjusted_kelly",
+      description: "Executes Strategic Move #4 fractional Kelly position sizing with empirical Brier reliability shrinkage (1,316 settled windows) and non-linear taker fee deduction.",
+      parameters: {
+        type: "object",
+        required: ["nominalPriceCents", "userStatedWinRatePct"],
+        properties: {
+          nominalPriceCents: { type: "number", description: "Contract price in cents (1-99)" },
+          userStatedWinRatePct: { type: "number", description: "Trader's stated or model win probability in % (1-99)" },
+          bankrollUsd: { type: "number", default: 1000, description: "Total sandbox bankroll in USD" },
+          shrinkageFactor: { type: "number", default: 0.35, description: "Empirical Brier shrinkage factor (0.35 = out-of-sample resolution ratio)" }
+        }
+      }
+    },
+    {
+      name: "decode_whale_flow",
+      description: "Executes Strategic Move #5 whale flow forensics, calculating contract delta, taker fees paid, CME CF BRTI 60s TWAP market impact, and intent classification (basis hedge vs retail churn).",
+      parameters: {
+        type: "object",
+        required: ["priceCents", "contracts"],
+        properties: {
+          contractTicker: { type: "string", default: "KXBTC15M-SAMPLE", description: "Contract ticker" },
+          venue: { type: "string", enum: ["kalshi", "polymarket"], default: "kalshi", description: "Venue" },
+          priceCents: { type: "number", description: "Trade fill price in cents (1-99)" },
+          contracts: { type: "number", description: "Number of contracts filled in block" },
+          spotPriceUsd: { type: "number", default: 68485, description: "Current BTC spot price" },
+          strikePriceUsd: { type: "number", default: 68500, description: "Contract strike price" },
+          timeRemainingSeconds: { type: "number", default: 180, description: "Seconds until contract settlement" }
+        }
+      }
+    },
+    {
+      name: "generate_trustos_audit_dossier",
+      description: "Executes Strategic Move #6 enterprise AI model governance audit dossier with Brier Murphy decomposition, Colorado SB 26-189 disparity ratio, and NAIC/ECOA statutory compliance.",
+      parameters: {
+        type: "object",
+        properties: {
+          institutionName: { type: "string", default: "Enterprise Risk Partner", description: "Institution name" },
+          modelDomain: { type: "string", enum: ["algorithmic_underwriting", "binary_options_pricing", "credit_risk"], default: "algorithmic_underwriting", description: "Model domain" },
+          sampleDecisionsCount: { type: "number", default: 1316, description: "Number of scored decisions" },
+          targetBrierScore: { type: "number", default: 0.2001, description: "Target empirical Brier score" }
         }
       }
     }
@@ -615,6 +666,48 @@ export async function executeMcpTool(name: string, params: Record<string, any> =
         venueAPriceCents: pKalshi,
         venueBPriceCents: pPoly,
         contracts: count,
+      });
+    }
+    case "calculate_calibration_adjusted_kelly": {
+      const priceCents = Number(params.nominalPriceCents ?? 50);
+      const winRatePct = Number(params.userStatedWinRatePct ?? 60);
+      const bankroll = Number(params.bankrollUsd ?? 1000);
+      const alpha = Number(params.shrinkageFactor ?? 0.35);
+      return computeCalibrationAdjustedKelly({
+        nominalPriceCents: priceCents,
+        userStatedWinRatePct: winRatePct,
+        bankrollUsd: bankroll,
+        shrinkageFactor: alpha,
+      });
+    }
+    case "decode_whale_flow": {
+      const ticker = String(params.contractTicker || "KXBTC15M-SAMPLE");
+      const venue = (String(params.venue || "kalshi").toLowerCase() === "polymarket" ? "polymarket" : "kalshi") as "kalshi" | "polymarket";
+      const priceCents = Number(params.priceCents ?? 51);
+      const contracts = Number(params.contracts ?? 5000);
+      const spot = params.spotPriceUsd !== undefined ? Number(params.spotPriceUsd) : undefined;
+      const strike = params.strikePriceUsd !== undefined ? Number(params.strikePriceUsd) : undefined;
+      const timeRemaining = params.timeRemainingSeconds !== undefined ? Number(params.timeRemainingSeconds) : undefined;
+      return decodeWhaleFlow({
+        contractTicker: ticker,
+        venue,
+        priceCents,
+        contracts,
+        spotPriceUsd: spot,
+        strikePriceUsd: strike,
+        timeRemainingSeconds: timeRemaining,
+      });
+    }
+    case "generate_trustos_audit_dossier": {
+      const institution = String(params.institutionName || "Enterprise Risk Partner");
+      const domain = (params.modelDomain || "algorithmic_underwriting") as "algorithmic_underwriting" | "binary_options_pricing" | "credit_risk";
+      const samples = params.sampleDecisionsCount !== undefined ? Number(params.sampleDecisionsCount) : 1316;
+      const brier = params.targetBrierScore !== undefined ? Number(params.targetBrierScore) : 0.2001;
+      return generateTrustOsAuditPreview({
+        institutionName: institution,
+        modelDomain: domain,
+        sampleDecisionsCount: samples,
+        targetBrierScore: brier,
       });
     }
     default:

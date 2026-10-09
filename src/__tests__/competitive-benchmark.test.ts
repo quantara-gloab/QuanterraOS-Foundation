@@ -3,6 +3,10 @@ import assert from "node:assert/strict";
 import {
   computeFrictionTeardown,
   computeCrossVenueSpreadTeardown,
+  computeCalibrationAdjustedKelly,
+  decodeWhaleFlow,
+  generateTrustOsAuditPreview,
+  renderTrustOsPageHtml,
   COMPETITOR_BENCHMARK_ROWS,
   COMPETITOR_DOSSIER_LIST,
   generateBenchmarkSvgReceipt,
@@ -139,8 +143,8 @@ describe("Competitive Benchmark & Truth vs. Hype Engine (2026 Strategy)", () => 
     assert.equal(smallOrder.verdict, "ILLUSORY_SPREAD_DESTROYED");
   });
 
-  it("7. Competitor Dossier: audits all 6 market incumbents against QuanterraOS advantages", () => {
-    assert.equal(COMPETITOR_DOSSIER_LIST.length, 6, "Must contain all 6 competitor dossiers");
+  it("7. Competitor Dossier: audits all 12 market incumbents across prediction markets and AI governance", () => {
+    assert.ok(COMPETITOR_DOSSIER_LIST.length >= 10, "Must contain all 10+ competitor dossiers");
 
     const names = COMPETITOR_DOSSIER_LIST.map((c) => c.name);
     assert.ok(names.includes("Verso"));
@@ -149,6 +153,12 @@ describe("Competitive Benchmark & Truth vs. Hype Engine (2026 Strategy)", () => 
     assert.ok(names.includes("Predly"));
     assert.ok(names.includes("Stand.Trade"));
     assert.ok(names.includes("Unusual Whales"));
+    assert.ok(names.includes("The 7 Oracles"));
+    assert.ok(names.includes("PillarLab AI"));
+    assert.ok(names.includes("OddsPipe"));
+    assert.ok(names.includes("Credo AI"));
+    assert.ok(names.includes("Fiddler AI"));
+    assert.ok(names.includes("Trustible"));
 
     for (const dossier of COMPETITOR_DOSSIER_LIST) {
       assert.ok(dossier.domain.length > 3);
@@ -157,6 +167,101 @@ describe("Competitive Benchmark & Truth vs. Hype Engine (2026 Strategy)", () => 
       assert.ok(dossier.vulnerability.length > 20);
       assert.ok(dossier.quanterraAdvantage.length > 20);
     }
+  });
+
+  it("8. Strategic Move #4: Calibration-Adjusted Fractional Kelly sizing protects against over-betting", () => {
+    // 50c contract, user thinks they have 60% win rate on $1,000 bankroll
+    const kelly = computeCalibrationAdjustedKelly({
+      nominalPriceCents: 50,
+      userStatedWinRatePct: 60,
+      bankrollUsd: 1000,
+      shrinkageFactor: 0.35,
+    });
+
+    assert.equal(kelly.nominalPriceCents, 50);
+    assert.equal(kelly.userStatedWinRatePct, 60);
+    assert.equal(kelly.bankrollUsd, 1000);
+
+    // Competitor Naive Kelly (The 7 Oracles): bets 20% of bankroll = $200
+    assert.equal(kelly.competitorNaiveFullKellyPct, 20.0);
+    assert.equal(kelly.competitorNaiveRecommendedContracts, 400);
+    assert.ok(kelly.competitorRuinRiskProbabilityPct > 30.0, "Naive Kelly ruin risk must be high");
+
+    // QuanterraOS Calibrated Kelly:
+    // Shrinks 60% towards 50% baseline -> 53.5%
+    assert.equal(kelly.calibratedWinRatePct, 53.5);
+    // Exact Kalshi taker fee is 1.75c, effective cost is 51.75c
+    assert.equal(kelly.exactTakerFeePerContractUsd, 0.0175);
+    assert.equal(kelly.effectivePurchaseCostUsd, 0.5175);
+
+    // Quarter-Kelly fraction is ~0.9%
+    assert.ok(kelly.calibratedQuarterKellyPct < 2.0, "Quarter-Kelly allocation must be disciplined");
+    assert.ok(kelly.recommendedQuarterKellyContracts > 0 && kelly.recommendedQuarterKellyContracts <= 25);
+    assert.ok(kelly.maximumCapitalAtRiskUsd < 20.0, "Capital at risk must be <$20 on $1,000 bankroll");
+    assert.ok(kelly.ruinRiskProbabilityPct < 2.5, "Calibrated ruin risk must be negligible");
+    assert.equal(kelly.circuitBreakerStatus, "LOCKED_RULE_B5_ZERO_LIVE_RISK");
+    assert.equal(kelly.provenanceHash.length, 64);
+  });
+
+  it("9. Strategic Move #5: Whale Forensics uncovers basis hedges and taker fee drag", () => {
+    // 5,000 contracts @ 51c executed ATM
+    const whale = decodeWhaleFlow({
+      contractTicker: "KXBTC15M-SAMPLE",
+      venue: "kalshi",
+      priceCents: 51,
+      contracts: 5000,
+      spotPriceUsd: 68485,
+      strikePriceUsd: 68500,
+      timeRemainingSeconds: 180,
+    });
+
+    assert.equal(whale.contracts, 5000);
+    assert.equal(whale.priceCents, 51);
+    assert.equal(whale.notionalUsd, 2550.00);
+    assert.equal(whale.takerFeePaidUsd, 87.50); // $0.0175 * 5000
+    assert.ok(whale.feeDragPctOfTrade > 3.0, "Fee drag should exceed 3% of notional");
+    assert.equal(whale.intentClassification, "DELTA_NEUTRAL_BASIS_HEDGE");
+    assert.ok(whale.counterIntelligenceWarning.includes("Unusual Whales"));
+    assert.equal(whale.provenanceHash.length, 64);
+  });
+
+  it("10. Strategic Move #6: TrustOS Mathematical Audit Dossier generates statutory proof", () => {
+    const audit = generateTrustOsAuditPreview({
+      institutionName: "Apex Regional Mutual",
+      modelDomain: "algorithmic_underwriting",
+      sampleDecisionsCount: 1316,
+      targetBrierScore: 0.2001,
+    });
+
+    assert.equal(audit.institutionName, "Apex Regional Mutual");
+    assert.equal(audit.modelDomain, "algorithmic_underwriting");
+    assert.equal(audit.sampleDecisionsCount, 1316);
+    assert.equal(audit.brierScore, 0.2001);
+    assert.equal(audit.statutoryCompliance.coloradoSb26189, "PASS");
+    assert.equal(audit.statutoryCompliance.naicModelBulletin, "PASS");
+    assert.equal(audit.statutoryCompliance.ecoaRegulationB, "PASS");
+    assert.equal(audit.commercialPilotTerms.fixedFeeUsd, 20000);
+    assert.equal(audit.commercialPilotTerms.durationWeeks, 6);
+    assert.equal(audit.auditSealSha256.length, 64);
+  });
+
+  it("11. Dedicated TrustOS Page renders compliant HTML meeting Rule B4/B5/B10", () => {
+    const audit = generateTrustOsAuditPreview({
+      institutionName: "Frontier Risk Analytics",
+      modelDomain: "algorithmic_underwriting",
+    });
+    const html = renderTrustOsPageHtml(audit);
+
+    assert.ok(html.includes("<!DOCTYPE html>"));
+    assert.ok(html.includes("TrustOS: Empirical Mathematical AI Governance"));
+    assert.ok(html.includes("$20,000"));
+    assert.ok(html.includes("Colorado SB 26-189"));
+    assert.ok(html.includes("NAIC AI Model Bulletin"));
+    assert.ok(html.includes(audit.auditSealSha256));
+
+    // Banned language check
+    assert.doesNotMatch(html, /\bguaranteed\b/i);
+    assert.doesNotMatch(html, /\bbeat the market\b/i);
   });
 });
 

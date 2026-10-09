@@ -643,12 +643,20 @@ export function renderMobileInstallPageHtml(): string {
         <div style="font-size: 0.75rem; color: var(--muted); margin-bottom: 14px;">
           Plus: CME CF BRTI 60s TWAP vs UMA resolution hazard creates asymmetric divergence risk.
         </div>
-        <div style="display:flex; gap:10px;">
+        <div style="display:flex; gap:10px; margin-bottom:8px;">
           <a href="/why#cross-venue-teardown" class="btn-gold" style="flex:1; text-decoration:none; font-size:0.75rem; padding:10px;">
             Full Spread Teardown &rarr;
           </a>
-          <a href="/transparency" class="btn-gold" style="flex:1; background:rgba(16,185,129,0.15); color:#10B981; border-color:rgba(16,185,129,0.4); text-decoration:none; font-size:0.75rem; padding:10px;">
-            Outcome Audit (#6.6)
+          <a href="/why#move4-kelly-engine" class="btn-gold" style="flex:1; background:rgba(212,175,55,0.15); color:var(--accent); border-color:rgba(212,175,55,0.4); text-decoration:none; font-size:0.75rem; padding:10px;">
+            Kelly Anti-Ruin (#4) &rarr;
+          </a>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <a href="/why#move5-whale-forensics" class="btn-gold" style="flex:1; background:rgba(16,185,129,0.15); color:#10B981; border-color:rgba(16,185,129,0.4); text-decoration:none; font-size:0.75rem; padding:10px;">
+            Whale Forensics (#5)
+          </a>
+          <a href="/trustos" class="btn-gold" style="flex:1; background:rgba(56,189,248,0.15); color:#38BDF8; border-color:rgba(56,189,248,0.4); text-decoration:none; font-size:0.75rem; padding:10px;">
+            TrustOS Audit ($20k)
           </a>
         </div>
       </div>

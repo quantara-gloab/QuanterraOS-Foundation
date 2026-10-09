@@ -156,4 +156,46 @@ describe("MCP Pre-Trade Risk Coprocessor & Friction Simulator", () => {
     assert.strictEqual(cross.feeDragRatioPct, 80);
     assert.strictEqual(cross.provenanceHash.length, 64);
   });
+
+  it("executes calculate_calibration_adjusted_kelly through executeMcpTool", async () => {
+    const kelly = await executeMcpTool("calculate_calibration_adjusted_kelly", {
+      nominalPriceCents: 50,
+      userStatedWinRatePct: 60,
+      bankrollUsd: 1000,
+      shrinkageFactor: 0.35,
+    });
+    assert.strictEqual(kelly.nominalPriceCents, 50);
+    assert.strictEqual(kelly.userStatedWinRatePct, 60);
+    assert.strictEqual(kelly.calibratedWinRatePct, 53.5);
+    assert.strictEqual(kelly.competitorNaiveFullKellyPct, 20);
+    assert.strictEqual(kelly.circuitBreakerStatus, "LOCKED_RULE_B5_ZERO_LIVE_RISK");
+    assert.strictEqual(kelly.provenanceHash.length, 64);
+  });
+
+  it("executes decode_whale_flow through executeMcpTool", async () => {
+    const whale = await executeMcpTool("decode_whale_flow", {
+      priceCents: 51,
+      contracts: 5000,
+      venue: "kalshi",
+    });
+    assert.strictEqual(whale.priceCents, 51);
+    assert.strictEqual(whale.contracts, 5000);
+    assert.strictEqual(whale.notionalUsd, 2550);
+    assert.strictEqual(whale.takerFeePaidUsd, 87.5);
+    assert.strictEqual(whale.intentClassification, "DELTA_NEUTRAL_BASIS_HEDGE");
+    assert.strictEqual(whale.provenanceHash.length, 64);
+  });
+
+  it("executes generate_trustos_audit_dossier through executeMcpTool", async () => {
+    const dossier = await executeMcpTool("generate_trustos_audit_dossier", {
+      institutionName: "Acme Risk Analytics",
+      modelDomain: "algorithmic_underwriting",
+    });
+    assert.strictEqual(dossier.institutionName, "Acme Risk Analytics");
+    assert.strictEqual(dossier.modelDomain, "algorithmic_underwriting");
+    assert.strictEqual(dossier.statutoryCompliance.naicModelBulletin, "PASS");
+    assert.strictEqual(dossier.statutoryCompliance.coloradoSb26189, "PASS");
+    assert.strictEqual(dossier.commercialPilotTerms.fixedFeeUsd, 20000);
+    assert.strictEqual(dossier.auditSealSha256.length, 64);
+  });
 });
