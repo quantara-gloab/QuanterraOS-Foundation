@@ -109,4 +109,21 @@ describe("Landing Page — 90-Day Execution Roadmap & Microstructure Cockpit Ver
     assert.ok(html.includes("PillarLab AI"));
     assert.ok(html.includes("OddsPipe"));
   });
+
+  it("6. Mobile App Gateway: renders prominent iPhone & Samsung direct links next to Sign up and in hero", () => {
+    // Top banner
+    assert.ok(html.includes("mobile-app-top-strip"));
+    assert.ok(html.includes("Apple iPhone &amp; Samsung Galaxy"));
+    assert.ok(html.includes('href="/mobile"'));
+
+    // Top navbar action group (Mobile App next to Sign up and Sign in)
+    assert.ok(html.includes("nav-pill-mobile-app"));
+    assert.ok(html.includes("iPhone &amp; Samsung App"));
+    assert.ok(html.includes('href="/account?flow=sign-up"'));
+    assert.ok(html.includes("Sign up"));
+    assert.ok(html.includes("Sign in"));
+
+    // Hero action button
+    assert.ok(html.includes("Mobile App: iPhone &amp; Samsung"));
+  });
 });

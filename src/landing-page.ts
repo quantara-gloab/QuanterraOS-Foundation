@@ -1668,6 +1668,17 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     <div style="font-family: var(--font-mono); color: var(--muted);">CRYPTOGRAPHIC REPRODUCIBILITY VERIFIED</div>
   </div>
 
+  <!-- Top Smart Mobile Gateway Banner for iPhone & Samsung Galaxy -->
+  <div class="mobile-app-top-strip" style="background:linear-gradient(90deg, rgba(0,242,254,0.1) 0%, rgba(223,184,67,0.12) 50%, rgba(0,242,254,0.1) 100%); border-bottom:1px solid rgba(0,242,254,0.25); padding:7px 16px; font-size:0.78rem; text-align:center; color:#E2E8F0; display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap;">
+    <span style="display:inline-flex; align-items:center; gap:6px;">
+      <span style="width:7px; height:7px; border-radius:50%; background:#00F2FE; box-shadow:0 0 8px #00F2FE;"></span>
+      <strong style="color:#FFF;">QuanterraOS Mobile App:</strong> Direct browser installation for Apple iPhone &amp; Samsung Galaxy.
+    </span>
+    <a href="/mobile" style="color:#00F2FE; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:4px; background:rgba(0,242,254,0.15); border:1px solid rgba(0,242,254,0.4); padding:3px 10px; border-radius:4px; font-family:var(--font-mono); font-size:0.74rem;">
+      Download for iPhone &amp; Samsung &rarr;
+    </a>
+  </div>
+
   <!-- Primary Tiered Navigation: Quant Tools · Intelligence · Enterprise · Sign in -->
   <nav class="top-nav">
     <div class="nav-left">
@@ -1812,11 +1823,17 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
         <!-- Direct Fast-Path Highlights -->
         <a href="/scanner" class="nav-pill-highlight">Live Scanner</a>
         <a href="/resolution-risk" class="nav-link-subtle" style="color:#FBBF24;">Anti-Dispute</a>
+        <a href="/mobile" class="nav-link-subtle" style="color:#00F2FE; font-weight:600; display:inline-flex; align-items:center; gap:4px;">📱 Mobile App</a>
       </div>
     </div>
 
-    <div class="nav-right" style="display:flex; gap:14px; align-items:center;">
+    <div class="nav-right" style="display:flex; gap:12px; align-items:center;">
+      <a href="/mobile" class="nav-pill-mobile-app" style="display:inline-flex; align-items:center; gap:6px; background:rgba(0, 242, 254, 0.12); border:1px solid rgba(0, 242, 254, 0.35); color:#00F2FE; padding:6px 13px; border-radius:6px; font-size:0.8rem; font-weight:700; text-decoration:none; transition:all 0.15s;" title="Direct Install for Apple iPhone &amp; Samsung Galaxy">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        <span>📱 iPhone &amp; Samsung App</span>
+      </a>
       <a href="/access" class="nav-link-subtle" style="font-weight:600;">Sign in</a>
+      <a href="/account?flow=sign-up" class="nav-link-subtle" style="color:var(--champagne); font-weight:700;">Sign up</a>
       <a href="/scanner" class="nav-cta" style="background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%); color:#07080B; border:1px solid rgba(255,248,220,0.8); box-shadow:0 4px 16px rgba(212,175,55,0.4), inset 0 1px 0 #FFF; font-weight:800;">FREE SCANNER &rarr;</a>
     </div>
   </nav>
@@ -1863,6 +1880,11 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
           <a href="/paper" class="btn-secondary" style="border-color:rgba(16,185,129,0.4); color:#10B981;">
             Realistic Paper Mode &rarr;
           </a>
+          <a href="/mobile" class="btn-secondary" style="border-color:rgba(0,242,254,0.45); color:#00F2FE; background:rgba(0,242,254,0.06); display:inline-flex; align-items:center; gap:8px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+            <span>📱 Mobile App: iPhone &amp; Samsung &rarr;</span>
+          </a>
+        </div>
         <div class="hero-contender-proof-strip">
           <div class="proof-pill">
             <div class="proof-pill-header">
