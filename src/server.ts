@@ -197,6 +197,12 @@ import {
   renderPeriodicFrictionReportPageHtml,
 } from "./periodic-outcome-reports.ts";
 import {
+  renderTrackRecordPageHtml,
+  getTrackRecordData,
+  generateTrackRecordReceiptSvg,
+  formatTrackRecordCsv,
+} from "./track-record-page.ts";
+import {
   WIDGET_CATALOG_LIST,
   renderWidgetCatalogHtml,
 } from "./widget-catalog.ts";
@@ -2686,6 +2692,35 @@ app.post("/api/scanner/calculate", express.json(), (req, res) => {
     settlementMatchCategory
   });
   res.json({ success: true, result });
+});
+
+// Strategic Move #11: Verified Settlement Track Record Explorer & Proof Ledger (/track-record, /ledger, /proof)
+app.get(["/track-record", "/ledger", "/proof", "/verified-performance"], (req, res) => {
+  const category = typeof req.query.cat === "string" ? req.query.cat : (typeof req.query.category === "string" ? req.query.category : undefined);
+  const outcome = typeof req.query.outcome === "string" ? req.query.outcome : undefined;
+  res.type("html").send(renderTrackRecordPageHtml({ category, outcome }));
+});
+
+app.get("/api/track-record/records", (req, res) => {
+  const category = typeof req.query.cat === "string" ? req.query.cat : (typeof req.query.category === "string" ? req.query.category : undefined);
+  const outcome = typeof req.query.outcome === "string" ? req.query.outcome : undefined;
+  const limit = req.query.limit ? Number(req.query.limit) : undefined;
+  const data = getTrackRecordData({ category, outcome, limit });
+  res.json({ success: true, ...data });
+});
+
+app.get("/api/track-record/card.svg", (_req, res) => {
+  const svg = generateTrackRecordReceiptSvg();
+  res.setHeader("Content-Type", "image/svg+xml; charset=utf-8");
+  res.setHeader("Cache-Control", "public, max-age=60, s-maxage=300");
+  res.send(svg);
+});
+
+app.get("/api/track-record/export.csv", (_req, res) => {
+  const csv = formatTrackRecordCsv();
+  res.setHeader("Content-Type", "text/csv; charset=utf-8");
+  res.setHeader("Content-Disposition", 'attachment; filename="quanterraos-settlement-track-record.csv"');
+  res.send(csv);
 });
 
 // Validated Forecast Comparison & Prospective Outcome Evaluation (90-Day Plan Build Order #6)

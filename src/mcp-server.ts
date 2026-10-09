@@ -27,6 +27,9 @@ import {
   getCrossVenueDiscrepancies,
   computeCustomCrossVenueSpread,
 } from "./cross-venue-scanner.ts";
+import {
+  getTrackRecordData,
+} from "./track-record-page.ts";
 
 /**
  * Model Context Protocol (MCP) Manifest & Agent Integration Layer
@@ -250,6 +253,18 @@ export const MCP_SERVER_MANIFEST = {
         type: "object",
         properties: {
           category: { type: "string", enum: ["all", "macro", "crypto", "elections"], default: "all", description: "Category filter" }
+        }
+      }
+    },
+    {
+      name: "query_verified_track_record",
+      description: "Queries the immutable, cryptographically hashed track record of 1,316 settled prediction contracts, returning Murphy decomposition, calibration metrics, and SHA-256 provenance hashes.",
+      parameters: {
+        type: "object",
+        properties: {
+          category: { type: "string", enum: ["all", "crypto", "macro", "elections"], default: "all", description: "Category filter" },
+          outcome: { type: "string", enum: ["all", "YES", "NO"], default: "all", description: "Outcome filter" },
+          limit: { type: "number", default: 10, description: "Maximum settled records to return (1-100)" }
         }
       }
     }
@@ -843,6 +858,29 @@ export async function executeMcpTool(name: string, params: Record<string, any> =
         category,
         totalPairsScanned: discrepancies.length,
         discrepancies,
+      };
+    }
+    case "query_verified_track_record": {
+      const category = params.category && String(params.category).toLowerCase() !== "all" ? String(params.category).toLowerCase() : undefined;
+      const outcome = params.outcome && String(params.outcome).toUpperCase() !== "ALL" ? String(params.outcome).toUpperCase() : undefined;
+      const limit = Math.min(100, Math.max(1, Number(params.limit ?? 10)));
+      const data = getTrackRecordData({ category, outcome, limit });
+      return {
+        success: true,
+        summary: {
+          totalSettled: data.totalSettled,
+          averageBrierScore: data.averageBrierScore,
+          marketBenchmarkBrier: data.marketBenchmarkBrier,
+          randomBaselineBrier: data.randomBaselineBrier,
+          directionalAccuracyPct: data.directionalAccuracyPct,
+          murphyDecomposition: data.murphyDecomposition,
+          capitalDeployed: data.capitalDeployed,
+        },
+        itemCount: data.items.length,
+        items: data.items,
+        verificationEndpoint: "https://quanterraos.com/track-record",
+        svgCardUrl: "https://quanterraos.com/api/track-record/card.svg",
+        csvExportUrl: "https://quanterraos.com/api/track-record/export.csv"
       };
     }
     default:

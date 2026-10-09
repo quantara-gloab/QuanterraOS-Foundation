@@ -1582,6 +1582,13 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
           <div class="nav-dropdown-menu">
             <div class="menu-category-title">Trader Records &amp; Methodology</div>
             <div class="menu-item-row">
+              <span class="menu-item-icon" style="color:var(--champagne);">📊</span>
+              <div class="menu-item-content">
+                <a href="/track-record" class="menu-item-title-link" style="color:var(--champagne);">Verified Track Record</a>
+                <span class="menu-item-desc">1,316 settled windows, Brier scores &amp; SHA-256 ledger</span>
+              </div>
+            </div>
+            <div class="menu-item-row">
               <span class="menu-item-icon" style="color:#10B981;">📓</span>
               <div class="menu-item-content">
                 <a href="/journal" class="menu-item-title-link">Journal</a>
@@ -1797,15 +1804,16 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
         <!-- Step 4: Review -->
         <div class="pipeline-card">
           <div class="pipeline-badge" style="color:#38BDF8; border-color:rgba(56,189,248,0.3); background:rgba(56,189,248,0.08);">STAGE 04 &bull; REVIEW</div>
-          <h3 class="pipeline-title">Journal &amp; Datasets</h3>
+          <h3 class="pipeline-title">Proof &amp; Track Record</h3>
           <p class="pipeline-desc">
-            Commit decisions to your immutable journal, dissect 60s TWAP mechanics, and export 19,740 canonical settled candles.
+            Audit our 1,316-window cryptographic settlement ledger, commit to your decision journal, and inspect raw candles.
           </p>
           <div class="pipeline-tools">
+            <span class="tool-tag">Verified Ledger</span>
             <span class="tool-tag">Decision Journal</span>
             <span class="tool-tag">Open Datasets Hub</span>
           </div>
-          <a href="/journal" class="pipeline-btn" style="border-color:rgba(56,189,248,0.4); color:#38BDF8;">View Journal &rarr;</a>
+          <a href="/track-record" class="pipeline-btn" style="border-color:rgba(56,189,248,0.4); color:#38BDF8;">Audit Track Record &rarr;</a>
         </div>
       </div>
     </section>

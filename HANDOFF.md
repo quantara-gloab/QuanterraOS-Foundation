@@ -1386,28 +1386,30 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
         - **Stage 04: Review** — Decision Journal, Settlement Dissection & Open Datasets (`/journal`, `/datasets`).
     - *Cross-Page Workflow Banners*:
       - Added "Next in Quant Workflow" jump strips to the footers of `/scanner`, `/resolution-risk`, `/paper`, and `/datasets` to guide the trader seamlessly from discovery through audit, paper execution, and post-settlement empirical review.
-    - *Verification*: `npx tsc --noEmit` clean 0 errors; full test suite `npm test` **529/529 passing across 113 suites (0 failures)**.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+13. **Verified Settlement Track Record Explorer, Cryptographic Proof Ledger & Autonomous MCP Integration (`src/track-record-page.ts`, `src/alert-dispatcher.ts`, `src/mcp-server.ts`, `src/server.ts`, `src/__tests__/track-record-page.test.ts`)**:
+    - *Solves user problem*: Prediction market traders prioritize transparency, track records, and backtesting over black-box enterprise promises.
+    - *Empirical Settlement Track Record Explorer (`/track-record`, `/ledger`, `/proof`, `/verified-performance`)*:
+      - Real-time searchable log of 1,316 settled canonical contracts + live resolved observations.
+      - Call-time probabilities vs. realized settlement outcomes with category filters (`crypto`, `macro`, `elections`) and outcome filters (`YES`, `NO`).
+      - Murphy/Yates Brier decomposition: Reliability ($0.0094$), Resolution ($0.0593$), Uncertainty ($0.2500$).
+      - Honest disclosure of market baseline outperformance (Market mid Brier $0.2001$ vs Model Brier $0.2063$).
+      - Cryptographic SHA-256 provenance fingerprint modal for independent reproducibility.
+      - Standalone institutional SVG verification badge generator (`GET /api/track-record/card.svg`).
+      - Direct RFC 4180 CSV export stream (`GET /api/track-record/export.csv`).
+      - JSON summary and item API (`GET /api/track-record/records`).
+    - *Automated Social Alert Dispatcher (`src/alert-dispatcher.ts`)*:
+      - Added event types `DISCREPANCY_SCANNER_DETECTED` and `RESOLUTION_RISK_SPIKE`.
+      - Built `formatXBroadcastPayload` formatting automated tweets/posts under strict 280-character limit with direct link, key metrics, and zero prohibited words.
+      - Built helper constructors `createDiscrepancyAlert` and `createResolutionRiskAlert`.
+    - *Autonomous MCP Tool Integration (`src/mcp-server.ts`)*:
+      - Added `query_verified_track_record` to `MCP_SERVER_MANIFEST.tools` and handler in `executeMcpTool`.
+      - Enables Claude, Cursor, and autonomous trading agents to query verified model calibration and Murphy decomposition on-demand.
+    - *Site Integration & Navigation*:
+      - Integrated Verified Track Record directly into `Intelligence ▾` dropdown on the landing page.
+      - Added Verified Track Record as destination for Stage 04 in the 4-Stage Execution Pipeline.
+      - Integrated companion jump strips into `/track-record` linking back to `/scanner`, `/datasets`, and `/journal`.
+    - *Dedicated Acceptance Test Suite (`src/__tests__/track-record-page.test.ts`)*:
+      - 11 automated tests validating Murphy decomposition, 64-char SHA-256 hashes, category/outcome filtering, CSV export, SVG generation, HTML rendering, MCP execution, social broadcasts, and strict Rule B4/B5/B10 compliance.
+    - *Verification*: `npx tsc --noEmit` clean 0 errors; full test suite `npm test` **540/540 passing across 120 suites (0 failures)**.
 
 

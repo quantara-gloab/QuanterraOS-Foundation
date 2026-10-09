@@ -24,6 +24,8 @@ import { createHash } from "node:crypto";
 
 export type AlertEventType =
   | "CROSS_VENUE_DIVERGENCE_SPIKE"
+  | "DISCREPANCY_SCANNER_DETECTED"
+  | "RESOLUTION_RISK_SPIKE"
   | "SETTLEMENT_ORACLE_DANGER"
   | "SETTLEMENT_POSTMORTEM_RESOLVED"
   | "CORRIDOR_ASYMMETRY_AUDITED"
@@ -184,6 +186,98 @@ export function formatTelegramAlertPayload(event: AlertEventData): TelegramMessa
     parse_mode: "HTML",
     disable_web_page_preview: false
   };
+}
+
+export interface XBroadcastPayload {
+  text: string;
+  charCount: number;
+  url: string;
+  isWithinLimit: boolean;
+}
+
+/**
+ * Formats an alert event as an automated social broadcast (X / Farcaster).
+ * Strict character limit <= 280.
+ */
+export function formatXBroadcastPayload(event: AlertEventData): XBroadcastPayload {
+  let body = "";
+  if (event.eventType === "CROSS_VENUE_DIVERGENCE_SPIKE" || event.eventType === "DISCREPANCY_SCANNER_DETECTED") {
+    const gross = event.metrics.GROSS_SPREAD ?? event.metrics.gross_spread ?? "5.0¢";
+    const net = event.metrics.REALIZED_NET ?? event.metrics.net_discrepancy ?? "3.8¢";
+    body = `⚡ Falcon detected ${gross} spread between Kalshi & Polymarket on ${event.eventTicker ?? event.underlying}.\n\nNet spread after CFTC taker fees & Polygon gas: ${net}.\n\nAudit: ${event.targetUrl}`;
+  } else if (event.eventType === "RESOLUTION_RISK_SPIKE") {
+    const score = event.metrics.AMBIGUITY_SCORE ?? "45";
+    const severity = event.metrics.SEVERITY ?? "HIGH";
+    body = `🛡️ Sentinel flagged ${severity} dispute risk (Score: ${score}/100) on resolution clause for ${event.eventTicker ?? event.underlying}.\n\nInspect audit: ${event.targetUrl}`;
+  } else {
+    body = `📊 ${event.title}: ${event.summary.slice(0, 130)}...\n\nAudit: ${event.targetUrl}`;
+  }
+
+  if (body.length > 280) {
+    body = body.slice(0, 277) + "...";
+  }
+
+  return {
+    text: body,
+    charCount: body.length,
+    url: event.targetUrl,
+    isWithinLimit: body.length <= 280
+  };
+}
+
+/**
+ * Creates a structured alert for a cross-venue pricing discrepancy.
+ */
+export function createDiscrepancyAlert(params: {
+  pairTicker: string;
+  grossSpreadCents: number;
+  netDiscrepancyCents: number;
+  kalshiPriceCents: number;
+  polymarketPriceCents: number;
+  hazardLevel: string;
+}): AlertEventData {
+  return createAlertEvent(
+    "DISCREPANCY_SCANNER_DETECTED",
+    params.pairTicker,
+    `Cross-Platform Discrepancy on ${params.pairTicker}`,
+    `Gross spread of ${params.grossSpreadCents}¢ yields realized net discrepancy of +${params.netDiscrepancyCents}¢ per contract after Kalshi taker fees and Polygon gas.`,
+    {
+      GROSS_SPREAD: `+${params.grossSpreadCents}¢`,
+      REALIZED_NET: `+${params.netDiscrepancyCents}¢`,
+      KALSHI_PRICE: `${params.kalshiPriceCents}¢`,
+      POLYMARKET_PRICE: `${params.polymarketPriceCents}¢`,
+      ORACLE_HAZARD: params.hazardLevel
+    },
+    `https://quanterraos.com/scanner?pair=${encodeURIComponent(params.pairTicker)}`,
+    params.netDiscrepancyCents > 4 ? "WARNING" : "INFO",
+    params.pairTicker
+  );
+}
+
+/**
+ * Creates a structured alert for a contract resolution rule dispute risk.
+ */
+export function createResolutionRiskAlert(params: {
+  marketId: string;
+  title: string;
+  ambiguityScore: number;
+  severity: "LOW" | "MODERATE" | "HIGH" | "CRITICAL";
+  umaDisputeProbabilityPct: number;
+}): AlertEventData {
+  return createAlertEvent(
+    "RESOLUTION_RISK_SPIKE",
+    params.marketId,
+    `Resolution Dispute Hazard on ${params.title}`,
+    `Sentinel NLP detected an Ambiguity Score of ${params.ambiguityScore}/100 with estimated ${params.umaDisputeProbabilityPct}% UMA dispute probability.`,
+    {
+      AMBIGUITY_SCORE: params.ambiguityScore,
+      SEVERITY: params.severity,
+      UMA_DISPUTE_PROB: `${params.umaDisputeProbabilityPct}%`
+    },
+    `https://quanterraos.com/resolution-risk?market=${encodeURIComponent(params.marketId)}`,
+    params.severity === "CRITICAL" || params.severity === "HIGH" ? "CRITICAL" : "WARNING",
+    params.marketId
+  );
 }
 
 /**
