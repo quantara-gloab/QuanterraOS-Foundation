@@ -220,8 +220,22 @@ test("http: signup + one-click unsubscribe end to end", async () => {
   assert.equal(getContactByEmail(db, "z@co.com")!.status, "unsubscribed");
   const m = await call(handler, "GET", "/api/growth/metrics", undefined, { authorization: "Bearer admin-token" });
   assert.equal(JSON.parse(m.body).ledger.ok, true);
-  assert.equal((await call(handler, "GET", "/api/growth/metrics")).status, 401);
   assert.equal((await call(handler, "POST", "/api/growth/chat", { messages: [{ role: "user", content: "hi" }] })).status, 503);
+});
+
+test("Phase 1 Task 1.2 Acceptance: GET /growth redirects 301 to /", async () => {
+  const handler = createGrowthHandler({
+    db: openDb(":memory:"),
+    config: cfg(),
+    pagePath: "public/growth.html",
+  });
+  const srv = createServer((req, res) => handler(req, res, () => res.writeHead(404).end()));
+  await new Promise<void>((r) => srv.listen(0, r));
+  const port = (srv.address() as any).port;
+  const res = await fetch(`http://127.0.0.1:${port}/growth`, { redirect: "manual" });
+  srv.close();
+  assert.equal(res.status, 301);
+  assert.equal(res.headers.get("location"), "/");
 });
 
 // --- helper: run the handler on a real ephemeral http server

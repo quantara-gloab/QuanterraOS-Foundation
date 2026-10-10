@@ -405,6 +405,10 @@ app.get(["/health", "/healthz"], (_req, res) => {
   });
 });
 
+app.get("/growth", (_req, res) => {
+  res.redirect(301, "/");
+});
+
 // QuanterraOS Growth Engine: outreach, concierge chat, opt-in voice callbacks, and tamper-evident consent ledger
 const growth = startGrowthEngine({ pagePath: path.resolve("public/growth.html") });
 app.use(growth.handler);

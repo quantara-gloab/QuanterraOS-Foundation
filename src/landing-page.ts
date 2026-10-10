@@ -3831,11 +3831,9 @@ ${miniCircles}
             <a href="/educators" class="footer-col-link">Distribution &amp; Partner Portal</a>
             <a href="/access" class="footer-col-link">Institutional Desk Access</a>
             <a href="/transparency" class="footer-col-link">Transparency &amp; Referee Charter</a>
-            <a href="/council" class="footer-col-link">Council Specialists</a>
-            <a href="/wallet" class="footer-col-link">Subscriber Sandbox Wallet</a>
+            <a href="/deck" class="footer-col-link">Flight Deck Terminal</a>
             <a href="/predictions" class="footer-col-link">Predictions Ledger Replay</a>
             <a href="/autopilot" class="footer-col-link">Autopilot Simulation</a>
-            <a href="/growth" class="footer-col-link">Growth Telemetry</a>
             <a href="/legal" class="footer-col-link">Legal Notices &amp; Terms</a>
           </div>
         </div>

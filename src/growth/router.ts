@@ -84,7 +84,11 @@ export function createGrowthHandler(deps: GrowthDeps) {
     const path = url.pathname.replace(/\/$/, "") || "/";
     const method = req.method ?? "GET";
     try {
-      if (path === "/growth" && method === "GET" && pageHtml) return send(res, 200, pageHtml, "text/html; charset=utf-8");
+      if (path === "/growth") {
+        res.writeHead(301, { Location: "/" });
+        res.end();
+        return;
+      }
       if (!path.startsWith("/api/growth")) return next ? next() : json(res, 404, { error: "not found" });
       const route = path.slice("/api/growth".length) || "/";
 
