@@ -93,6 +93,7 @@ import {
 } from "./lib/shadow-mode.ts";
 import { renderInstallPromptHtml } from "./lib/mobile-pwa.ts";
 import { parseSharedContractInput, type ParsedSharedContract } from "./lib/share-target.ts";
+import { REDUCED_MOTION_CSS, HAPTICS_AND_MOTION_CLIENT_SCRIPT } from "./lib/haptics-motion.ts";
 
 export type FlightDeckStationId =
   | "bridge"
@@ -927,6 +928,7 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
       .cockpit-telemetry-cluster { display: none; }
       .station-title { font-size: 1.55rem; }
     }
+    ${REDUCED_MOTION_CSS}
   </style>
 </head>
 <body>
@@ -2714,6 +2716,29 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
                 <a href="https://www.gamblersanonymous.org" target="_blank" rel="noopener noreferrer" style="color:var(--hud-cyan); margin-left:6px; text-decoration:none;">gamblersanonymous.org &nearr;</a>
               </div>
             </div>
+          <!-- Mobile Haptics & Accessibility Preferences (Task 8.3 / Part 3.11) -->
+          <div class="hud-card" id="hangar-haptics-card">
+            <div class="hud-card-title">
+              <span>HAPTIC FEEDBACK &amp; ACCESSIBILITY</span>
+              <span style="color:var(--hud-gold); font-size:0.72rem;">TACTILE TELEMETRY</span>
+            </div>
+            <p style="font-size:0.78rem; color:var(--fg-muted); line-height:1.5; margin-bottom:12px;">
+              Tactile vibration micro-feedback for station switching, slider increments, gauge thresholds, and tilt warnings on supported mobile devices.
+            </p>
+            <div style="background:rgba(5,6,11,0.6); border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:12px; margin-bottom:12px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                  <label for="setting-haptics-toggle" style="color:#FFFFFF; font-weight:600; display:block; font-size:0.82rem;">Haptic Vibrations</label>
+                  <div style="font-size:0.7rem; color:var(--fg-muted);">Suppressed when prefers-reduced-motion is active</div>
+                </div>
+                <input type="checkbox" id="setting-haptics-toggle" checked style="width:20px; height:20px; accent-color:var(--hud-gold); cursor:pointer;">
+              </div>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+              <button type="button" class="btn-aria-action" style="padding:6px 10px; font-size:0.72rem;" onclick="window.QOSHaptics &amp;&amp; window.QOSHaptics.light()">Test Light Tick</button>
+              <button type="button" class="btn-aria-action" style="padding:6px 10px; font-size:0.72rem; border-color:var(--hud-gold); color:var(--hud-gold);" onclick="window.QOSHaptics &amp;&amp; window.QOSHaptics.medium()">Test Gauge Bump</button>
+              <button type="button" class="btn-aria-action" style="padding:6px 10px; font-size:0.72rem; border-color:var(--alert-red); color:var(--alert-red);" onclick="window.QOSHaptics &amp;&amp; window.QOSHaptics.warning()">Test Hazard Buzz</button>
+            </div>
           </div>
         </div>
       </section>
@@ -3919,6 +3944,7 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
     }
   </script>
   ${renderInstallPromptHtml()}
+  <script>${HAPTICS_AND_MOTION_CLIENT_SCRIPT}</script>
 </body>
 </html>`;
 }

@@ -320,7 +320,7 @@ Tokens on `:root`, dark only for deck; public site dark-default with light-mode 
 ### PHASE 8 — Mobile polish (Weeks 6–8)
 - [x] **8.1** PWA manifest, icons, offline shell, install prompt, web push.
 - [x] **8.2** Share-sheet intake (Web Share Target API).
-- [ ] **8.3** Haptics + reduced-motion handling.
+- [x] **8.3** Haptics + reduced-motion handling.
 - [ ] **8.4** Capacitor wrapper prepared but **not submitted** until founder approval and D30 retention ≥ 25%.
 
 ### PHASE 9 — Measure (ongoing)
