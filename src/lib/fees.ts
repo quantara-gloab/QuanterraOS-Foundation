@@ -16,6 +16,8 @@
  * - Rule B5: $0.00 capital deployed; advisory cost audit
  */
 
+import { getBrtiDisplayMetadata } from "../config/licensing.ts";
+
 export interface FeeScheduleConfig {
   venue: "kalshi" | "polymarket";
   product: string;
@@ -214,7 +216,9 @@ export function computeTrueCostCheck(input: TrueCostCheckInput): TrueCostCheckOu
     assumedProbabilityPct: Number((userP * 100).toFixed(2)),
     expectedValue,
     expectedValuePerContractCents,
-    settlementSource: schedule.settlementSource,
+    settlementSource: schedule.venue === "kalshi"
+      ? getBrtiDisplayMetadata().settlementSourceLabel
+      : schedule.settlementSource,
     dangerZoneFlag,
     dangerZoneNotice,
     effectiveFeeRatePct,

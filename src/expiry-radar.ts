@@ -30,6 +30,10 @@ import {
   renderAudioControlWidgetHtml,
   generateWebAudioClientScript
 } from "./microstructure-audio.ts";
+import {
+  getBrtiDisplayMetadata,
+  type BrtiLicensingMetadata
+} from "./config/licensing.ts";
 
 export type ExpiryWindowPhase =
   | "NORMAL_TRADING"
@@ -85,6 +89,7 @@ export interface ExpiryRadarState {
   depthLadder?: OrderbookDepthLadder;
   timestampIso: string;
   disclaimer: string;
+  licensing: BrtiLicensingMetadata;
 }
 
 export interface DepthLadderLevel {
@@ -325,6 +330,7 @@ export function computeExpiryRadarState(options: {
     timestampIso: new Date(nowMs).toISOString(),
     disclaimer:
       "QuanterraOS Expiry Radar tracks real-time contract microstructure and TWAP sampling cadence. Quanterra Composite Index is an empirical multi-venue spot proxy and does not represent an official CME CF BRTI feed. Zero live capital deployed ($0.00).",
+    licensing: getBrtiDisplayMetadata(),
   };
 }
 
@@ -1341,9 +1347,13 @@ export function renderExpiryRadarPageHtml(
     <!-- Oracle Sampling Progression Panel -->
     <div class="oracle-section">
       <div class="oracle-header">
-        <div class="oracle-title">CME CF BRTI 60-Second TWAP Averaging Window</div>
-        <div class="card-subtext">Seconds 840–900 of the 15m candle determine the final contract settlement value</div>
+        <div class="oracle-title">${radar.licensing.fullTitle} 60-Second TWAP Averaging Window</div>
+        <div class="card-subtext">${radar.licensing.isLicensed ? 'Official CME CF BRTI feed' : 'Settlement-Index Proxy (Coinbase, Kraken, Bitstamp, Gemini)'} · Seconds 840–900 of the 15m candle determine settlement</div>
       </div>
+      ${!radar.licensing.isLicensed ? `
+      <div class="proxy-methodology-banner" style="background: rgba(223, 184, 67, 0.08); border: 1px solid rgba(223, 184, 67, 0.25); padding: 12px 16px; border-radius: 4px; margin: 12px 0 16px 0; font-size: 0.8rem; color: #CBD5E1; line-height: 1.5;">
+        <span style="color: var(--accent); font-weight: 600; font-family: var(--font-mono);">${radar.licensing.label}:</span> ${radar.licensing.methodologyNote}
+      </div>` : ''}
       <div class="oracle-twap-grid" id="twap-grid">
         ${twapBlocksHtml}
       </div>
