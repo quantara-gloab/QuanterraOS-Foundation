@@ -111,7 +111,7 @@ describe("Realistic Paper Mode — Practice Without Deposits Engine", () => {
     const pageHtml = renderRealisticPaperPageHtml();
 
     assert.ok(pageHtml.includes("Practice Without Deposits"));
-    assert.ok(pageHtml.includes("90-Day Plan Build Order #5"));
+    assert.ok(pageHtml.includes("Simulation Suite &bull; Realistic Paper Mode"));
 
     // Rule B5 check: Zero live capital deployed
     assert.ok(pageHtml.includes("$0.00 capital deployed"), "Must state $0.00 capital deployed per Rule B5");

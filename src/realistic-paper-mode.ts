@@ -610,7 +610,7 @@ export function renderRealisticPaperPageHtml(sampleResult?: PaperExecutionResult
 
   <main class="container">
     <div class="hero">
-      <div class="eyebrow">&Sigma; 90-Day Plan Build Order #5 &bull; Strategic Move #8 &bull; Realistic Paper Mode &bull; Zero Capital Risk Practice</div>
+      <div class="eyebrow">&Sigma; Simulation Suite &bull; Realistic Paper Mode &bull; Zero Capital Risk Practice</div>
       <h1>Practice Without Deposits</h1>
       <p class="lead">
         Prediction market simulation counter-positioned against naive competitor paper trading. Accurately models what standard simulators ignore: matching-engine latency, multi-tier queue depth depletion, parabolic Kalshi taker fees, and quote jump risk.

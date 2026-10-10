@@ -514,7 +514,7 @@ export function renderEducatorPageHtml(
     <div class="nav-links">
       <a href="/">Home</a>
       <a href="/calculator">True Cost Calc</a>
-      <a href="/study">Study #6.4</a>
+      <a href="/study">Cost Study</a>
       <a href="/educators" class="active">Educators</a>
       <a href="/paper">Paper Mode</a>
       <a href="/compare">Compare</a>
@@ -625,7 +625,7 @@ export function renderEducatorPageHtml(
           <div class="tool-code">&lt;iframe src="https://quanterraos.com/embed/calculator" width="480" height="340"&gt;&lt;/iframe&gt;</div>
         </div>
         <div class="tool-card">
-          <div class="tool-name">3. Study #6.4 Progress Card</div>
+          <div class="tool-name">3. Cost Study Progress Card</div>
           <div style="font-size:0.8rem; color:var(--text-dim);">Cohort fee awareness and week-4 retention progress metrics.</div>
           <div class="tool-code">&lt;iframe src="https://quanterraos.com/embed/study" width="480" height="260"&gt;&lt;/iframe&gt;</div>
         </div>

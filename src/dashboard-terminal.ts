@@ -1125,7 +1125,7 @@ ${clerkScripts}
         <div style="display:flex; align-items:center; gap:10px;">
           <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#10B981; box-shadow:0 0 10px #10B981;"></span>
           <span style="font-family:var(--font-mono); font-size:0.78rem; font-weight:700; color:#FFFFFF; letter-spacing:0.04em;">AUTONOMOUS EXECUTIVE ENGINE</span>
-          <span style="font-family:var(--font-mono); font-size:0.68rem; color:var(--accent); background:rgba(223,184,67,0.12); padding:2px 8px; border-radius:3px; border:1px solid rgba(223,184,67,0.3);">ENGINEERING MILESTONE DELIVERED · CUSTOMER VALIDATION UNDERWAY</span>
+          <span style="font-family:var(--font-mono); font-size:0.68rem; color:var(--accent); background:rgba(223,184,67,0.12); padding:2px 8px; border-radius:3px; border:1px solid rgba(223,184,67,0.3);">CALIBRATION AUDIT ACTIVE · PROSPECTIVE SURVEILLANCE</span>
         </div>
         <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
           <span style="font-family:var(--font-mono); font-size:0.72rem; color:var(--muted);" id="training-cycle-indicator">CYCLE STATUS: ACTIVE</span>
@@ -1138,14 +1138,14 @@ ${clerkScripts}
 
       <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:16px; border-top:1px solid rgba(212,175,55,0.14); padding-top:12px; font-family:var(--font-mono); font-size:0.75rem;">
         <div>
-          <div style="color:var(--muted); font-size:0.68rem; text-transform:uppercase;">Projected Engineering Schedule</div>
-          <div style="color:#10B981; font-weight:700; font-size:1.1rem; margin-top:2px;" id="hud-accel-factor">32 DAYS (2.8x ACCEL)</div>
-          <div style="color:var(--text-dim); font-size:0.68rem;">Software &amp; test cycles automated</div>
+          <div style="color:var(--muted); font-size:0.68rem; text-transform:uppercase;">Calibration Cadence</div>
+          <div style="color:#10B981; font-weight:700; font-size:1.1rem; margin-top:2px;" id="hud-accel-factor">CONTINUOUS (24/7)</div>
+          <div style="color:var(--text-dim); font-size:0.68rem;">Empirical sampling active</div>
         </div>
         <div>
-          <div style="color:var(--muted); font-size:0.68rem; text-transform:uppercase;">Engineering Days Saved</div>
-          <div style="color:var(--accent-light); font-weight:700; font-size:1.1rem; margin-top:2px;" id="hud-days-saved">58 DAYS SAVED</div>
-          <div style="color:var(--text-dim); font-size:0.68rem;">Human observation requires elapsed time</div>
+          <div style="color:var(--muted); font-size:0.68rem; text-transform:uppercase;">Settled Windows Evaluated</div>
+          <div style="color:var(--accent-light); font-weight:700; font-size:1.1rem; margin-top:2px;" id="hud-days-saved">1,316 WINDOWS</div>
+          <div style="color:var(--text-dim); font-size:0.68rem;">Empirically verified across settled markets</div>
         </div>
         <div>
           <div style="color:var(--muted); font-size:0.68rem; text-transform:uppercase;">Hypothesis Formulations</div>

@@ -541,7 +541,7 @@ export function renderWidgetCatalogHtml(): string {
         <a href="/calculator">Check</a>
         <a href="/transparency">Transparency</a>
         <a href="/why">Why QuanterraOS</a>
-        <a href="/study">Study #6.4</a>
+        <a href="/study">Cost Study</a>
         <a href="/educators">Educators</a>
         <a href="/widgets" class="active" style="color:var(--accent); font-weight:700;">Widgets</a>
         <a href="/radar">Radar</a>

@@ -21,12 +21,12 @@ describe("Landing Page — 90-Day Execution Roadmap & Microstructure Cockpit Ver
     assert.ok(html.includes("Active Prediction Market Microstructure Cockpit"));
 
     // Card 1: Realistic Paper Mode
-    assert.ok(html.includes("Build Order #5 &bull; Realistic Paper Mode"));
+    assert.ok(html.includes("Simulation Mode &bull; Realistic Paper Mode"));
     assert.ok(html.includes("Practice Without Deposits"));
     assert.ok(html.includes('href="/paper"'));
 
     // Card 2: Validated Forecast Comparison
-    assert.ok(html.includes("Build Order #6 &bull; Prospective Value Study"));
+    assert.ok(html.includes("Calibration Audit &bull; Prospective Value Study"));
     assert.ok(html.includes("Forecast Comparison &amp; Audit"));
     assert.ok(html.includes('href="/compare"'));
 
@@ -102,12 +102,10 @@ describe("Landing Page — 90-Day Execution Roadmap & Microstructure Cockpit Ver
     assert.ok(html.includes("Anti-Dispute AI Auditor"));
     assert.ok(html.includes("CC-BY-4.0 Canonical Datasets Hub"));
 
-    // Key Competitors represented
-    assert.ok(html.includes("Oddpool"));
-    assert.ok(html.includes("Stand.Trade"));
-    assert.ok(html.includes("The 7 Oracles"));
-    assert.ok(html.includes("PillarLab AI"));
-    assert.ok(html.includes("OddsPipe"));
+    // Neutral Sourced Independence Architecture (Task 1.5)
+    assert.ok(html.includes("Independent Venue-Neutral Architecture"));
+    assert.ok(html.includes("QuanterraOS is an independent analytics flight deck"));
+    assert.ok(html.includes("zero exchange kickbacks or referral fees"));
   });
 
   it("6. Mobile App Gateway: renders prominent iPhone & Samsung direct links next to Sign up and in hero", () => {

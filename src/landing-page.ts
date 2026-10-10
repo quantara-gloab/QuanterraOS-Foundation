@@ -2024,7 +2024,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
             <div class="menu-item-row">
               <span class="menu-item-icon" style="color:#38BDF8;">🔬</span>
               <div class="menu-item-content">
-                <a href="/study" class="menu-item-title-link">Study #6.4</a>
+                <a href="/study" class="menu-item-title-link">Calibration Study</a>
                 <span class="menu-item-desc">Prospective cost awareness cohort evaluation</span>
               </div>
             </div>
@@ -2159,7 +2159,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
         <div style="background: rgba(14, 20, 30, 0.7); border: 1px solid rgba(212, 175, 55, 0.25); border-radius: 6px; padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 24px; width: 100%; font-family: var(--font-mono); font-size: 0.74rem;">
           <div style="display:flex; align-items:center; gap:8px;">
             <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#10B981; box-shadow:0 0 8px #10B981;"></span>
-            <span style="color:var(--text); font-weight:600;">SOVEREIGN AGENT DEPLOYMENT</span>
+            <span style="color:var(--text); font-weight:600;">AI CREW &amp; MCP PROTOCOL</span>
             <span style="color:rgba(255,255,255,0.2);">//</span>
             <span style="color:var(--muted);">DUAL MCP &amp; A2A PROTOCOL</span>
           </div>
@@ -2491,12 +2491,12 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       </div>
     </section>
 
-    <!-- 1. Acquisition Wedge: Free True-Cost & Breakeven Check -->
+    <!-- 1. Free True-Cost & Breakeven Check -->
     <section class="section-block" id="true-cost-check" style="margin-top: 8px;">
       <div class="wedge-container">
         <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
           <div>
-            <div class="section-eyebrow">The Acquisition Wedge · Free Prior to Registration</div>
+            <div class="section-eyebrow">Pre-Flight Check · Free Prior to Registration</div>
             <h2 class="section-heading" style="margin-top: 4px;">True-Cost &amp; Breakeven Check</h2>
             <p style="font-size: 0.9rem; color: var(--muted); max-width: 680px; margin-top: 6px;">
               Understand the hurdle to profitability before risking capital. Compute executable purchase cost, venue taker fees, slippage, and true breakeven odds for any prediction-market contract.
@@ -2775,7 +2775,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     <!-- 90-Day Execution Roadmap: Specialized Microstructure & Risk Cockpit -->
     <section class="section-block" id="roadmap-cockpit" style="margin-top: 48px;">
       <div class="section-heading-group">
-        <div class="section-eyebrow" style="color:var(--accent-light);">&Sigma; 90-Day Plan &bull; Institutional Microstructure Engines</div>
+        <div class="section-eyebrow" style="color:var(--accent-light);">&Sigma; Institutional Microstructure Engines</div>
         <h2 class="section-heading">Active Prediction Market Microstructure Cockpit</h2>
         <p class="section-description">
           Six specialized tools designed to enforce pre-trade discipline, quantify exchange friction, and evaluate out-of-sample forecast accuracy before risking live capital.
@@ -2786,7 +2786,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
         <!-- 1. Realistic Paper Mode -->
         <div class="cockpit-card">
           <div>
-            <div class="cockpit-badge">Build Order #5 &bull; Realistic Paper Mode</div>
+            <div class="cockpit-badge">Simulation Mode &bull; Realistic Paper Mode</div>
             <div class="cockpit-title">Practice Without Deposits</div>
             <p class="cockpit-desc">
               Realistic simulation incorporating matching engine network transit latency (50ms–350ms), Level-2 queue depth depletion, parabolic Kalshi taker fees ($0.07&times;P(1-P)), and missed fills on fast price jumps.
@@ -2806,7 +2806,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
         <!-- 2. Validated Forecast Comparison -->
         <div class="cockpit-card">
           <div>
-            <div class="cockpit-badge">Build Order #6 &bull; Prospective Value Study</div>
+            <div class="cockpit-badge">Calibration Audit &bull; Prospective Value Study</div>
             <div class="cockpit-title">Forecast Comparison &amp; Audit</div>
             <p class="cockpit-desc">
               Tests whether your subjective forecast adds statistical value over the naive Kalshi market mid-price baseline. Evaluates prospective Brier scores and net expected profit after taker fees, half-spreads, and slippage.
@@ -3770,7 +3770,7 @@ ${miniCircles}
           </div>
           <div class="footer-col-links">
             <a href="/track-record" class="footer-col-link">1,316-Window Settlement Ledger</a>
-            <a href="/study" class="footer-col-link">Study #6.4 Cohort Portal</a>
+            <a href="/study" class="footer-col-link">Calibration Study Portal</a>
             <a href="/calibration" class="footer-col-link">Calibration Explorer</a>
             <a href="/calibration/explorer" class="footer-col-link">Murphy Decomposition</a>
             <a href="/datasets" class="footer-col-link">Open Datasets Hub (19,740 rows)</a>
@@ -3803,13 +3803,13 @@ ${miniCircles}
         </div>
       </div>
 
-      <!-- Compact 11px Monospace Regulatory & Safety Disclaimers -->
+      <!-- Plain-English Regulatory & Safety Compliance Footer -->
       <div class="footer-regulatory-box">
         <p style="margin-bottom: 8px;">
-          <strong>Regulatory &amp; Non-Affiliation Notice (Rule B10):</strong> Kalshi, CME Group, CF Benchmarks, Coinbase, Kraken, Bitstamp, Gemini, and Polymarket are trademarks of their respective owners. QuanterraOS is an independent measurement and statistical verification system operated by Quantara Global LLC and is not affiliated with, endorsed by, or sponsored by any exchange, index provider, or market operator.
+          QuanterraOS is an independent analytics tool by Quantara Global LLC. We don't place trades, hold funds, or give investment advice. Calculations use public data and published fee schedules and may be delayed or wrong — verify with your exchange.
         </p>
         <p>
-          <strong>Not Investment Advice &amp; Zero Live Capital (Rule B5):</strong> QuanterraOS does not provide investment, financial, or trading advice, and does not route or execute live orders. In accordance with internal safety Rule B5, zero live capital is deployed ($0.00 exposure). Simulated and historical calibration results have inherent limitations under CFTC Rule 4.41. Past performance does not guarantee future results. <a href="/legal">Read full Legal Notices, Terms &amp; Regulatory Disclaimers &rarr;</a>
+          Prediction-market trading can lose money. 18+. Zero live capital deployed ($0.00 exposure). Kalshi, Polymarket, CME Group, CF Benchmarks (CME CF BRTI), and other names are trademarks of their owners; we're not affiliated with them. <a href="/legal">Full Legal Notices &amp; Terms &rarr;</a>
         </p>
       </div>
     </footer>

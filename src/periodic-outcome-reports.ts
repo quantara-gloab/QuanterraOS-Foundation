@@ -585,7 +585,7 @@ export function renderPeriodicFrictionReportPageHtml(report: MarketFrictionRepor
       <div class="nav-links">
         <a href="/calculator">Check</a>
         <a href="/why">Why QuanterraOS</a>
-        <a href="/study">Study #6.4</a>
+        <a href="/study">Cost Study</a>
         <a href="/educators">Educators</a>
         <a href="/transparency" class="active" style="color:var(--accent); font-weight:700;">Transparency</a>
         <a href="/radar">Radar</a>

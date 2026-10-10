@@ -386,7 +386,7 @@ export function renderStudyWidgetHtml(summary: ProspectiveCohortSummary): string
 <body>
   <div class="widget-box">
     <div class="header">
-      <div class="title">QUANTERRAOS STUDY #6.4</div>
+      <div class="title">QUANTERRAOS COST STUDY</div>
       <div class="badge">${summary.currentEnrolled} / ${summary.targetEnrollment} ENROLLED</div>
     </div>
     <div class="grid">
@@ -578,12 +578,12 @@ export function renderStudyPageHtml(
   <nav class="top-nav">
     <a href="/" class="nav-brand">
       QUANTERRAOS
-      <span>/ STUDY #6.4</span>
+      <span>/ COST STUDY</span>
     </a>
     <div class="nav-links">
       <a href="/">Home</a>
       <a href="/calculator">True Cost Calc</a>
-      <a href="/study" class="active">Study #6.4</a>
+      <a href="/study" class="active">Cost Study</a>
       <a href="/paper">Paper Mode</a>
       <a href="/compare">Compare</a>
       <a href="/radar">Radar</a>

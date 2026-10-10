@@ -1093,7 +1093,7 @@ export function renderBenchmarkPageHtml(teardown: FrictionTeardownResult): strin
       <a href="/transparency">Transparency</a>
       <a href="/widgets">Widgets</a>
       <a href="/why" class="active" style="color:var(--accent); font-weight:700;">Why QuanterraOS</a>
-      <a href="/study">Study #6.4</a>
+      <a href="/study">Cost Study</a>
       <a href="/educators">Educators</a>
       <a href="/radar">Radar</a>
       <a href="/pricing">Pricing</a>

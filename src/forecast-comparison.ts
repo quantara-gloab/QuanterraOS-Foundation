@@ -485,7 +485,7 @@ export function generateForecastComparisonSvgReceipt(result: ForecastComparisonR
   <text x="480" y="44" fill="#38bdf8" font-family="monospace" font-size="11">STANDBY: $0.00</text>
 
   <!-- Title Section -->
-  <text x="36" y="86" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" text-transform="uppercase" letter-spacing="0.5">Prospective Value &amp; Friction Audit &bull; 90-Day Plan #6</text>
+  <text x="36" y="86" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" text-transform="uppercase" letter-spacing="0.5">Prospective Value &amp; Friction Audit</text>
   <text x="36" y="114" fill="#f8fafc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700">${escapeXml(marketContext.marketTicker)}</text>
   <text x="36" y="134" fill="#64748b" font-family="monospace" font-size="12">Spot: $${marketContext.spotPrice.toLocaleString()} &bull; Strike: $${marketContext.strike.toLocaleString()} &bull; Expiry: ${marketContext.minutesToExpiry}m &bull; CME CF BRTI</text>
 
@@ -713,7 +713,7 @@ export function renderForecastComparisonPageHtml(
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Validated Forecast Comparison &amp; Prospective Outcome Evaluation &bull; QuanterraOS</title>
-  <meta name="description" content="QuanterraOS 90-Day Execution Roadmap Build Order #6: Validated Forecast Comparison. Prospective out-of-sample evaluation testing whether forecasts add value over Kalshi market mid-price after exact Kalshi taker fees, slippage, and spread friction.">
+  <meta name="description" content="QuanterraOS Validated Forecast Comparison: Prospective out-of-sample evaluation testing whether forecasts add value over Kalshi market mid-price after exact Kalshi taker fees, slippage, and spread friction.">
   <style>
     :root {
       --bg: #07090e;
@@ -906,7 +906,7 @@ export function renderForecastComparisonPageHtml(
 
   <main class="container">
     <div class="hero">
-      <div class="eyebrow">&Sigma; 90-Day Execution Roadmap &bull; Build Order #6</div>
+      <div class="eyebrow">&Sigma; Empirical Calibration &bull; Prospective Outcome Study</div>
       <h1>Validated Forecast Comparison &amp; Prospective Outcome Study</h1>
       <p class="lead">
         Tests whether subjective or model forecasts add real statistical value over the Kalshi market mid-price baseline. 
