@@ -1009,6 +1009,31 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
           </p>
         </div>
 
+        <!-- Welcoming Video Briefing Banner & Onboarding Tutorial -->
+        <div class="deck-welcome-briefing-card" style="background: linear-gradient(135deg, rgba(201, 162, 74, 0.14) 0%, rgba(79, 209, 232, 0.12) 100%); border: 1px solid var(--hud-gold); border-radius: 8px; padding: 18px 22px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);">
+          <div style="max-width: 680px;">
+            <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--hud-gold); text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+              <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--hud-gold); box-shadow:0 0 8px var(--hud-gold);"></span>
+              <span>WELCOME CADET // ONBOARDING COCKPIT BRIEFING</span>
+            </div>
+            <div style="font-size: 1.1rem; font-weight: 700; color: #FFFFFF; letter-spacing: -0.01em;">
+              60-Second Flight Deck Briefing: How Pre-Flight Checks Save $142.50/mo
+            </div>
+            <div style="font-size: 0.8rem; color: var(--fg-muted); margin-top: 4px; line-height: 1.5;">
+              Explore the 7 stations, monitor real-time CME CF BRTI settlement dispersion, eliminate toxic taker fees, and build discipline XP from Cadet to Admiral.
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <button type="button" id="btn-open-deck-briefing" style="background: var(--hud-gold); color: #05060B; font-family: var(--font-mono); font-weight: 700; font-size: 0.82rem; padding: 10px 18px; border-radius: 20px; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 0 16px rgba(201, 162, 74, 0.35);" onclick="openDeckVideoBriefingModal()">
+              <span>▶</span>
+              <span>Watch Video Briefing</span>
+            </button>
+            <a href="/pricing" style="background: rgba(255, 255, 255, 0.06); color: #FFFFFF; border: 1px solid rgba(255, 255, 255, 0.15); font-family: var(--font-mono); font-weight: 600; font-size: 0.78rem; padding: 9px 16px; border-radius: 20px; text-decoration: none;">
+              Upgrade Pro ($29/mo) &rarr;
+            </a>
+          </div>
+        </div>
+
         <!-- Aria Computer Console Box -->
         <div class="aria-console-box">
           <div class="aria-header">
@@ -3925,24 +3950,212 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
       }
     }
 
-    function toggleShadowRule(ruleId) {
-      fetch('/api/deck/shadow/rules/' + encodeURIComponent(ruleId) + '/toggle', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({}),
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.rule) {
-          alert('Shadow tracking rule "' + data.rule.name + '" is now ' + (data.rule.enabled ? 'ACTIVE' : 'STANDBY') + '.');
-          location.reload();
+    // ===================================================================
+    // ONBOARDING COCKPIT BRIEFING TUTORIAL ENGINE
+    // ===================================================================
+    let deckAudioCtx = null;
+    let deckAudioMuted = true;
+    let deckTutorialPlaying = false;
+    let deckTutorialProgress = 0;
+    let deckTutorialRafId = null;
+    let deckLastTimestamp = 0;
+
+    const DECK_TUTORIAL_ACTS = [
+      { start: 0, end: 15, caption: "Act 1: Pre-Flight Check — 50¢ contracts charge $1.75 fee drag. QuanterraOS saves $142.50/mo in toxic spread." },
+      { start: 15, end: 30, caption: "Act 2: 60s Settlement Radar — Tracking CME CF BRTI TWAP vs Coinbase & Kraken to prevent basis traps." },
+      { start: 30, end: 45, caption: "Act 3: Copilot Aria & Stations — 7 stations monitoring risk with $0.00 live exposure (Rule B5)." },
+      { start: 45, end: 60, caption: "Act 4: Build Your Legacy — Earn discipline XP from Cadet to Admiral and unlock Pro telemetry." }
+    ];
+
+    function openDeckVideoBriefingModal() {
+      const m = document.getElementById('deck-video-briefing-modal');
+      if (m) m.style.display = 'flex';
+      const AudioClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioClass && !deckAudioCtx) deckAudioCtx = new AudioClass();
+      deckTutorialPlaying = true;
+      deckTutorialProgress = 0;
+      deckLastTimestamp = performance.now();
+      if (deckTutorialRafId) cancelAnimationFrame(deckTutorialRafId);
+      deckTutorialRafId = requestAnimationFrame(deckTutorialLoop);
+    }
+
+    function closeDeckVideoBriefingModal() {
+      const m = document.getElementById('deck-video-briefing-modal');
+      if (m) m.style.display = 'none';
+      deckTutorialPlaying = false;
+      if (deckTutorialRafId) cancelAnimationFrame(deckTutorialRafId);
+    }
+
+    function toggleDeckTutorialAudio() {
+      const AudioClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioClass && !deckAudioCtx) deckAudioCtx = new AudioClass();
+      if (deckAudioCtx && deckAudioCtx.state === 'suspended') deckAudioCtx.resume();
+      deckAudioMuted = !deckAudioMuted;
+      const b = document.getElementById('btn-deck-audio');
+      if (b) b.innerText = deckAudioMuted ? "🔇 Sound: OFF" : "🔊 Sound: ON";
+    }
+
+    function toggleDeckTutorialPlay() {
+      deckTutorialPlaying = !deckTutorialPlaying;
+      const b = document.getElementById('btn-deck-play');
+      if (b) b.innerText = deckTutorialPlaying ? "❚❚ Pause" : "▶ Play";
+      if (deckTutorialPlaying) {
+        deckLastTimestamp = performance.now();
+        deckTutorialRafId = requestAnimationFrame(deckTutorialLoop);
+      }
+    }
+
+    function seekDeckTutorialAct(idx) {
+      if (DECK_TUTORIAL_ACTS[idx]) {
+        deckTutorialProgress = DECK_TUTORIAL_ACTS[idx].start;
+        for (let i = 0; i < 4; i++) {
+          const btn = document.getElementById('btn-deck-chap-' + i);
+          if (btn) btn.classList.toggle('active', i === idx);
         }
-      })
-      .catch(err => {
-        alert('Failed to update shadow rule: ' + err.message);
-      });
+      }
+    }
+
+    function deckTutorialLoop(timestamp) {
+      if (!deckTutorialPlaying) return;
+      const dt = (timestamp - deckLastTimestamp) / 1000;
+      deckLastTimestamp = timestamp;
+
+      deckTutorialProgress += dt;
+      if (deckTutorialProgress >= 60) deckTutorialProgress = 0;
+
+      let currentActIdx = 0;
+      for (let i = 0; i < DECK_TUTORIAL_ACTS.length; i++) {
+        if (deckTutorialProgress >= DECK_TUTORIAL_ACTS[i].start && deckTutorialProgress < DECK_TUTORIAL_ACTS[i].end) {
+          currentActIdx = i;
+          break;
+        }
+      }
+
+      for (let i = 0; i < 4; i++) {
+        const btn = document.getElementById('btn-deck-chap-' + i);
+        if (btn) btn.classList.toggle('active', i === currentActIdx);
+      }
+
+      const cap = document.getElementById('deck-tutorial-caption');
+      if (cap) cap.innerText = DECK_TUTORIAL_ACTS[currentActIdx].caption;
+
+      drawDeckCanvas(currentActIdx, deckTutorialProgress);
+      deckTutorialRafId = requestAnimationFrame(deckTutorialLoop);
+    }
+
+    function drawDeckCanvas(actIdx, prog) {
+      const c = document.getElementById('deck-tutorial-hud-canvas');
+      if (!c) return;
+      const ctx = c.getContext('2d');
+      if (!ctx) return;
+
+      const w = c.width = c.clientWidth || 800;
+      const h = c.height = c.clientHeight || 360;
+
+      ctx.fillStyle = '#05070D';
+      ctx.fillRect(0, 0, w, h);
+
+      // Rotating Radar
+      const cx = w / 2;
+      const cy = h / 2 - 10;
+      ctx.strokeStyle = 'rgba(79, 209, 232, 0.15)';
+      for (let r = 40; r <= 160; r += 40) {
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      const angle = (prog * 2.5) % (Math.PI * 2);
+      ctx.strokeStyle = 'rgba(79, 209, 232, 0.5)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + Math.cos(angle) * 160, cy + Math.sin(angle) * 160);
+      ctx.stroke();
+
+      // Top Status Bar
+      ctx.fillStyle = '#C9A24A';
+      ctx.font = '600 13px "IBM Plex Mono", monospace';
+      ctx.fillText("FLIGHT DECK SIMULATOR // 60s TUTORIAL", 20, 25);
+      const secStr = Math.floor(prog).toString().padStart(2, '0') + ":00 / 01:00";
+      ctx.fillStyle = '#94A3B8';
+      ctx.fillText(secStr, w - 120, 25);
+
+      // Act Content Overlays
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = '700 18px Inter, sans-serif';
+      if (actIdx === 0) {
+        ctx.fillText("ACT 1: THE $142.50/MO HOUSE EDGE RECOVERY", 30, 65);
+        ctx.fillStyle = '#F43F5E';
+        ctx.font = '700 18px "IBM Plex Mono", monospace';
+        ctx.fillText("$1.75 PEAK TAKER DRAG (50¢ STRIKE)", 30, 100);
+        ctx.fillStyle = '#10B981';
+        ctx.fillText("+$142.50 AVOIDABLE LOSS SAVED / MO", 30, 130);
+      } else if (actIdx === 1) {
+        ctx.fillText("ACT 2: 60-SECOND TWAP SETTLEMENT RADAR", 30, 65);
+        ctx.fillStyle = '#38BDF8';
+        ctx.font = '600 14px "IBM Plex Mono", monospace';
+        ctx.fillText("CME CF BRTI Consensus vs Coinbase & Kraken Spot", 30, 100);
+        ctx.fillStyle = '#C9A24A';
+        ctx.fillText("Basis Gap Warning: Kalshi settles on index, not app.", 30, 130);
+      } else if (actIdx === 2) {
+        ctx.fillText("ACT 3: AUTONOMOUS COPILOT ARIA & 7 STATIONS", 30, 65);
+        ctx.fillStyle = '#4FD1E8';
+        ctx.font = 'italic 14px Inter, sans-serif';
+        ctx.fillText('"I can show you exactly what this costs and how it settles."', 30, 100);
+        ctx.fillStyle = '#10B981';
+        ctx.font = '600 13px "IBM Plex Mono", monospace';
+        ctx.fillText("Rule B5 Safe: $0.00 Live Risk exposure. 100% Paper Mode.", 30, 130);
+      } else {
+        ctx.fillText("ACT 4: BUILD YOUR LEGACY & SUBCRIBE TO PRO", 30, 65);
+        ctx.fillStyle = '#C9A24A';
+        ctx.font = '700 15px "IBM Plex Mono", monospace';
+        ctx.fillText("Cadet → Pilot → Flight Leader → Admiral", 30, 100);
+        ctx.fillStyle = '#FFF';
+        ctx.font = '600 13px "IBM Plex Mono", monospace';
+        ctx.fillText("Pro Access: $29/mo or $199/yr with 7-Day Free Check", 30, 130);
+      }
+
+      // Progress Line
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+      ctx.fillRect(0, h - 5, w, 5);
+      ctx.fillStyle = '#C9A24A';
+      ctx.fillRect(0, h - 5, (prog / 60) * w, 5);
     }
   </script>
+
+  <!-- Video Briefing Modal for Mobile App -->
+  <div id="deck-video-briefing-modal" style="display:none; position:fixed; inset:0; background:rgba(3,4,7,0.95); backdrop-filter:blur(20px); z-index:9999; align-items:center; justify-content:center; padding:16px;">
+    <div style="width:min(860px,100%); background:#080B12; border:1px solid rgba(201,162,74,0.4); border-radius:12px; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 25px 60px rgba(0,0,0,0.9);">
+      <div style="padding:12px 18px; background:#0C101A; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-family:var(--font-mono); font-size:0.8rem; font-weight:700; color:var(--hud-gold);">
+          🛰️ FLIGHT DECK BRIEFING // 60-SEC WALKTHROUGH
+        </span>
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="btn-aria-action" id="btn-deck-audio" onclick="toggleDeckTutorialAudio()" style="font-size:0.7rem; padding:4px 8px;">🔇 Sound: OFF</button>
+          <button type="button" class="btn-aria-action" id="btn-deck-play" onclick="toggleDeckTutorialPlay()" style="font-size:0.7rem; padding:4px 8px;">❚❚ Pause</button>
+          <button type="button" class="btn-aria-action" onclick="closeDeckVideoBriefingModal()" style="font-size:0.7rem; padding:4px 8px; color:var(--alert-red); border-color:var(--alert-red);">✕ Close</button>
+        </div>
+      </div>
+      <div style="width:100%; height:320px; background:#020306; position:relative;">
+        <canvas id="deck-tutorial-hud-canvas" width="800" height="320" style="width:100%; height:100%; display:block;"></canvas>
+      </div>
+      <div style="padding:10px 18px; background:#07090F; border-top:1px solid rgba(255,255,255,0.08); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          <button type="button" class="btn-aria-action active" id="btn-deck-chap-0" onclick="seekDeckTutorialAct(0)" style="font-size:0.68rem; padding:3px 8px;">01. Fee Drag</button>
+          <button type="button" class="btn-aria-action" id="btn-deck-chap-1" onclick="seekDeckTutorialAct(1)" style="font-size:0.68rem; padding:3px 8px;">02. TWAP Radar</button>
+          <button type="button" class="btn-aria-action" id="btn-deck-chap-2" onclick="seekDeckTutorialAct(2)" style="font-size:0.68rem; padding:3px 8px;">03. Copilot Aria</button>
+          <button type="button" class="btn-aria-action" id="btn-deck-chap-3" onclick="seekDeckTutorialAct(3)" style="font-size:0.68rem; padding:3px 8px;">04. Pro Upgrade</button>
+        </div>
+        <a href="/pricing" style="background:var(--hud-gold); color:#000; font-family:var(--font-mono); font-weight:700; font-size:0.75rem; padding:6px 14px; border-radius:4px; text-decoration:none;">
+          Claim Pro Access &rarr;
+        </a>
+      </div>
+      <div id="deck-tutorial-caption" style="padding:10px 18px; background:#05060B; border-top:1px solid rgba(255,255,255,0.06); font-family:var(--font-mono); font-size:0.75rem; color:#E2E8F0; text-align:center;">
+        Loading Flight Operations Briefing… Initializing audio-visual telemetry.
+      </div>
+    </div>
+  </div>
+
   ${renderInstallPromptHtml()}
   <script>${HAPTICS_AND_MOTION_CLIENT_SCRIPT}</script>
 </body>
