@@ -298,7 +298,7 @@ Tokens on `:root`, dark only for deck; public site dark-default with light-mode 
 
 ### PHASE 5 — Crew & game (Weeks 3–5)
 - [x] **5.1** Aria router + 8 launch crew (3.3), each with tool scope and eval set. *Accept:* 50-prompt adversarial eval = 100% non-advisory.
-- [ ] **5.2** XP engine (event-sourced table `xp_events`), ranks, missions, cosmetic unlocks. *Accept:* unit tests prove no XP path from trade count, size, P&L, or wins.
+- [x] **5.2** XP engine (event-sourced table `xp_events`), ranks, missions, cosmetic unlocks. *Accept:* unit tests prove no XP path from trade count, size, P&L, or wins.
 - [ ] **5.3** Opt-in leaderboards by calibration (min n=30 settled logs) and fees saved.
 - [ ] **5.4** Celebration animations only on rank-up, mission complete, calibration improvement.
 

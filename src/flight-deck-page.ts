@@ -62,6 +62,11 @@ import {
   ARIA_VERBATIM_REFUSAL,
   ADVERSARIAL_EVAL_PROMPTS,
 } from "./lib/aria-crew.ts";
+import {
+  PILOT_RANKS,
+  MISSIONS_ROSTER,
+  computeUserXpState,
+} from "./lib/xp-engine.ts";
 
 export type FlightDeckStationId =
   | "bridge"
@@ -1190,6 +1195,48 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
               <span class="mission-xp-badge">+50 XP</span>
             </li>
           </ul>
+        </div>
+
+        <!-- Pilot Progression & Cosmetic Unlocks Showcase (Task 5.2 / Part 3.5) -->
+        <div class="hud-card" id="cosmetic-unlocks-card" style="margin-top:20px;">
+          <div class="hud-card-title" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>PILOT RANKS &amp; COSMETIC UNLOCKS</span>
+            <span style="color:var(--hud-cyan); font-family:var(--font-mono); font-size:0.72rem;">ANTI-VOLUME REWARDS ONLY</span>
+          </div>
+          <div style="font-size:0.78rem; color:var(--fg-muted); margin-bottom:14px; line-height:1.5;">
+            Level up from Cadet to Admiral strictly by pre-flight checks, written theses, maker liquidity, and calibration accuracy. Unlocks are strictly cosmetic (ship hull skins, HUD themes, officer crests) — never trading features or fee volume discounts.
+          </div>
+
+          <!-- Ranks Stepper -->
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:10px; margin-bottom:16px;">
+            ${PILOT_RANKS.map(rank => `
+              <div style="background:rgba(0,0,0,0.4); border:1px solid ${rank.minXp <= user.xp ? 'var(--hud-cyan)' : 'var(--border-subtle)'}; padding:10px; border-radius:4px; opacity:${rank.minXp <= user.xp ? '1' : '0.6'};">
+                <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+                  <div style="width:18px; height:18px;">${rank.badgeSvg}</div>
+                  <strong style="font-size:0.8rem; color:#FFF;">${rank.rankName}</strong>
+                </div>
+                <div style="font-size:0.68rem; font-family:var(--font-mono); color:var(--hud-gold);">${rank.minXp} XP</div>
+                <div style="font-size:0.65rem; color:var(--fg-muted); margin-top:4px;">${rank.cosmetics.length} Cosmetics</div>
+              </div>
+            `).join('')}
+          </div>
+
+          <!-- Cosmetic Showcase Gallery -->
+          <div style="font-size:0.72rem; font-family:var(--font-mono); color:var(--hud-gold); margin-bottom:8px; text-transform:uppercase;">
+            Unlocked Cosmetic Inventory:
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px;">
+            ${PILOT_RANKS.filter(r => r.minXp <= user.xp).flatMap(r => r.cosmetics).map(c => `
+              <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:4px; padding:10px;">
+                <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--hud-cyan); margin-bottom:2px;">
+                  <span>${c.category.replace('_', ' ').toUpperCase()}</span>
+                  <span style="color:var(--ok-green);">UNLOCKED</span>
+                </div>
+                <div style="font-weight:600; color:#FFF; font-size:0.8rem; margin-bottom:2px;">${c.name}</div>
+                <div style="font-size:0.68rem; color:var(--fg-muted); line-height:1.3;">${c.description}</div>
+              </div>
+            `).join('')}
+          </div>
         </div>
       </section>
 

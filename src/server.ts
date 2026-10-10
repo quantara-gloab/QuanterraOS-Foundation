@@ -90,6 +90,12 @@ import {
   isAdvisoryPrompt,
 } from "./lib/aria-crew.ts";
 import {
+  recordDisciplineXpEvent,
+  computeUserXpState,
+  PILOT_RANKS,
+  MISSIONS_ROSTER,
+} from "./lib/xp-engine.ts";
+import {
   computeExpiryRadarState,
   renderExpiryRadarPageHtml,
   simulateExpiryPayoff,
@@ -4621,6 +4627,45 @@ app.post("/api/deck/crew/aria/eval", (req, res) => {
   const { prompts } = req.body || {};
   const report = evaluateAdversarialEvalSet(Array.isArray(prompts) ? prompts : undefined);
   res.json(report);
+});
+
+// ===================================================================
+// XP Engine & Anti-Volume Gamification API (Task 5.2 / Part 3.5)
+// ===================================================================
+app.get("/api/deck/xp", (req, res) => {
+  const auth = getUserAuth(req);
+  const userId = auth.user?.id || "cadet-default";
+  const state = computeUserXpState(userId);
+  res.json(state);
+});
+
+app.post("/api/deck/xp/record", (req, res) => {
+  const auth = getUserAuth(req);
+  const userId = auth.user?.id || "cadet-default";
+  const { action, metadata } = req.body || {};
+
+  try {
+    const event = recordDisciplineXpEvent(userId, action, metadata);
+    const updatedState = computeUserXpState(userId);
+    res.json({ success: true, event, state: updatedState });
+  } catch (err) {
+    res.status(400).json({ error: "guardrail_violation", message: (err as Error).message });
+  }
+});
+
+app.get("/api/deck/missions", (_req, res) => {
+  res.json({ count: MISSIONS_ROSTER.length, missions: MISSIONS_ROSTER });
+});
+
+app.get("/api/deck/cosmetics", (_req, res) => {
+  res.json({
+    ranks: PILOT_RANKS.map((r) => ({
+      rankName: r.rankName,
+      minXp: r.minXp,
+      tier: r.tier,
+      cosmetics: r.cosmetics,
+    })),
+  });
 });
 
 app.get("/wallet", (_req, res) => {

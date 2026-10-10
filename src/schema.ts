@@ -941,6 +941,21 @@ export const retainedBackupDrills = sqliteTable(
   })
 );
 
-
-
-
+// ---------------------------------------------------------------------------
+// Flight Deck Anti-Volume Gamification: Event-Sourced xp_events (Task 5.2 / Part 3.5)
+// ---------------------------------------------------------------------------
+export const xpEvents = sqliteTable(
+  "xp_events",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id").notNull(),
+    eventType: text("event_type").notNull(), // 'PRE_FLIGHT_CHECK' | 'WRITTEN_THESIS' | 'MAKER_SAVER_DISCIPLINE' | 'COIN_FLIP_STAND_DOWN' | 'FLIGHT_SCHOOL_LESSON' | 'WEEKLY_DEBRIEF' | 'BRIER_CALIBRATION_IMPROVEMENT' | 'TILT_COOLDOWN_RESPECTED'
+    xpAmount: integer("xp_amount").notNull(),
+    metadataJson: text("metadata_json"),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => ({
+    userIdIdx: index("xp_events_user_id_idx").on(table.userId),
+    createdAtIdx: index("xp_events_created_at_idx").on(table.createdAt),
+  })
+);
