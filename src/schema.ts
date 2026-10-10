@@ -1135,4 +1135,22 @@ export const tournamentLeaderboard = sqliteTable(
   })
 );
 
+export const crewApparelInterest = sqliteTable(
+  "crew_apparel_interest",
+  {
+    id: text("id").primaryKey(),
+    email: text("email").notNull(),
+    crewId: text("crew_id").notNull(),
+    productId: text("product_id"),
+    fitPreference: text("fit_preference"),
+    noticeVersion: text("notice_version").notNull().default("2026-10-10"),
+    consentGranted: integer("consent_granted", { mode: "boolean" }).notNull().default(true),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => ({
+    emailIdx: index("crew_apparel_interest_email_idx").on(table.email),
+    crewIdIdx: index("crew_apparel_interest_crew_id_idx").on(table.crewId),
+  })
+);
+
 

@@ -23,7 +23,7 @@ export function renderMobilePageHtml(): string {
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="QuanterraOS">
 <title>QuanterraOS Mobile Terminal — Progressive Web App Direct Install</title>
-<meta name="description" content="Install QuanterraOS directly on Apple iPhone and Samsung Galaxy via Progressive Web App. Real-time predictive intelligence, low-latency market telemetry, and Aria AI executive voice.">
+<meta name="description" content="Install QuanterraOS directly on Apple iPhone and Samsung Galaxy via Progressive Web App. Real-time predictive intelligence, low-latency market telemetry, and Quanta & Quantana AI executive voice.">
 
 <!-- PWA & Icon Metadata -->
 <link rel="manifest" href="/manifest.json">
@@ -974,7 +974,7 @@ export function renderMobilePageHtml(): string {
           <li>No App Store account or download needed</li>
           <li>Apple Touch Icon (180x180 PNG) included</li>
           <li>Fullscreen standalone display</li>
-          <li>Web Audio Aria voice synthesizer support</li>
+          <li>Web Audio Quanta & Quantana voice synthesizer support</li>
         </ul>
       </div>
       <div>
@@ -1051,7 +1051,7 @@ export function renderMobilePageHtml(): string {
         <div class="device-phone">
           <div class="dynamic-island">
             <div class="island-pill"></div>
-            <span style="font-size: 8px; color: #888; font-family: var(--font-mono)">ARIA ON</span>
+            <span style="font-size: 8px; color: #888; font-family: var(--font-mono)">QUANTA ON</span>
             <div class="island-cam"></div>
           </div>
           <div class="screen-content">
@@ -1103,7 +1103,7 @@ export function renderMobilePageHtml(): string {
 
             <!-- Specialist Audio HUD -->
             <div class="screen-voice-wave">
-              <span style="font-size:10px; font-weight:700; color:var(--cyan)">ARIA VOICE:</span>
+              <span style="font-size:10px; font-weight:700; color:var(--cyan)">QUANTA VOICE:</span>
               <div class="wave-bar"></div>
               <div class="wave-bar"></div>
               <div class="wave-bar"></div>
@@ -1334,7 +1334,7 @@ export function renderMobilePageHtml(): string {
     </div>
     <div class="feature-item">
       <div class="feature-icon">🎙️</div>
-      <h4>Aria Executive Voice</h4>
+      <h4>Quanta &amp; Quantana Voice</h4>
       <p>Audio-synthesized briefings and speech-to-text voice recognition natively tuned for mobile microphones and wireless earbuds.</p>
     </div>
     <div class="feature-item">

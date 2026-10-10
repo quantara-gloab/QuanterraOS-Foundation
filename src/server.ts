@@ -465,6 +465,14 @@ import {
 import { renderOddsDefendersPageHtml } from "./odds-defenders-page.ts";
 import { isCampaignEnabled, recordCampaignEvent } from "./config/campaign.ts";
 import { renderMerchandisePageHtml } from "./merchandise-page.ts";
+import { renderCrewApparelPageHtml } from "./crew-apparel-page.ts";
+import {
+  ORIGINAL_EIGHT_COLLECTIONS,
+  CREW_OUTFIT_CATALOG,
+  getCrewCollection,
+  getCrewOutfits,
+  recordApparelInterest,
+} from "./lib/crew-apparel-catalog.ts";
 import {
   getMerchandiseCatalog,
   getMerchandiseProduct,
@@ -549,17 +557,17 @@ app.get("/growth", (_req, res) => {
 const growth = startGrowthEngine({ pagePath: path.resolve("public/growth.html") });
 app.use(growth.handler);
 
-// QuanterraOS Homepage v2 Preview (Lion spokesperson, 3-layer Council, F1 Fleet graphic)
+// Legacy / Unneeded Preview & Corporate Pitch Routes -> Redirect to Core Proof & Tools
 app.get(["/preview", "/home-v2"], (_req, res) => {
-  res.sendFile(path.resolve("public/quanterraos-home.html"));
+  res.redirect(301, "/");
 });
 app.get("/fleet.jpg", (_req, res) => {
   res.sendFile(path.resolve("public/fleet.jpg"));
 });
 
-// TrustOS Enterprise AI Pilot Offer ($20,000 / 6-Week Calibration Audit)
+// TrustOS Enterprise AI Pilot Offer -> Redirect to Brier Calibration Proof Ledger (/proof)
 app.get(["/trustos", "/pilot"], (_req, res) => {
-  res.sendFile(path.resolve("public/trustos.html"));
+  res.redirect(301, "/proof");
 });
 
 // Go-To-Market (GTM) Agents API (Content, Ad Platform, CRM, Sales Pipeline)
@@ -1340,18 +1348,40 @@ app.post(["/api/assistant/chat", "/api/council/:agentId/chat", "/api/council/:id
         message: `Message exceeds maximum allowed length of ${MAX_MESSAGE_LENGTH} characters.`
       });
     }
+    const isQuanta = agentId.toLowerCase() === "quanta" || agentId.toLowerCase() === "aria";
+    const isQuantana = agentId.toLowerCase() === "quantana";
+
     if (isAdvisoryPrompt(message.trim())) {
       const ariaRes = routeAriaQuery(message.trim());
+      const selectedId = isQuantana ? "quantana" : "quanta";
+      const selectedName = isQuantana ? "Quantana" : "Quanta";
       return res.json({
-        agentId: "aria",
-        agentName: "Aria",
-        role: "Ship's Computer // Executive Concierge",
+        agentId: selectedId,
+        agentName: selectedName,
+        role: "Global Galactic Leader // Virtual Assistant",
         reply: ariaRes.message,
         message: ariaRes.message,
         disclaimer: "Non-advisory response. QuanterraOS does not provide trading advice.",
         citations: ariaRes.citations,
         suggestedActions: ariaRes.suggestedActions,
         isAdvisoryRefusal: true,
+      });
+    }
+
+    if (isQuanta || isQuantana) {
+      const assistantRes = routeAriaQuery(message.trim());
+      const selectedId = isQuantana ? "quantana" : "quanta";
+      const selectedName = isQuantana ? "Quantana" : "Quanta";
+      return res.json({
+        agentId: selectedId,
+        agentName: selectedName,
+        role: "Global Galactic Leader // Virtual Assistant",
+        reply: assistantRes.message,
+        message: assistantRes.message,
+        disclaimer: "Non-advisory response. QuanterraOS does not provide trading advice.",
+        citations: assistantRes.citations,
+        suggestedActions: assistantRes.suggestedActions,
+        isAdvisoryRefusal: assistantRes.isRefusal,
       });
     }
 
@@ -2157,6 +2187,60 @@ app.post("/api/campaign/event", (req, res) => {
 app.get("/merchandise", (req, res) => {
   const auth = getUserAuth(req);
   res.type("html").send(renderMerchandisePageHtml(auth.user));
+});
+
+// ---------------------------------------------------------------------------
+// Eight Original Council Apparel Collections + Quanta Leader Collection
+// ---------------------------------------------------------------------------
+
+// Crew Apparel Gallery Entry & Specific Crew Route
+app.get(["/merchandise/crew", "/gear/crew", "/crew/apparel"], (req, res) => {
+  const auth = getUserAuth(req);
+  res.type("html").send(renderCrewApparelPageHtml({ selectedCrewSlug: "draco", user: auth.user }));
+});
+
+app.get(["/merchandise/crew/:crewSlug", "/gear/crew/:crewSlug"], (req, res) => {
+  const auth = getUserAuth(req);
+  const slug = (req.params.crewSlug || "draco").toLowerCase().trim();
+  res.type("html").send(renderCrewApparelPageHtml({ selectedCrewSlug: slug, user: auth.user }));
+});
+
+// Crew Apparel Collections API
+app.get("/api/merchandise/collections", (_req, res) => {
+  res.json({
+    success: true,
+    totalCollections: ORIGINAL_EIGHT_COLLECTIONS.length,
+    originalCouncilCount: 8,
+    collections: ORIGINAL_EIGHT_COLLECTIONS,
+    outfitsCount: CREW_OUTFIT_CATALOG.length,
+  });
+});
+
+// Crew Apparel Consented Interest Notification API
+app.post("/api/merchandise/interest", (req, res) => {
+  try {
+    const { email, crewSlug, crewId, productId, fitPreference } = req.body || {};
+    const targetSlug = crewSlug || crewId;
+
+    if (!email || typeof email !== "string" || !email.includes("@")) {
+      return res.status(400).json({ success: false, error: "A valid email address is required to register interest." });
+    }
+
+    if (!targetSlug) {
+      return res.status(400).json({ success: false, error: "crewSlug or crewId is required." });
+    }
+
+    const result = recordApparelInterest({
+      email,
+      crewSlug: String(targetSlug).toLowerCase().trim(),
+      productId: productId ? String(productId) : undefined,
+      fitPreference: fitPreference ? String(fitPreference) : undefined,
+    });
+
+    res.json(result);
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: err.message });
+  }
 });
 
 // Route Aliases (/gear and /shop)
@@ -3702,15 +3786,9 @@ app.all(["/api/trustos/audit-preview", "/api/audit/dossier"], (req, res) => {
   res.json({ success: true, result });
 });
 
-// Executive Enterprise TrustOS Portal
+// Executive Enterprise TrustOS Portal -> Redirected to Verified Settlement Track Record & Calibration Proof (/proof)
 app.get(["/trustos", "/enterprise/trustos", "/audit-pilot"], (_req, res) => {
-  const preview = generateTrustOsAuditPreview({
-    institutionName: "Frontier Risk Analytics / Regional Insurer",
-    modelDomain: "algorithmic_underwriting",
-    sampleDecisionsCount: 1316,
-    targetBrierScore: 0.2001,
-  });
-  res.type("html").send(renderTrustOsPageHtml(preview));
+  res.redirect(301, "/proof");
 });
 
 app.get("/api/benchmark/card.svg", (req, res) => {

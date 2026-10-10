@@ -717,6 +717,33 @@ export function renderMerchandisePageHtml(user?: { email?: string; callsign?: st
         Official physical apparel for Flight Deck Pilots and Spacecraft Council officers. Mascot hoodies, aerospace jumpsuits, and bespoke Italian wool suits for men and women. Purchase direct or win through points, raffles, and tournaments.
       </p>
 
+      <!-- Original Council Flight Crew Apparel Banner -->
+      <div style="background: linear-gradient(135deg, rgba(148, 104, 255, 0.15) 0%, rgba(89, 221, 236, 0.1) 100%); border: 1px solid rgba(148, 104, 255, 0.35); border-radius: 16px; padding: 24px; margin: 24px auto 32px; max-width: 960px; text-align: left; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 14px;">
+          <div>
+            <span style="font-family: var(--public-font-mono); font-size: 0.75rem; color: #59DDEC; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;">NEW // ORIGINAL COUNCIL CREW APPAREL</span>
+            <h2 style="font-size: 1.45rem; font-weight: 800; color: #FFFFFF; margin: 4px 0 6px;">Wear your Flight Crew.</h2>
+            <p style="font-size: 0.88rem; color: #CBD5E1; margin: 0; max-width: 600px; line-height: 1.5;">
+              Eight original crew identities. Men’s and women’s Street Sets and Flight Sets inspired by Draco, Wolf, Falcon, Quantum Fox, Sentinel, Kraken, Lion, Phoenix, and Quanta Leader.
+            </p>
+          </div>
+          <a href="/merchandise/crew" style="display: inline-flex; align-items: center; gap: 8px; background: #9468FF; color: #FFFFFF; font-weight: 700; font-size: 0.88rem; padding: 12px 20px; border-radius: 10px; text-decoration: none; transition: transform 0.15s ease, background 0.15s ease;">
+            Explore Collections &rarr;
+          </a>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 12px;">
+          <a href="/merchandise/crew/draco" style="font-family: var(--public-font-mono); font-size: 0.72rem; color: #F4F5FF; background: rgba(255,255,255,0.06); padding: 5px 10px; border-radius: 6px; text-decoration: none; border: 1px solid rgba(255,255,255,0.1);">Draco</a>
+          <a href="/merchandise/crew/wolf" style="font-family: var(--public-font-mono); font-size: 0.72rem; color: #F4F5FF; background: rgba(255,255,255,0.06); padding: 5px 10px; border-radius: 6px; text-decoration: none; border: 1px solid rgba(255,255,255,0.1);">Wolf</a>
+          <a href="/merchandise/crew/falcon" style="font-family: var(--public-font-mono); font-size: 0.72rem; color: #F4F5FF; background: rgba(255,255,255,0.06); padding: 5px 10px; border-radius: 6px; text-decoration: none; border: 1px solid rgba(255,255,255,0.1);">Falcon</a>
+          <a href="/merchandise/crew/quantum-fox" style="font-family: var(--public-font-mono); font-size: 0.72rem; color: #F4F5FF; background: rgba(255,255,255,0.06); padding: 5px 10px; border-radius: 6px; text-decoration: none; border: 1px solid rgba(255,255,255,0.1);">Quantum Fox</a>
+          <a href="/merchandise/crew/sentinel" style="font-family: var(--public-font-mono); font-size: 0.72rem; color: #F4F5FF; background: rgba(255,255,255,0.06); padding: 5px 10px; border-radius: 6px; text-decoration: none; border: 1px solid rgba(255,255,255,0.1);">Sentinel</a>
+          <a href="/merchandise/crew/kraken" style="font-family: var(--public-font-mono); font-size: 0.72rem; color: #F4F5FF; background: rgba(255,255,255,0.06); padding: 5px 10px; border-radius: 6px; text-decoration: none; border: 1px solid rgba(255,255,255,0.1);">Kraken</a>
+          <a href="/merchandise/crew/lion" style="font-family: var(--public-font-mono); font-size: 0.72rem; color: #F4F5FF; background: rgba(255,255,255,0.06); padding: 5px 10px; border-radius: 6px; text-decoration: none; border: 1px solid rgba(255,255,255,0.1);">Lion</a>
+          <a href="/merchandise/crew/phoenix" style="font-family: var(--public-font-mono); font-size: 0.72rem; color: #F4F5FF; background: rgba(255,255,255,0.06); padding: 5px 10px; border-radius: 6px; text-decoration: none; border: 1px solid rgba(255,255,255,0.1);">Phoenix</a>
+          <a href="/merchandise/crew/quanta" style="font-family: var(--public-font-mono); font-size: 0.72rem; color: #59DDEC; background: rgba(89,221,236,0.1); padding: 5px 10px; border-radius: 6px; text-decoration: none; border: 1px solid rgba(89,221,236,0.3);">Quanta &amp; Quantana ⭐</a>
+        </div>
+      </div>
+
       <!-- User XP Gamification Bar -->
       <div class="user-xp-strip">
         <div class="xp-stat-group">

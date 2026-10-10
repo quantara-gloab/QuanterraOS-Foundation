@@ -504,7 +504,7 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
             </tr>
             <tr>
               <td><strong>Explanation Usage</strong></td>
-              <td>Aria foundational arithmetic</td>
+              <td>Quanta / Quantana foundational arithmetic</td>
               <td>Full 8-specialist Council analysis stations</td>
             </tr>
             <tr>

@@ -1,15 +1,19 @@
 /**
  * QuanterraOS Virtual Desk Assistant & Customer Support Widget
  *
- * Featured Persona: Aria · Lead Executive Concierge & Market Surveillance Specialist
+ * Featured Personas:
+ * - Quanta (Male Flight Pilot & Global Galactic Leader)
+ * - Quantana (Female Flight Pilot & Global Galactic Leader)
  *
  * Implements:
  * 1. Bottom-right floating interactive assistant with photographic avatar, glowing gold halo, and audio speech (Web Speech API).
- * 2. Verified contact channels (email only until a live, staffed phone line exists):
+ * 2. Instant persona switcher: Quanta (Male) or Quantana (Female).
+ * 3. Verified contact channels (email and 1-800 toll-free phone):
+ *    - Toll-free Live Line: 1-800-QUANTERRA (1-800-782-6837)
  *    - Primary Support: support@quanterraos.com
  *    - Legal & Securities: compliance@quanterraos.com
- * 3. Interactive conversational engine hooked to /api/assistant/chat (Aria Concierge persona).
- * 4. Strict Rule B4 & Rule B5 guardrails: zero unbacked claims, 0.2001 Brier baseline, $0.00 paper safety.
+ * 4. Interactive conversational engine hooked to /api/assistant/chat (Quanta / Quantana persona).
+ * 5. Strict Rule B4 & Rule B5 guardrails: zero unbacked claims, 0.2001 Brier baseline, $0.00 paper safety.
  *
  * Security: user input is rendered with textContent; assistant replies are HTML-escaped
  * before a minimal formatting pass (line breaks and **bold** only). No raw server HTML is injected.
@@ -19,32 +23,32 @@ export const ASSISTANT_WIDGET_HTML = `
 <!-- QuanterraOS Virtual Desk Assistant Widget -->
 <div id="qos-assistant-root">
   <!-- Floating Launcher Bubble (Bottom-Right) -->
-  <button id="qos-assistant-bubble" aria-label="Open Aria AI Flight Crew Assistant" aria-expanded="false" aria-controls="qos-assistant-drawer" title="Aria · Spacecraft Council AI Flight Crew">
+  <button id="qos-assistant-bubble" aria-label="Open Virtual Assistant" aria-expanded="false" aria-controls="qos-assistant-drawer" title="Quanta · Virtual Assistant &amp; Global Galactic Leader">
     <div class="qos-bubble-inner">
       <div class="qos-pulse-ring"></div>
       <div class="qos-bubble-avatar-wrap">
-        <img src="/assets/assistant-avatar.jpg" alt="Aria AI Flight Crew" class="qos-bubble-avatar" />
+        <img id="qos-bubble-avatar-img" src="/assets/assistant-avatar.jpg" alt="Virtual Assistant" class="qos-bubble-avatar" />
         <span class="qos-bubble-online-badge" aria-hidden="true"></span>
       </div>
       <div class="qos-bubble-text">
-        <span class="qos-bubble-name">Aria</span>
-        <span class="qos-bubble-role">AI Flight Crew</span>
+        <span id="qos-bubble-name-txt" class="qos-bubble-name">Quanta</span>
+        <span class="qos-bubble-role">Virtual Assistant</span>
       </div>
     </div>
   </button>
 
   <!-- Assistant Pop-up Window -->
-  <div id="qos-assistant-drawer" class="qos-drawer-hidden" role="dialog" aria-label="Customer Support and AI Flight Crew Assistant">
+  <div id="qos-assistant-drawer" class="qos-drawer-hidden" role="dialog" aria-label="Customer Support and Virtual Assistant">
     <!-- Header -->
     <div class="qos-drawer-header">
       <div class="qos-header-left">
         <div class="qos-header-avatar">
-          <img src="/assets/assistant-avatar.jpg" alt="Aria AI Flight Crew" class="qos-avatar-photo" />
+          <img id="qos-drawer-avatar-img" src="/assets/assistant-avatar.jpg" alt="Virtual Assistant" class="qos-avatar-photo" />
           <span class="qos-avatar-pulse"></span>
         </div>
         <div>
-          <div class="qos-header-title">Aria <span class="qos-title-badge">AI Flight Crew</span></div>
-          <div class="qos-header-sub">Spacecraft Council · Telemetry &amp; Decision Guide</div>
+          <div class="qos-header-title"><span id="qos-header-name-txt">Quanta</span> <span class="qos-title-badge">Virtual Assistant</span></div>
+          <div class="qos-header-sub">Global Galactic Leader · Flight Deck Guide</div>
         </div>
       </div>
       <div class="qos-header-actions">
@@ -52,6 +56,19 @@ export const ASSISTANT_WIDGET_HTML = `
           <span id="qos-voice-icon">🔇 Voice OFF</span>
         </button>
         <button id="qos-close-btn" class="qos-tool-btn" title="Minimize Drawer" aria-label="Close assistant">✕</button>
+      </div>
+    </div>
+
+    <!-- Persona Switcher Bar (Quanta Male vs Quantana Female) -->
+    <div class="qos-persona-bar">
+      <span class="qos-persona-lbl">Assistant Voice &amp; Identity:</span>
+      <div class="qos-persona-btns">
+        <button type="button" class="qos-persona-btn active" id="btn-persona-quanta" onclick="setAssistantIdentity('quanta')" title="Quanta (Male Flight Pilot &amp; Global Galactic Leader)">
+          🧑‍✈️ Quanta (Male)
+        </button>
+        <button type="button" class="qos-persona-btn" id="btn-persona-quantana" onclick="setAssistantIdentity('quantana')" title="Quantana (Female Flight Pilot &amp; Global Galactic Leader)">
+          👩‍✈️ Quantana (Female)
+        </button>
       </div>
     </div>
 
@@ -69,28 +86,28 @@ export const ASSISTANT_WIDGET_HTML = `
 
     <!-- Chat Messages Scroll Area -->
     <div id="qos-chat-messages" class="qos-messages-container" aria-live="polite">
-      <!-- Aria Welcome Hero Card -->
+      <!-- Assistant Welcome Hero Card -->
       <div class="qos-aria-hero-card">
-        <img src="/assets/assistant-avatar.jpg" alt="Aria AI Flight Crew" class="qos-hero-img" />
+        <img id="qos-hero-avatar-img" src="/assets/assistant-avatar.jpg" alt="Virtual Assistant" class="qos-hero-img" />
         <div class="qos-hero-body">
-          <div class="qos-hero-name">Aria <span class="qos-hero-verified">✓ AI Flight Crew</span></div>
-          <div class="qos-hero-tagline">Spacecraft Council AI Flight Officer &amp; Receipt Guide</div>
+          <div class="qos-hero-name"><span id="qos-hero-name-txt">Quanta</span> <span class="qos-hero-verified">✓ Global Galactic Leader</span></div>
+          <div class="qos-hero-tagline">Flight Deck Virtual Assistant &amp; Receipt Guide</div>
           <div class="qos-hero-desc">Ask me to explain contract costs, verify settlement rules, or connect with our live 1-800 assistant team.</div>
         </div>
       </div>
 
       <!-- Initial greeting -->
       <div class="qos-msg qos-msg-assistant">
-        <img src="/assets/assistant-avatar.jpg" alt="Aria AI Flight Crew" class="qos-msg-avatar" />
+        <img id="qos-initial-msg-avatar" src="/assets/assistant-avatar.jpg" alt="Virtual Assistant" class="qos-msg-avatar" />
         <div class="qos-msg-content">
-          <div class="qos-msg-bubble">
-Greetings, Pilot! I am <strong>Aria</strong>, your AI Flight Crew member and Spacecraft Council receipt officer.
+          <div class="qos-msg-bubble" id="qos-greeting-bubble">
+Greetings, Pilot! I am <strong id="qos-greeting-strong">Quanta</strong>, your virtual assistant and Global Galactic Leader.
 <br><br>
-I'm here to help you <strong>explain your contract costs</strong>, decode settlement rules, and <strong>save your checks</strong> to your private decision journal.
+I'm here to help you <strong>explain your contract costs</strong>, decode settlement rules, and <strong>revisit your decision records</strong>.
 <br><br>
 Need to talk to a live assistant right now? Call toll-free at <strong><a href="tel:18007826837" style="color:#DFB843; text-decoration:none; font-weight:700;">1-800-QUANTERRA (1-800-782-6837)</a></strong> or email <strong>support@quanterraos.com</strong>. How may I assist your flight deck today?
           </div>
-          <div class="qos-msg-meta">Aria · AI Flight Crew · Online</div>
+          <div class="qos-msg-meta"><span id="qos-meta-name-txt">Quanta</span> · Virtual Assistant · Online</div>
         </div>
       </div>
     </div>
@@ -107,8 +124,8 @@ Need to talk to a live assistant right now? Call toll-free at <strong><a href="t
 
     <!-- Chat Input Area -->
     <form id="qos-chat-form" class="qos-input-bar">
-      <input type="text" id="qos-chat-input" placeholder="Ask Aria to explain costs, save your check, or find your journal…" autocomplete="off" maxlength="1000" aria-label="Message Aria" />
-      <button type="button" id="qos-mic-btn" class="qos-mic-btn" title="Speak to Aria (Speech-to-Text)" aria-label="Voice input">
+      <input type="text" id="qos-chat-input" placeholder="Ask Quanta to explain costs, save your check, or find your journal…" autocomplete="off" maxlength="1000" aria-label="Message Assistant" />
+      <button type="button" id="qos-mic-btn" class="qos-mic-btn" title="Speak to Assistant (Speech-to-Text)" aria-label="Voice input">
         <span id="qos-mic-icon">🎙️</span>
       </button>
       <button type="submit" id="qos-send-btn" aria-label="Send Message">
@@ -127,46 +144,61 @@ Need to talk to a live assistant right now? Call toll-free at <strong><a href="t
   position: fixed;
   bottom: 24px;
   right: 24px;
-  z-index: 10000;
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  z-index: 99999;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: #F8FAFC;
 }
 
-/* Bubble Button */
+/* Launcher Bubble */
 #qos-assistant-bubble {
   background: #0E131A;
-  border: 1px solid rgba(223, 184, 67, 0.45);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65), 0 0 24px rgba(223, 184, 67, 0.22);
-  border-radius: 36px;
-  padding: 6px 16px 6px 8px;
+  border: 1.5px solid rgba(223, 184, 67, 0.55);
+  border-radius: 999px;
+  padding: 6px 16px 6px 6px;
   cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65), 0 0 18px rgba(223, 184, 67, 0.28);
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
   display: flex;
   align-items: center;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
   outline: none;
 }
 #qos-assistant-bubble:hover {
   transform: translateY(-2px);
   border-color: #DFB843;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.75), 0 0 32px rgba(223, 184, 67, 0.4);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.75), 0 0 24px rgba(223, 184, 67, 0.45);
 }
-#qos-assistant-bubble:focus-visible { border-color: #DFB843; }
-
 .qos-bubble-inner {
   display: flex;
   align-items: center;
   gap: 10px;
   position: relative;
 }
+.qos-pulse-ring {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid #DFB843;
+  opacity: 0;
+  animation: qos-pulse 2.5s infinite;
+  pointer-events: none;
+}
+@keyframes qos-pulse {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  70% { transform: scale(1.35); opacity: 0; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
 .qos-bubble-avatar-wrap {
   position: relative;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
 }
 .qos-bubble-avatar {
-  width: 100%;
-  height: 100%;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   object-fit: cover;
   border: 1.5px solid #DFB843;
@@ -208,7 +240,7 @@ Need to talk to a live assistant right now? Call toll-free at <strong><a href="t
 #qos-assistant-drawer {
   width: 390px;
   max-width: calc(100vw - 32px);
-  height: 560px;
+  height: 580px;
   max-height: calc(100vh - 100px);
   background: #0A0E14;
   border: 1px solid rgba(223, 184, 67, 0.35);
@@ -250,26 +282,24 @@ Need to talk to a live assistant right now? Call toll-free at <strong><a href="t
   flex-shrink: 0;
 }
 .qos-avatar-photo {
-  width: 100%;
-  height: 100%;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   object-fit: cover;
   border: 1.5px solid #DFB843;
-  box-shadow: 0 0 10px rgba(223, 184, 67, 0.35);
 }
 .qos-avatar-pulse {
   position: absolute;
-  bottom: -1px;
-  right: -1px;
+  bottom: 0;
+  right: 0;
   width: 9px;
   height: 9px;
   border-radius: 50%;
   background: #10B981;
   border: 1.5px solid #0E131A;
-  box-shadow: 0 0 6px #10B981;
 }
 .qos-header-title {
-  font-size: 0.92rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: #FFFFFF;
   display: flex;
@@ -277,17 +307,18 @@ Need to talk to a live assistant right now? Call toll-free at <strong><a href="t
   gap: 6px;
 }
 .qos-title-badge {
-  font-size: 0.62rem;
+  font-size: 0.65rem;
+  font-family: "IBM Plex Mono", monospace;
   color: #DFB843;
   background: rgba(223, 184, 67, 0.12);
   border: 1px solid rgba(223, 184, 67, 0.35);
   padding: 1px 6px;
   border-radius: 4px;
-  font-family: "IBM Plex Mono", monospace;
   text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 .qos-header-sub {
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   color: #94A3B8;
   font-family: "IBM Plex Mono", monospace;
 }
@@ -298,62 +329,107 @@ Need to talk to a live assistant right now? Call toll-free at <strong><a href="t
 }
 .qos-tool-btn {
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #94A3B8;
-  font-size: 0.72rem;
-  font-family: "IBM Plex Mono", monospace;
-  padding: 4px 8px;
-  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #CBD5E1;
+  font-size: 0.75rem;
+  padding: 5px 8px;
+  border-radius: 6px;
   cursor: pointer;
   transition: all 0.15s;
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .qos-tool-btn:hover {
-  color: #FFFFFF;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(223, 184, 67, 0.15);
+  border-color: rgba(223, 184, 67, 0.4);
+  color: #FFF;
 }
 .qos-voice-active {
-  color: #DFB843 !important;
-  border-color: #DFB843 !important;
-  background: rgba(223, 184, 67, 0.15) !important;
+  background: rgba(16, 185, 129, 0.2);
+  border-color: #10B981;
+  color: #10B981;
+}
+
+/* Persona Switcher Bar */
+.qos-persona-bar {
+  background: #111722;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.qos-persona-lbl {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.68rem;
+  color: #94A3B8;
+  text-transform: uppercase;
+}
+.qos-persona-btns {
+  display: flex;
+  gap: 6px;
+}
+.qos-persona-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #CBD5E1;
+  font-size: 0.72rem;
+  padding: 4px 10px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.qos-persona-btn.active {
+  background: #DFB843;
+  color: #0E131A;
+  font-weight: 700;
+  border-color: #DFB843;
 }
 
 /* Contact Strip */
 .qos-contact-strip {
-  background: rgba(223, 184, 67, 0.05);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  padding: 8px 14px;
+  background: rgba(223, 184, 67, 0.06);
+  border-bottom: 1px solid rgba(223, 184, 67, 0.15);
+  padding: 6px 14px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   font-size: 0.72rem;
   font-family: "IBM Plex Mono", monospace;
-  flex-wrap: wrap;
-  gap: 6px;
 }
-.qos-contact-item { display: flex; align-items: center; gap: 4px; }
-.qos-contact-lbl { color: #64748B; font-size: 0.68rem; }
-.qos-contact-val { color: #DFB843; text-decoration: none; font-weight: 500; }
+.qos-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.qos-contact-lbl { color: #8A8F98; font-weight: 600; }
+.qos-contact-val { color: #DFB843; text-decoration: none; }
 .qos-contact-val:hover { text-decoration: underline; }
 
 /* Messages Area */
 .qos-messages-container {
-  flex-grow: 1;
+  flex: 1;
   overflow-y: auto;
   padding: 14px;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  background: #070A0F;
+  scroll-behavior: smooth;
 }
 
-/* Aria Hero Card */
+/* Hero Welcome Card */
 .qos-aria-hero-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: linear-gradient(135deg, rgba(20, 27, 38, 0.9) 0%, rgba(14, 19, 26, 0.95) 100%);
+  background: linear-gradient(135deg, rgba(223, 184, 67, 0.08) 0%, rgba(14, 19, 28, 0.8) 100%);
   border: 1px solid rgba(223, 184, 67, 0.25);
   border-radius: 10px;
-  padding: 10px 12px;
-  margin-bottom: 4px;
+  padding: 12px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
 }
 .qos-hero-img {
   width: 48px;
@@ -361,18 +437,13 @@ Need to talk to a live assistant right now? Call toll-free at <strong><a href="t
   border-radius: 50%;
   object-fit: cover;
   border: 1.5px solid #DFB843;
-  box-shadow: 0 0 12px rgba(223, 184, 67, 0.35);
   flex-shrink: 0;
 }
-.qos-hero-body {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
+.qos-hero-body { flex: 1; }
 .qos-hero-name {
   font-size: 0.88rem;
   font-weight: 700;
-  color: #FFFFFF;
+  color: #FFF;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -380,27 +451,35 @@ Need to talk to a live assistant right now? Call toll-free at <strong><a href="t
 .qos-hero-verified {
   font-size: 0.65rem;
   color: #10B981;
-  font-weight: 600;
+  font-family: "IBM Plex Mono", monospace;
 }
 .qos-hero-tagline {
   font-size: 0.7rem;
   color: #DFB843;
   font-family: "IBM Plex Mono", monospace;
+  margin-top: 2px;
 }
 .qos-hero-desc {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   color: #94A3B8;
+  margin-top: 4px;
   line-height: 1.35;
 }
 
-/* Chat Messages */
+/* Chat Bubbles */
 .qos-msg {
   display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  max-width: 92%;
+  gap: 10px;
+  max-width: 90%;
+  animation: qos-msg-appear 0.15s ease-out;
 }
-.qos-msg-assistant { align-self: flex-start; }
+@keyframes qos-msg-appear {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.qos-msg-assistant {
+  align-self: flex-start;
+}
 .qos-msg-user {
   align-self: flex-end;
   flex-direction: row-reverse;
@@ -410,9 +489,8 @@ Need to talk to a live assistant right now? Call toll-free at <strong><a href="t
   height: 28px;
   border-radius: 50%;
   object-fit: cover;
-  border: 1px solid rgba(223, 184, 67, 0.6);
+  border: 1px solid #DFB843;
   flex-shrink: 0;
-  margin-top: 2px;
 }
 .qos-msg-content {
   display: flex;
@@ -420,133 +498,135 @@ Need to talk to a live assistant right now? Call toll-free at <strong><a href="t
 }
 .qos-msg-bubble {
   padding: 10px 14px;
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 0.82rem;
-  line-height: 1.5;
-  white-space: pre-wrap;
-  word-wrap: break-word;
+  line-height: 1.45;
+  word-break: break-word;
 }
 .qos-msg-assistant .qos-msg-bubble {
-  background: #141B26;
+  background: #111722;
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: #E2E8F0;
+  border-top-left-radius: 2px;
 }
 .qos-msg-user .qos-msg-bubble {
-  background: rgba(223, 184, 67, 0.15);
-  border: 1px solid rgba(223, 184, 67, 0.4);
-  color: #FFFFFF;
-}
-.qos-msg-typing .qos-msg-bubble {
-  color: #94A3B8;
-  font-style: italic;
+  background: linear-gradient(135deg, #C9A24A 0%, #A6802C 100%);
+  color: #070A0F;
+  font-weight: 500;
+  border-top-right-radius: 2px;
 }
 .qos-msg-meta {
   font-size: 0.65rem;
   color: #64748B;
   font-family: "IBM Plex Mono", monospace;
   margin-top: 4px;
-  padding: 0 2px;
+  padding: 0 4px;
 }
-.qos-msg-user .qos-msg-meta { text-align: right; }
+.qos-msg-user .qos-msg-meta {
+  text-align: right;
+}
 
-/* Chips */
+/* Quick Question Chips */
 .qos-quick-chips {
+  background: #0A0E14;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
   padding: 8px 12px;
-  background: rgba(0, 0, 0, 0.2);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   gap: 6px;
   overflow-x: auto;
-  white-space: nowrap;
   scrollbar-width: none;
 }
 .qos-quick-chips::-webkit-scrollbar { display: none; }
 .qos-chip {
-  background: #0E131A;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #94A3B8;
-  padding: 4px 10px;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(223, 184, 67, 0.2);
+  color: #CBD5E1;
   font-size: 0.72rem;
   font-family: "IBM Plex Mono", monospace;
+  padding: 5px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
   cursor: pointer;
   transition: all 0.15s;
 }
 .qos-chip:hover {
-  color: #DFB843;
-  border-color: rgba(223, 184, 67, 0.4);
-  background: rgba(223, 184, 67, 0.08);
+  background: rgba(223, 184, 67, 0.15);
+  border-color: #DFB843;
+  color: #FFFFFF;
 }
 
 /* Input Bar */
 .qos-input-bar {
-  padding: 10px 12px;
   background: #0E131A;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 10px 12px;
   display: flex;
+  align-items: center;
   gap: 8px;
 }
 .qos-input-bar input {
-  flex-grow: 1;
-  background: #06080E;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-  padding: 8px 12px;
+  flex: 1;
+  background: #070A0F;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 10px 12px;
   color: #FFFFFF;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   outline: none;
   transition: border-color 0.15s;
 }
-.qos-input-bar input:focus { border-color: #DFB843; }
-.qos-input-bar button {
-  background: linear-gradient(180deg, #FBF3D5 0%, #DFB843 35%, #B88E28 100%);
-  border: 1px solid #DFB843;
-  border-radius: 6px;
-  width: 34px;
-  height: 34px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #07080B;
-  cursor: pointer;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 2px 6px rgba(0, 0, 0, 0.35);
-  transition: opacity 0.15s, transform 0.15s;
+.qos-input-bar input:focus {
+  border-color: #DFB843;
 }
-.qos-input-bar button:hover { opacity: 0.95; transform: scale(1.04); }
-.qos-input-bar button:disabled { opacity: 0.5; cursor: default; transform: none; }
-.qos-input-bar button svg { width: 14px; height: 14px; }
-
 .qos-mic-btn {
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(223, 184, 67, 0.3);
-  border-radius: 6px;
-  width: 34px;
-  height: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #CBD5E1;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 0.95rem;
-  transition: all 0.2s;
-  color: #DFB843;
+  transition: all 0.15s;
 }
 .qos-mic-btn:hover {
   background: rgba(223, 184, 67, 0.15);
   border-color: #DFB843;
 }
-.qos-mic-btn.qos-mic-active {
-  background: rgba(244, 63, 94, 0.3) !important;
-  border-color: #F43F5E !important;
-  animation: qosMicPulse 0.9s infinite alternate;
+.qos-mic-active {
+  background: rgba(244, 63, 94, 0.2);
+  border-color: #F43F5E;
+  animation: qos-mic-pulse 1s infinite alternate;
 }
-@keyframes qosMicPulse {
-  0% { transform: scale(1); box-shadow: 0 0 4px rgba(244, 63, 94, 0.5); }
-  100% { transform: scale(1.1); box-shadow: 0 0 14px rgba(244, 63, 94, 0.9); }
+@keyframes qos-mic-pulse {
+  from { box-shadow: 0 0 4px #F43F5E; }
+  to { box-shadow: 0 0 12px #F43F5E; }
 }
+#qos-send-btn {
+  background: linear-gradient(135deg, #C9A24A 0%, #A6802C 100%);
+  border: none;
+  color: #070A0F;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+#qos-send-btn svg { width: 16px; height: 16px; }
+#qos-send-btn:hover { opacity: 0.9; }
+#qos-send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-/* Mobile: full-screen drawer below 480px */
+/* Responsive Adjustments for Mobile (320px - 480px) */
 @media (max-width: 480px) {
-  #qos-assistant-root { bottom: 16px; right: 16px; }
+  #qos-assistant-root {
+    bottom: 16px;
+    right: 16px;
+  }
   #qos-assistant-drawer {
     position: fixed;
     inset: 0;
@@ -568,6 +648,12 @@ Need to talk to a live assistant right now? Call toll-free at <strong><a href="t
   let isSending = false;
   let hasSpokenWelcome = false;
   let conversationHistory = [];
+  let currentIdentity = 'quanta'; // 'quanta' (male) or 'quantana' (female)
+
+  try {
+    const saved = localStorage.getItem('qos_assistant_identity');
+    if (saved === 'quantana') currentIdentity = 'quantana';
+  } catch (e) {}
 
   const bubble = document.getElementById('qos-assistant-bubble');
   const drawer = document.getElementById('qos-assistant-drawer');
@@ -581,7 +667,54 @@ Need to talk to a live assistant right now? Call toll-free at <strong><a href="t
   const micIcon = document.getElementById('qos-mic-icon');
   const messagesContainer = document.getElementById('qos-chat-messages');
 
-  const FALLBACK_REPLY = 'Aria is active and monitoring telemetry. To speak with a live assistant, call toll-free at 1-800-QUANTERRA (1-800-782-6837) or email support@quanterraos.com. All operations adhere strictly to Rule B5 paper execution.';
+  const btnQuanta = document.getElementById('btn-persona-quanta');
+  const btnQuantana = document.getElementById('btn-persona-quantana');
+
+  const bubbleAvatarImg = document.getElementById('qos-bubble-avatar-img');
+  const bubbleNameTxt = document.getElementById('qos-bubble-name-txt');
+  const drawerAvatarImg = document.getElementById('qos-drawer-avatar-img');
+  const headerNameTxt = document.getElementById('qos-header-name-txt');
+  const heroAvatarImg = document.getElementById('qos-hero-avatar-img');
+  const heroNameTxt = document.getElementById('qos-hero-name-txt');
+  const initialMsgAvatar = document.getElementById('qos-initial-msg-avatar');
+  const greetingStrong = document.getElementById('qos-greeting-strong');
+  const metaNameTxt = document.getElementById('qos-meta-name-txt');
+
+  function updateIdentityUI() {
+    const isQuanta = currentIdentity === 'quanta';
+    const name = isQuanta ? 'Quanta' : 'Quantana';
+    const avatar = isQuanta ? '/assets/merch-hoodie-quanta.jpg' : '/assets/assistant-avatar.jpg';
+
+    if (btnQuanta) btnQuanta.classList.toggle('active', isQuanta);
+    if (btnQuantana) btnQuantana.classList.toggle('active', !isQuanta);
+
+    if (bubbleAvatarImg) bubbleAvatarImg.src = avatar;
+    if (bubbleNameTxt) bubbleNameTxt.textContent = name;
+    if (drawerAvatarImg) drawerAvatarImg.src = avatar;
+    if (headerNameTxt) headerNameTxt.textContent = name;
+    if (heroAvatarImg) heroAvatarImg.src = avatar;
+    if (heroNameTxt) heroNameTxt.textContent = name;
+    if (initialMsgAvatar) initialMsgAvatar.src = avatar;
+    if (greetingStrong) greetingStrong.textContent = name;
+    if (metaNameTxt) metaNameTxt.textContent = name;
+
+    if (chatInput) {
+      chatInput.placeholder = 'Ask ' + name + ' to explain costs, explore the Flight Deck, or review records…';
+    }
+  }
+
+  window.setAssistantIdentity = function(id) {
+    currentIdentity = id === 'quantana' ? 'quantana' : 'quanta';
+    try { localStorage.setItem('qos_assistant_identity', currentIdentity); } catch (e) {}
+    updateIdentityUI();
+    if (isVoiceEnabled) {
+      speakText('Switched virtual assistant identity to ' + (currentIdentity === 'quanta' ? 'Quanta' : 'Quantana') + '. Global Galactic Leader active.');
+    }
+  };
+
+  updateIdentityUI();
+
+  const FALLBACK_REPLY = 'Quanta is active and monitoring telemetry. To speak with a live assistant, call toll-free at 1-800-QUANTERRA (1-800-782-6837) or email support@quanterraos.com. All operations adhere strictly to Rule B5 paper execution.';
 
   // Cached voice loading
   let cachedVoices = [];
@@ -603,7 +736,8 @@ Need to talk to a live assistant right now? Call toll-free at <strong><a href="t
       if (focusInput) chatInput.focus();
       if (isVoiceEnabled && !hasSpokenWelcome) {
         hasSpokenWelcome = true;
-        speakText('Hello! I am Aria, your AI flight crew member. I am active and ready to communicate with you.');
+        const name = currentIdentity === 'quanta' ? 'Quanta' : 'Quantana';
+        speakText('Hello! I am ' + name + ', your virtual assistant and Global Galactic Leader. Ready to assist your Flight Deck.');
       }
     }
   }
@@ -633,7 +767,7 @@ Need to talk to a live assistant right now? Call toll-free at <strong><a href="t
   }
 
   function formatAssistantText(str) {
-    return escapeHtml(str).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    return escapeHtml(str).replace(/\\*\\*(.+?)\\*\\*/g, '<strong>$1</strong>');
   }
 
   // Voice Speech Synthesis
@@ -646,24 +780,32 @@ Need to talk to a live assistant right now? Call toll-free at <strong><a href="t
       }
       const clean = String(text)
         .replace(/<[^>]*>/g, ' ')
-        .replace(/[*_#\x60~]/g, '')
-        .replace(/\s+/g, ' ')
+        .replace(/[*_#\\x60~]/g, '')
+        .replace(/\\s+/g, ' ')
         .trim();
       if (!clean) return;
 
       const utter = new SpeechSynthesisUtterance(clean);
+      const isQuanta = currentIdentity === 'quanta';
       utter.rate = 1.02;
-      utter.pitch = 1.05; // warm feminine tone
+      utter.pitch = isQuanta ? 0.95 : 1.08;
 
       const voices = cachedVoices.length > 0 ? cachedVoices : window.speechSynthesis.getVoices();
-      const femaleVoice = voices.find(function(v) {
-        return (
-          v.name.match(/samantha|victoria|karen|zira|jenny|moira|fiona|serena|stephanie|female/i) ||
-          v.voiceURI.match(/female|zira|samantha/i)
-        ) && v.lang.startsWith('en');
-      }) || voices.find(function(v) { return v.lang.startsWith('en'); });
+      let matchedVoice = null;
+      if (isQuanta) {
+        matchedVoice = voices.find(function(v) {
+          return v.name.match(/daniel|george|david|alex|fred|male/i) && v.lang.startsWith('en');
+        });
+      } else {
+        matchedVoice = voices.find(function(v) {
+          return v.name.match(/samantha|victoria|karen|zira|jenny|moira|fiona|serena|female/i) && v.lang.startsWith('en');
+        });
+      }
+      if (!matchedVoice) {
+        matchedVoice = voices.find(function(v) { return v.lang.startsWith('en'); });
+      }
 
-      if (femaleVoice) utter.voice = femaleVoice;
+      if (matchedVoice) utter.voice = matchedVoice;
       window.speechSynthesis.speak(utter);
     } catch (e) {
       console.warn('Speech synthesis error:', e);
@@ -716,14 +858,14 @@ Need to talk to a live assistant right now? Call toll-free at <strong><a href="t
       isListening = false;
       micBtn.classList.remove('qos-mic-active');
       if (micIcon) micIcon.textContent = '🎙️';
-      chatInput.placeholder = 'Ask Aria about market calibration, telemetry, or support…';
+      chatInput.placeholder = 'Ask ' + (currentIdentity === 'quanta' ? 'Quanta' : 'Quantana') + ' about market calibration, telemetry, or support…';
     };
 
     recognition.onend = function() {
       isListening = false;
       micBtn.classList.remove('qos-mic-active');
       if (micIcon) micIcon.textContent = '🎙️';
-      chatInput.placeholder = 'Ask Aria about market calibration, telemetry, or support…';
+      chatInput.placeholder = 'Ask ' + (currentIdentity === 'quanta' ? 'Quanta' : 'Quantana') + ' about market calibration, telemetry, or support…';
     };
 
     micBtn.addEventListener('click', function() {
@@ -748,8 +890,8 @@ Need to talk to a live assistant right now? Call toll-free at <strong><a href="t
 
     if (role === 'assistant') {
       const avatarImg = document.createElement('img');
-      avatarImg.src = '/assets/assistant-avatar.jpg';
-      avatarImg.alt = 'Aria';
+      avatarImg.src = currentIdentity === 'quanta' ? '/assets/merch-hoodie-quanta.jpg' : '/assets/assistant-avatar.jpg';
+      avatarImg.alt = currentIdentity === 'quanta' ? 'Quanta' : 'Quantana';
       avatarImg.className = 'qos-msg-avatar';
       msgDiv.appendChild(avatarImg);
     }
@@ -770,7 +912,7 @@ Need to talk to a live assistant right now? Call toll-free at <strong><a href="t
     metaDiv.className = 'qos-msg-meta';
     metaDiv.textContent = role === 'user'
       ? 'You'
-      : 'Aria · ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      : (currentIdentity === 'quanta' ? 'Quanta' : 'Quantana') + ' · ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
     contentDiv.appendChild(bubbleDiv);
     contentDiv.appendChild(metaDiv);
@@ -788,8 +930,8 @@ Need to talk to a live assistant right now? Call toll-free at <strong><a href="t
     el.className = 'qos-msg qos-msg-assistant qos-msg-typing';
     
     const avatarImg = document.createElement('img');
-    avatarImg.src = '/assets/assistant-avatar.jpg';
-    avatarImg.alt = 'Aria';
+    avatarImg.src = currentIdentity === 'quanta' ? '/assets/merch-hoodie-quanta.jpg' : '/assets/assistant-avatar.jpg';
+    avatarImg.alt = currentIdentity === 'quanta' ? 'Quanta' : 'Quantana';
     avatarImg.className = 'qos-msg-avatar';
     el.appendChild(avatarImg);
 
@@ -798,7 +940,7 @@ Need to talk to a live assistant right now? Call toll-free at <strong><a href="t
 
     const b = document.createElement('div');
     b.className = 'qos-msg-bubble';
-    b.textContent = 'Aria is analyzing telemetry…';
+    b.textContent = (currentIdentity === 'quanta' ? 'Quanta' : 'Quantana') + ' is analyzing telemetry…';
     contentDiv.appendChild(b);
     el.appendChild(contentDiv);
 
@@ -824,7 +966,7 @@ Need to talk to a live assistant right now? Call toll-free at <strong><a href="t
       const response = await fetch('/api/assistant/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: trimmed, agentId: 'aria', history: conversationHistory.slice(-10) }),
+        body: JSON.stringify({ message: trimmed, agentId: currentIdentity, history: conversationHistory.slice(-10) }),
       });
 
       if (!response.ok) {
@@ -845,7 +987,7 @@ Need to talk to a live assistant right now? Call toll-free at <strong><a href="t
       conversationHistory.push({ role: 'assistant', content: reply });
       appendMessage('assistant', reply);
     } catch (err) {
-      console.warn('Aria request failed:', err);
+      console.warn('Assistant request failed:', err);
       typingIndicator.remove();
       appendMessage('assistant', FALLBACK_REPLY);
     } finally {
