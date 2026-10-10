@@ -52,6 +52,11 @@ import { renderChangelogPageHtml } from "./changelog-page.ts";
 import { renderPredictionsPage } from "./predictions-page.ts";
 import { renderAutopilotPage } from "./autopilot-page.ts";
 import { getPredictionsLedger, seedHistoricalReplay } from "./prediction-ledger.ts";
+import {
+  reconcilePendingSettlements,
+  getSettlementReconciliationStatus,
+  startSettlementReconciler,
+} from "./settlement-reconciler.ts";
 import { getAutopilotLedger } from "./autopilot-engine.ts";
 import { renderPricingPageHtml } from "./pricing-page.ts";
 import { renderTwoStrategiesLostPageHtml } from "./blog-page.ts";
@@ -5488,6 +5493,15 @@ app.get("/api/alerts/sample-payloads", (_req, res) => {
   });
 });
 
+app.get("/api/reconciler/status", (_req, res) => {
+  res.json(getSettlementReconciliationStatus());
+});
+
+app.post("/api/reconciler/run", (_req, res) => {
+  const result = reconcilePendingSettlements();
+  res.json(result);
+});
+
 const port = Number(process.env.PORT ?? 3000);
 app.listen(port, () => {
   console.log(`QuanterraOS foundation server listening on http://localhost:${port}`);
@@ -5495,6 +5509,7 @@ app.listen(port, () => {
   runCouncilPipelineCycle().catch((err) => console.error("Initial council pipeline run error:", err));
   checkLiveSwingEvents().catch((err) => console.error("Initial swing check error:", err));
   runAutonomousLearningCycle().catch((err) => console.error("Initial learning cycle error:", err));
+  startSettlementReconciler(60_000);
   setInterval(() => {
     runCouncilPipelineCycle().catch((err) => console.error("Periodic council pipeline run error:", err));
     checkLiveSwingEvents().catch((err) => console.error("Periodic swing check error:", err));
