@@ -308,8 +308,8 @@ Tokens on `:root`, dark only for deck; public site dark-default with light-mode 
 - [x] **6.3** Shadow Mode with Rule 4.41 disclosure; no order routing anywhere in code path. *Accept:* grep for any order-placement API call = 0.
 
 ### PHASE 7 — Monetization, service & distribution (Weeks 4–6)
-- [ ] **7.1** Clerk Billing plans + gates (Part 4).
-- [ ] **7.2** `/help` center, Aria→human escalation, SLA tagging by plan.
+- [x] **7.1** Clerk Billing plans + gates (Part 4).
+- [x] **7.2** `/help` center, Aria→human escalation, SLA tagging by plan.
 - [ ] **7.3** Discord launch + moderation rules; feedback/voting board; public changelog.
 - [ ] **7.4** Widgets (3.9) + `/widgets` gallery + white-label flag.
 - [ ] **7.5** `/developers` (OpenAPI, `llms.txt`, `agents.md`, MCP card), free + Builder keys, rate limits.
