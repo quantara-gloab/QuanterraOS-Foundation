@@ -269,7 +269,7 @@ Tokens on `:root`, dark only for deck; public site dark-default with light-mode 
 - [x] **1.6** Strip internal language ("Acquisition Wedge," "Build Order #," "90-Day Plan," "Engineering Days Saved," "Customer Validation," "Sovereign Agent Deployment," "Study #6.4," "Rule B5/B10" labels) from public pages; replace with plain-English compliance footer.
 - [x] **1.7** Sync-error banner only on actual failure.
 - [x] **1.8** "Execution Desks" → "Market View."
-- [ ] **1.9** Aria voice default OFF site-wide.
+- [x] **1.9** Aria voice default OFF site-wide.
 
 ### PHASE 2 — Data integrity (Week 1)
 - [ ] **2.1** Settlement reconciler; backfill all `PENDING` rows for closed markets. *Accept:* closed >30 min = 100% settled.

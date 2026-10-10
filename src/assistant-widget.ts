@@ -48,8 +48,8 @@ export const ASSISTANT_WIDGET_HTML = `
         </div>
       </div>
       <div class="qos-header-actions">
-        <button id="qos-voice-toggle" class="qos-tool-btn qos-voice-active" title="Toggle Voice / Read Aloud" aria-pressed="true">
-          <span id="qos-voice-icon">🔊 Voice ON</span>
+        <button id="qos-voice-toggle" class="qos-tool-btn" title="Toggle Voice / Read Aloud" aria-pressed="false">
+          <span id="qos-voice-icon">🔇 Voice OFF</span>
         </button>
         <button id="qos-close-btn" class="qos-tool-btn" title="Minimize Drawer" aria-label="Close assistant">✕</button>
       </div>
@@ -563,7 +563,7 @@ For direct human support, our team is reachable at <strong>support@quanterraos.c
 
 <script>
 (function() {
-  let isVoiceEnabled = true; // Active by default
+  let isVoiceEnabled = false; // Default OFF site-wide (opt-in)
   let isOpen = false;
   let isSending = false;
   let hasSpokenWelcome = false;
