@@ -18,7 +18,6 @@ export const PUBLIC_NAV_ITEMS = [
   { label: "Check", href: "/check" },
   { label: "Radar", href: "/radar" },
   { label: "Journal", href: "/journal" },
-  { label: "Crew", href: "/crew" },
   { label: "Learn", href: "/learn" },
   { label: "Pricing", href: "/pricing" },
 ] as const;
@@ -452,7 +451,7 @@ export function renderPublicHeader(options: PublicLayoutOptions = {}): string {
 
   <!-- Persistent Mobile Bottom Bar -->
   <div class="flight-mobile-bottom-bar" id="mobile-sticky-action">
-    <a href="/check" class="flight-mobile-bottom-btn">Get my receipt &rarr;</a>
+    <a href="/check" class="flight-mobile-bottom-btn">Get my receipt →</a>
   </div>
 
   <script>
@@ -511,6 +510,7 @@ export function renderPublicFooter(): string {
             <li><a href="/art-gallery">Artwork Gallery</a></li>
             <li><a href="/research">Research</a></li>
             <li><a href="/access">Institutional</a></li>
+            <li><a href="/developers">Developers API &amp; MCP</a></li>
           </ul>
         </div>
 
@@ -519,6 +519,8 @@ export function renderPublicFooter(): string {
           <ul>
             <li><a href="/learn">Flight School &amp; Glossary</a></li>
             <li><a href="/news">Mission Brief Digest</a></li>
+            <li><a href="/changelog">Changelog</a></li>
+            <li><a href="/help">Help &amp; Support</a></li>
             <li><a href="/status">System Ingestion Status</a></li>
             <li><a href="/legal">Legal &amp; Risk Disclosure</a></li>
           </ul>

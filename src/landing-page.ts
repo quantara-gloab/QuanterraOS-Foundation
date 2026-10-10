@@ -922,6 +922,9 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       <span>📲 Mobile Flight Deck PWA available for <strong>Apple iPhone &amp; Samsung Galaxy</strong></span>
       <div style="display:flex; align-items:center; gap:12px;">
         <button type="button" class="btn-strip-download" onclick="openMobileAppDownloadModal()">Install / Download App &rarr;</button>
+        <a href="/check" style="color:var(--public-accent-purple); text-decoration:none; font-size:0.75rem; font-family:var(--public-font-mono);">Check</a>
+        <a href="/journal" style="color:#CBD5E1; text-decoration:none; font-size:0.75rem; font-family:var(--public-font-mono);">Journal</a>
+        <a href="/learn" style="color:#CBD5E1; text-decoration:none; font-size:0.75rem; font-family:var(--public-font-mono);">Learn</a>
         <a href="/mobile" style="color:var(--public-accent-purple); text-decoration:none; font-size:0.75rem; font-family:var(--public-font-mono);">Mobile Guide</a>
         <a href="/account?flow=sign-up" class="nav-pill-mobile-app" style="color:#FFF; text-decoration:none; font-size:0.75rem; font-family:var(--public-font-mono); background:rgba(255,255,255,0.08); padding:3px 8px; border-radius:4px;">iPhone &amp; Samsung App</a>
         <a href="/account?flow=sign-up" style="color:#94A3B8; text-decoration:none; font-size:0.75rem; font-family:var(--public-font-mono);">Sign up</a>
@@ -1573,6 +1576,8 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       </div>
     </div>
   </section>
+
+  ${renderPublicFooter()}
 
   <!-- =======================================================================
        INTERACTIVE COCKPIT VIDEO BRIEFING & TUTORIAL MODAL

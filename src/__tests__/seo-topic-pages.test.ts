@@ -44,9 +44,9 @@ describe('Phase 3 Task 3.5 Acceptance: SEO Topic Pages + Structured FAQ Schema',
       const h1Matches = html.match(/<h1[^>]*>/g) || [];
       assert.equal(h1Matches.length, 1, `Page ${slug} must have exactly one <h1> tag`);
 
-      // Global Tesla header and footer
-      assert.ok(html.includes('tesla-header'), `Page ${slug} must have global tesla-header`);
-      assert.ok(html.includes('tesla-footer'), `Page ${slug} must have global tesla-footer`);
+      // Global header and footer
+      assert.ok(html.includes('flight-header') || html.includes('tesla-header'), `Page ${slug} must have global header`);
+      assert.ok(html.includes('flight-footer') || html.includes('tesla-footer'), `Page ${slug} must have global footer`);
     }
   });
 
