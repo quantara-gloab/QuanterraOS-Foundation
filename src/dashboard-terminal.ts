@@ -1453,7 +1453,7 @@ ${clerkScripts}
 
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:14px; background:rgba(255,255,255,0.02); border:1px solid var(--panel-border); border-radius:6px; padding:8px 12px;">
               <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                <span style="font-family:var(--font-mono); font-size:0.72rem; color:var(--muted); text-transform:uppercase;">Execution Desks:</span>
+                <span style="font-family:var(--font-mono); font-size:0.72rem; color:var(--muted); text-transform:uppercase;">Market View:</span>
                 <a href="/kalshi/15m" style="font-family:var(--font-mono); font-size:0.74rem; color:var(--accent); text-decoration:none; padding:3px 9px; border-radius:4px; background:rgba(212,175,55,0.12); border:1px solid rgba(212,175,55,0.3);">15 Min · KXBTC15M &rarr;</a>
                 <a href="/kalshi/1h" style="font-family:var(--font-mono); font-size:0.74rem; color:#34D399; text-decoration:none; padding:3px 9px; border-radius:4px; background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3);">1 Hour · KXBTCD Multi-Strike &rarr;</a>
               </div>

@@ -125,7 +125,7 @@ Competitors on both fronts suffer from systemic, fatal flaws:
 
 1. **Website Positioning:**
    - Feature the **Empirical Benchmark Vault (0.2001 Brier)** prominently on `quanterraos.com`.
-   - Highlight the **15M Kalshi Bidding Terminal** as an honest, fee-adjusted execution desk backed by the $10,000 sandbox wallet.
+   - Highlight the **15M Kalshi Bidding Terminal** as an honest, fee-adjusted market view backed by the $10,000 sandbox wallet.
    - Promote the **TrustOS $20,000 Fixed-Price Pilot** directly to insurers, regional banks, and algorithmic funds facing regulatory scrutiny.
 2. **Sales Playbook:**
    - When speaking to quants/traders: *"Unlike other terminals that hide taker fees and pitch illusory alpha, we prove why the market is efficient and give you institutional-grade calibration tools."*

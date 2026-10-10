@@ -1,7 +1,7 @@
 /**
  * QuanterraOS Interactive 15-Minute High/Low Kalshi Bidding Terminal
  *
- * Provides a live, interactive execution desk for Kalshi KXBTC15M prediction contracts:
+ * Provides a live, interactive market view for Kalshi KXBTC15M prediction contracts:
  * 1. Live market feed: Active 15m strike, live countdown timer, and orderbook (YES/NO bids & asks)
  * 2. Interactive Bidding Ticket:
  *    - Buy YES / Buy NO toggle
@@ -10,7 +10,7 @@
  *    - Contract quantity chips (1, 5, 10, 25, 50, 100)
  *    - Real-time cost & potential payout calculator
  *    - One-click order execution with audio & visual feedback
- * 3. Active positions & trade ledger table
+ *    - 3. Active positions & trade ledger table
  * 4. Aria Virtual Desk Assistant integration with voice toggle
  */
 
@@ -22,7 +22,7 @@ export function renderKalshiTerminalHtml(userEmail?: string, userTier: string = 
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>QuanterraOS — Kalshi Prediction Terminal (15M &amp; 1H Desks)</title>
+<title>QuanterraOS — Kalshi Prediction Terminal (15M &amp; 1H Market Views)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
