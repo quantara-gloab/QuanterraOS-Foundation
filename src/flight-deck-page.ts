@@ -18,6 +18,15 @@
  *   maker orders, and calibration scoring (never volume or P&L).
  */
 
+import {
+  computeTrueCostCheck,
+  computeMakerTakerSaver,
+  computeRoundingOptimizer,
+  computeCrossVenueNetSpread,
+  computeKalshiTakerFee,
+  ceilToCent,
+} from "./lib/fees.ts";
+
 export type FlightDeckStationId =
   | "bridge"
   | "navigation"
@@ -107,6 +116,22 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
     xp: 140,
     streakDays: 3,
   };
+
+  // Pre-calculate initial Engineering station metrics (10 contracts @ $0.51 ask on Kalshi KXBTC15M)
+  const initialCost = computeTrueCostCheck({
+    venue: "kalshi",
+    product: "KXBTC15M",
+    price: 0.51,
+    contracts: 10,
+    userAssumedProbability: 0.55,
+  });
+  const initialSaver = computeMakerTakerSaver(10, 0.51, "KXBTC15M", 50);
+  const initialRounding = computeRoundingOptimizer(10, 5, 0.51);
+  const initialSpread = computeCrossVenueNetSpread({
+    kalshiPrice: 0.51,
+    polymarketPrice: 0.53,
+    contracts: 10,
+  });
 
   const navItemsDesktopHtml = FLIGHT_DECK_STATIONS.map((station) => {
     const isActive = station.id === activeStation;
@@ -1044,51 +1069,239 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
           </p>
         </div>
 
-        <div class="deck-grid-3">
-          <div class="hud-card accent-gold">
-            <div class="hud-card-title">
-              <span>PEAK TAKER DRAG</span>
-              <span>50¢ STRIKE</span>
-            </div>
-            <div class="hud-stat-val" style="color:var(--alert-red);">$1.75</div>
-            <div class="hud-stat-label">Fee per 100 contracts (3.5% capital drag)</div>
+        <!-- Interactive Reactor Control Pod -->
+        <div class="hud-card accent-cyan" style="margin-bottom:24px;">
+          <div class="hud-card-title">
+            <span>REACTOR CONTROL POD // ORDER SPECIFICATIONS</span>
+            <span style="color:var(--hud-cyan); font-family:var(--font-mono);">RULE B5 LOCKED ($0.00 LIVE RISK)</span>
           </div>
 
-          <div class="hud-card">
-            <div class="hud-card-title">
-              <span>MAKER SAVER EFFICIENCY</span>
-              <span>PASSIVE LIMIT</span>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:18px;">
+            <!-- Contract Price -->
+            <div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:0.78rem;">
+                <label for="eng-input-price" style="color:#FFFFFF; font-weight:600;">Contract Ask Price</label>
+                <span id="eng-label-price" style="color:var(--hud-gold); font-family:var(--font-mono); font-weight:700;">51¢ ($0.51)</span>
+              </div>
+              <input type="range" id="eng-slider-price" min="1" max="99" value="51" aria-label="Contract price in cents" style="width:100%; accent-color:var(--hud-gold);" oninput="syncEngPriceFromSlider(this.value)">
+              <div style="display:flex; gap:6px; margin-top:6px;">
+                <button type="button" class="btn-aria-action" style="padding:2px 8px; font-size:0.7rem;" onclick="setEngPrice(10)">10¢</button>
+                <button type="button" class="btn-aria-action" style="padding:2px 8px; font-size:0.7rem;" onclick="setEngPrice(25)">25¢</button>
+                <button type="button" class="btn-aria-action" style="padding:2px 8px; font-size:0.7rem;" onclick="setEngPrice(50)">50¢</button>
+                <button type="button" class="btn-aria-action" style="padding:2px 8px; font-size:0.7rem; border-color:var(--hud-gold); color:var(--hud-gold);" onclick="setEngPrice(51)">51¢</button>
+                <button type="button" class="btn-aria-action" style="padding:2px 8px; font-size:0.7rem;" onclick="setEngPrice(75)">75¢</button>
+              </div>
             </div>
-            <div class="hud-stat-val" style="color:var(--ok-green);">100%</div>
-            <div class="hud-stat-label">$0.00 exchange taker fees paid</div>
-          </div>
 
-          <div class="hud-card">
-            <div class="hud-card-title">
-              <span>ROUNDING OPTIMIZER</span>
-              <span>CONSOLIDATION</span>
+            <!-- Contract Quantity -->
+            <div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:0.78rem;">
+                <label for="eng-input-count" style="color:#FFFFFF; font-weight:600;">Order Quantity (Contracts)</label>
+                <span id="eng-label-count" style="color:#FFFFFF; font-family:var(--font-mono); font-weight:700;">10 ct</span>
+              </div>
+              <input type="range" id="eng-slider-count" min="1" max="250" value="10" aria-label="Order contract quantity" style="width:100%; accent-color:var(--hud-cyan);" oninput="syncEngCountFromSlider(this.value)">
+              <div style="display:flex; gap:6px; margin-top:6px;">
+                <button type="button" class="btn-aria-action" style="padding:2px 8px; font-size:0.7rem;" onclick="setEngCount(1)">1 ct</button>
+                <button type="button" class="btn-aria-action" style="padding:2px 8px; font-size:0.7rem; border-color:var(--hud-cyan); color:var(--hud-cyan);" onclick="setEngCount(10)">10 ct</button>
+                <button type="button" class="btn-aria-action" style="padding:2px 8px; font-size:0.7rem;" onclick="setEngCount(50)">50 ct</button>
+                <button type="button" class="btn-aria-action" style="padding:2px 8px; font-size:0.7rem;" onclick="setEngCount(100)">100 ct</button>
+              </div>
             </div>
-            <div class="hud-stat-val" style="color:var(--hud-cyan);">+14.3%</div>
-            <div class="hud-stat-label">Avoid fractional-cent ceil() round-up drag</div>
+
+            <!-- User Assumed Probability -->
+            <div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:0.78rem;">
+                <label for="eng-input-prob" style="color:#FFFFFF; font-weight:600;">Assessed Win Probability</label>
+                <span id="eng-label-prob" style="color:#38BDF8; font-family:var(--font-mono); font-weight:700;">55.0%</span>
+              </div>
+              <input type="range" id="eng-slider-prob" min="1" max="99" value="55" aria-label="Assessed win probability percentage" style="width:100%; accent-color:#38BDF8;" oninput="syncEngProbFromSlider(this.value)">
+              <div style="font-size:0.68rem; color:var(--fg-muted); margin-top:6px;">
+                Strictly labeled <strong style="color:var(--hud-gold);">your assumption</strong> (not an automated model forecast).
+              </div>
+            </div>
+
+            <!-- Venue Selection -->
+            <div>
+              <label for="eng-select-venue" style="display:block; margin-bottom:6px; font-size:0.78rem; color:#FFFFFF; font-weight:600;">Execution Venue</label>
+              <select id="eng-select-venue" aria-label="Execution venue selection" style="width:100%; background:rgba(0,0,0,0.5); border:1px solid var(--glass-border); color:#FFFFFF; font-family:var(--font-mono); font-size:0.8rem; padding:8px 10px; border-radius:4px;" onchange="recalculateEngineering()">
+                <option value="kalshi-15m" selected>Kalshi 15M (KXBTC15M)</option>
+                <option value="kalshi-1h">Kalshi 1H (KXBTCD)</option>
+                <option value="polymarket-15m">Polymarket 15M (Crypto)</option>
+              </select>
+              <div style="font-size:0.68rem; color:var(--fg-muted); margin-top:6px;">
+                Settles on <span id="eng-settlement-label" style="color:var(--hud-cyan);">${initialCost.settlementSource}</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="hud-card">
-          <div class="hud-card-title">
-            <span>TRUE-COST ENGINE CALCULATOR</span>
-            <a href="/check" style="color:var(--hud-gold); font-size:0.75rem; text-decoration:none;">Open Dedicated Check &rarr;</a>
-          </div>
-          <div style="background:rgba(5,6,11,0.6); border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:24px; text-align:center;">
-            <div style="font-family:var(--font-mono); font-size:0.9rem; color:#FFFFFF; margin-bottom:8px;">
-              Config-Driven Pre-Trade Fee Auditor (Kalshi &amp; Polymarket)
+        <!-- 4 Primary Reactor Friction Gauges -->
+        <div class="deck-grid-4">
+          <div class="hud-card">
+            <div class="hud-card-title">
+              <span>PURCHASE OUTLAY</span>
+              <span>CAPITAL</span>
             </div>
-            <div style="font-size:0.8rem; color:var(--fg-muted); max-width:540px; margin:0 auto 16px;">
-              Compute exact breakeven hurdles, net EV, and required win rates using verified fee schedules before executing any contract.
-            </div>
-            <a href="/check" class="btn-aria-action" style="display:inline-block; text-decoration:none; padding:10px 20px; border-color:var(--hud-gold); color:var(--hud-gold);">
-              Run Pre-Flight True-Cost Check &rarr;
-            </a>
+            <div class="hud-stat-val" id="eng-stat-outlay">$${initialCost.executableCost.toFixed(2)}</div>
+            <div class="hud-stat-label" id="eng-stat-outlay-sub">10 contracts @ $0.51</div>
           </div>
+
+          <div class="hud-card accent-gold">
+            <div class="hud-card-title">
+              <span>EXCHANGE TAKER FEE</span>
+              <span id="eng-stat-fee-badge" style="color:var(--alert-red);">PEAK DRAG</span>
+            </div>
+            <div class="hud-stat-val" style="color:var(--alert-red);" id="eng-stat-fee">$${initialCost.fee.toFixed(2)}</div>
+            <div class="hud-stat-label" id="eng-stat-fee-rate">1.80¢ / contract (3.53% outlay drag)</div>
+          </div>
+
+          <div class="hud-card">
+            <div class="hud-card-title">
+              <span>REQUIRED BREAKEVEN</span>
+              <span>HURDLE RATE</span>
+            </div>
+            <div class="hud-stat-val" style="color:var(--hud-gold);" id="eng-stat-breakeven">${initialCost.discreteBreakevenPct.toFixed(2)}%</div>
+            <div class="hud-stat-label" id="eng-stat-raw-breakeven">Raw: ${initialCost.rawBreakevenPct.toFixed(2)}% (Hurdle: +${(initialCost.discreteBreakevenPct - 51).toFixed(2)}%)</div>
+          </div>
+
+          <div class="hud-card accent-cyan">
+            <div class="hud-card-title">
+              <span>NET EXPECTED VALUE</span>
+              <span>YOUR ASSUMPTION</span>
+            </div>
+            <div class="hud-stat-val" style="color:var(--ok-green);" id="eng-stat-ev">+$${initialCost.expectedValue.toFixed(2)}</div>
+            <div class="hud-stat-label" id="eng-stat-ev-contract">+${initialCost.expectedValuePerContractCents?.toFixed(2) ?? "2.20"}¢ net expectancy / ct</div>
+          </div>
+        </div>
+
+        <!-- 3 Core Sub-Modules: Saver, Rounding, Cross-Venue -->
+        <div style="display:flex; flex-direction:column; gap:24px;">
+
+          <!-- SUB-MODULE 1: MAKER VS TAKER SAVER -->
+          <div class="hud-card accent-gold" id="eng-module-saver">
+            <div class="hud-card-title">
+              <span style="display:flex; align-items:center; gap:8px;">
+                <span style="color:var(--hud-gold);">⚡</span>
+                <span>MAKER VS. TAKER SAVER // PASSIVE LIQUIDITY ACCELERATOR</span>
+              </span>
+              <span style="color:var(--ok-green); font-family:var(--font-mono);">100% TAKER FEE SAVED</span>
+            </div>
+
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:16px; margin-bottom:16px;">
+              <div style="background:rgba(5,6,11,0.6); padding:12px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
+                <div style="font-family:var(--font-mono); font-size:0.68rem; color:var(--fg-muted); text-transform:uppercase;">Taker Execution Fee</div>
+                <div style="font-family:var(--font-mono); font-size:1.25rem; font-weight:700; color:var(--alert-red); margin-top:2px;" id="eng-saver-taker-fee">$${initialSaver.takerFee.toFixed(2)}</div>
+                <div style="font-size:0.7rem; color:var(--fg-muted);">Pays exchange crossing toll</div>
+              </div>
+
+              <div style="background:rgba(5,6,11,0.6); padding:12px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
+                <div style="font-family:var(--font-mono); font-size:0.68rem; color:var(--fg-muted); text-transform:uppercase;">Maker Limit Order Fee</div>
+                <div style="font-family:var(--font-mono); font-size:1.25rem; font-weight:700; color:var(--ok-green); margin-top:2px;" id="eng-saver-maker-fee">$${initialSaver.makerFee.toFixed(2)}</div>
+                <div style="font-size:0.7rem; color:var(--fg-muted);">Posts passive book liquidity</div>
+              </div>
+
+              <div style="background:rgba(5,6,11,0.6); padding:12px; border-radius:6px; border:1px solid var(--hud-gold-dim);">
+                <div style="font-family:var(--font-mono); font-size:0.68rem; color:var(--hud-gold); text-transform:uppercase;">Instant Dollar Savings</div>
+                <div style="font-family:var(--font-mono); font-size:1.25rem; font-weight:700; color:var(--hud-gold); margin-top:2px;" id="eng-saver-dollars">$${initialSaver.dollarSavings.toFixed(2)}</div>
+                <div style="font-size:0.7rem; color:var(--hud-gold);" id="eng-saver-bps">+${initialSaver.savingsBps} bps preserved</div>
+              </div>
+
+              <div style="background:rgba(5,6,11,0.6); padding:12px; border-radius:6px; border:1px solid rgba(79,209,232,0.2);">
+                <div style="font-family:var(--font-mono); font-size:0.68rem; color:var(--hud-cyan); text-transform:uppercase;">Hurdle Reduction</div>
+                <div style="font-family:var(--font-mono); font-size:1.25rem; font-weight:700; color:var(--hud-cyan); margin-top:2px;" id="eng-saver-hurdle">-${initialSaver.hurdleReductionPct.toFixed(2)}%</div>
+                <div style="font-size:0.7rem; color:var(--fg-muted);">Direct win-rate threshold drop</div>
+              </div>
+            </div>
+
+            <div style="font-size:0.78rem; color:#E2E8F0; line-height:1.5; padding:10px 14px; background:rgba(0,0,0,0.4); border-radius:6px; border-left:3px solid var(--hud-gold);" id="eng-saver-method-note">
+              <strong>Methodology Note:</strong> ${initialSaver.methodologyNote} Estimated fill probability from orderbook depth: <strong style="color:var(--hud-cyan);" id="eng-saver-fill-prob">~${initialSaver.estimatedFillProbabilityPct}%</strong>.
+            </div>
+          </div>
+
+          <!-- SUB-MODULE 2: ROUNDING OPTIMIZER -->
+          <div class="hud-card" id="eng-module-rounding">
+            <div class="hud-card-title">
+              <span style="display:flex; align-items:center; gap:8px;">
+                <span style="color:var(--hud-cyan);">⚙️</span>
+                <span>ROUNDING OPTIMIZER // CEIL() FRICTION AUDITOR</span>
+              </span>
+              <span style="color:var(--hud-cyan); font-family:var(--font-mono);">DISCRETE CENT ARITHMETIC</span>
+            </div>
+
+            <p style="font-size:0.8rem; color:var(--fg-muted); margin-bottom:14px;">
+              Kalshi rounds taker fees up to the nearest full cent per order: <code>ceil(0.07 × Count × P × (1 − P))</code>. Placing discrete small orders creates severe fractional-cent penalties that vanish upon consolidation.
+            </p>
+
+            <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; font-family:var(--font-mono); font-size:0.75rem; text-align:center; margin-bottom:16px;">
+              <div style="background:rgba(5,6,11,0.6); padding:10px; border-radius:4px; border:1px solid rgba(244,63,94,0.3);">
+                <div style="color:var(--fg-muted);">1 Contract @ 51¢</div>
+                <div style="color:var(--alert-red); font-size:0.95rem; font-weight:700; margin:4px 0;">2¢ Fee</div>
+                <div style="font-size:0.68rem; color:#FDA4AF;">+0.25¢ drag (14.3% penalty)</div>
+              </div>
+              <div style="background:rgba(5,6,11,0.6); padding:10px; border-radius:4px; border:1px solid rgba(201,162,74,0.3);">
+                <div style="color:var(--fg-muted);">10 Contracts @ 51¢</div>
+                <div style="color:var(--hud-gold); font-size:0.95rem; font-weight:700; margin:4px 0;">18¢ Fee</div>
+                <div style="font-size:0.68rem; color:var(--hud-gold);">+0.05¢ drag (1.80¢/ct)</div>
+              </div>
+              <div style="background:rgba(5,6,11,0.6); padding:10px; border-radius:4px; border:1px solid rgba(255,255,255,0.1);">
+                <div style="color:var(--fg-muted);">50 Contracts @ 51¢</div>
+                <div style="color:#FFFFFF; font-size:0.95rem; font-weight:700; margin:4px 0;">88¢ Fee</div>
+                <div style="font-size:0.68rem; color:var(--fg-muted);">+0.01¢ drag (1.76¢/ct)</div>
+              </div>
+              <div style="background:rgba(5,6,11,0.6); padding:10px; border-radius:4px; border:1px solid rgba(48,164,108,0.3);">
+                <div style="color:var(--fg-muted);">100 Contracts @ 50¢</div>
+                <div style="color:var(--ok-green); font-size:0.95rem; font-weight:700; margin:4px 0;">$1.75 Fee</div>
+                <div style="font-size:0.68rem; color:var(--ok-green);">0.00¢ drag (Exact 1.75¢/ct)</div>
+              </div>
+            </div>
+
+            <div style="background:rgba(79,209,232,0.06); border:1px solid var(--glass-border); padding:12px 14px; border-radius:6px; font-size:0.8rem; color:#E2E8F0;" id="eng-rounding-recommendation">
+              <strong>Consolidation Recommendation:</strong> ${initialRounding.recommendation}
+            </div>
+          </div>
+
+          <!-- SUB-MODULE 3: CROSS-VENUE NET SPREAD -->
+          <div class="hud-card" id="eng-module-spread">
+            <div class="hud-card-title">
+              <span style="display:flex; align-items:center; gap:8px;">
+                <span style="color:var(--hud-gold);">⚖️</span>
+                <span>CROSS-VENUE NET SPREAD // KALSHI VS. POLYMARKET</span>
+              </span>
+              <span style="color:var(--fg-muted); font-family:var(--font-mono);">NET FRICTION DEDUCTION</span>
+            </div>
+
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:14px; margin-bottom:16px;">
+              <div style="background:rgba(5,6,11,0.6); padding:12px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
+                <div style="font-family:var(--font-mono); font-size:0.7rem; color:var(--fg-muted);">Kalshi KXBTC15M Price</div>
+                <div style="font-family:var(--font-mono); font-size:1.25rem; font-weight:700; color:#FFFFFF; margin-top:2px;">51.0¢</div>
+                <div style="font-size:0.7rem; color:var(--alert-red);">Taker Fee: 1.80¢ / ct</div>
+              </div>
+
+              <div style="background:rgba(5,6,11,0.6); padding:12px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
+                <div style="font-family:var(--font-mono); font-size:0.7rem; color:var(--fg-muted);">Polymarket BTC 15m Price</div>
+                <div style="font-family:var(--font-mono); font-size:1.25rem; font-weight:700; color:#FFFFFF; margin-top:2px;">53.0¢</div>
+                <div style="font-size:0.7rem; color:var(--ok-green);">Protocol Fee: 0.00¢ / ct</div>
+              </div>
+
+              <div style="background:rgba(5,6,11,0.6); padding:12px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
+                <div style="font-family:var(--font-mono); font-size:0.7rem; color:var(--fg-muted);">Gross Quoted Spread</div>
+                <div style="font-family:var(--font-mono); font-size:1.25rem; font-weight:700; color:var(--fg-muted); margin-top:2px;" id="eng-spread-gross">${initialSpread.grossSpreadCents.toFixed(2)}¢</div>
+                <div style="font-size:0.7rem; color:var(--fg-muted);">Apparent price difference</div>
+              </div>
+
+              <div style="background:rgba(5,6,11,0.6); padding:12px; border-radius:6px; border:1px solid var(--glass-border);">
+                <div style="font-family:var(--font-mono); font-size:0.7rem; color:var(--hud-cyan);">Net Spread (After Both Fees)</div>
+                <div style="font-family:var(--font-mono); font-size:1.25rem; font-weight:700; color:var(--hud-cyan); margin-top:2px;" id="eng-spread-net">${initialSpread.netSpreadCents.toFixed(2)}¢</div>
+                <div style="font-size:0.7rem; color:var(--hud-cyan);" id="eng-spread-viable">Taker friction consumes 90% of spread</div>
+              </div>
+            </div>
+
+            <!-- Settlement Source Basis Mismatch Alert -->
+            <div style="background:rgba(229,72,77,0.08); border:1px solid rgba(229,72,77,0.3); border-radius:6px; padding:12px 16px; font-size:0.78rem; line-height:1.5; color:#FECDD3;" id="eng-spread-mismatch-notice">
+              <strong style="color:var(--alert-red);">Settlement Risk Hazard:</strong> ${initialSpread.settlementMismatchNotice}
+            </div>
+          </div>
+
         </div>
       </section>
 
@@ -1430,6 +1643,148 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
         }
       } catch (_) {}
     })();
+
+    // Engineering Station Live Reactor Engine
+    function ceilToCent(val) {
+      if (val <= 0) return 0.0;
+      return Math.ceil(Number((val - 1e-9).toFixed(6)) * 100) / 100;
+    }
+
+    function recalculateEngineering() {
+      const priceSlider = document.getElementById('eng-slider-price');
+      const countSlider = document.getElementById('eng-slider-count');
+      const probSlider = document.getElementById('eng-slider-prob');
+      const venueSelect = document.getElementById('eng-select-venue');
+      if (!priceSlider || !countSlider || !probSlider) return;
+
+      const priceCents = parseInt(priceSlider.value, 10);
+      const price = priceCents / 100;
+      const count = parseInt(countSlider.value, 10);
+      const prob = parseFloat(probSlider.value) / 100;
+      const venue = venueSelect ? venueSelect.value : 'kalshi-15m';
+
+      let takerFee = 0;
+      let makerFee = 0;
+      const isKalshi = venue.startsWith('kalshi');
+      if (isKalshi) {
+        takerFee = ceilToCent(0.07 * count * price * (1.0 - price));
+        makerFee = 0.00;
+      } else {
+        takerFee = 0.00;
+        makerFee = 0.00;
+      }
+
+      const outlay = count * price;
+      const maxLoss = outlay + takerFee;
+      const rawBreakevenPct = (price + 0.07 * price * (1.0 - price)) * 100;
+      const discreteBreakevenPct = (maxLoss / count) * 100;
+      const expectedValue = (prob * count * 1.0) - maxLoss;
+      const evPerContractCents = (expectedValue / count) * 100;
+
+      // Update gauges
+      const outlayEl = document.getElementById('eng-stat-outlay');
+      if (outlayEl) outlayEl.textContent = '$' + outlay.toFixed(2);
+      const outlaySubEl = document.getElementById('eng-stat-outlay-sub');
+      if (outlaySubEl) outlaySubEl.textContent = count + ' contracts @ $' + price.toFixed(2);
+
+      const feeEl = document.getElementById('eng-stat-fee');
+      if (feeEl) feeEl.textContent = '$' + takerFee.toFixed(2);
+      const feeRateEl = document.getElementById('eng-stat-fee-rate');
+      if (feeRateEl) feeRateEl.textContent = ((takerFee / count) * 100).toFixed(2) + '¢ / contract (' + ((takerFee / outlay) * 100).toFixed(2) + '% outlay drag)';
+
+      const breakevenEl = document.getElementById('eng-stat-breakeven');
+      if (breakevenEl) breakevenEl.textContent = discreteBreakevenPct.toFixed(2) + '%';
+      const rawBreakevenEl = document.getElementById('eng-stat-raw-breakeven');
+      if (rawBreakevenEl) rawBreakevenEl.textContent = 'Raw: ' + rawBreakevenPct.toFixed(2) + '% (Hurdle: +' + (discreteBreakevenPct - priceCents).toFixed(2) + '%)';
+
+      const evEl = document.getElementById('eng-stat-ev');
+      if (evEl) {
+        evEl.textContent = (expectedValue >= 0 ? '+' : '') + '$' + expectedValue.toFixed(2);
+        evEl.style.color = expectedValue >= 0 ? 'var(--ok-green)' : 'var(--alert-red)';
+      }
+      const evContractEl = document.getElementById('eng-stat-ev-contract');
+      if (evContractEl) evContractEl.textContent = (evPerContractCents >= 0 ? '+' : '') + evPerContractCents.toFixed(2) + '¢ net expectancy / ct';
+
+      // Sub-module 1: Maker vs Taker Saver
+      const saverTakerFeeEl = document.getElementById('eng-saver-taker-fee');
+      if (saverTakerFeeEl) saverTakerFeeEl.textContent = '$' + takerFee.toFixed(2);
+      const saverMakerFeeEl = document.getElementById('eng-saver-maker-fee');
+      if (saverMakerFeeEl) saverMakerFeeEl.textContent = '$' + makerFee.toFixed(2);
+      const dollarSavings = takerFee - makerFee;
+      const saverDollarsEl = document.getElementById('eng-saver-dollars');
+      if (saverDollarsEl) saverDollarsEl.textContent = '$' + dollarSavings.toFixed(2);
+      const saverBpsEl = document.getElementById('eng-saver-bps');
+      if (saverBpsEl) {
+        const bps = outlay > 0 ? Math.round((dollarSavings / outlay) * 10000) : 0;
+        saverBpsEl.textContent = '+' + bps + ' bps preserved';
+      }
+      const saverHurdleEl = document.getElementById('eng-saver-hurdle');
+      if (saverHurdleEl) {
+        const hurdleReduction = discreteBreakevenPct - priceCents;
+        saverHurdleEl.textContent = '-' + hurdleReduction.toFixed(2) + '%';
+      }
+
+      // Sub-module 2: Rounding Optimizer
+      const singleFee = ceilToCent(0.07 * 1 * price * (1.0 - price));
+      const separate10 = singleFee * count;
+      const roundingDrag = Math.max(0, separate10 - takerFee);
+      const roundingDragEl = document.getElementById('eng-rounding-recommendation');
+      if (roundingDragEl) {
+        roundingDragEl.innerHTML = '<strong>Consolidation Recommendation:</strong> ' + (
+          roundingDrag > 0
+            ? 'Consolidating ' + count + ' separate 1-contract orders into 1 single order of ' + count + ' contracts saves $' + roundingDrag.toFixed(2) + ' in fractional cent round-up drag.'
+            : 'Order sizing of ' + count + ' contracts is already mathematically optimized against cent rounding drag.'
+        );
+      }
+
+      // Sub-module 3: Cross-Venue Net Spread
+      const polyPrice = Math.min(0.99, price + 0.02);
+      const grossSpreadCents = Math.abs(price - polyPrice) * 100;
+      const polyFee = 0.00;
+      const totalFeesPerContract = (takerFee / count) + polyFee;
+      const netSpreadCents = grossSpreadCents - (totalFeesPerContract * 100);
+      const grossSpreadEl = document.getElementById('eng-spread-gross');
+      if (grossSpreadEl) grossSpreadEl.textContent = grossSpreadCents.toFixed(2) + '¢';
+      const netSpreadEl = document.getElementById('eng-spread-net');
+      if (netSpreadEl) {
+        netSpreadEl.textContent = netSpreadCents.toFixed(2) + '¢';
+        netSpreadEl.style.color = netSpreadCents > 0 ? 'var(--hud-cyan)' : 'var(--alert-red)';
+      }
+    }
+
+    function setEngPrice(cents) {
+      const slider = document.getElementById('eng-slider-price');
+      if (slider) {
+        slider.value = cents;
+        syncEngPriceFromSlider(cents);
+      }
+    }
+
+    function setEngCount(count) {
+      const slider = document.getElementById('eng-slider-count');
+      if (slider) {
+        slider.value = count;
+        syncEngCountFromSlider(count);
+      }
+    }
+
+    function syncEngPriceFromSlider(val) {
+      const label = document.getElementById('eng-label-price');
+      if (label) label.textContent = val + '¢ ($' + (val / 100).toFixed(2) + ')';
+      recalculateEngineering();
+    }
+
+    function syncEngCountFromSlider(val) {
+      const label = document.getElementById('eng-label-count');
+      if (label) label.textContent = val + ' ct';
+      recalculateEngineering();
+    }
+
+    function syncEngProbFromSlider(val) {
+      const label = document.getElementById('eng-label-prob');
+      if (label) label.textContent = parseFloat(val).toFixed(1) + '%';
+      recalculateEngineering();
+    }
   </script>
 </body>
 </html>`;

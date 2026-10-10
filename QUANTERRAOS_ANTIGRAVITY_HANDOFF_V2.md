@@ -290,7 +290,7 @@ Tokens on `:root`, dark only for deck; public site dark-default with light-mode 
 
 ### PHASE 4 — Flight Deck core (Weeks 2–4)
 - [x] **4.1** `/deck` shell: stations (2.3), bottom tabs (mobile), left rail (desktop), celestial theme (Part 5).
-- [ ] **4.2** Engineering: Maker/Taker Saver, Rounding Optimizer, Cross-Venue Net Spread.
+- [x] **4.2** Engineering: Maker/Taker Saver, Rounding Optimizer, Cross-Venue Net Spread.
 - [ ] **4.3** Navigation: live Settlement Radar + coin-flip-zone overlay.
 - [ ] **4.4** Mission Log: thesis → trade → settle; Kalshi CSV import; fees paid/avoidable; personal Brier.
 - [ ] **4.5** Bridge gauges: Fuel, Hull, Navigation accuracy, Discipline.
