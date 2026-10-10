@@ -74,6 +74,7 @@ import { getFeatureFlags } from "./feature-flags.ts";
 import { renderPilotAuditPageHtml } from "./pilot-audit-page.ts";
 import { renderAccessTerminalPage } from "./access-terminal-page.ts";
 import { renderCalculatorPageHtml } from "./calculator-page.ts";
+import { renderFlightDeckPageHtml, type FlightDeckStationId } from "./flight-deck-page.ts";
 import {
   computeExpiryRadarState,
   renderExpiryRadarPageHtml,
@@ -4503,8 +4504,23 @@ app.get("/api/predictions", (req, res) => {
 });
 
 
-app.get("/deck", (_req, res) => {
-  res.redirect("/dashboard");
+app.get("/deck", (req, res) => {
+  const station = req.query.station as FlightDeckStationId | undefined;
+  const auth = getUserAuth(req);
+  res.type("html").send(
+    renderFlightDeckPageHtml({
+      initialStation: station,
+      user: auth?.user
+        ? {
+            email: auth.user.email,
+            callsign: (auth.user as any).callsign || "PILOT-1",
+            rank: (auth.user as any).rank || "Pilot",
+            xp: (auth.user as any).xp || 240,
+            streakDays: 5,
+          }
+        : null,
+    })
+  );
 });
 
 app.get("/wallet", (_req, res) => {
