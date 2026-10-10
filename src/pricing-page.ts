@@ -522,31 +522,15 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
       </div>
     </section>
 
-    <!-- Business & Developer Section -->
+    <!-- Business & Developer Section (Ordered Least to Most Expensive: $49 Builder API -> $399 Commander -> Custom Institutional) -->
     <section class="business-section" aria-label="Business and Developer Offers">
       <div class="business-header">
-        <div class="hero-tag">Desks &amp; Developers</div>
+        <div class="hero-tag">Desks &amp; Developers · Ascending Tier Order</div>
         <h2>Business &amp; API Infrastructure</h2>
-        <p style="color:var(--text-dim); font-size:0.9rem;">High-throughput feeds, desk workflows, and dedicated institutional access.</p>
+        <p style="color:var(--text-dim); font-size:0.9rem;">Ordered from least to most expensive: Builder API ($49/mo), Commander Desk ($399/mo), and Institutional Access.</p>
       </div>
       <div class="business-grid">
-        <!-- Commander Card -->
-        <div class="pricing-card">
-          <div class="tier-name">${commander.name}</div>
-          <div class="tier-desc">${commander.description}</div>
-          <div class="price-box">
-            <div class="price-amount">${commander.priceDisplay}</div>
-            <div class="price-period">${commander.billingPeriod}</div>
-          </div>
-          <ul class="features-list">
-            ${commander.features.map((f) => `<li><span class="check-icon">✓</span> <span>${f}</span></li>`).join("\n            ")}
-          </ul>
-          <a href="/institutional?tier=commander" class="action-btn btn-free">
-            Discuss Desk Access
-          </a>
-        </div>
-
-        <!-- Builder API Card -->
+        <!-- 1. Builder API Card ($49/mo) -->
         <div class="pricing-card">
           <div class="tier-name">${builder.name}</div>
           <div class="tier-desc">${builder.description}</div>
@@ -562,7 +546,23 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
           </a>
         </div>
 
-        <!-- Institutional Card -->
+        <!-- 2. Commander Desk Card ($399/mo) -->
+        <div class="pricing-card">
+          <div class="tier-name">${commander.name}</div>
+          <div class="tier-desc">${commander.description}</div>
+          <div class="price-box">
+            <div class="price-amount">${commander.priceDisplay}</div>
+            <div class="price-period">${commander.billingPeriod}</div>
+          </div>
+          <ul class="features-list">
+            ${commander.features.map((f) => `<li><span class="check-icon">✓</span> <span>${f}</span></li>`).join("\n            ")}
+          </ul>
+          <a href="/institutional?tier=commander" class="action-btn btn-free">
+            Discuss Desk Access
+          </a>
+        </div>
+
+        <!-- 3. Institutional Card (Custom Quote) -->
         <div class="pricing-card">
           <div class="tier-name">${institutional.name}</div>
           <div class="tier-desc">${institutional.description}</div>
