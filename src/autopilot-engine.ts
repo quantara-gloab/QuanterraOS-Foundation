@@ -78,6 +78,11 @@ export function executeAutopilotPaperStep(input: {
   size?: number;
   edgeThreshold?: number;
 }): AutopilotTradeRecord {
+  if (!input.contract || typeof input.contract !== "string" || input.contract.toUpperCase().endsWith("-CURRENT")) {
+    throw new Error(
+      `Invalid contract identifier: Placeholder tickers ending in -CURRENT are strictly rejected at write time (${input.contract}).`
+    );
+  }
   const size = input.size ?? 100;
   const decision = suggestPaperTrade({
     owner: "autopilot-agent",

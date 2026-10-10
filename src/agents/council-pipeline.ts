@@ -612,8 +612,16 @@ async function fetchCurrentMarketQuote(now: Date): Promise<PipelineMarketQuote> 
   // Graceful deterministic fallback market quote
   const next15MinBoundary = Math.ceil(nowMs / (15 * 60000)) * (15 * 60000);
   const minutesLeft = Number(((next15MinBoundary - nowMs) / 60000).toFixed(2));
+  const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+  const closeDate = new Date(next15MinBoundary);
+  const yr = String(closeDate.getUTCFullYear()).slice(2);
+  const mo = MONTHS[closeDate.getUTCMonth()];
+  const dy = String(closeDate.getUTCDate()).padStart(2, "0");
+  const hr = String(closeDate.getUTCHours()).padStart(2, "0");
+  const mn = String(closeDate.getUTCMinutes()).padStart(2, "0");
+  const ticker = `KXBTC15M-${yr}${mo}${dy}${hr}${mn}-${mn}`;
   return {
-    ticker: `KXBTC15M-${now.toISOString().slice(2, 10).replace(/-/g, "")}-CURRENT`,
+    ticker,
     openTime: new Date(next15MinBoundary - 15 * 60000).toISOString(),
     closeTime: new Date(next15MinBoundary).toISOString(),
     strike: 85260.5,

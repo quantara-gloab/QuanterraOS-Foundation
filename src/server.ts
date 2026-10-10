@@ -5379,6 +5379,9 @@ app.post("/api/kalshi/bid", async (req, res) => {
   if (!ticker || !side || price === undefined || count === undefined) {
     return res.status(400).json({ error: "Missing required fields: ticker, side, price, count" });
   }
+  if (typeof ticker === "string" && ticker.toUpperCase().endsWith("-CURRENT")) {
+    return res.status(400).json({ error: "Invalid ticker: Placeholder tickers ending in -CURRENT are strictly rejected at write time." });
+  }
 
   const requestedMode = mode === "live" ? "live" : "sandbox";
 

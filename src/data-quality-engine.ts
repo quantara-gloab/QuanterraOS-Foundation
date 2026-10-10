@@ -40,6 +40,7 @@ export const KXBTC15M_TICKER_REGEX = /^KXBTC15M(-[0-9]{2}[A-Z]{3}[0-9]{2})?(-T[0
 export function validateContractIdentifier(ticker: string): boolean {
   if (!ticker || typeof ticker !== "string") return false;
   const clean = ticker.trim().toUpperCase();
+  if (clean.endsWith("-CURRENT") || clean.includes("-CURRENT")) return false;
   // Valid if standard 15m format, or general prediction ticker with alphanumeric prefix & dash
   return KXBTC15M_TICKER_REGEX.test(clean) || /^[A-Z0-9]{3,12}(-[A-Z0-9]+)+$/i.test(clean);
 }

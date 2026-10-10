@@ -257,6 +257,9 @@ export async function getKalshiPortfolioBalance(): Promise<KalshiBalance> {
  *  - Submits signed order to Kalshi API: POST /trade-api/v2/portfolio/orders
  */
 export async function placeKalshi15mBid(input: PlaceBidInput): Promise<BidResult> {
+  if (!input.ticker || typeof input.ticker !== "string" || input.ticker.toUpperCase().endsWith("-CURRENT")) {
+    throw new Error(`Invalid ticker: Placeholder tickers ending in -CURRENT are strictly rejected at write time (${input.ticker}).`);
+  }
   const price = Math.max(0.01, Math.min(0.99, Number(input.price)));
   const count = Math.max(1, Math.floor(Number(input.count)));
   const totalCost = Number((price * count).toFixed(2));

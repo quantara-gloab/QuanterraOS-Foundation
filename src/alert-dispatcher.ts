@@ -309,7 +309,7 @@ export function createSampleAlertEvent(eventType: string = "DISCREPANCY_SCANNER_
       },
       "https://quanterraos.com/kalshi",
       "WARNING",
-      "KXBTC15M-CURRENT"
+      "KXBTC15M-26OCT092030-30"
     );
   }
 

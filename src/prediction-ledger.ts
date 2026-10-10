@@ -57,6 +57,12 @@ export function recordPrediction(input: {
   isReplay?: boolean;
   notes?: string;
 }): PredictionRecord {
+  if (!input.marketId || typeof input.marketId !== "string" || input.marketId.toUpperCase().endsWith("-CURRENT")) {
+    throw new Error(
+      `Invalid market identifier: Placeholder tickers ending in -CURRENT are strictly rejected at write time (${input.marketId}).`
+    );
+  }
+
   const prob = Math.min(0.9999, Math.max(0.0001, input.predictedProb));
   const recordId = input.id ?? `pred_${randomUUID().slice(0, 12)}`;
   const now = input.timestamp ?? new Date().toISOString();
