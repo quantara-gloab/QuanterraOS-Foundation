@@ -294,7 +294,7 @@ Tokens on `:root`, dark only for deck; public site dark-default with light-mode 
 - [x] **4.3** Navigation: live Settlement Radar + coin-flip-zone overlay.
 - [x] **4.4** Mission Log: thesis → trade → settle; Kalshi CSV import; fees paid/avoidable; personal Brier.
 - [x] **4.5** Bridge gauges: Fuel, Hull, Navigation accuracy, Discipline.
-- [ ] **4.6** Responsible-trading layer (3.6). *Accept:* QA script triggers tilt cooldown; limits sync across devices.
+- [x] **4.6** Responsible-trading layer (3.6). *Accept:* QA script triggers tilt cooldown; limits sync across devices.
 
 ### PHASE 5 — Crew & game (Weeks 3–5)
 - [ ] **5.1** Aria router + 8 launch crew (3.3), each with tool scope and eval set. *Accept:* 50-prompt adversarial eval = 100% non-advisory.

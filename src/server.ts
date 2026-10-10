@@ -76,6 +76,14 @@ import { renderAccessTerminalPage } from "./access-terminal-page.ts";
 import { renderCalculatorPageHtml } from "./calculator-page.ts";
 import { renderFlightDeckPageHtml, type FlightDeckStationId } from "./flight-deck-page.ts";
 import {
+  getUserLimits,
+  updateUserLimits,
+  recordLossAndCheckTilt,
+  respectTiltCooldown,
+  applySelfPause,
+  attestAge18,
+} from "./lib/responsible-trading.ts";
+import {
   computeExpiryRadarState,
   renderExpiryRadarPageHtml,
   simulateExpiryPayoff,
@@ -4521,6 +4529,52 @@ app.get("/deck", (req, res) => {
         : null,
     })
   );
+});
+
+// ===================================================================
+// Responsible Trading & Tilt Cooldown API (Task 4.6 / Part 3.6)
+// ===================================================================
+app.get("/api/responsible/limits", (req, res) => {
+  const auth = getUserAuth(req);
+  const userId = auth.user?.id || "cadet-default";
+  res.json(getUserLimits(userId));
+});
+
+app.post("/api/responsible/limits", (req, res) => {
+  const auth = getUserAuth(req);
+  const userId = auth.user?.id || "cadet-default";
+  const updated = updateUserLimits(userId, req.body || {});
+  res.json({ success: true, limits: updated });
+});
+
+app.post("/api/responsible/tilt/trigger", (req, res) => {
+  const auth = getUserAuth(req);
+  const userId = auth.user?.id || "cadet-default";
+  const loss = req.body || { lossDollars: 15, ticker: "KXBTC15M-91250" };
+  const result = recordLossAndCheckTilt(userId, loss);
+  res.json({ success: true, ...result });
+});
+
+app.post("/api/responsible/tilt/respect", (req, res) => {
+  const auth = getUserAuth(req);
+  const userId = auth.user?.id || "cadet-default";
+  const result = respectTiltCooldown(userId);
+  res.json({ success: true, ...result });
+});
+
+app.post("/api/responsible/self-pause", (req, res) => {
+  const auth = getUserAuth(req);
+  const userId = auth.user?.id || "cadet-default";
+  const hours = Number(req.body?.hours || 24);
+  const updated = applySelfPause(userId, hours);
+  res.json({ success: true, limits: updated });
+});
+
+app.post("/api/responsible/attest-18", (req, res) => {
+  const auth = getUserAuth(req);
+  const userId = auth.user?.id || "cadet-default";
+  const updated = attestAge18(userId);
+  res.json({ success: true, limits: updated });
 });
 
 app.get("/wallet", (_req, res) => {

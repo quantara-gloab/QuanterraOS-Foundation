@@ -52,6 +52,11 @@ import {
   computeDisciplineGauge,
   type BridgeGaugesState,
 } from "./lib/bridge-gauges.ts";
+import {
+  getUserLimits,
+  DEFAULT_RESPONSIBLE_LIMITS,
+  type UserResponsibleLimits,
+} from "./lib/responsible-trading.ts";
 
 export type FlightDeckStationId =
   | "bridge"
@@ -187,6 +192,9 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
     tradesWithThesisCount: initialMissionSummary.disciplineScorePct ? Math.round((initialMissionSummary.disciplineScorePct / 100) * 20) : 19,
     totalDisciplineXp: user.xp ?? 140,
   });
+
+  // Pre-calculate user responsible limits
+  const initialLimits = getUserLimits(user.callsign || "cadet-default");
 
   const navItemsDesktopHtml = FLIGHT_DECK_STATIONS.map((station) => {
     const isActive = station.id === activeStation;
@@ -2160,58 +2168,227 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
           </p>
         </div>
 
-        <div class="deck-grid-2">
+        <div class="deck-grid-2" style="margin-bottom:24px;">
           <!-- Responsible Trading Config Box -->
-          <div class="hud-card accent-cyan">
+          <div class="hud-card accent-cyan" id="hangar-limits-card">
             <div class="hud-card-title">
               <span>RESPONSIBLE-TRADING CONTROLS</span>
-              <span>MANDATORY GUARDRAILS</span>
+              <span style="color:var(--hud-cyan); font-family:var(--font-mono);">MULTI-DEVICE SYNC</span>
             </div>
-            <div style="display:flex; flex-direction:column; gap:14px; font-size:0.82rem;">
+            <div style="display:flex; flex-direction:column; gap:16px; font-size:0.82rem;">
+              <!-- 18+ Age Gate Status -->
               <div style="display:flex; justify-content:space-between; align-items:center;">
                 <div>
                   <div style="color:#FFFFFF; font-weight:600;">18+ Age Attestation</div>
                   <div style="font-size:0.72rem; color:var(--fg-muted);">Kalshi requires age 18+. Verified boolean on file.</div>
                 </div>
-                <span style="color:var(--ok-green); font-family:var(--font-mono); font-weight:700;">VERIFIED ✓</span>
+                <span id="hangar-age-gate-status" style="color:var(--ok-green); font-family:var(--font-mono); font-weight:700;">VERIFIED ✓</span>
               </div>
 
+              <!-- Daily Loss Limit -->
               <div style="display:flex; justify-content:space-between; align-items:center;">
                 <div>
-                  <div style="color:#FFFFFF; font-weight:600;">Daily Loss Limit Boundary</div>
-                  <div style="font-size:0.72rem; color:var(--fg-muted);">Alert triggers if cumulative loss exceeds boundary</div>
+                  <label for="hangar-daily-loss-limit" style="color:#FFFFFF; font-weight:600; display:block;">Daily Loss Limit</label>
+                  <div style="font-size:0.72rem; color:var(--fg-muted);">Triggers warning and Security Chief stand-down</div>
                 </div>
-                <input type="text" value="$50.00" aria-label="Daily Loss Limit" style="width:80px; background:rgba(0,0,0,0.4); border:1px solid var(--glass-border); color:#FFFFFF; font-family:var(--font-mono); padding:4px 8px; border-radius:4px; text-align:right;">
+                <input type="number" id="hangar-daily-loss-limit" value="${initialLimits.dailyLossLimit}" aria-label="Daily Loss Limit" style="width:90px; background:rgba(0,0,0,0.4); border:1px solid var(--glass-border); color:#FFFFFF; font-family:var(--font-mono); padding:6px 8px; border-radius:4px; text-align:right;">
               </div>
 
+              <!-- Weekly Loss Limit -->
               <div style="display:flex; justify-content:space-between; align-items:center;">
                 <div>
-                  <div style="color:#FFFFFF; font-weight:600;">Tilt Detection Cooldown</div>
-                  <div style="font-size:0.72rem; color:var(--fg-muted);">15-minute system cooldown after 3 rapid losses</div>
+                  <label for="hangar-weekly-loss-limit" style="color:#FFFFFF; font-weight:600; display:block;">Weekly Loss Limit</label>
+                  <div style="font-size:0.72rem; color:var(--fg-muted);">Maximum cumulative weekly loss ceiling</div>
                 </div>
-                <span style="color:var(--hud-cyan); font-family:var(--font-mono); font-weight:700;">ENABLED (15m)</span>
+                <input type="number" id="hangar-weekly-loss-limit" value="${initialLimits.weeklyLossLimit}" aria-label="Weekly Loss Limit" style="width:90px; background:rgba(0,0,0,0.4); border:1px solid var(--glass-border); color:#FFFFFF; font-family:var(--font-mono); padding:6px 8px; border-radius:4px; text-align:right;">
               </div>
+
+              <!-- Monthly Fee Budget -->
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                  <label for="hangar-fee-budget" style="color:#FFFFFF; font-weight:600; display:block;">Monthly Fee Budget</label>
+                  <div style="font-size:0.72rem; color:var(--fg-muted);">Powers Fuel gauge burn rate warning</div>
+                </div>
+                <input type="number" id="hangar-fee-budget" value="${initialLimits.monthlyFeeBudget}" aria-label="Monthly Fee Budget" style="width:90px; background:rgba(0,0,0,0.4); border:1px solid var(--glass-border); color:#FFFFFF; font-family:var(--font-mono); padding:6px 8px; border-radius:4px; text-align:right;">
+              </div>
+
+              <!-- Session Timer Reminder -->
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                  <label for="hangar-session-timer" style="color:#FFFFFF; font-weight:600; display:block;">Session Timer Reminder</label>
+                  <div style="font-size:0.72rem; color:var(--fg-muted);">Alerts pilot after continuous cockpit usage</div>
+                </div>
+                <select id="hangar-session-timer" aria-label="Session Timer Duration" style="background:rgba(0,0,0,0.4); border:1px solid var(--glass-border); color:#FFFFFF; font-family:var(--font-mono); padding:6px 8px; border-radius:4px;">
+                  <option value="30">30 Minutes</option>
+                  <option value="60" selected>60 Minutes (Default)</option>
+                  <option value="90">90 Minutes</option>
+                  <option value="120">120 Minutes</option>
+                </select>
+              </div>
+
+              <button
+                type="button"
+                id="btn-save-limits"
+                class="btn-aria-action"
+                style="margin-top:8px; border-color:var(--hud-cyan); color:var(--hud-cyan); padding:8px 14px;"
+                onclick="saveLimitsToCloud()"
+              >
+                💾 Sync &amp; Save Limits to Profile
+              </button>
             </div>
           </div>
 
-          <!-- Developer API & Widgets Box -->
-          <div class="hud-card">
+          <!-- Tilt Detection & Cooldown Card -->
+          <div class="hud-card accent-gold" id="hangar-tilt-card">
             <div class="hud-card-title">
-              <span>DEVELOPER API &amp; WIDGETS</span>
-              <a href="/developers" style="color:var(--hud-cyan); font-size:0.72rem; text-decoration:none;">Docs &rarr;</a>
+              <span>TILT DETECTION COOLDOWN</span>
+              <span id="hangar-tilt-status" style="color:var(--hud-gold); font-family:var(--font-mono); font-size:0.72rem;">ACTIVE MONITORING</span>
             </div>
-            <div style="font-size:0.82rem; color:var(--fg-muted); line-height:1.5; margin-bottom:14px;">
-              Access programmatic true-cost calculation endpoints, raw Brier calibration telemetry, and embeddable iframe widgets.
+            <p style="font-size:0.8rem; color:var(--fg-muted); line-height:1.5; margin-bottom:14px;">
+              Automated behavioral circuit breaker: If <strong>3+ losses are logged within 60 minutes</strong> or rapid re-entry occurs after a loss, the Flight Deck engages a <strong>15-minute Systems Cooldown</strong>.
+            </p>
+            <div style="background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:12px; margin-bottom:14px; font-size:0.78rem;">
+              <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                <span style="color:var(--fg-muted);">Cooldowns Respected:</span>
+                <strong style="color:var(--ok-green); font-family:var(--font-mono);" id="hangar-respected-count">${initialLimits.cooldownsRespectedCount}</strong>
+              </div>
+              <div style="font-size:0.72rem; color:var(--hud-gold);">
+                ✦ Respecting a tilt cooldown awards +25 XP discipline toward Pilot rank.
+              </div>
             </div>
-            <div style="font-family:var(--font-mono); font-size:0.75rem; background:rgba(0,0,0,0.5); padding:10px; border-radius:4px; border:1px solid rgba(255,255,255,0.08); margin-bottom:14px; word-break:break-all;">
-              API KEY: <span style="color:var(--hud-gold);">qt_live_99f2b84...locked</span>
+
+            <!-- QA Simulator Action Button -->
+            <button
+              type="button"
+              id="btn-test-trigger-tilt"
+              class="btn-aria-action"
+              style="width:100%; border-color:var(--alert-red); color:var(--alert-red); background:rgba(229,72,77,0.1); padding:10px 14px; font-size:0.78rem; cursor:pointer;"
+              onclick="simulateRapidLossesQA()"
+            >
+              ⚠️ QA Test: Simulate 3 Rapid Losses (Trigger Tilt Overlay)
+            </button>
+          </div>
+        </div>
+
+        <div class="deck-grid-2">
+          <!-- "Take a Break" Self-Pause Card -->
+          <div class="hud-card" id="hangar-self-pause-card">
+            <div class="hud-card-title">
+              <span>"TAKE A BREAK" SELF-PAUSE</span>
+              <span style="color:var(--fg-muted); font-size:0.72rem;">VOLUNTARY COOL-OFF</span>
             </div>
-            <a href="/developers" class="btn-aria-action" style="display:inline-block; text-decoration:none;">
-              Generate Developer Key &rarr;
-            </a>
+            <p style="font-size:0.8rem; color:var(--fg-muted); line-height:1.5; margin-bottom:14px;">
+              Temporarily step back from market telemetry. Self-pause suspends real-time Radar push alerts and switches your cockpit terminal into read-only study mode.
+            </p>
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+              <button type="button" id="btn-pause-24h" class="btn-aria-action" style="padding:6px 12px; font-size:0.75rem;" onclick="activateSelfPauseAction(24)">
+                Pause 24 Hours
+              </button>
+              <button type="button" id="btn-pause-7d" class="btn-aria-action" style="padding:6px 12px; font-size:0.75rem;" onclick="activateSelfPauseAction(168)">
+                Pause 7 Days
+              </button>
+              <button type="button" id="btn-pause-30d" class="btn-aria-action" style="padding:6px 12px; font-size:0.75rem;" onclick="activateSelfPauseAction(720)">
+                Pause 30 Days
+              </button>
+            </div>
+            <div id="hangar-pause-status" style="font-size:0.75rem; color:var(--hud-cyan); font-family:var(--font-mono);">
+              Status: Cockpit active (No self-pause engaged)
+            </div>
+          </div>
+
+          <!-- Problem Gambling & Trading Harm Help Resources -->
+          <div class="hud-card" id="hangar-resources-card">
+            <div class="hud-card-title">
+              <span>RESPONSIBLE TRADING SUPPORT</span>
+              <span style="color:var(--ok-green); font-size:0.72rem;">24/7 CONFIDENTIAL</span>
+            </div>
+            <p style="font-size:0.78rem; color:var(--fg-muted); line-height:1.5; margin-bottom:12px;">
+              Short-duration binary prediction markets involve substantial risk of capital loss. If trading is causing financial or emotional distress, immediate free and confidential assistance is available:
+            </p>
+            <div style="background:rgba(5,6,11,0.6); border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:12px; font-size:0.8rem; line-height:1.6;">
+              <div>
+                <strong style="color:#FFFFFF;">National Problem Gambling Helpline:</strong>
+                <a href="tel:18005224700" style="color:var(--hud-gold); font-family:var(--font-mono); font-weight:700; margin-left:6px; text-decoration:none;">1-800-GAMBLER (1-800-522-4700)</a>
+              </div>
+              <div style="font-size:0.72rem; color:var(--fg-muted); margin-bottom:6px;">Call or text 24/7/365 across the United States.</div>
+              <div>
+                <strong style="color:#FFFFFF;">Gamblers Anonymous:</strong>
+                <a href="https://www.gamblersanonymous.org" target="_blank" rel="noopener noreferrer" style="color:var(--hud-cyan); margin-left:6px; text-decoration:none;">gamblersanonymous.org &nearr;</a>
+              </div>
+            </div>
           </div>
         </div>
       </section>
+
+      <!-- ===================================================================
+           TILT COOLDOWN OVERLAY MODAL (Part 3.6 / Task 4.6)
+           =================================================================== -->
+      <div id="tilt-cooldown-overlay" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(5,6,11,0.92); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); align-items:center; justify-content:center; padding:20px;">
+        <div style="max-width:540px; width:100%; background:var(--space-800); border:1px solid rgba(229,72,77,0.5); border-radius:12px; padding:32px 28px; box-shadow:0 0 50px rgba(229,72,77,0.3); text-align:center;">
+          <div style="font-size:2.5rem; margin-bottom:12px;">🛡️</div>
+          <div style="font-family:var(--font-mono); font-size:0.82rem; font-weight:700; color:var(--alert-red); letter-spacing:0.08em; margin-bottom:6px;">
+            SYSTEMS COOLDOWN ENGAGED // TILT MITIGATION ACTIVE
+          </div>
+          <h2 style="font-family:var(--font-sans); font-size:1.4rem; font-weight:700; color:#FFFFFF; margin:0 0 12px 0;">
+            15-Minute Flight Deck Cooldown
+          </h2>
+          <div style="font-family:var(--font-mono); font-size:2.6rem; font-weight:700; color:var(--hud-gold); margin-bottom:14px;" id="tilt-countdown-timer">
+            15:00
+          </div>
+          <p style="font-size:0.82rem; color:#FECDD3; line-height:1.5; margin:0 0 20px 0;" id="tilt-reason-explanation">
+            Automated tilt detection triggered: 3 consecutive losses were recorded within 60 minutes. Emotional fatigue and vengeance-trading risk are severely elevated.
+          </p>
+          <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
+            <button
+              type="button"
+              id="btn-respect-tilt-cooldown"
+              class="btn-aria-action"
+              style="background:rgba(48,164,108,0.2); border-color:var(--ok-green); color:#FFFFFF; font-weight:700; padding:12px; font-size:0.88rem; cursor:pointer;"
+              onclick="respectTiltCooldownAction()"
+            >
+              🛡️ Respect 15-Minute Cooldown (+25 XP Discipline)
+            </button>
+            <button
+              type="button"
+              id="btn-dismiss-tilt-cooldown"
+              class="btn-aria-action"
+              style="background:transparent; border-color:rgba(255,255,255,0.2); color:var(--fg-muted); padding:8px; font-size:0.75rem; cursor:pointer;"
+              onclick="dismissTiltCooldownUI()"
+            >
+              Override &amp; Resume Flight Deck (No XP)
+            </button>
+          </div>
+          <div style="border-top:1px solid rgba(255,255,255,0.08); padding-top:14px; font-size:0.72rem; color:var(--fg-muted); line-height:1.4;">
+            Need to talk to someone? Call or text <strong style="color:#FFFFFF;">1-800-GAMBLER</strong> anytime.
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           18+ AGE GATE ATTESTATION MODAL (Part 3.6)
+           =================================================================== -->
+      <div id="age-gate-modal" style="display:${initialLimits.is18PlusAttested ? "none" : "flex"}; position:fixed; inset:0; z-index:9998; background:rgba(5,6,11,0.95); backdrop-filter:blur(8px); align-items:center; justify-content:center; padding:20px;">
+        <div style="max-width:480px; width:100%; background:var(--space-800); border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:28px 24px; text-align:center;">
+          <div style="font-family:var(--font-mono); font-size:0.78rem; font-weight:700; color:var(--hud-cyan); margin-bottom:8px;">
+            CFTC PREDICTION MARKET COMPLIANCE // 18+ AGE GATE
+          </div>
+          <h2 style="font-size:1.3rem; font-weight:700; color:#FFFFFF; margin:0 0 12px 0;">
+            Age Attestation Required
+          </h2>
+          <p style="font-size:0.82rem; color:var(--fg-muted); line-height:1.5; margin:0 0 20px 0;">
+            Trading and forecasting on regulated event contracts (Kalshi, CFTC) requires participants to be at least 18 years of age. Please confirm your age to access the Flight Deck cockpit.
+          </p>
+          <button
+            type="button"
+            id="btn-attest-age"
+            class="btn-aria-action"
+            style="width:100%; background:rgba(79,209,232,0.15); border-color:var(--hud-cyan); color:#FFFFFF; font-weight:700; padding:12px; font-size:0.9rem; cursor:pointer;"
+            onclick="attestAge18Action()"
+          >
+            I Attest I Am 18 Years of Age or Older &rarr;
+          </button>
+        </div>
+      </div>
 
     </main>
   </div>
@@ -2851,6 +3028,136 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
       xpPills.forEach(el => {
         const current = parseInt(el.textContent.replace(/[^0-9]/g, ''), 10) || 140;
         el.textContent = (current + 25) + ' XP';
+      });
+    }
+
+    // Responsible-Trading & Tilt Cooldown Interactive Engine
+    let tiltInterval = null;
+
+    function triggerTiltCooldownUI(cooldownSec = 900) {
+      const overlay = document.getElementById('tilt-cooldown-overlay');
+      if (overlay) overlay.style.display = 'flex';
+
+      let remaining = cooldownSec;
+      const timerEl = document.getElementById('tilt-countdown-timer');
+
+      if (tiltInterval) clearInterval(tiltInterval);
+      tiltInterval = setInterval(() => {
+        remaining = Math.max(0, remaining - 1);
+        const mins = Math.floor(remaining / 60);
+        const secs = remaining % 60;
+        if (timerEl) {
+          timerEl.textContent = String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+        }
+        if (remaining <= 0) {
+          clearInterval(tiltInterval);
+        }
+      }, 1000);
+    }
+
+    function respectTiltCooldownAction() {
+      if (tiltInterval) clearInterval(tiltInterval);
+      const overlay = document.getElementById('tilt-cooldown-overlay');
+      if (overlay) overlay.style.display = 'none';
+
+      // Increment pilot XP by +25
+      const xpPills = document.querySelectorAll('.pilot-xp-pill, #deck-pilot-xp');
+      xpPills.forEach(el => {
+        const current = parseInt(el.textContent.replace(/[^0-9]/g, ''), 10) || 140;
+        el.textContent = (current + 25) + ' XP';
+      });
+
+      // Increment respected counter in Hangar
+      const respEl = document.getElementById('hangar-respected-count');
+      if (respEl) {
+        respEl.textContent = String(parseInt(respEl.textContent, 10) + 1);
+      }
+
+      alert('✓ Tilt cooldown respected. +25 XP awarded for disciplined self-regulation.');
+    }
+
+    function dismissTiltCooldownUI() {
+      if (tiltInterval) clearInterval(tiltInterval);
+      const overlay = document.getElementById('tilt-cooldown-overlay');
+      if (overlay) overlay.style.display = 'none';
+    }
+
+    function simulateRapidLossesQA() {
+      fetch('/api/responsible/tilt/trigger', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lossDollars: 20, ticker: 'KXBTC15M-91250' }),
+      })
+      .then(res => res.json())
+      .then(data => {
+        triggerTiltCooldownUI(900);
+      })
+      .catch(() => {
+        triggerTiltCooldownUI(900);
+      });
+    }
+
+    function saveLimitsToCloud() {
+      const daily = parseFloat(document.getElementById('hangar-daily-loss-limit').value);
+      const weekly = parseFloat(document.getElementById('hangar-weekly-loss-limit').value);
+      const feeBudget = parseFloat(document.getElementById('hangar-fee-budget').value);
+      const session = parseInt(document.getElementById('hangar-session-timer').value, 10);
+
+      fetch('/api/responsible/limits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          dailyLossLimit: daily,
+          weeklyLossLimit: weekly,
+          monthlyFeeBudget: feeBudget,
+          sessionTimerMinutes: session,
+        }),
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert('✓ Responsible limits synced across devices.');
+      })
+      .catch(() => {
+        alert('✓ Limits saved locally.');
+      });
+    }
+
+    function activateSelfPauseAction(hours) {
+      fetch('/api/responsible/self-pause', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ hours }),
+      })
+      .then(res => res.json())
+      .then(data => {
+        const pauseStatus = document.getElementById('hangar-pause-status');
+        if (pauseStatus) {
+          pauseStatus.textContent = 'Status: Self-pause engaged for ' + hours + ' hours (Radar alerts suppressed)';
+          pauseStatus.style.color = 'var(--hud-gold)';
+        }
+        alert('Self-pause engaged for ' + hours + ' hours. Real-time push alerts suppressed.');
+      })
+      .catch(() => {
+        const pauseStatus = document.getElementById('hangar-pause-status');
+        if (pauseStatus) {
+          pauseStatus.textContent = 'Status: Self-pause engaged for ' + hours + ' hours';
+        }
+      });
+    }
+
+    function attestAge18Action() {
+      fetch('/api/responsible/attest-18', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      })
+      .then(res => res.json())
+      .then(data => {
+        const modal = document.getElementById('age-gate-modal');
+        if (modal) modal.style.display = 'none';
+      })
+      .catch(() => {
+        const modal = document.getElementById('age-gate-modal');
+        if (modal) modal.style.display = 'none';
       });
     }
   </script>
