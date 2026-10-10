@@ -96,6 +96,12 @@ import {
   MISSIONS_ROSTER,
 } from "./lib/xp-engine.ts";
 import {
+  getCalibrationLeaderboard,
+  getFeesSavedLeaderboard,
+  updatePilotLeaderboardOptIn,
+  validateLeaderboardSortingMetric,
+} from "./lib/leaderboards.ts";
+import {
   computeExpiryRadarState,
   renderExpiryRadarPageHtml,
   simulateExpiryPayoff,
@@ -4666,6 +4672,28 @@ app.get("/api/deck/cosmetics", (_req, res) => {
       cosmetics: r.cosmetics,
     })),
   });
+});
+
+// ===================================================================
+// Opt-In Pseudonymous Leaderboard API (Task 5.3 / Part 3.5)
+// ===================================================================
+app.get("/api/deck/leaderboard/calibration", (req, res) => {
+  const minSamples = Math.max(1, parseInt(req.query.minSamples as string) || 30);
+  const board = getCalibrationLeaderboard(minSamples);
+  res.json(board);
+});
+
+app.get("/api/deck/leaderboard/fees-saved", (_req, res) => {
+  const board = getFeesSavedLeaderboard();
+  res.json({ rankedLeaders: board });
+});
+
+app.post("/api/deck/leaderboard/opt-in", (req, res) => {
+  const auth = getUserAuth(req);
+  const userId = auth.user?.id || "cadet-default";
+  const { isOptedIn, callsign } = req.body || {};
+  const profile = updatePilotLeaderboardOptIn(userId, Boolean(isOptedIn), typeof callsign === "string" ? callsign : undefined);
+  res.json({ success: true, profile });
 });
 
 app.get("/wallet", (_req, res) => {

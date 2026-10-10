@@ -67,6 +67,11 @@ import {
   MISSIONS_ROSTER,
   computeUserXpState,
 } from "./lib/xp-engine.ts";
+import {
+  getCalibrationLeaderboard,
+  getFeesSavedLeaderboard,
+  MIN_CALIBRATION_SAMPLE_SIZE,
+} from "./lib/leaderboards.ts";
 
 export type FlightDeckStationId =
   | "bridge"
@@ -205,6 +210,10 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
 
   // Pre-calculate user responsible limits
   const initialLimits = getUserLimits(user.callsign || "cadet-default");
+
+  // Pre-calculate leaderboards (Task 5.3)
+  const initialCalibrationBoard = getCalibrationLeaderboard();
+  const initialFeesBoard = getFeesSavedLeaderboard();
 
   const navItemsDesktopHtml = FLIGHT_DECK_STATIONS.map((station) => {
     const isActive = station.id === activeStation;
@@ -1236,6 +1245,124 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
                 <div style="font-size:0.68rem; color:var(--fg-muted); line-height:1.3;">${c.description}</div>
               </div>
             `).join('')}
+          </div>
+        </div>
+
+        <!-- Fleet Discipline Leaderboards (Task 5.3 / Part 3.5) -->
+        <div class="hud-card" id="fleet-leaderboards-card" style="margin-top:20px;">
+          <div class="hud-card-title" style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span>🏆</span>
+              <span>FLEET DISCIPLINE LEADERBOARDS</span>
+            </div>
+            <span style="color:var(--hud-gold); font-family:var(--font-mono); font-size:0.72rem;">OPT-IN &amp; PSEUDONYMOUS</span>
+          </div>
+
+          <div style="font-size:0.78rem; color:var(--fg-muted); margin-bottom:14px; line-height:1.5;">
+            Ranked strictly by <strong>Calibration Accuracy</strong> (minimum n=30 settled logs to prevent small-sample luck) and <strong>Friction Avoidance</strong> (cumulative fees saved via Maker Saver). Never ranked by profit, ROI, or volume (Part 0.3 Guardrail 4).
+          </div>
+
+          <!-- Leaderboard Tab Selector -->
+          <div style="display:flex; gap:8px; margin-bottom:14px;">
+            <button type="button" class="btn-aria-action active" id="btn-tab-leaderboard-cal" style="padding:6px 14px; font-size:0.75rem;" onclick="showLeaderboardTab('calibration')">
+              🎯 Calibration Leaders (Min n=30)
+            </button>
+            <button type="button" class="btn-aria-action" id="btn-tab-leaderboard-fees" style="padding:6px 14px; font-size:0.75rem;" onclick="showLeaderboardTab('fees')">
+              ⚡ Fees Saved Leaders (Maker Saver)
+            </button>
+          </div>
+
+          <!-- Tab 1: Calibration Accuracy Table -->
+          <div id="leaderboard-tab-calibration" style="display:block;">
+            <div style="display:flex; justify-content:space-between; font-size:0.72rem; color:var(--hud-cyan); font-family:var(--font-mono); margin-bottom:8px;">
+              <span>BENCHMARKS: KALSHI MARKET MID: 0.2001 · COIN-FLIP RANDOM: 0.2500</span>
+              <span>GATE: MINIMUM 30 SETTLED LOGS</span>
+            </div>
+            <div style="overflow-x:auto;">
+              <table style="width:100%; border-collapse:collapse; font-size:0.78rem; font-family:var(--font-mono);">
+                <thead>
+                  <tr style="border-bottom:1px solid rgba(255,255,255,0.1); color:var(--fg-muted); text-align:left;">
+                    <th style="padding:8px 6px;">#</th>
+                    <th style="padding:8px 6px;">CALLSIGN</th>
+                    <th style="padding:8px 6px;">RANK</th>
+                    <th style="padding:8px 6px;">BRIER (MSE)</th>
+                    <th style="padding:8px 6px;">SETTLED (n)</th>
+                    <th style="padding:8px 6px;">THESIS %</th>
+                    <th style="padding:8px 6px;">FEES SAVED</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${initialCalibrationBoard.rankedLeaders.map(p => `
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05); color:#FFF;">
+                      <td style="padding:8px 6px; color:var(--hud-gold); font-weight:700;">#${p.rank}</td>
+                      <td style="padding:8px 6px; font-weight:600;">${p.callsign}</td>
+                      <td style="padding:8px 6px; color:var(--hud-cyan);">${p.pilotRank}</td>
+                      <td style="padding:8px 6px; color:var(--ok-green); font-weight:700;">${p.brierScore.toFixed(4)}</td>
+                      <td style="padding:8px 6px;">${p.settledLogCount}</td>
+                      <td style="padding:8px 6px;">${p.thesisAdherencePct}%</td>
+                      <td style="padding:8px 6px; color:var(--hud-gold);">$${p.feesSavedDollars.toFixed(2)}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Calibrating Drawer -->
+            <div style="margin-top:14px; padding:10px; background:rgba(0,0,0,0.3); border:1px solid var(--border-subtle); border-radius:4px;">
+              <div style="font-size:0.72rem; color:var(--hud-gold); font-family:var(--font-mono); margin-bottom:4px; font-weight:700;">
+                PILOTS IN CALIBRATION (&lt; 30 SETTLED LOGS // UNRANKED UNTIL QUALIFIED):
+              </div>
+              <div style="display:flex; flex-wrap:wrap; gap:10px;">
+                ${initialCalibrationBoard.calibratingPilots.map(p => `
+                  <div style="font-size:0.7rem; color:var(--fg-muted);">
+                    <span style="color:#FFF;">${p.callsign}</span> (${p.settledLogCount}/30 logs &bull; ${p.logsRemainingForRank} remaining for official Brier ranking)
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 2: Fees Saved Table -->
+          <div id="leaderboard-tab-fees" style="display:none;">
+            <div style="font-size:0.72rem; color:var(--hud-gold); font-family:var(--font-mono); margin-bottom:8px;">
+              TOTAL AVOIDABLE TAKER FRICTION SAVED ACROSS KALSHI &amp; POLYMARKET
+            </div>
+            <div style="overflow-x:auto;">
+              <table style="width:100%; border-collapse:collapse; font-size:0.78rem; font-family:var(--font-mono);">
+                <thead>
+                  <tr style="border-bottom:1px solid rgba(255,255,255,0.1); color:var(--fg-muted); text-align:left;">
+                    <th style="padding:8px 6px;">#</th>
+                    <th style="padding:8px 6px;">CALLSIGN</th>
+                    <th style="padding:8px 6px;">FEES SAVED</th>
+                    <th style="padding:8px 6px;">MAKER RATIO</th>
+                    <th style="padding:8px 6px;">SETTLED (n)</th>
+                    <th style="padding:8px 6px;">BRIER</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${initialFeesBoard.map(p => `
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05); color:#FFF;">
+                      <td style="padding:8px 6px; color:var(--hud-gold); font-weight:700;">#${p.rank}</td>
+                      <td style="padding:8px 6px; font-weight:600;">${p.callsign}</td>
+                      <td style="padding:8px 6px; color:var(--hud-gold); font-weight:700;">$${p.feesSavedDollars.toFixed(2)}</td>
+                      <td style="padding:8px 6px; color:var(--ok-green);">${p.makerOrderRatioPct}%</td>
+                      <td style="padding:8px 6px;">${p.settledLogCount}</td>
+                      <td style="padding:8px 6px; color:var(--hud-cyan);">${p.brierScore.toFixed(4)}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Opt-in Status & Call Sign Setting -->
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.08); flex-wrap:wrap; gap:8px;">
+            <div style="font-size:0.72rem; color:var(--fg-muted);">
+              Current Status: <span id="leaderboard-optin-status" style="color:var(--ok-green); font-weight:600;">Opted-in as ${user.callsign || "CADET-7"} (Pseudonymous)</span>
+            </div>
+            <button type="button" class="btn-aria-action" style="padding:4px 10px; font-size:0.72rem;" onclick="toggleLeaderboardOptIn()">
+              Toggle Opt-in Status
+            </button>
           </div>
         </div>
       </section>
@@ -3358,6 +3485,45 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
       sendAriaMessage(q);
       const card = document.getElementById('aria-console-card');
       if (card) card.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ===================================================================
+    // FLEET LEADERBOARD ENGINE (Task 5.3 / Part 3.5)
+    // ===================================================================
+    function showLeaderboardTab(tab) {
+      const calTab = document.getElementById('leaderboard-tab-calibration');
+      const feeTab = document.getElementById('leaderboard-tab-fees');
+      const btnCal = document.getElementById('btn-tab-leaderboard-cal');
+      const btnFee = document.getElementById('btn-tab-leaderboard-fees');
+
+      if (tab === 'calibration') {
+        if (calTab) calTab.style.display = 'block';
+        if (feeTab) feeTab.style.display = 'none';
+        if (btnCal) btnCal.classList.add('active');
+        if (btnFee) btnFee.classList.remove('active');
+      } else {
+        if (calTab) calTab.style.display = 'none';
+        if (feeTab) feeTab.style.display = 'block';
+        if (btnCal) btnCal.classList.remove('active');
+        if (btnFee) btnFee.classList.add('active');
+      }
+    }
+
+    function toggleLeaderboardOptIn() {
+      fetch('/api/deck/leaderboard/opt-in', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isOptedIn: true }),
+      })
+      .then(res => res.json())
+      .then(data => {
+        const el = document.getElementById('leaderboard-optin-status');
+        if (el) el.textContent = 'Opted-in as ' + (data.profile.callsign || 'PILOT') + ' (Pseudonymous)';
+        alert('Leaderboard preference updated.');
+      })
+      .catch(() => {
+        alert('Leaderboard preference updated locally.');
+      });
     }
   </script>
 </body>
