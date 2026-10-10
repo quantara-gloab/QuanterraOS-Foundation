@@ -57,6 +57,7 @@ import { renderInstitutionalPageHtml } from "./institutional-page.ts";
 import { renderDevelopersPageHtml } from "./developers-page.ts";
 import { renderNewsPageHtml } from "./news-page.ts";
 import { renderHelpPageHtml } from "./help-page.ts";
+import { searchHelpArticles, createSupportTicket } from "./lib/support-escalation.ts";
 import { renderSeoTopicPageHtml } from "./seo-topic-pages.ts";
 import {
   reconcilePendingSettlements,
@@ -2045,8 +2046,39 @@ app.get("/news", (_req, res) => {
   res.type("html").send(renderNewsPageHtml());
 });
 
-app.get("/help", (_req, res) => {
-  res.type("html").send(renderHelpPageHtml());
+app.get("/help", async (req, res) => {
+  const plan = await currentPlan(req);
+  const auth = getUserAuth(req);
+  res.type("html").send(renderHelpPageHtml(plan, auth.user?.email || ""));
+});
+
+// Help Center Search API (Task 7.2 / Part 3.7)
+app.get("/api/help/articles", (req, res) => {
+  const q = req.query.q as string | undefined;
+  const articles = searchHelpArticles(q);
+  res.json({ count: articles.length, articles });
+});
+
+// Human Escalation & Support Ticket API (Task 7.2 / Part 3.7)
+app.post("/api/support/escalate", async (req, res) => {
+  const plan = await currentPlan(req);
+  const auth = getUserAuth(req);
+  const { email, subject, message, attachedAriaTranscript, userConsentGiven } = req.body || {};
+
+  try {
+    const ticket = createSupportTicket({
+      userId: auth.user?.id,
+      email: email || auth.user?.email || "",
+      plan,
+      subject,
+      message,
+      attachedAriaTranscript,
+      userConsentGiven: Boolean(userConsentGiven),
+    });
+    res.json({ success: true, ticket });
+  } catch (err: any) {
+    res.status(400).json({ error: "escalation_error", message: err.message });
+  }
 });
 
 // SEO Topic Pages with JSON-LD FAQ Schema (Part 2.1 & Task 3.5)
