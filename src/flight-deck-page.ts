@@ -2608,6 +2608,43 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
         </div>
       </div>
 
+      <!-- ===================================================================
+           DISCIPLINE CELEBRATION MODAL OVERLAY (Part 3.5 / Task 5.4)
+           Fires for Rank-Up, Mission Completion, Calibration Improvement (Never for Wins)
+           =================================================================== -->
+      <div id="celebration-overlay" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(5,6,11,0.92); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); align-items:center; justify-content:center; padding:20px;">
+        <canvas id="celebration-canvas" style="position:absolute; inset:0; pointer-events:none; width:100%; height:100%;"></canvas>
+        <div style="position:relative; max-width:520px; width:100%; background:var(--space-800); border:1px solid var(--hud-gold); border-radius:12px; padding:32px 28px; box-shadow:0 0 60px rgba(201,162,74,0.3); text-align:center;">
+          <div id="celebration-badge-slot" style="width:64px; height:64px; margin:0 auto 16px;"></div>
+          <div id="celebration-title" style="font-family:var(--font-mono); font-size:0.75rem; font-weight:700; color:var(--hud-gold); letter-spacing:0.1em; margin-bottom:8px;">
+            DISCIPLINE MILESTONE ACHIEVED
+          </div>
+          <h2 id="celebration-headline" style="font-size:1.5rem; font-weight:700; color:#FFFFFF; margin:0 0 12px 0;">
+            Celebration
+          </h2>
+          <p id="celebration-detail" style="font-size:0.85rem; color:#E8EDF2; line-height:1.5; margin:0 0 20px 0;">
+            Detail
+          </p>
+          <div id="celebration-xp-slot" style="display:inline-block; background:rgba(201,162,74,0.15); border:1px solid var(--hud-gold); color:var(--hud-gold); font-family:var(--font-mono); font-size:0.85rem; font-weight:700; padding:6px 14px; border-radius:4px; margin-bottom:20px;">
+            +0 XP
+          </div>
+          <div style="margin-bottom:14px;">
+            <button
+              type="button"
+              id="btn-dismiss-celebration"
+              class="btn-aria-action"
+              style="width:100%; background:var(--hud-gold); color:#000; font-weight:700; border:none; padding:12px; font-size:0.9rem; cursor:pointer;"
+              onclick="dismissCelebrationModal()"
+            >
+              Acknowledge &amp; Resume Flight Deck &rarr;
+            </button>
+          </div>
+          <div style="font-size:0.7rem; color:var(--fg-muted);">
+            QuanterraOS Anti-Volume Guardrail: Celebrations fire exclusively for procedural discipline, never for winning trades.
+          </div>
+        </div>
+      </div>
+
     </main>
   </div>
 
@@ -3524,6 +3561,54 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
       .catch(() => {
         alert('Leaderboard preference updated locally.');
       });
+    }
+
+    // ===================================================================
+    // DISCIPLINE CELEBRATION ENGINE (Task 5.4 / Part 3.5)
+    // ===================================================================
+    function triggerCelebrationModal(trigger, payload) {
+      fetch('/api/deck/celebration/trigger', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ trigger, payload }),
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (!data.celebration) return;
+        const c = data.celebration;
+        const overlay = document.getElementById('celebration-overlay');
+        const badgeSlot = document.getElementById('celebration-badge-slot');
+        const titleEl = document.getElementById('celebration-title');
+        const headEl = document.getElementById('celebration-headline');
+        const detailEl = document.getElementById('celebration-detail');
+        const xpSlot = document.getElementById('celebration-xp-slot');
+
+        if (badgeSlot) badgeSlot.innerHTML = c.badgeSvg || '';
+        if (titleEl) titleEl.textContent = c.title || '';
+        if (headEl) headEl.textContent = c.headline || '';
+        if (detailEl) detailEl.textContent = c.detail || '';
+        if (xpSlot) {
+          if (c.xpEarned > 0) {
+            xpSlot.style.display = 'inline-block';
+            xpSlot.textContent = '+' + c.xpEarned + ' XP DISCIPLINE';
+          } else if (c.unlockedItemName) {
+            xpSlot.style.display = 'inline-block';
+            xpSlot.textContent = 'UNLOCKED: ' + c.unlockedItemName.toUpperCase();
+          } else {
+            xpSlot.style.display = 'none';
+          }
+        }
+
+        if (overlay) overlay.style.display = 'flex';
+      })
+      .catch(err => {
+        console.error('Celebration trigger error:', err);
+      });
+    }
+
+    function dismissCelebrationModal() {
+      const overlay = document.getElementById('celebration-overlay');
+      if (overlay) overlay.style.display = 'none';
     }
   </script>
 </body>

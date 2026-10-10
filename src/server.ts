@@ -101,6 +101,7 @@ import {
   updatePilotLeaderboardOptIn,
   validateLeaderboardSortingMetric,
 } from "./lib/leaderboards.ts";
+import { triggerDisciplineCelebration } from "./lib/celebrations.ts";
 import {
   computeExpiryRadarState,
   renderExpiryRadarPageHtml,
@@ -4694,6 +4695,19 @@ app.post("/api/deck/leaderboard/opt-in", (req, res) => {
   const { isOptedIn, callsign } = req.body || {};
   const profile = updatePilotLeaderboardOptIn(userId, Boolean(isOptedIn), typeof callsign === "string" ? callsign : undefined);
   res.json({ success: true, profile });
+});
+
+// ===================================================================
+// Discipline Celebrations API (Task 5.4 / Part 3.5)
+// ===================================================================
+app.post("/api/deck/celebration/trigger", (req, res) => {
+  const { trigger, payload } = req.body || {};
+  try {
+    const config = triggerDisciplineCelebration(trigger, payload);
+    res.json({ success: true, celebration: config });
+  } catch (err) {
+    res.status(400).json({ error: "guardrail_violation", message: (err as Error).message });
+  }
 });
 
 app.get("/wallet", (_req, res) => {
