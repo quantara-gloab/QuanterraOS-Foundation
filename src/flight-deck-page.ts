@@ -77,6 +77,12 @@ import {
   queryLargeTradeFeed,
   type LargeTradePrint,
 } from "./lib/sensors-feed.ts";
+import {
+  getPolymarketWalletCard,
+  getCuratedBenchmarkWallets,
+  renderWalletCardDetailsHtml,
+  type WalletCalibrationCard,
+} from "./lib/wallet-cards.ts";
 
 export type FlightDeckStationId =
   | "bridge"
@@ -219,6 +225,10 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
   // Pre-calculate leaderboards (Task 5.3)
   const initialCalibrationBoard = getCalibrationLeaderboard();
   const initialFeesBoard = getFeesSavedLeaderboard();
+
+  // Pre-calculate Polymarket wallet calibration cards (Task 6.2)
+  const initialBenchmarkWallets = getCuratedBenchmarkWallets();
+  const initialDefaultWalletCard = getPolymarketWalletCard("0x71c828b6d8efec4f0c86bb0b784a9e29a39ec70a");
 
   const navItemsDesktopHtml = FLIGHT_DECK_STATIONS.map((station) => {
     const isActive = station.id === activeStation;
@@ -2325,6 +2335,44 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
             <span style="color:var(--hud-cyan);">CFTC Rule 4.41 Compliant</span>
           </div>
         </div>
+
+        <!-- Polymarket Wallet Calibration Track Record Cards (Task 6.2 / Part 3.4) -->
+        <div class="hud-card" id="sensors-wallet-cards-card" style="margin-top:20px;">
+          <div class="hud-card-title" style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--hud-cyan); box-shadow:0 0 8px var(--hud-cyan);"></span>
+              <span>POLYMARKET WALLET CALIBRATION TRACK RECORD CARDS // PROBABILISTIC BRIER SCORING</span>
+            </div>
+            <span style="color:var(--hud-gold); font-family:var(--font-mono); font-size:0.72rem;">ON-CHAIN CALIBRATION AUDIT</span>
+          </div>
+
+          <div style="font-size:0.78rem; color:var(--fg-muted); margin-bottom:14px; line-height:1.5;">
+            Evaluating public on-chain Polymarket wallets by <strong>probabilistic calibration (Brier score &amp; reliability)</strong> rather than misleading raw P&amp;L or high win rates. Exposes the Favorite-Chaser Paradox (traders winning 80% of trades on 90&cent; contracts while underperforming a naive coin flip).
+          </div>
+
+          <!-- Address Lookup and Benchmark Quick Chips -->
+          <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:14px;">
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <input type="text" id="wallet-address-input" placeholder="Enter Polymarket wallet address (0x...) or select a benchmark" style="flex:1; min-width:260px; background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.15); border-radius:4px; padding:8px 12px; color:#FFF; font-family:var(--font-mono); font-size:0.8rem;" value="0x71c828b6d8efec4f0c86bb0b784a9e29a39ec70a" />
+              <button type="button" class="btn-aria-action active" id="btn-lookup-wallet" style="padding:8px 16px; font-size:0.8rem;" onclick="lookupWalletCard()">
+                Audit Calibration
+              </button>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:0.72rem; color:var(--fg-muted);">
+              <span>Benchmark Profiles:</span>
+              ${initialBenchmarkWallets.map(b => `
+                <button type="button" class="btn-aria-action" style="padding:3px 8px; font-size:0.7rem; font-family:var(--font-mono);" onclick="loadBenchmarkWallet('${b.address}')">
+                  ${b.callsign} (${b.grade === 'EXEMPLARY_CALIBRATED' ? 'Alpha' : b.grade === 'WELL_CALIBRATED' ? 'Well Calibrated' : 'Paradox'})
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Dynamic Wallet Card Container -->
+          <div id="wallet-card-container">
+            ${renderWalletCardDetailsHtml(initialDefaultWalletCard)}
+          </div>
+        </div>
       </section>
 
       <!-- ===================================================================
@@ -3679,6 +3727,62 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
     function dismissCelebrationModal() {
       const overlay = document.getElementById('celebration-overlay');
       if (overlay) overlay.style.display = 'none';
+    }
+
+    // ===================================================================
+    // SENSORS STATION ENGINES (Task 6.1 & 6.2 / Part 3.4)
+    // ===================================================================
+    function filterSensorsFeed(venue) {
+      const rows = document.querySelectorAll('.sensor-trade-row');
+      const btnAll = document.getElementById('btn-feed-filter-all');
+      const btnKalshi = document.getElementById('btn-feed-filter-kalshi');
+      const btnPoly = document.getElementById('btn-feed-filter-poly');
+      [btnAll, btnKalshi, btnPoly].forEach(b => { if (b) b.classList.remove('active'); });
+      if (venue === 'all' && btnAll) btnAll.classList.add('active');
+      if (venue === 'kalshi' && btnKalshi) btnKalshi.classList.add('active');
+      if (venue === 'polymarket' && btnPoly) btnPoly.classList.add('active');
+
+      rows.forEach(r => {
+        if (venue === 'all') {
+          r.style.display = '';
+        } else if (r.classList.contains('venue-' + venue)) {
+          r.style.display = '';
+        } else {
+          r.style.display = 'none';
+        }
+      });
+    }
+
+    function lookupWalletCard() {
+      const input = document.getElementById('wallet-address-input');
+      const container = document.getElementById('wallet-card-container');
+      const addr = input ? input.value.trim() : '';
+      if (!addr) return;
+      if (container) {
+        container.innerHTML = '<div style="padding:24px; text-align:center; color:var(--hud-cyan); font-family:var(--font-mono); font-size:0.85rem;"><span style="display:inline-block; animation:spin 1s linear infinite; margin-right:8px;">◌</span> Auditing on-chain calibration & calculating probabilistic Brier decomposition...</div>';
+      }
+
+      fetch('/api/deck/sensors/wallets/' + encodeURIComponent(addr))
+        .then(res => {
+          if (!res.ok) throw new Error('Address audit failed or invalid format');
+          return res.json();
+        })
+        .then(data => {
+          if (container && data.html) {
+            container.innerHTML = data.html;
+          }
+        })
+        .catch(err => {
+          if (container) {
+            container.innerHTML = '<div style="padding:20px; text-align:center; color:var(--alert-red); font-family:var(--font-mono); font-size:0.8rem;">' + (err.message || 'Audit lookup failed') + '</div>';
+          }
+        });
+    }
+
+    function loadBenchmarkWallet(addr) {
+      const input = document.getElementById('wallet-address-input');
+      if (input) input.value = addr;
+      lookupWalletCard();
     }
   </script>
 </body>

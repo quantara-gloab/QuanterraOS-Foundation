@@ -104,6 +104,12 @@ import {
 import { triggerDisciplineCelebration } from "./lib/celebrations.ts";
 import { queryLargeTradeFeed } from "./lib/sensors-feed.ts";
 import {
+  getPolymarketWalletCard,
+  isValidPolymarketAddress,
+  getCuratedBenchmarkWallets,
+  renderWalletCardDetailsHtml,
+} from "./lib/wallet-cards.ts";
+import {
   computeExpiryRadarState,
   renderExpiryRadarPageHtml,
   simulateExpiryPayoff,
@@ -4720,6 +4726,23 @@ app.get("/api/deck/sensors/trades", (req, res) => {
   const riskLevel = (req.query.riskLevel as any) || "all";
   const prints = queryLargeTradeFeed({ venue, minContracts, riskLevel });
   res.json({ count: prints.length, prints });
+});
+
+// Polymarket Wallet Calibration Track Record Cards (Task 6.2 / Part 3.4)
+app.get("/api/deck/sensors/wallets", (_req, res) => {
+  res.json({ benchmarks: getCuratedBenchmarkWallets() });
+});
+
+app.get("/api/deck/sensors/wallets/:address", (req, res) => {
+  const address = req.params.address;
+  if (!isValidPolymarketAddress(address)) {
+    return res.status(400).json({
+      error: "invalid_address",
+      message: "Address must be a valid 42-character 0x hex string or standard truncated format (e.g. 0x71c8...c70a)",
+    });
+  }
+  const card = getPolymarketWalletCard(address);
+  res.json({ card, html: renderWalletCardDetailsHtml(card) });
 });
 
 app.get("/wallet", (_req, res) => {
