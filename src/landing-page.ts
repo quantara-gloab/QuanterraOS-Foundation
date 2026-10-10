@@ -3397,52 +3397,16 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
           </div>
         </div>
 
-        <!-- 9-Competitor Dossier Summary Strip -->
-        <div style="margin-top:24px; display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:12px;">
-          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:14px;">
-            <div style="font-size:0.82rem; font-weight:700; color:#FFFFFF;">Verso &bull; verso.finance</div>
-            <div style="font-size:0.72rem; color:#F43F5E; margin:3px 0; font-weight:600;">Fatal Flaw: Friction Blindness</div>
-            <div style="font-size:0.72rem; color:var(--muted); line-height:1.4;">Hides $0.07&times;P(1-P) taker fee. Pushes high-frequency execution into retail churn.</div>
+        <!-- Neutral Sourced Independence Architecture -->
+        <div style="margin-top:24px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:22px; text-align:center;">
+          <div style="font-size:0.75rem; font-family:var(--font-mono); color:var(--accent); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">
+            Independent Venue-Neutral Architecture
           </div>
-          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:14px;">
-            <div style="font-size:0.82rem; font-weight:700; color:#FFFFFF;">Oddpool &bull; oddpool.com</div>
-            <div style="font-size:0.72rem; color:#F43F5E; margin:3px 0; font-weight:600;">Fatal Flaw: Platform Captured</div>
-            <div style="font-size:0.72rem; color:var(--muted); line-height:1.4;">Acquired by Kalshi (Sep 2026). No longer an independent referee of spreads or fees.</div>
+          <div style="font-size:1.05rem; font-weight:700; color:#FFFFFF; max-width:680px; margin:0 auto 8px;">
+            QuanterraOS is an independent analytics flight deck by Quantara Global LLC.
           </div>
-          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:14px;">
-            <div style="font-size:0.82rem; font-weight:700; color:#FFFFFF;">Dome &bull; domeapi.io</div>
-            <div style="font-size:0.72rem; color:#F43F5E; margin:3px 0; font-weight:600;">Fatal Flaw: Platform Captured</div>
-            <div style="font-size:0.72rem; color:var(--muted); line-height:1.4;">Acquired by Polymarket (Feb 2026). Locked into single venue; ignores CFTC compliance.</div>
-          </div>
-          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:14px;">
-            <div style="font-size:0.82rem; font-weight:700; color:#FFFFFF;">Stand.Trade &bull; stand.trade</div>
-            <div style="font-size:0.72rem; color:#F43F5E; margin:3px 0; font-weight:600;">Fatal Flaw: Retail Churn Trap</div>
-            <div style="font-size:0.72rem; color:var(--muted); line-height:1.4;">Promotes copy-trading whales hedging basis off-exchange without risk plans.</div>
-          </div>
-          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:14px;">
-            <div style="font-size:0.82rem; font-weight:700; color:#FFFFFF;">The 7 Oracles &bull; 7oracles.io</div>
-            <div style="font-size:0.72rem; color:#F43F5E; margin:3px 0; font-weight:600;">Fatal Flaw: Naive Kelly Over-Betting</div>
-            <div style="font-size:0.72rem; color:var(--muted); line-height:1.4;">Assumes uncalibrated win rates; pushes full-Kelly sizing carrying &gt;50% ruin risk.</div>
-          </div>
-          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:14px;">
-            <div style="font-size:0.82rem; font-weight:700; color:#FFFFFF;">PillarLab AI &bull; pillarlab.ai</div>
-            <div style="font-size:0.72rem; color:#F43F5E; margin:3px 0; font-weight:600;">Fatal Flaw: LLM Hallucinations</div>
-            <div style="font-size:0.72rem; color:var(--muted); line-height:1.4;">Assigns subjective letter grades (A+, B) with zero Brier calibration or pre-registration.</div>
-          </div>
-          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:14px;">
-            <div style="font-size:0.82rem; font-weight:700; color:#FFFFFF;">OddsPipe &bull; oddspipe.com</div>
-            <div style="font-size:0.72rem; color:#F43F5E; margin:3px 0; font-weight:600;">Fatal Flaw: Paywalled Passive Dump</div>
-            <div style="font-size:0.72rem; color:var(--muted); line-height:1.4;">Passive CSV dump behind steep paywalls without real-time UMA dispute surveillance.</div>
-          </div>
-          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:14px;">
-            <div style="font-size:0.82rem; font-weight:700; color:#FFFFFF;">Predly &bull; predly.ai</div>
-            <div style="font-size:0.72rem; color:#F43F5E; margin:3px 0; font-weight:600;">Fatal Flaw: Uncalibrated AI Claims</div>
-            <div style="font-size:0.72rem; color:var(--muted); line-height:1.4;">Claims 89% accuracy scraping news. Market mid beats models (0.2001 vs 0.2063).</div>
-          </div>
-          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:6px; padding:14px;">
-            <div style="font-size:0.82rem; font-weight:700; color:#FFFFFF;">Unusual Whales</div>
-            <div style="font-size:0.72rem; color:#F43F5E; margin:3px 0; font-weight:600;">Fatal Flaw: Superficial Alerts</div>
-            <div style="font-size:0.72rem; color:var(--muted); line-height:1.4;">Alerts on raw block sizes without contract delta, TWAP context, or fee drag audits.</div>
+          <div style="font-size:0.82rem; color:var(--muted); max-width:740px; margin:0 auto; line-height:1.6;">
+            We don't place trades, hold funds, or give investment advice. We audit real execution costs, CME CF BRTI settlement indexes, and probability calibration with zero exchange kickbacks or referral fees.
           </div>
         </div>
 

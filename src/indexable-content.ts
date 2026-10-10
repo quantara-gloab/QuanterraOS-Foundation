@@ -498,7 +498,7 @@ export const SEARCH_QUERY_ARTICLES: SearchQueryArticle[] = [
     ],
     readTimeMinutes: 7,
     lastUpdated: "October 2026",
-    summary: "Aggregator terminals frequently claim cross-venue spreads represent 'risk-free arbitrage' (e.g. buying Kalshi YES at 48¢ and Polymarket NO at 49¢ for a claimed 3.0¢ gross profit). This analysis exposes three fatal flaws: 1) Kalshi's parabolic taker fee ($17.50 on 1k contracts), 2) Polymarket's Polygon gas and execution slippage ($6.50), which together consume 80% to 100% of the nominal spread, and 3) Asymmetric oracle risk (CME BRTI TWAP vs UMA token dispute) which can cause both legs to resolve as losses.",
+    summary: "Aggregator terminals frequently claim cross-venue spreads represent 'risk-free arbitrage' (e.g. buying Kalshi YES at 48¢ and Polymarket NO at 49¢ for a claimed 3.0¢ gross profit). This analysis exposes three friction realities: 1) Kalshi's parabolic taker fee ($17.50 on 1k contracts), 2) Polymarket's Polygon gas and execution slippage ($6.50), which together consume 80% to 100% of the nominal spread, and 3) Asymmetric oracle risk (CME BRTI TWAP vs UMA token dispute) which can cause both legs to resolve as losses.",
     formulaHeadline: "Cross-Venue Realized Net Return Equation",
     formulaMath: "Net_Return = (100¢ - (Price_Kalshi + Price_Poly)) × N - (Fee_Kalshi + Gas_Poly + Slippage_Poly)\nIf Net_Return ≤ 0, theoretical spread is completely illusory.",
     interactivePreset: {

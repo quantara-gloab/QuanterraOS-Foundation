@@ -1106,11 +1106,11 @@ export function renderBenchmarkPageHtml(teardown: FrictionTeardownResult): strin
       <div class="hero-tag">The 2026 Competitive Differentiation &amp; Game-Changer Playbook</div>
       <h1>The Independent Truth Layer vs. Competitor Hype</h1>
       <p class="hero-subtitle">
-        In 2026, annualized prediction market volume crossed $200B. Yet every existing tool is caught in one of three fatal traps: platform capture, uncalibrated AI snake oil, or friction blindness. QuanterraOS is the independent sovereign referee.
+        In 2026, annualized prediction market volume crossed $200B. Yet traders frequently encounter platform capture, uncalibrated probability estimates, or unexpected friction drag. QuanterraOS is an independent, venue-neutral analytics flight deck.
       </p>
     </div>
 
-    <!-- The 3 Fatal Traps in 2026 Prediction Market Tools -->
+    <!-- The 3 Structural Gaps in 2026 Prediction Market Tools -->
     <div class="traps-grid">
       <div class="trap-card">
         <div class="trap-badge">Trap 1 // Platform Capture</div>
@@ -1518,7 +1518,7 @@ export function renderBenchmarkPageHtml(teardown: FrictionTeardownResult): strin
             </div>
             <div class="dossier-claim">${c.claim} &bull; Target: ${c.targetUser}</div>
             <div class="dossier-flaw">
-              <strong>Fatal Flaw:</strong> ${c.vulnerability}
+              <strong>Structural Limitation:</strong> ${c.vulnerability}
             </div>
             <div class="dossier-advantage">
               <strong>QuanterraOS Advantage:</strong> ${c.quanterraAdvantage}

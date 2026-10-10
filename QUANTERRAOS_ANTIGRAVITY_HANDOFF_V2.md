@@ -265,7 +265,7 @@ Tokens on `:root`, dark only for deck; public site dark-default with light-mode 
 - [x] **1.2** Move `/growth` off this domain. 301 → `/`.
 - [x] **1.3** Create `src/config/pricing.ts` (Part 4); homepage + `/pricing` render from it. *Accept:* no hard-coded prices elsewhere.
 - [x] **1.4** Rename legacy fee labels → "Kalshi taker fee" everywhere. *Accept:* legacy taker fee label count = 0.
-- [ ] **1.5** Remove named-competitor "Fatal Flaw" cards; keep a neutral, sourced independence line.
+- [x] **1.5** Remove named-competitor "Fatal Flaw" cards; keep a neutral, sourced independence line.
 - [ ] **1.6** Strip internal language ("Acquisition Wedge," "Build Order #," "90-Day Plan," "Engineering Days Saved," "Customer Validation," "Sovereign Agent Deployment," "Study #6.4," "Rule B5/B10" labels) from public pages; replace with plain-English compliance footer.
 - [ ] **1.7** Sync-error banner only on actual failure.
 - [ ] **1.8** "Execution Desks" → "Market View."
