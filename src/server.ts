@@ -442,6 +442,7 @@ import {
   getConversionFunnel,
   getWeekOverWeekRetention,
   getRecentRawEvents,
+  getFounderPhase9Kpis,
 } from "./metrics.ts";
 
 runMigrations();
@@ -5610,6 +5611,16 @@ app.get("/api/admin/metrics", (req, res) => {
     conversionFunnel: getConversionFunnel(),
     cohortRetention: getWeekOverWeekRetention(),
     recentEvents: getRecentRawEvents(50),
+  });
+});
+
+app.get("/api/admin/founder-kpis", (req, res) => {
+  if (!checkAdminAuth(req)) {
+    return res.status(401).json({ error: "unauthorized", message: "Admin authentication required. Provide x-admin-key header or ?key= query parameter." });
+  }
+  res.json({
+    ok: true,
+    kpis: getFounderPhase9Kpis(),
   });
 });
 
