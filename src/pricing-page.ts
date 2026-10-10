@@ -15,6 +15,11 @@
 
 import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
 import { PRICING_PLANS, COACHING_ADDON, type PricingPlan } from "./config/pricing.ts";
+import {
+  renderPublicHeader,
+  renderPublicFooter,
+  PUBLIC_LAYOUT_CSS
+} from "./components/public-layout.ts";
 
 export function renderPricingPageHtml(userTier: string = "free"): string {
   const planCardsHtml = PRICING_PLANS.map((plan: PricingPlan) => {
@@ -379,26 +384,12 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
       line-height: 1.6;
     }
     .pricing-footer span { color: var(--accent); }
+    ${PUBLIC_LAYOUT_CSS}
   </style>
 </head>
 <body>
 
-  <nav class="top-nav" aria-label="Pricing Navigation">
-    <a href="/" class="nav-brand">
-      QUANTERRAOS
-      <span>/ PRICING</span>
-    </a>
-    <div class="nav-links">
-      <a href="/">Home</a>
-      <a href="/check">True-Cost Check</a>
-      <a href="/radar">Settlement Radar</a>
-      <a href="/deck">Flight Deck</a>
-      <a href="/proof">Proof</a>
-      <a href="/institutional">Institutional</a>
-      <a href="/pricing" class="active">Pricing</a>
-      <a href="/account" class="btn-account">Account / Login</a>
-    </div>
-  </nav>
+  ${renderPublicHeader({ activePath: "/pricing" })}
 
   <main class="container">
     <div class="hero-header">
@@ -433,18 +424,9 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
         </a>
       </div>
     </div>
-
-    <!-- Plain-English Compliance Footer -->
-    <footer class="pricing-footer">
-      <div>
-        QuanterraOS is an independent analytics platform by Quantara Global LLC. We do not place trades, hold custody of funds, or provide investment advice.
-      </div>
-      <div style="margin-top:4px;">
-        All figures computed from stored market data. Kalshi, Polymarket, CME CF BRTI, and other exchange trademarks belong to their respective owners.
-      </div>
-    </footer>
   </main>
 
+  ${renderPublicFooter()}
   ${ASSISTANT_WIDGET_HTML}
 </body>
 </html>`;

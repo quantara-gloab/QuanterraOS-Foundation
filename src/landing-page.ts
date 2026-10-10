@@ -3,6 +3,11 @@ import { getCouncilAgentsData } from "./agents/council-data.ts";
 import { renderSpecialistIcon, SPECIALIST_ICONS_CSS } from "./specialist-icons.ts";
 import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
 import { renderBetaFeedbackWidgetHtml } from "./feedback-widget.ts";
+import {
+  renderPublicHeader,
+  renderPublicFooter,
+  PUBLIC_LAYOUT_CSS
+} from "./components/public-layout.ts";
 
 /**
  * QuanterraOS Flagship — Elite Institutional Grade
@@ -74,6 +79,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+  ${PUBLIC_LAYOUT_CSS}
   :root {
     --bg: #06070A;
     --bg-elevated: #0C0E14;
@@ -1876,209 +1882,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     </div>
   </div>
 
-  <!-- Top Smart Mobile Gateway Banner for iPhone & Samsung Galaxy -->
-  <div class="mobile-app-top-strip" style="background:linear-gradient(90deg, rgba(0,242,254,0.1) 0%, rgba(223,184,67,0.12) 50%, rgba(0,242,254,0.1) 100%); border-bottom:1px solid rgba(0,242,254,0.25); padding:7px 16px; font-size:0.78rem; text-align:center; color:#E2E8F0; display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap;">
-    <span style="display:inline-flex; align-items:center; gap:6px;">
-      <span style="width:7px; height:7px; border-radius:50%; background:#00F2FE; box-shadow:0 0 8px #00F2FE;"></span>
-      <strong style="color:#FFF;">QuanterraOS Mobile App:</strong> Direct browser installation for Apple iPhone &amp; Samsung Galaxy.
-    </span>
-    <a href="/mobile" style="color:#00F2FE; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:4px; background:rgba(0,242,254,0.15); border:1px solid rgba(0,242,254,0.4); padding:3px 10px; border-radius:4px; font-family:var(--font-mono); font-size:0.74rem;">
-      Download for iPhone &amp; Samsung &rarr;
-    </a>
-  </div>
-
-  <!-- Streamlined Top Navigation Bar: Engines ▾ · Settlement ▾ · Research ▾ · Radar · CTAs -->
-  <nav class="top-nav">
-    <div class="nav-left">
-      <a href="/" class="nav-brand"><span class="brand-dot"></span> Quanterra<span style="color:var(--accent);">OS</span></a>
-
-      <div class="nav-links">
-        <!-- Dropdown 1: Engines -->
-        <div class="nav-dropdown">
-          <button class="nav-dropdown-btn" type="button" aria-haspopup="true">
-            <span>Engines</span>
-            <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-          </button>
-          <div class="nav-dropdown-menu">
-            <div class="menu-category-title">Execution &amp; Pricing Engines</div>
-            <div class="menu-item-row">
-              <span class="menu-item-icon" style="color:var(--champagne);">📡</span>
-              <div class="menu-item-content">
-                <a href="/scanner" class="menu-item-title-link" style="color:var(--champagne);">Live Discrepancy Scanner</a>
-                <span class="menu-item-desc">Polymarket vs Kalshi live spreads &amp; net fee deductions</span>
-              </div>
-            </div>
-            <div class="menu-item-row">
-              <span class="menu-item-icon" style="color:#38BDF8;">📊</span>
-              <div class="menu-item-content">
-                <a href="/matrix" class="menu-item-title-link">Pricing Matrix</a>
-                <span class="menu-item-desc">Cross-strike liquidity wall &amp; depth matrix</span>
-              </div>
-            </div>
-            <div class="menu-item-row">
-              <span class="menu-item-icon" style="color:#F59E0B;">⚡</span>
-              <div class="menu-item-content">
-                <a href="/corridors" class="menu-item-title-link">Corridors</a>
-                <span class="menu-item-desc">Multi-strike binary corridor &amp; vertical spreads</span>
-              </div>
-            </div>
-            <div class="menu-item-row">
-              <span class="menu-item-icon" style="color:#A78BFA;">🌊</span>
-              <div class="menu-item-content">
-                <a href="/flow" class="menu-item-title-link">Flow &amp; Depth</a>
-                <span class="menu-item-desc">Real-time order flow imbalances &amp; whale activity</span>
-              </div>
-            </div>
-            <div class="menu-item-row">
-              <span class="menu-item-icon" style="color:#10B981;">🧪</span>
-              <div class="menu-item-content">
-                <a href="/paper" class="menu-item-title-link" style="color:#10B981;">Paper Mode</a>
-                <span class="menu-item-desc">Latency-simulated execution testbed ($10k sandbox)</span>
-              </div>
-            </div>
-            <div class="menu-item-row">
-              <span class="menu-item-icon" style="color:var(--accent);">🧮</span>
-              <div class="menu-item-content">
-                <a href="/calculator" class="menu-item-title-link">Check</a>
-                <span class="menu-item-desc">Non-linear taker fee &amp; true breakeven calculator</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Dropdown 2: Settlement Truth -->
-        <div class="nav-dropdown">
-          <button class="nav-dropdown-btn" type="button" aria-haspopup="true">
-            <span>Settlement Truth</span>
-            <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-          </button>
-          <div class="nav-dropdown-menu">
-            <div class="menu-category-title">Settlement Verification</div>
-            <div class="menu-item-row">
-              <span class="menu-item-icon" style="color:#10B981;">🎯</span>
-              <div class="menu-item-content">
-                <a href="/radar" class="menu-item-title-link">60s Expiry Radar</a>
-                <span class="menu-item-desc">CME CF BRTI final TWAP window &amp; constituent ticks</span>
-              </div>
-            </div>
-            <div class="menu-item-row">
-              <span class="menu-item-icon" style="color:var(--champagne);">📜</span>
-              <div class="menu-item-content">
-                <a href="/settlement" class="menu-item-title-link">Tape Reconstruction</a>
-                <span class="menu-item-desc">Constituent second-by-second weights &amp; post-mortems</span>
-              </div>
-            </div>
-            <div class="menu-item-row">
-              <span class="menu-item-icon" style="color:#F43F5E;">⚠️</span>
-              <div class="menu-item-content">
-                <a href="/radar#danger" class="menu-item-title-link" style="color:#FDA4AF;">Settlement Danger Zone</a>
-                <span class="menu-item-desc">ATM strike proximity &amp; expiry pinning hazard</span>
-              </div>
-            </div>
-            <div class="menu-item-row">
-              <span class="menu-item-icon" style="color:#F59E0B;">🛡️</span>
-              <div class="menu-item-content">
-                <a href="/resolution-risk" class="menu-item-title-link" style="color:#FBBF24;">Anti-Dispute AI</a>
-                <span class="menu-item-desc">UMA oracle dispute probabilities &amp; rulebook hazards</span>
-              </div>
-            </div>
-            <div class="menu-item-row">
-              <span class="menu-item-icon" style="color:#38BDF8;">⚖️</span>
-              <div class="menu-item-content">
-                <a href="/compare" class="menu-item-title-link">Cross-Venue Divergence</a>
-                <span class="menu-item-desc">Kalshi vs Polymarket fee-adjusted spread auditor</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Dropdown 3: Research & Verification -->
-        <div class="nav-dropdown">
-          <button class="nav-dropdown-btn" type="button" aria-haspopup="true">
-            <span>Research &amp; Records</span>
-            <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-          </button>
-          <div class="nav-dropdown-menu">
-            <div class="menu-category-title">Empirical Evidence &amp; Tools</div>
-            <div class="menu-item-row">
-              <span class="menu-item-icon" style="color:var(--champagne);">📊</span>
-              <div class="menu-item-content">
-                <a href="/track-record" class="menu-item-title-link" style="color:var(--champagne);">1,316 Settled Ledger</a>
-                <span class="menu-item-desc">Cryptographic SHA-256 settlement track record</span>
-              </div>
-            </div>
-            <div class="menu-item-row">
-              <span class="menu-item-icon" style="color:#A78BFA;">📈</span>
-              <div class="menu-item-content">
-                <a href="/calibration/explorer" class="menu-item-title-link">Murphy Calibration</a>
-                <span class="menu-item-desc">Brier score decomposition (0.2001 market baseline)</span>
-              </div>
-            </div>
-            <div class="menu-item-row">
-              <span class="menu-item-icon" style="color:#10B981;">📓</span>
-              <div class="menu-item-content">
-                <a href="/journal" class="menu-item-title-link">Journal</a>
-                <span class="menu-item-desc">Systematic trade logger &amp; broker reconciliation</span>
-              </div>
-            </div>
-            <div class="menu-item-row">
-              <span class="menu-item-icon" style="color:#38BDF8;">🔬</span>
-              <div class="menu-item-content">
-                <a href="/study" class="menu-item-title-link">Calibration Study</a>
-                <span class="menu-item-desc">Prospective cost awareness cohort evaluation</span>
-              </div>
-            </div>
-            <div class="menu-item-row">
-              <span class="menu-item-icon" style="color:#FBBF24;">🎓</span>
-              <div class="menu-item-content">
-                <a href="/learn" class="menu-item-title-link">Learn</a>
-                <span class="menu-item-desc">Prediction market math, fee drag &amp; calibration guides</span>
-              </div>
-            </div>
-            <div class="menu-item-row">
-              <span class="menu-item-icon" style="color:#64748B;">📄</span>
-              <div class="menu-item-content">
-                <a href="/research" class="menu-item-title-link">Research</a>
-                <span class="menu-item-desc">Empirical market microstructure whitepapers</span>
-              </div>
-            </div>
-            <div class="menu-item-row">
-              <span class="menu-item-icon" style="color:#10B981;">🤖</span>
-              <div class="menu-item-content">
-                <a href="/mcp" class="menu-item-title-link">MCP Agent API</a>
-                <span class="menu-item-desc">Model Context Protocol endpoint for LLM &amp; Python bots</span>
-              </div>
-            </div>
-            <div class="menu-item-row">
-              <span class="menu-item-icon" style="color:#34D399;">🏛️</span>
-              <div class="menu-item-content">
-                <a href="/access" class="menu-item-title-link">Institutional</a>
-                <span class="menu-item-desc">Dedicated enterprise deployment &amp; bridge API</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Center Pill: Settlement Radar -->
-        <a href="/radar" class="nav-radar-pill" title="Live CME CF BRTI Expiry Radar">
-          <span class="nav-radar-dot"></span>
-          <span>Settlement Radar</span>
-        </a>
-      </div>
-    </div>
-
-    <!-- Right Header Controls: Mobile App · Sign in · Launch Terminal CTA -->
-    <div class="nav-right" style="display:flex; gap:12px; align-items:center;">
-      <a href="/mobile" class="nav-pill-mobile-app" style="display:inline-flex; align-items:center; gap:6px; background:rgba(0, 242, 254, 0.12); border:1px solid rgba(0, 242, 254, 0.35); color:#00F2FE; padding:6px 13px; border-radius:6px; font-size:0.8rem; font-weight:700; text-decoration:none; transition:all 0.15s;" title="Direct Install for Apple iPhone &amp; Samsung Galaxy">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-        <span>📱 iPhone &amp; Samsung App</span>
-      </a>
-      <a href="/calculator" class="nav-link-subtle" style="font-weight:600; color:var(--text-dim);" title="Audit Contract Friction">Check Friction</a>
-      <a href="/access" class="nav-link-subtle" style="font-weight:600;">Sign in</a>
-      <a href="/account?flow=sign-up" class="nav-link-subtle" style="color:var(--champagne); font-weight:700;">Sign up</a>
-      <a href="/scanner" class="nav-cta" style="background:linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%); color:#07080B; border:1px solid rgba(255,248,220,0.8); box-shadow:0 4px 16px rgba(212,175,55,0.4), inset 0 1px 0 #FFF; font-weight:800;">LAUNCH TERMINAL &rarr;</a>
-    </div>
-  </nav>
+  ${renderPublicHeader({ activePath: "/" })}
 
   <div class="page-wrap">
 
@@ -3726,94 +3530,7 @@ ${miniCircles}
       </div>
     </div>
 
-    <!-- 4-Column Structured Institutional Footer -->
-    <footer class="page-footer">
-      <div class="footer-columns-grid">
-        <!-- Col 1: Terminal Engines -->
-        <div class="footer-col">
-          <div class="footer-col-title">
-            <span>⚡</span> Terminal Engines
-          </div>
-          <div class="footer-col-links">
-            <a href="/calculator" class="footer-col-link">Taker Friction Calculator</a>
-            <a href="/paper" class="footer-col-link">Realistic Paper Mode</a>
-            <a href="/scanner" class="footer-col-link">Live Discrepancy Scanner</a>
-            <a href="/matrix" class="footer-col-link">Liquidity Depth Matrix</a>
-            <a href="/flow" class="footer-col-link">Order Flow &amp; Tension</a>
-            <a href="/corridors" class="footer-col-link">Binary Corridors Engine</a>
-            <a href="/mobile" class="footer-col-link">iPhone &amp; Samsung Mobile App</a>
-            <a href="/widgets" class="footer-col-link">Widget Embed Catalog</a>
-          </div>
-        </div>
-
-        <!-- Col 2: Settlement & Microstructure -->
-        <div class="footer-col">
-          <div class="footer-col-title">
-            <span>🎯</span> Settlement Truth
-          </div>
-          <div class="footer-col-links">
-            <a href="/radar" class="footer-col-link">60s Expiry Radar</a>
-            <a href="/settlement" class="footer-col-link">Tape Reconstruction</a>
-            <a href="/resolution-risk" class="footer-col-link">Anti-Dispute AI Guardian</a>
-            <a href="/radar/audio" class="footer-col-link">Microstructure Sonification</a>
-            <a href="/divergence" class="footer-col-link">Cross-Venue Divergence</a>
-            <a href="/compare" class="footer-col-link">Venue Comparison Terminal</a>
-            <a href="/index" class="footer-col-link">Composite Index Proxy</a>
-            <a href="/spread" class="footer-col-link">Cross-Venue Spread Monitor</a>
-          </div>
-        </div>
-
-        <!-- Col 3: Data Provenance & Research -->
-        <div class="footer-col">
-          <div class="footer-col-title">
-            <span>🔬</span> Provenance &amp; Data
-          </div>
-          <div class="footer-col-links">
-            <a href="/track-record" class="footer-col-link">1,316-Window Settlement Ledger</a>
-            <a href="/study" class="footer-col-link">Calibration Study Portal</a>
-            <a href="/calibration" class="footer-col-link">Calibration Explorer</a>
-            <a href="/calibration/explorer" class="footer-col-link">Murphy Decomposition</a>
-            <a href="/datasets" class="footer-col-link">Open Datasets Hub (19,740 rows)</a>
-            <a href="/journal" class="footer-col-link">Systematic Decision Journal</a>
-            <a href="/learn" class="footer-col-link">Market Math &amp; Bias Guides</a>
-            <a href="/research" class="footer-col-link">Empirical Whitepapers</a>
-            <a href="/methodology" class="footer-col-link">Research Methodology</a>
-            <a href="/status" class="footer-col-link">System Status (11 Services)</a>
-            <a href="/changelog" class="footer-col-link">Release Changelog (v0.8.0)</a>
-          </div>
-        </div>
-
-        <!-- Col 4: Legal & Institutional -->
-        <div class="footer-col">
-          <div class="footer-col-title">
-            <span>🏛️</span> Institutional &amp; Legal
-          </div>
-          <div class="footer-col-links">
-            <a href="/trustos" class="footer-col-link">TrustOS Model Governance</a>
-            <a href="/why" class="footer-col-link">Why QuanterraOS vs Competitors (/vs)</a>
-            <a href="/mcp" class="footer-col-link">Model Context Protocol (MCP API)</a>
-            <a href="/educators" class="footer-col-link">Distribution &amp; Partner Portal</a>
-            <a href="/access" class="footer-col-link">Institutional Desk Access</a>
-            <a href="/transparency" class="footer-col-link">Transparency &amp; Referee Charter</a>
-            <a href="/deck" class="footer-col-link">Flight Deck Terminal</a>
-            <a href="/predictions" class="footer-col-link">Predictions Ledger Replay</a>
-            <a href="/autopilot" class="footer-col-link">Autopilot Simulation</a>
-            <a href="/legal" class="footer-col-link">Legal Notices &amp; Terms</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Plain-English Regulatory & Safety Compliance Footer -->
-      <div class="footer-regulatory-box">
-        <p style="margin-bottom: 8px;">
-          QuanterraOS is an independent analytics tool by Quantara Global LLC. We don't place trades, hold funds, or give investment advice. Calculations use public data and published fee schedules and may be delayed or wrong — verify with your exchange.
-        </p>
-        <p>
-          Prediction-market trading can lose money. 18+. Zero live capital deployed ($0.00 exposure). Kalshi, Polymarket, CME Group, CF Benchmarks (CME CF BRTI), and other names are trademarks of their owners; we're not affiliated with them. <a href="/legal">Full Legal Notices &amp; Terms &rarr;</a>
-        </p>
-      </div>
-    </footer>
-
+    ${renderPublicFooter()}
   </div>
 
 <script>

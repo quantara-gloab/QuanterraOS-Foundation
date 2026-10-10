@@ -34,6 +34,11 @@ import {
   getBrtiDisplayMetadata,
   type BrtiLicensingMetadata
 } from "./config/licensing.ts";
+import {
+  renderPublicHeader,
+  renderPublicFooter,
+  PUBLIC_LAYOUT_CSS
+} from "./components/public-layout.ts";
 
 export type ExpiryWindowPhase =
   | "NORMAL_TRADING"
@@ -1278,35 +1283,11 @@ export function renderExpiryRadarPageHtml(
       padding: 2rem 1.5rem;
       color: var(--text-muted);
       font-size: 0.8rem;
-      text-align: center;
-    }
+    ${PUBLIC_LAYOUT_CSS}
   </style>
 </head>
 <body>
-  <header class="site-nav">
-    <div class="brand-area">
-      <div class="brand-logo">&Sigma;</div>
-      <div class="brand-title">QUANTERRA<span>OS</span></div>
-    </div>
-    <nav class="nav-links">
-      <a href="/">Overview</a>
-      <a href="/radar" class="active">Expiry Radar</a>
-      <a href="/calculator">True-Cost Calculator</a>
-      <a href="/paper">Paper Mode</a>
-      <a href="/compare">Forecast Comparison</a>
-      <a href="/corridors">Corridors</a>
-      <a href="/divergence">Cross-Venue Divergence</a>
-      <a href="/flow">Order Flow</a>
-      <a href="/matrix">Depth Matrix</a>
-      <a href="/calibration/explorer">Decomposition</a>
-      <a href="/settlement">Settlement Dissection</a>
-      <a href="/schedule">Schedule</a>
-      <a href="/radar/audio">Audio Telemetry</a>
-      <a href="/webhooks">Webhooks</a>
-      <a href="/calibration">Calibration Proof</a>
-      <a href="/account">Account</a>
-    </nav>
-  </header>
+  ${renderPublicHeader({ activePath: "/radar", user })}
 
   <main class="container">
     <div class="radar-hero">
@@ -1577,12 +1558,7 @@ export function renderExpiryRadarPageHtml(
     </div>
   </main>
 
-  <footer class="site-footer">
-    <p>QuanterraOS &bull; Independent Truth Layer for BTC Prediction Markets. Rule B5: $0.00 Live Capital Deployed.</p>
-    <p style="margin-top:0.4rem;font-size:0.75rem;">
-      Attribution: CME CF Bitcoin Real-Time Index (BRTI) is a registered trademark of CME Group and CF Benchmarks. Kalshi is a registered mark of Kalshi Inc. QuanterraOS is not affiliated with, endorsed by, or sponsored by these entities.
-    </p>
-  </footer>
+  ${renderPublicFooter()}
 
   <!-- Embed Radar Widget Modal -->
   <div id="embed-radar-modal" class="modal-backdrop" onclick="if(event.target===this) closeEmbedRadarModal()">

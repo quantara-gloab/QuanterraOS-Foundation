@@ -8,6 +8,11 @@
 import Database from "better-sqlite3";
 import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
 import { getSettlementReconciliationStatus } from "./settlement-reconciler.ts";
+import {
+  renderPublicHeader,
+  renderPublicFooter,
+  PUBLIC_LAYOUT_CSS
+} from "./components/public-layout.ts";
 
 export interface SystemStatusData {
   status: "OPERATIONAL" | "DEGRADED";
@@ -522,10 +527,12 @@ export function renderStatusPageHtml(dbPath = process.env.DB_PATH || "quanterrao
     .badge-active { background: rgba(223, 184, 67, 0.14); color: var(--accent-light); border: 1px solid rgba(223, 184, 67, 0.4); box-shadow: 0 0 10px rgba(223, 184, 67, 0.18); }
     .badge-scheduled { background: rgba(232, 234, 237, 0.08); color: var(--text); border: 1px solid var(--border); }
     .badge-locked { background: rgba(244, 63, 94, 0.12); color: var(--warning); border: 1px solid rgba(244, 63, 94, 0.35); box-shadow: 0 0 10px rgba(244, 63, 94, 0.15); }
-    footer { border-top: 1px solid var(--border); padding-top: 1.8rem; margin-top: 2.5rem; color: var(--text-muted); font-size: 0.78rem; text-align: left; font-family: var(--font-mono); }
+    ${PUBLIC_LAYOUT_CSS}
   </style>
 </head>
 <body>
+
+  ${renderPublicHeader({ activePath: "/status" })}
 
   <!-- Top Live Telemetry Ticker -->
   <div class="live-ticker-strip">
@@ -541,39 +548,6 @@ export function renderStatusPageHtml(dbPath = process.env.DB_PATH || "quanterrao
       <span class="ticker-item">SAFETY GATE: ${data.capitalLock.rule} LOCKED (${data.capitalLock.exposure})</span>
     </div>
   </div>
-
-  <!-- Navigation -->
-  <nav class="top-nav">
-    <div class="nav-left">
-      <a href="/" class="nav-brand-container">
-        <div class="nav-brand-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-            <polyline points="2 17 12 22 22 17"></polyline>
-            <polyline points="2 12 12 17 22 12"></polyline>
-          </svg>
-        </div>
-        <div class="nav-brand-text">
-          <span class="nav-brand-title">QUANTERRA // OS</span>
-          <span class="nav-brand-sub">INSTITUTIONAL QUANTITATIVE CORE</span>
-        </div>
-      </a>
-      <div class="nav-links">
-        <a href="/calculator">Calculator</a>
-        <a href="/compare">Compare Venues</a>
-        <a href="/journal">Journal</a>
-        <a href="/calibration">Calibration</a>
-        <a href="/council">Council Terminal</a>
-        <a href="/index">Composite Index</a>
-        <a href="/spread">Spread Monitor</a>
-        <a href="/status" class="active">System Status</a>
-        <a href="/research">Research</a>
-      </div>
-    </div>
-    <div class="nav-right">
-      <a href="/council" class="btn-outline">Launch Terminal →</a>
-    </div>
-  </nav>
 
   <div class="container">
     <main>
@@ -738,12 +712,9 @@ export function renderStatusPageHtml(dbPath = process.env.DB_PATH || "quanterrao
           Notice: Regional edge nodes operate high-frequency exchange telemetry and timestamp synchronization for CME CF BRTI and global spot venues. QuanterraOS does not operate physical corporate trading offices.
         </div>
       </div>
-    </main>
-
-    <footer>
-      QuanterraOS Ingestion Status · Auditable empirical benchmarks · Rule B5 locked · Zero live capital deployed ($0.00).
-    </footer>
+    </div>
   </div>
+  ${renderPublicFooter()}
 ${ASSISTANT_WIDGET_HTML}
 </body>
 </html>`;
