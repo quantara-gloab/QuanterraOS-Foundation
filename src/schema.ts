@@ -376,12 +376,14 @@ export const predictions = sqliteTable(
     settledAt: text("settled_at"),
     isReplay: integer("is_replay").notNull().default(0),
     notes: text("notes"),
+    checkpointMinute: integer("checkpoint_minute"),
   },
   (table) => ({
     marketIdx: index("predictions_market_id_idx").on(table.marketId),
     statusIdx: index("predictions_status_idx").on(table.status),
     isReplayIdx: index("predictions_is_replay_idx").on(table.isReplay),
     timestampIdx: index("predictions_timestamp_idx").on(table.timestamp),
+    marketCheckpointIdx: index("predictions_market_checkpoint_idx").on(table.marketId, table.checkpointMinute),
   }),
 );
 

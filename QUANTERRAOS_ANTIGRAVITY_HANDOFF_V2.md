@@ -275,7 +275,7 @@ Tokens on `:root`, dark only for deck; public site dark-default with light-mode 
 - [x] **2.1** Settlement reconciler; backfill all `PENDING` rows for closed markets. *Accept:* closed >30 min = 100% settled.
 - [x] **2.2** Reject placeholder tickers (`*-CURRENT`) at write.
 - [x] **2.3** Paper entries require real ask price; no $0.00 buys.
-- [ ] **2.4** One prediction per market per checkpoint (min 4/7/10/13).
+- [x] **2.4** One prediction per market per checkpoint (min 4/7/10/13).
 - [ ] **2.5** `src/lib/fees.ts` with tests (Part 3.1).
 - [ ] **2.6** `/status` shows feed freshness, reconciler lag, uptime.
 - [ ] **2.7** Verify BRTI display licensing; if not licensed, display "settlement-index proxy" from constituent exchanges with methodology note.

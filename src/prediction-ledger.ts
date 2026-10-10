@@ -20,6 +20,29 @@ import { db } from "./db.ts";
 import { predictions } from "./schema.ts";
 import { eq, desc, and } from "drizzle-orm";
 import { buildMarketsFromCsvText } from "./market-price-calibration.ts";
+import { parseMarketCloseTime } from "./settlement-reconciler.ts";
+
+export const CANONICAL_CHECKPOINTS = [4, 7, 10, 13] as const;
+export type CanonicalCheckpoint = (typeof CANONICAL_CHECKPOINTS)[number];
+
+export function deriveCheckpointMinute(marketId: string, timestampIso?: string): CanonicalCheckpoint | null {
+  try {
+    const ts = timestampIso ? Date.parse(timestampIso) : Date.now();
+    const closeTime = parseMarketCloseTime(marketId, timestampIso);
+    const openTime = closeTime - 15 * 60 * 1000;
+    if (isNaN(ts) || isNaN(closeTime) || ts < openTime || ts > closeTime) {
+      return null;
+    }
+    const elapsedMinutes = Math.floor((ts - openTime) / 60000);
+    if (elapsedMinutes >= 4 && elapsedMinutes < 7) return 4;
+    if (elapsedMinutes >= 7 && elapsedMinutes < 10) return 7;
+    if (elapsedMinutes >= 10 && elapsedMinutes < 13) return 10;
+    if (elapsedMinutes >= 13 && elapsedMinutes <= 15) return 13;
+    return null;
+  } catch {
+    return null;
+  }
+}
 
 export interface PredictionRecord {
   id: string;
@@ -33,6 +56,7 @@ export interface PredictionRecord {
   settledAt: string | null;
   isReplay: number;
   notes: string | null;
+  checkpointMinute?: number | null;
 }
 
 export interface PredictionLedgerSummary {
@@ -56,6 +80,7 @@ export function recordPrediction(input: {
   id?: string;
   isReplay?: boolean;
   notes?: string;
+  checkpointMinute?: number | null;
 }): PredictionRecord {
   if (!input.marketId || typeof input.marketId !== "string" || input.marketId.toUpperCase().endsWith("-CURRENT")) {
     throw new Error(
@@ -66,6 +91,30 @@ export function recordPrediction(input: {
   const prob = Math.min(0.9999, Math.max(0.0001, input.predictedProb));
   const recordId = input.id ?? `pred_${randomUUID().slice(0, 12)}`;
   const now = input.timestamp ?? new Date().toISOString();
+
+  // One prediction per market per checkpoint (min 4/7/10/13) enforcement
+  const checkpoint = input.checkpointMinute !== undefined
+    ? input.checkpointMinute
+    : deriveCheckpointMinute(input.marketId, now);
+
+  if (checkpoint !== null && [4, 7, 10, 13].includes(checkpoint)) {
+    const existingAtCheckpoint = db
+      .select()
+      .from(predictions)
+      .where(
+        and(
+          eq(predictions.marketId, input.marketId),
+          eq(predictions.checkpointMinute, checkpoint)
+        )
+      )
+      .get();
+
+    if (existingAtCheckpoint) {
+      throw new Error(
+        `Duplicate prediction violation: Market ${input.marketId} already has a prediction recorded for checkpoint minute ${checkpoint}. Exactly one prediction per market per checkpoint (min 4/7/10/13) is permitted.`
+      );
+    }
+  }
 
   // Ensure immutability: check if ID exists
   const existing = db
@@ -92,6 +141,7 @@ export function recordPrediction(input: {
     settledAt: null,
     isReplay: input.isReplay ? 1 : 0,
     notes: input.notes ?? null,
+    checkpointMinute: checkpoint ?? null,
   };
 
   db.insert(predictions).values(row).run();
@@ -108,6 +158,7 @@ export function recordPrediction(input: {
     settledAt: null,
     isReplay: input.isReplay ? 1 : 0,
     notes: row.notes ?? null,
+    checkpointMinute: row.checkpointMinute ?? null,
   };
 }
 

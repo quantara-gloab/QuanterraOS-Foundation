@@ -53,6 +53,7 @@ export function runMigrations(): void {
     "0025_statement_import_and_reconciliation.sql",
     "0026_beta_attribution_support_and_drills.sql",
     "0027_risk_plan_advisory_controls.sql",
+    "0028_predictions_checkpoint_minute.sql",
   ]) {
     const migrationPath = path.join(migrationsDir, migration);
     if (migration === "0006_multi_asset.sql") {
@@ -213,6 +214,14 @@ export function runMigrations(): void {
       if (!journalCols.some((col) => col.name === "cooling_off_until")) {
         sqlite.exec("ALTER TABLE user_decision_journal ADD COLUMN cooling_off_until TEXT");
       }
+      continue;
+    }
+    if (migration === "0028_predictions_checkpoint_minute.sql") {
+      const predCols = sqlite.prepare("PRAGMA table_info(predictions)").all() as Array<{ name: string }>;
+      if (!predCols.some((col) => col.name === "checkpoint_minute")) {
+        sqlite.exec("ALTER TABLE predictions ADD COLUMN checkpoint_minute INTEGER");
+      }
+      sqlite.exec("CREATE INDEX IF NOT EXISTS predictions_market_checkpoint_idx ON predictions(market_id, checkpoint_minute)");
       continue;
     }
     sqlite.exec(readFileSync(migrationPath, "utf-8"));
