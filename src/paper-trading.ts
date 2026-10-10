@@ -157,29 +157,38 @@ export function suggestPaperTrade(input: PaperTradeInput): {
   const p = Math.min(0.999, Math.max(0.001, input.modelProbability));
   const edges = computeEdges(p, input.market);
 
-  if (edges.yesEdge > threshold && edges.yesEdge >= edges.noEdge) {
+  const yesAsk = input.market?.yesAsk;
+  const noAsk = input.market?.noAsk;
+  const hasRealYesAsk = typeof yesAsk === "number" && !isNaN(yesAsk) && yesAsk >= 0.01 && yesAsk <= 0.99;
+  const hasRealNoAsk = typeof noAsk === "number" && !isNaN(noAsk) && noAsk >= 0.01 && noAsk <= 0.99;
+
+  if (hasRealYesAsk && edges.yesEdge > threshold && edges.yesEdge >= edges.noEdge) {
     return {
       decision: "buy",
       side: "yes",
       edge: Number(edges.yesEdge.toFixed(6)),
-      entryPrice: Number(input.market.yesAsk.toFixed(6)),
+      entryPrice: Number(yesAsk.toFixed(6)),
       breakevenProbability: Number(edges.yesBreakeven.toFixed(6)),
       feeEstimate: Number(edges.yesFee.toFixed(6)),
       rationale: `YES edge ${Number(edges.yesEdge.toFixed(4))} clears threshold ${threshold} (P=${p.toFixed(4)} vs breakeven ${edges.yesBreakeven.toFixed(4)}).`,
     };
   }
 
-  if (edges.noEdge > threshold) {
+  if (hasRealNoAsk && edges.noEdge > threshold) {
     return {
       decision: "buy",
       side: "no",
       edge: Number(edges.noEdge.toFixed(6)),
-      entryPrice: Number(input.market.noAsk.toFixed(6)),
+      entryPrice: Number(noAsk.toFixed(6)),
       breakevenProbability: Number(edges.noBreakeven.toFixed(6)),
       feeEstimate: Number(edges.noFee.toFixed(6)),
       rationale: `NO edge ${Number(edges.noEdge.toFixed(4))} clears threshold ${threshold} (P=${p.toFixed(4)} vs breakeven ${edges.noBreakeven.toFixed(4)}).`,
     };
   }
+
+  const unquotedNotice = (!hasRealYesAsk && edges.yesEdge > threshold) || (!hasRealNoAsk && edges.noEdge > threshold)
+    ? " Real ask price required ($0.01 - $0.99); unquoted or $0.00 ask rejected."
+    : "";
 
   return {
     decision: "skip",
@@ -188,7 +197,7 @@ export function suggestPaperTrade(input: PaperTradeInput): {
     entryPrice: null,
     breakevenProbability: Math.min(edges.yesBreakeven, edges.noBreakeven),
     feeEstimate: edges.yesEdge >= edges.noEdge ? edges.yesFee : edges.noFee,
-    rationale: `No edge clears threshold ${threshold} (YES edge ${Number(edges.yesEdge.toFixed(4))}, NO edge ${Number(edges.noEdge.toFixed(4))}). Skipped.`,
+    rationale: `No edge clears threshold ${threshold} (YES edge ${Number(edges.yesEdge.toFixed(4))}, NO edge ${Number(edges.noEdge.toFixed(4))}).${unquotedNotice} Skipped.`,
   };
 }
 
@@ -209,6 +218,12 @@ export function buildPaperTradeRow(
     marketQuote: input.market,
     edgeThreshold: input.edgeThreshold ?? DEFAULT_EDGE_THRESHOLD,
   };
+
+  if (decision.decision === "buy" && (decision.entryPrice === null || decision.entryPrice <= 0 || isNaN(decision.entryPrice))) {
+    throw new Error(
+      "Paper trade violation: Real ask price required for buy decision ($0.01 - $0.99). $0.00 buys are strictly prohibited."
+    );
+  }
 
   return {
     id: generateId(),

@@ -102,6 +102,9 @@ export function simulateRealisticPaperOrder(
   const targetLevels = isBuyYes ? book.asks : book.bids;
   const bestQuote = targetLevels[0]?.priceCents ?? (isBuyYes ? 53 : 47);
   const requestedPrice = request.limitPriceCents ?? bestQuote;
+  if (requestedPrice <= 0 || requestedPrice >= 100 || isNaN(requestedPrice)) {
+    throw new Error("Real ask price required for paper order execution (1¢ - 99¢). $0.00 buys are strictly prohibited.");
+  }
 
   // 1. Voluntary Risk Plan Advisory Audit
   const estimatedCost = (request.contracts * requestedPrice) / 100;

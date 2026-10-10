@@ -94,6 +94,12 @@ export function executeAutopilotPaperStep(input: {
     edgeThreshold: input.edgeThreshold ?? 0.02,
   });
 
+  if (decision.decision === "buy" && (decision.entryPrice === null || decision.entryPrice <= 0 || isNaN(decision.entryPrice))) {
+    throw new Error(
+      "Autopilot paper trade violation: Real ask price required for buy decision ($0.01 - $0.99). $0.00 buys are strictly prohibited."
+    );
+  }
+
   const id = `pt_${randomUUID().slice(0, 12)}`;
   const now = new Date().toISOString();
 
