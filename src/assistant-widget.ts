@@ -19,32 +19,32 @@ export const ASSISTANT_WIDGET_HTML = `
 <!-- QuanterraOS Virtual Desk Assistant Widget -->
 <div id="qos-assistant-root">
   <!-- Floating Launcher Bubble (Bottom-Right) -->
-  <button id="qos-assistant-bubble" aria-label="Open Aria Desk Assistant" aria-expanded="false" aria-controls="qos-assistant-drawer" title="Aria · QuanterraOS Executive Concierge">
+  <button id="qos-assistant-bubble" aria-label="Open Aria AI Flight Crew Assistant" aria-expanded="false" aria-controls="qos-assistant-drawer" title="Aria · Spacecraft Council AI Flight Crew">
     <div class="qos-bubble-inner">
       <div class="qos-pulse-ring"></div>
       <div class="qos-bubble-avatar-wrap">
-        <img src="/assets/assistant-avatar.jpg" alt="Aria" class="qos-bubble-avatar" />
+        <img src="/assets/assistant-avatar.jpg" alt="Aria AI Flight Crew" class="qos-bubble-avatar" />
         <span class="qos-bubble-online-badge" aria-hidden="true"></span>
       </div>
       <div class="qos-bubble-text">
         <span class="qos-bubble-name">Aria</span>
-        <span class="qos-bubble-role">Concierge</span>
+        <span class="qos-bubble-role">AI Flight Crew</span>
       </div>
     </div>
   </button>
 
   <!-- Assistant Pop-up Window -->
-  <div id="qos-assistant-drawer" class="qos-drawer-hidden" role="dialog" aria-label="Customer Support and Assistant">
+  <div id="qos-assistant-drawer" class="qos-drawer-hidden" role="dialog" aria-label="Customer Support and AI Flight Crew Assistant">
     <!-- Header -->
     <div class="qos-drawer-header">
       <div class="qos-header-left">
         <div class="qos-header-avatar">
-          <img src="/assets/assistant-avatar.jpg" alt="Aria" class="qos-avatar-photo" />
+          <img src="/assets/assistant-avatar.jpg" alt="Aria AI Flight Crew" class="qos-avatar-photo" />
           <span class="qos-avatar-pulse"></span>
         </div>
         <div>
-          <div class="qos-header-title">Aria <span class="qos-title-badge">Concierge</span></div>
-          <div class="qos-header-sub">Online · Market Specialist 24/7</div>
+          <div class="qos-header-title">Aria <span class="qos-title-badge">AI Flight Crew</span></div>
+          <div class="qos-header-sub">Spacecraft Council · Telemetry &amp; Decision Guide</div>
         </div>
       </div>
       <div class="qos-header-actions">
@@ -55,15 +55,15 @@ export const ASSISTANT_WIDGET_HTML = `
       </div>
     </div>
 
-    <!-- Official Contact Banner (verified channels only) -->
+    <!-- Official Contact Banner (verified channels with 1-800 toll-free phone) -->
     <div class="qos-contact-strip">
+      <div class="qos-contact-item">
+        <span class="qos-contact-lbl">LIVE 1-800:</span>
+        <a href="tel:18007826837" class="qos-contact-val" style="color:#DFB843; font-weight:700;">1-800-782-6837</a>
+      </div>
       <div class="qos-contact-item">
         <span class="qos-contact-lbl">SUPPORT:</span>
         <a href="mailto:support@quanterraos.com" class="qos-contact-val">support@quanterraos.com</a>
-      </div>
-      <div class="qos-contact-item">
-        <span class="qos-contact-lbl">COMPLIANCE:</span>
-        <a href="mailto:compliance@quanterraos.com" class="qos-contact-val">compliance@quanterraos.com</a>
       </div>
     </div>
 
@@ -71,26 +71,26 @@ export const ASSISTANT_WIDGET_HTML = `
     <div id="qos-chat-messages" class="qos-messages-container" aria-live="polite">
       <!-- Aria Welcome Hero Card -->
       <div class="qos-aria-hero-card">
-        <img src="/assets/assistant-avatar.jpg" alt="Aria" class="qos-hero-img" />
+        <img src="/assets/assistant-avatar.jpg" alt="Aria AI Flight Crew" class="qos-hero-img" />
         <div class="qos-hero-body">
-          <div class="qos-hero-name">Aria <span class="qos-hero-verified">✓ Concierge</span></div>
-          <div class="qos-hero-tagline">Executive Concierge &amp; Risk Guide</div>
-          <div class="qos-hero-desc">Ask me to explain contract costs, save your check to your journal, or locate your records.</div>
+          <div class="qos-hero-name">Aria <span class="qos-hero-verified">✓ AI Flight Crew</span></div>
+          <div class="qos-hero-tagline">Spacecraft Council AI Flight Officer &amp; Receipt Guide</div>
+          <div class="qos-hero-desc">Ask me to explain contract costs, verify settlement rules, or connect with our live 1-800 assistant team.</div>
         </div>
       </div>
 
       <!-- Initial greeting -->
       <div class="qos-msg qos-msg-assistant">
-        <img src="/assets/assistant-avatar.jpg" alt="Aria" class="qos-msg-avatar" />
+        <img src="/assets/assistant-avatar.jpg" alt="Aria AI Flight Crew" class="qos-msg-avatar" />
         <div class="qos-msg-content">
           <div class="qos-msg-bubble">
-Hello! I am <strong>Aria</strong>, your QuanterraOS executive concierge.
+Greetings, Pilot! I am <strong>Aria</strong>, your AI Flight Crew member and Spacecraft Council receipt officer.
 <br><br>
-I'm here to help you <strong>explain your contract costs</strong>, <strong>save your checks</strong> to your personal decision journal, or locate your trading records.
+I'm here to help you <strong>explain your contract costs</strong>, decode settlement rules, and <strong>save your checks</strong> to your private decision journal.
 <br><br>
-For direct human support, our team is reachable at <strong>support@quanterraos.com</strong>. How may I assist you today?
+Need to talk to a live assistant right now? Call toll-free at <strong><a href="tel:18007826837" style="color:#DFB843; text-decoration:none; font-weight:700;">1-800-QUANTERRA (1-800-782-6837)</a></strong> or email <strong>support@quanterraos.com</strong>. How may I assist your flight deck today?
           </div>
-          <div class="qos-msg-meta">Aria · Just now</div>
+          <div class="qos-msg-meta">Aria · AI Flight Crew · Online</div>
         </div>
       </div>
     </div>
@@ -98,11 +98,11 @@ For direct human support, our team is reachable at <strong>support@quanterraos.c
     <!-- Quick Question Chips -->
     <div class="qos-quick-chips">
       <button class="qos-chip" data-q="Explain my costs">Explain my costs</button>
+      <button class="qos-chip" data-q="How do I talk to a live assistant on 1-800?">📞 Call 1-800 Assistant</button>
       <button class="qos-chip" data-q="How does Expiry Radar work?">Expiry Radar?</button>
       <button class="qos-chip" data-q="Save my check">Save my check</button>
       <button class="qos-chip" data-q="Find my journal">Find my journal</button>
       <button class="qos-chip" data-q="How do fees work on Kalshi?">Kalshi fee formula?</button>
-      <button class="qos-chip" data-q="How do I contact customer support?">Contact support</button>
     </div>
 
     <!-- Chat Input Area -->
@@ -581,7 +581,7 @@ For direct human support, our team is reachable at <strong>support@quanterraos.c
   const micIcon = document.getElementById('qos-mic-icon');
   const messagesContainer = document.getElementById('qos-chat-messages');
 
-  const FALLBACK_REPLY = 'Aria is active and monitoring telemetry. For dedicated support, please email support@quanterraos.com. All operations adhere strictly to Rule B5 paper execution.';
+  const FALLBACK_REPLY = 'Aria is active and monitoring telemetry. To speak with a live assistant, call toll-free at 1-800-QUANTERRA (1-800-782-6837) or email support@quanterraos.com. All operations adhere strictly to Rule B5 paper execution.';
 
   // Cached voice loading
   let cachedVoices = [];
@@ -603,7 +603,7 @@ For direct human support, our team is reachable at <strong>support@quanterraos.c
       if (focusInput) chatInput.focus();
       if (isVoiceEnabled && !hasSpokenWelcome) {
         hasSpokenWelcome = true;
-        speakText('Hello! I am Aria, your executive concierge. I am active and ready to communicate with you.');
+        speakText('Hello! I am Aria, your AI flight crew member. I am active and ready to communicate with you.');
       }
     }
   }

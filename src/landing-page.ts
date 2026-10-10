@@ -918,10 +918,15 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
 </head>
 <body>
 
-  <!-- Top Strip: Direct Mobile App Gateway -->
-  <aside class="mobile-app-top-strip" id="mobile-app-top-strip" aria-label="Mobile Application Download">
+  <!-- Top Strip: Direct Mobile App Gateway & 1-800 Live Assistance -->
+  <aside class="mobile-app-top-strip" id="mobile-app-top-strip" aria-label="Mobile Application Download & Live Assistance">
     <div class="mobile-app-top-strip-inner">
-      <span>📲 Mobile Flight Deck PWA available for <strong>Apple iPhone &amp; Samsung Galaxy</strong></span>
+      <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+        <span>📲 Mobile Flight Deck PWA available for <strong>Apple iPhone &amp; Samsung Galaxy</strong></span>
+        <a href="tel:18007826837" class="strip-phone-link" style="color:#DFB843; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-family:var(--public-font-mono); font-size:0.75rem; background:rgba(223, 184, 67, 0.12); padding:3px 10px; border-radius:12px; border:1px solid rgba(223, 184, 67, 0.35);">
+          <span>📞</span> <span>Call 1-800-QUANTERRA (1-800-782-6837) &bull; Talk to Live Assistant Now</span>
+        </a>
+      </div>
       <div style="display:flex; align-items:center; gap:12px;">
         <button type="button" class="btn-strip-download" onclick="openMobileAppDownloadModal()">Install / Download App &rarr;</button>
         <a href="/check" style="color:var(--public-accent-purple); text-decoration:none; font-size:0.75rem; font-family:var(--public-font-mono);">Check</a>

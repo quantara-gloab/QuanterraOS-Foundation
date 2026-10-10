@@ -424,6 +424,9 @@ export function renderPublicHeader(options: PublicLayoutOptions = {}): string {
 
       <!-- Desktop Actions -->
       <div class="flight-nav-actions">
+        <a href="tel:18007826837" class="flight-btn-phone" title="Call 1-800-QUANTERRA to talk to a live assistant now" style="display:inline-flex; align-items:center; gap:6px; color:#DFB843; font-family:var(--public-font-mono); font-size:0.8rem; font-weight:700; text-decoration:none; padding:6px 12px; border-radius:6px; border:1px solid rgba(223,184,67,0.35); background:rgba(223,184,67,0.1); transition:all 0.2s ease;">
+          <span>📞</span> <span>1-800-782-6837</span>
+        </a>
         ${authActionHtml}
         <a href="/check" class="flight-btn-freecheck" id="nav-free-check-btn">Get my receipt</a>
       </div>
@@ -444,6 +447,7 @@ export function renderPublicHeader(options: PublicLayoutOptions = {}): string {
         ${mobileNavLinksHtml}
       </ul>
       <div class="flight-mobile-actions">
+        <a href="tel:18007826837" class="flight-btn-phone" style="text-align:center; display:flex; justify-content:center; align-items:center; gap:8px; padding:12px; border-radius:8px; border:1px solid rgba(223,184,67,0.4); background:rgba(223,184,67,0.12); color:#DFB843; text-decoration:none; font-family:var(--public-font-mono); font-weight:700; font-size:0.88rem;">📞 Call 1-800-QUANTERRA (Live Assistant)</a>
         ${user ? `<a href="/deck" class="flight-btn-freecheck" style="text-align:center;">Launch Flight Deck</a>` : `<a href="/login" class="flight-btn-signin" style="text-align:center; border:1px solid rgba(255,255,255,0.15);">Sign in</a>`}
         <a href="/check" class="flight-btn-freecheck" style="text-align:center; background:var(--public-accent-purple); color:#FFFFFF;">Get my receipt</a>
       </div>
