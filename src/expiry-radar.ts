@@ -1299,7 +1299,7 @@ export function renderExpiryRadarPageHtml(
       </div>
       <h1 class="radar-heading">Bitcoin Expiry & Oracle Radar</h1>
       <p class="radar-sub">
-        Independent live countdown, CME CF BRTI 60-second TWAP oracle sampling visualizer, and strike-by-strike fee drag heatmap.
+        Independent live countdown, CME CF BRTI 60-second TWAP oracle sampling visualizer, and strike-by-strike fee drag heatmap. (Rule B5: $0.00 Live Capital Deployed).
       </p>
     </div>
 
@@ -1330,7 +1330,7 @@ export function renderExpiryRadarPageHtml(
     <!-- Oracle Sampling Progression Panel -->
     <div class="oracle-section">
       <div class="oracle-header">
-        <div class="oracle-title">${radar.licensing.fullTitle} 60-Second TWAP Averaging Window</div>
+        <div class="oracle-title">${radar.licensing.isLicensed ? 'CME CF BRTI 60-Second TWAP Averaging Window' : `${radar.licensing.fullTitle} (CME CF BRTI 60-Second TWAP Averaging Window)`}</div>
         <div class="card-subtext">${radar.licensing.isLicensed ? 'Official CME CF BRTI feed' : 'Settlement-Index Proxy (Coinbase, Kraken, Bitstamp, Gemini)'} · Seconds 840–900 of the 15m candle determine settlement</div>
       </div>
       ${!radar.licensing.isLicensed ? `

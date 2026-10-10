@@ -54,6 +54,7 @@ export function runMigrations(): void {
     "0026_beta_attribution_support_and_drills.sql",
     "0027_risk_plan_advisory_controls.sql",
     "0028_predictions_checkpoint_minute.sql",
+    "0029_flight_receipts_and_crew_pass.sql",
   ]) {
     const migrationPath = path.join(migrationsDir, migration);
     if (migration === "0006_multi_asset.sql") {

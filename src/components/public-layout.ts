@@ -1,14 +1,11 @@
 /**
- * QuanterraOS Flagship Public Layout (Tesla Mode)
+ * QuanterraOS Flagship Public Layout (Flight Deck Mode)
  *
- * Implements Phase 3 Task 3.1:
- * "Global header/footer components; remove all per-page navs."
- *
- * Requirements (Parts 0.2, 2.1, 5, 7):
- * - Clean, minimal Tesla-grade aesthetic: pure obsidian, full-bleed panels, ≤6 nav items.
- * - Public top nav: QuanterraOS · Check · Radar · Flight Deck · Institutional · Pricing · [Sign in] · [Free Check]
- * - Mobile: Full-screen menu containing same items + persistent bottom "Free Check" bar.
- * - Global footer: Verbatim Part 7 disclaimer, responsible-trading notices, and unified sitemap.
+ * Requirements:
+ * - Clean, minimal Flight-grade aesthetic: pure obsidian, full-bleed panels, <=6 nav items.
+ * - Public top nav: Check · Radar · Journal · Crew · Learn · Pricing · [Sign in] · [Get my receipt]
+ * - Mobile: Full-screen menu containing same items + persistent bottom "Get my receipt" bar.
+ * - Global footer: Part 7 disclaimer, responsible-trading notices, research/institutional links, and unified sitemap.
  */
 
 export interface PublicLayoutOptions {
@@ -20,42 +17,47 @@ export interface PublicLayoutOptions {
 export const PUBLIC_NAV_ITEMS = [
   { label: "Check", href: "/check" },
   { label: "Radar", href: "/radar" },
-  { label: "Flight Deck", href: "/deck" },
-  { label: "Institutional", href: "/institutional" },
+  { label: "Journal", href: "/journal" },
+  { label: "Crew", href: "/crew" },
+  { label: "Learn", href: "/learn" },
   { label: "Pricing", href: "/pricing" },
 ] as const;
 
 export const PUBLIC_LAYOUT_CSS = `
-  /* --- QuanterraOS Tesla-Mode Global Design Tokens --- */
+  /* --- QuanterraOS Flight Deck Global Design Tokens --- */
   :root {
-    --public-bg: #000000;
-    --public-card-bg: rgba(18, 18, 20, 0.75);
-    --public-fg: #FFFFFF;
-    --public-muted: #8A8F98;
-    --public-border: rgba(255, 255, 255, 0.09);
-    --public-border-gold: rgba(201, 162, 74, 0.35);
+    --public-bg: #080B18;
+    --public-card-bg: rgba(18, 23, 43, 0.85);
+    --public-surface: #12172B;
+    --public-fg: #F4F5FF;
+    --public-muted: #AFB6CE;
+    --public-border: rgba(175, 182, 206, 0.15);
+    --public-border-purple: rgba(148, 104, 255, 0.4);
+    --public-accent-purple: #9468FF;
+    --public-accent-cyan: #59DDEC;
     --public-accent-gold: #C9A24A;
-    --public-accent-gold-glow: rgba(201, 162, 74, 0.2);
+    --public-accent-yes: #86F94A;
+    --public-accent-no: #FF55C8;
     --public-font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     --public-font-mono: "IBM Plex Mono", "JetBrains Mono", ui-monospace, monospace;
   }
 
-  /* Sticky Tesla Minimal Nav */
-  .tesla-header {
+  /* Sticky Flight Minimal Nav */
+  .flight-header {
     position: sticky;
     top: 0;
     left: 0;
     width: 100%;
     z-index: 1000;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(8, 11, 24, 0.92);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--public-border);
     transition: background 0.3s ease, border-color 0.3s ease;
   }
 
-  .tesla-header-inner {
-    max-width: 1280px;
+  .flight-header-inner {
+    max-width: 1200px;
     margin: 0 auto;
     padding: 0 24px;
     height: 64px;
@@ -64,37 +66,37 @@ export const PUBLIC_LAYOUT_CSS = `
     justify-content: space-between;
   }
 
-  .tesla-brand {
+  .flight-brand {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     font-family: var(--public-font-sans);
     font-size: 1.15rem;
     font-weight: 700;
     letter-spacing: -0.02em;
-    color: #FFFFFF;
+    color: #F4F5FF;
     text-decoration: none;
     cursor: pointer;
   }
 
-  .tesla-brand-dot {
-    width: 7px;
-    height: 7px;
+  .flight-brand-dot {
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    background: var(--public-accent-gold);
-    box-shadow: 0 0 10px var(--public-accent-gold);
+    background: var(--public-accent-purple);
+    box-shadow: 0 0 10px var(--public-accent-purple);
   }
 
-  .tesla-nav-links {
+  .flight-nav-links {
     display: flex;
     align-items: center;
-    gap: 28px;
+    gap: 24px;
     list-style: none;
     margin: 0;
     padding: 0;
   }
 
-  .tesla-nav-link {
+  .flight-nav-link {
     font-family: var(--public-font-sans);
     font-size: 0.9rem;
     font-weight: 500;
@@ -105,32 +107,32 @@ export const PUBLIC_LAYOUT_CSS = `
     position: relative;
   }
 
-  .tesla-nav-link:hover {
+  .flight-nav-link:hover {
     color: #FFFFFF;
   }
 
-  .tesla-nav-link.active {
+  .flight-nav-link.active {
     color: #FFFFFF;
     font-weight: 600;
   }
 
-  .tesla-nav-link.active::after {
+  .flight-nav-link.active::after {
     content: "";
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
     height: 2px;
-    background: var(--public-accent-gold);
+    background: var(--public-accent-purple);
   }
 
-  .tesla-nav-actions {
+  .flight-nav-actions {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 14px;
   }
 
-  .tesla-btn-signin {
+  .flight-btn-signin {
     font-family: var(--public-font-sans);
     font-size: 0.88rem;
     font-weight: 500;
@@ -141,34 +143,34 @@ export const PUBLIC_LAYOUT_CSS = `
     transition: color 0.15s ease, background 0.15s ease;
   }
 
-  .tesla-btn-signin:hover {
+  .flight-btn-signin:hover {
     color: #FFFFFF;
     background: rgba(255, 255, 255, 0.05);
   }
 
-  .tesla-btn-freecheck {
+  .flight-btn-freecheck {
     font-family: var(--public-font-sans);
     font-size: 0.88rem;
     font-weight: 600;
-    color: #000000;
+    color: #080B18;
     background: #FFFFFF;
     text-decoration: none;
     padding: 8px 18px;
     border-radius: 20px;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.15);
+    box-shadow: 0 2px 10px rgba(148, 104, 255, 0.2);
     white-space: nowrap;
   }
 
-  .tesla-btn-freecheck:hover {
-    background: var(--public-accent-gold);
-    color: #000000;
-    box-shadow: 0 4px 18px var(--public-accent-gold-glow);
+  .flight-btn-freecheck:hover {
+    background: var(--public-accent-purple);
+    color: #FFFFFF;
+    box-shadow: 0 4px 18px rgba(148, 104, 255, 0.4);
     transform: translateY(-1px);
   }
 
   /* Hamburger Button */
-  .tesla-hamburger {
+  .flight-hamburger {
     display: none;
     background: transparent;
     border: none;
@@ -177,21 +179,21 @@ export const PUBLIC_LAYOUT_CSS = `
     color: #FFFFFF;
   }
 
-  .tesla-hamburger svg {
+  .flight-hamburger svg {
     width: 24px;
     height: 24px;
     stroke: currentColor;
   }
 
   /* Full Screen Mobile Menu */
-  .tesla-mobile-menu {
+  .flight-mobile-menu {
     display: none;
     position: fixed;
     top: 64px;
     left: 0;
     width: 100%;
     height: calc(100vh - 64px);
-    background: rgba(0, 0, 0, 0.98);
+    background: rgba(8, 11, 24, 0.98);
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
     z-index: 999;
@@ -200,11 +202,11 @@ export const PUBLIC_LAYOUT_CSS = `
     overflow-y: auto;
   }
 
-  .tesla-mobile-menu.open {
+  .flight-mobile-menu.open {
     display: flex;
   }
 
-  .tesla-mobile-menu-links {
+  .flight-mobile-menu-links {
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -213,7 +215,7 @@ export const PUBLIC_LAYOUT_CSS = `
     padding: 0;
   }
 
-  .tesla-mobile-nav-link {
+  .flight-mobile-nav-link {
     font-size: 1.35rem;
     font-weight: 600;
     color: #E2E8F0;
@@ -222,18 +224,18 @@ export const PUBLIC_LAYOUT_CSS = `
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
 
-  .tesla-mobile-nav-link.active {
-    color: var(--public-accent-gold);
+  .flight-mobile-nav-link.active {
+    color: var(--public-accent-purple);
   }
 
-  .tesla-mobile-actions {
+  .flight-mobile-actions {
     display: flex;
     flex-direction: column;
     gap: 12px;
   }
 
   /* Persistent Mobile Bottom Action Bar */
-  .tesla-mobile-bottom-bar {
+  .flight-mobile-bottom-bar {
     display: none;
     position: fixed;
     bottom: 0;
@@ -241,57 +243,57 @@ export const PUBLIC_LAYOUT_CSS = `
     width: 100%;
     z-index: 950;
     padding: 12px 16px;
-    background: rgba(0, 0, 0, 0.92);
+    background: rgba(8, 11, 24, 0.94);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-top: 1px solid var(--public-border);
     box-sizing: border-box;
   }
 
-  .tesla-mobile-bottom-btn {
+  .flight-mobile-bottom-btn {
     display: block;
     width: 100%;
     text-align: center;
-    background: #FFFFFF;
-    color: #000000;
+    background: var(--public-accent-purple);
+    color: #FFFFFF;
     font-weight: 700;
     font-size: 0.95rem;
     text-decoration: none;
     padding: 14px 20px;
     border-radius: 28px;
-    box-shadow: 0 4px 16px rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 16px rgba(148, 104, 255, 0.3);
     box-sizing: border-box;
   }
 
-  /* Tesla Footer */
-  .tesla-footer {
-    background: #000000;
+  /* Flight Footer */
+  .flight-footer {
+    background: #060812;
     border-top: 1px solid var(--public-border);
     color: var(--public-muted);
     font-family: var(--public-font-sans);
     padding: 64px 24px 96px;
   }
 
-  .tesla-footer-inner {
-    max-width: 1280px;
+  .flight-footer-inner {
+    max-width: 1200px;
     margin: 0 auto;
   }
 
-  .tesla-footer-grid {
+  .flight-footer-grid {
     display: grid;
     grid-template-columns: 2fr repeat(3, 1fr);
     gap: 48px;
     margin-bottom: 48px;
   }
 
-  .tesla-footer-brand {
+  .flight-footer-brand {
     font-size: 1.1rem;
     font-weight: 700;
     color: #FFFFFF;
     margin-bottom: 12px;
   }
 
-  .tesla-footer-tagline {
+  .flight-footer-tagline {
     font-size: 0.9rem;
     line-height: 1.6;
     color: var(--public-muted);
@@ -299,7 +301,7 @@ export const PUBLIC_LAYOUT_CSS = `
     margin-bottom: 16px;
   }
 
-  .tesla-footer-col h4 {
+  .flight-footer-col h4 {
     font-size: 0.8rem;
     font-family: var(--public-font-mono);
     text-transform: uppercase;
@@ -308,7 +310,7 @@ export const PUBLIC_LAYOUT_CSS = `
     margin-bottom: 16px;
   }
 
-  .tesla-footer-col ul {
+  .flight-footer-col ul {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -317,18 +319,18 @@ export const PUBLIC_LAYOUT_CSS = `
     gap: 10px;
   }
 
-  .tesla-footer-col a {
+  .flight-footer-col a {
     color: var(--public-muted);
     font-size: 0.88rem;
     text-decoration: none;
     transition: color 0.15s ease;
   }
 
-  .tesla-footer-col a:hover {
+  .flight-footer-col a:hover {
     color: #FFFFFF;
   }
 
-  .tesla-footer-legal-box {
+  .flight-footer-legal-box {
     border-top: 1px solid var(--public-border);
     padding-top: 28px;
     font-size: 0.78rem;
@@ -337,7 +339,7 @@ export const PUBLIC_LAYOUT_CSS = `
     margin-bottom: 24px;
   }
 
-  .tesla-footer-bottom {
+  .flight-footer-bottom {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -349,7 +351,7 @@ export const PUBLIC_LAYOUT_CSS = `
 
   /* Accessibility & Focus-Visible Standards */
   a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
-    outline: 2px solid var(--public-accent-gold) !important;
+    outline: 2px solid var(--public-accent-purple) !important;
     outline-offset: 2px !important;
   }
 
@@ -364,20 +366,20 @@ export const PUBLIC_LAYOUT_CSS = `
   }
 
   @media (max-width: 900px) {
-    .tesla-nav-links, .tesla-nav-actions {
+    .flight-nav-links, .flight-nav-actions {
       display: none;
     }
-    .tesla-hamburger {
+    .flight-hamburger {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       min-width: 44px;
       min-height: 44px;
     }
-    .tesla-mobile-bottom-bar {
+    .flight-mobile-bottom-bar {
       display: block;
     }
-    .tesla-footer-grid {
+    .flight-footer-grid {
       grid-template-columns: 1fr;
       gap: 32px;
     }
@@ -385,50 +387,49 @@ export const PUBLIC_LAYOUT_CSS = `
 `;
 
 /**
- * Renders the global, minimal Tesla-mode header.
- * Conforms to ≤6 nav items: Check · Radar · Flight Deck · Institutional · Pricing
+ * Renders the global, minimal Flight Deck header.
  */
 export function renderPublicHeader(options: PublicLayoutOptions = {}): string {
   const activePath = options.activePath || "/";
   const user = options.user;
 
   const navLinksHtml = PUBLIC_NAV_ITEMS.map((item) => {
-    const isActive = activePath === item.href || (item.href !== "/" && activePath.startsWith(item.href));
-    return `<li><a href="${item.href}" class="tesla-nav-link ${isActive ? 'active' : ''}">${item.label}</a></li>`;
+    const isActive = activePath === item.href || (activePath !== "/" && activePath.startsWith(item.href));
+    return `<li><a href="${item.href}" class="flight-nav-link ${isActive ? 'active' : ''}">${item.label}</a></li>`;
   }).join("\n");
 
   const mobileNavLinksHtml = PUBLIC_NAV_ITEMS.map((item) => {
-    const isActive = activePath === item.href || (item.href !== "/" && activePath.startsWith(item.href));
-    return `<li><a href="${item.href}" class="tesla-mobile-nav-link ${isActive ? 'active' : ''}">${item.label}</a></li>`;
+    const isActive = activePath === item.href || (activePath !== "/" && activePath.startsWith(item.href));
+    return `<li><a href="${item.href}" class="flight-mobile-nav-link ${isActive ? 'active' : ''}">${item.label}</a></li>`;
   }).join("\n");
 
   const authActionHtml = user
-    ? `<a href="/deck" class="tesla-btn-signin">Flight Deck →</a>`
-    : `<a href="/login" class="tesla-btn-signin">Sign in</a>`;
+    ? `<a href="/deck" class="flight-btn-signin">Flight Deck &rarr;</a>`
+    : `<a href="/login" class="flight-btn-signin">Sign in</a>`;
 
   return `
-  <header class="tesla-header" id="main-header">
-    <div class="tesla-header-inner">
-      <a href="/" class="tesla-brand">
-        <span class="tesla-brand-dot"></span>
+  <header class="flight-header" id="main-header">
+    <div class="flight-header-inner">
+      <a href="/" class="flight-brand">
+        <span class="flight-brand-dot"></span>
         <span>QuanterraOS</span>
       </a>
 
-      <!-- Desktop Nav (≤6 items) -->
+      <!-- Desktop Nav -->
       <nav aria-label="Main Navigation">
-        <ul class="tesla-nav-links">
+        <ul class="flight-nav-links">
           ${navLinksHtml}
         </ul>
       </nav>
 
       <!-- Desktop Actions -->
-      <div class="tesla-nav-actions">
+      <div class="flight-nav-actions">
         ${authActionHtml}
-        <a href="/check" class="tesla-btn-freecheck" id="nav-free-check-btn">Free Check</a>
+        <a href="/check" class="flight-btn-freecheck" id="nav-free-check-btn">Get my receipt</a>
       </div>
 
       <!-- Mobile Hamburger Button -->
-      <button class="tesla-hamburger" id="tesla-hamburger-btn" aria-label="Toggle mobile menu" type="button">
+      <button class="flight-hamburger" id="flight-hamburger-btn" aria-label="Toggle mobile menu" type="button">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="3" y1="12" x2="21" y2="12"></line>
           <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -438,26 +439,26 @@ export function renderPublicHeader(options: PublicLayoutOptions = {}): string {
     </div>
 
     <!-- Mobile Full-Screen Overlay Menu -->
-    <div class="tesla-mobile-menu" id="tesla-mobile-menu">
-      <ul class="tesla-mobile-menu-links">
+    <div class="flight-mobile-menu" id="flight-mobile-menu">
+      <ul class="flight-mobile-menu-links">
         ${mobileNavLinksHtml}
       </ul>
-      <div class="tesla-mobile-actions">
-        ${user ? `<a href="/deck" class="tesla-btn-freecheck" style="text-align:center;">Launch Flight Deck</a>` : `<a href="/login" class="tesla-btn-signin" style="text-align:center; border:1px solid rgba(255,255,255,0.15);">Sign in</a>`}
-        <a href="/check" class="tesla-btn-freecheck" style="text-align:center; background:var(--public-accent-gold); color:#000;">Run Free Check</a>
+      <div class="flight-mobile-actions">
+        ${user ? `<a href="/deck" class="flight-btn-freecheck" style="text-align:center;">Launch Flight Deck</a>` : `<a href="/login" class="flight-btn-signin" style="text-align:center; border:1px solid rgba(255,255,255,0.15);">Sign in</a>`}
+        <a href="/check" class="flight-btn-freecheck" style="text-align:center; background:var(--public-accent-purple); color:#FFFFFF;">Get my receipt</a>
       </div>
     </div>
   </header>
 
   <!-- Persistent Mobile Bottom Bar -->
-  <div class="tesla-mobile-bottom-bar" id="mobile-sticky-action">
-    <a href="/check" class="tesla-mobile-bottom-btn">Run Free Check →</a>
+  <div class="flight-mobile-bottom-bar" id="mobile-sticky-action">
+    <a href="/check" class="flight-mobile-bottom-btn">Get my receipt &rarr;</a>
   </div>
 
   <script>
     (function() {
-      const btn = document.getElementById('tesla-hamburger-btn');
-      const menu = document.getElementById('tesla-mobile-menu');
+      const btn = document.getElementById('flight-hamburger-btn');
+      const menu = document.getElementById('flight-mobile-menu');
       if (btn && menu) {
         btn.addEventListener('click', function() {
           const isOpen = menu.classList.toggle('open');
@@ -473,62 +474,63 @@ export function renderPublicHeader(options: PublicLayoutOptions = {}): string {
 }
 
 /**
- * Renders the global, Part 7 compliant Tesla-mode footer.
+ * Renders the global, Part 7 compliant Flight Deck footer.
  */
 export function renderPublicFooter(): string {
   return `
-  <footer class="tesla-footer">
-    <div class="tesla-footer-inner">
-      <div class="tesla-footer-grid">
-        <div class="tesla-footer-about">
-          <div class="tesla-footer-brand">QuanterraOS</div>
-          <p class="tesla-footer-tagline">
-            Trade like a pilot, not a passenger. True cost, settlement radar, and calibration intelligence across prediction markets.
+  <footer class="flight-footer">
+    <div class="flight-footer-inner">
+      <div class="flight-footer-grid">
+        <div class="flight-footer-about">
+          <div class="flight-footer-brand">QuanterraOS</div>
+          <p class="flight-footer-tagline">
+            See the cost. Choose your side. Check fees, spreads and settlement rules before you decide.
           </p>
-          <div style="font-size:0.75rem; color:#475569; font-family:var(--public-font-mono);">
+          <div style="font-size:0.75rem; color:#8A8F98; font-family:var(--public-font-mono);">
             Quantara Global LLC · Wilmington, DE
           </div>
         </div>
 
-        <div class="tesla-footer-col">
+        <div class="flight-footer-col">
           <h4>Platform</h4>
           <ul>
             <li><a href="/check">True-Cost Check</a></li>
             <li><a href="/radar">Settlement Radar</a></li>
+            <li><a href="/journal">Calibration Journal</a></li>
             <li><a href="/deck">Flight Deck Cockpit</a></li>
             <li><a href="/proof">Calibration Proof</a></li>
             <li><a href="/pricing">Pricing Plans</a></li>
           </ul>
         </div>
 
-        <div class="tesla-footer-col">
-          <h4>Institutional</h4>
+        <div class="flight-footer-col">
+          <h4>Crew &amp; Cosmetics</h4>
           <ul>
-            <li><a href="/institutional">Institutional Overview</a></li>
-            <li><a href="/developers">Developer API &amp; MCP</a></li>
-            <li><a href="/status">System Ingestion Status</a></li>
-            <li><a href="/changelog">Public Changelog</a></li>
+            <li><a href="/crew">Flight Deck Crew</a></li>
+            <li><a href="/pass">Free Crew Pass</a></li>
+            <li><a href="/art-gallery">Artwork Gallery</a></li>
+            <li><a href="/research">Research</a></li>
+            <li><a href="/access">Institutional</a></li>
           </ul>
         </div>
 
-        <div class="tesla-footer-col">
+        <div class="flight-footer-col">
           <h4>Flight School</h4>
           <ul>
             <li><a href="/learn">Flight School &amp; Glossary</a></li>
             <li><a href="/news">Mission Brief Digest</a></li>
-            <li><a href="/press">Press Kit &amp; Citations</a></li>
-            <li><a href="/help">Help Center &amp; Support</a></li>
+            <li><a href="/status">System Ingestion Status</a></li>
             <li><a href="/legal">Legal &amp; Risk Disclosure</a></li>
           </ul>
         </div>
       </div>
 
       <!-- Verbatim Part 7 Compliance Footer -->
-      <div class="tesla-footer-legal-box">
+      <div class="flight-footer-legal-box">
         QuanterraOS is an independent analytics tool by Quantara Global LLC. We don't place trades, hold funds, or give investment advice. Calculations use public data and published fee schedules and may be delayed or wrong — verify with your exchange. Prediction-market trading can lose money. 18+. Kalshi, Polymarket, CME CF BRTI and other names are trademarks of their owners; we're not affiliated with them.
       </div>
 
-      <div class="tesla-footer-bottom">
+      <div class="flight-footer-bottom">
         <div>&copy; 2026 Quantara Global LLC. All rights reserved. Rule B5 locked ($0.00 capital deployed).</div>
         <div style="display:flex; gap:16px;">
           <a href="/legal" style="color:#94A3B8; text-decoration:none;">Terms of Service</a>

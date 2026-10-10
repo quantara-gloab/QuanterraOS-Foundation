@@ -444,6 +444,24 @@ import {
   getRecentRawEvents,
   getFounderPhase9Kpis,
 } from "./metrics.ts";
+import {
+  resolveFlightReceipt,
+  createFlightReceipt,
+  getFlightReceiptById,
+  getFlightReceiptByPublicId,
+  publishFlightReceipt,
+  unpublishFlightReceipt,
+  generateFlightReceiptCardSvg,
+  renderPublicReceiptPageHtml,
+} from "./lib/flight-receipt.ts";
+import {
+  claimCrewPass,
+  getUserCrewPass,
+  selectPassSkin,
+  renderCrewShowcasePageHtml,
+  renderCrewPassClaimPageHtml,
+  renderArtGalleryPageHtml,
+} from "./lib/crew-pass.ts";
 
 runMigrations();
 seedHistoricalReplay().catch((err) => console.error("Error seeding historical replay:", err));
@@ -2078,6 +2096,146 @@ app.get("/signup", (_req, res) => {
 
 app.get(["/check", "/calculator"], (_req, res) => {
   res.type("html").send(renderCalculatorPageHtml());
+});
+
+// ---------------------------------------------------------------------------
+// Flight Deck Pilot Redesign: Flight Receipts Engine & Free Crew Pass
+// ---------------------------------------------------------------------------
+
+// Public Crew Showcase
+app.get("/crew", (req, res) => {
+  const auth = getUserAuth(req);
+  const pass = auth.user ? getUserCrewPass(auth.user.id) : null;
+  res.type("html").send(renderCrewShowcasePageHtml(auth.user, pass));
+});
+
+// Free Crew Pass Claim & Management
+app.get("/pass", (req, res) => {
+  const auth = getUserAuth(req);
+  const pass = auth.user ? getUserCrewPass(auth.user.id) : null;
+  res.type("html").send(renderCrewPassClaimPageHtml(auth.user, pass));
+});
+
+// Artwork Gallery
+app.get("/art-gallery", (req, res) => {
+  const auth = getUserAuth(req);
+  res.type("html").send(renderArtGalleryPageHtml(auth.user));
+});
+
+// Claim Free Crew Pass API
+app.post("/api/pass/claim", (req, res) => {
+  const auth = getUserAuth(req);
+  const userId = auth.user ? auth.user.id : (req.headers["x-visitor-id"] ? String(req.headers["x-visitor-id"]) : "visitor_anon");
+  try {
+    const pass = claimCrewPass(userId);
+    res.json({ success: true, pass });
+  } catch (err) {
+    res.status(400).json({ success: false, error: (err as Error).message });
+  }
+});
+
+// Select Cosmetic Pilot Skin API
+app.post("/api/pass/skin", (req, res) => {
+  const auth = getUserAuth(req);
+  const userId = auth.user ? auth.user.id : (req.headers["x-visitor-id"] ? String(req.headers["x-visitor-id"]) : "visitor_anon");
+  const { skinId } = req.body || {};
+  if (!skinId) {
+    return res.status(400).json({ success: false, error: "skinId is required." });
+  }
+  try {
+    const result = selectPassSkin(userId, skinId);
+    res.json(result);
+  } catch (err) {
+    res.status(400).json({ success: false, error: (err as Error).message });
+  }
+});
+
+// Flight Receipt Resolution API
+app.post("/api/receipts/resolve", (req, res) => {
+  try {
+    const receipt = resolveFlightReceipt(req.body);
+    res.json({ success: true, receipt });
+  } catch (err) {
+    res.status(400).json({ success: false, error: (err as Error).message });
+  }
+});
+
+// Save Flight Receipt Draft API
+app.post("/api/receipts", (req, res) => {
+  const auth = getUserAuth(req);
+  try {
+    const receipt = createFlightReceipt(req.body, auth.user ? auth.user.id : null);
+    res.status(201).json({ success: true, receipt });
+  } catch (err) {
+    res.status(400).json({ success: false, error: (err as Error).message });
+  }
+});
+
+// Get Receipt by ID API
+app.get("/api/receipts/:id", (req, res) => {
+  const receipt = getFlightReceiptById(req.params.id);
+  if (!receipt) {
+    return res.status(404).json({ success: false, error: "Receipt not found." });
+  }
+  res.json({ success: true, receipt });
+});
+
+// Publish Receipt (Stripping Private Data) API
+app.post("/api/receipts/:id/publish", (req, res) => {
+  const auth = getUserAuth(req);
+  try {
+    const published = publishFlightReceipt(req.params.id, auth.user ? auth.user.id : null);
+    res.json({
+      success: true,
+      publicId: published.publicId,
+      publicUrl: `/receipts/${published.publicId}`,
+      cardUrl: `/api/receipts/${published.receipt.id}/card.svg`,
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, error: (err as Error).message });
+  }
+});
+
+// Unpublish / Delete Public Receipt API
+app.delete("/api/receipts/:id/public", (req, res) => {
+  const auth = getUserAuth(req);
+  try {
+    const unpublished = unpublishFlightReceipt(req.params.id, auth.user ? auth.user.id : null);
+    res.json({ success: true, receipt: unpublished });
+  } catch (err) {
+    res.status(400).json({ success: false, error: (err as Error).message });
+  }
+});
+
+// Shareable SVG Social Card Endpoint (1200x630 OG)
+app.get(["/api/receipts/:id/card.svg", "/api/receipts/:id/card.png"], (req, res) => {
+  const receipt = getFlightReceiptById(req.params.id) || getFlightReceiptByPublicId(req.params.id);
+  if (!receipt) {
+    return res.status(404).send("Receipt not found.");
+  }
+  const svg = generateFlightReceiptCardSvg(receipt);
+  res.setHeader("Content-Type", "image/svg+xml");
+  res.setHeader("Cache-Control", "public, max-age=3600");
+  res.send(svg);
+});
+
+// Public Shareable Receipt View
+app.get("/receipts/:publicId", (req, res) => {
+  const receipt = getFlightReceiptByPublicId(req.params.publicId);
+  if (!receipt || !receipt.publicSharing) {
+    return res.status(404).type("html").send(`
+      <!doctype html>
+      <html>
+      <head><title>Receipt Not Found</title></head>
+      <body style="background:#080B18;color:#F4F5FF;font-family:sans-serif;text-align:center;padding:80px 20px;">
+        <h2>Receipt Not Found or Private</h2>
+        <p style="color:#AFB6CE;">This trade receipt snapshot does not exist or has been made private by its author.</p>
+        <a href="/check" style="color:#9468FF;text-decoration:none;">&larr; Run a new True Cost Check</a>
+      </body>
+      </html>
+    `);
+  }
+  res.type("html").send(renderPublicReceiptPageHtml(receipt));
 });
 
 app.get("/institutional", (_req, res) => {

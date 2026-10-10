@@ -371,10 +371,10 @@ export function renderChangelogPageHtml(): string {
       <div class="release-item">
         <div class="release-dot" style="background:#4FD1E8; box-shadow:0 0 12px #4FD1E8;"></div>
         <div class="release-date" style="color:var(--accent);">// 10 October 2026 (Major Release — v2.0.0)</div>
-        <div class="release-version">v2.0.0 — Celestial Flight Deck &amp; Tesla-Grade Public Surface</div>
+        <div class="release-version">v2.0.0 — Celestial Flight Deck &amp; Flight-Deck Public Surface</div>
         <div class="release-notes">
           <ul>
-            <li><strong>Two Surfaces, One Product:</strong> Built Tesla-mode public web surface (<code>/</code>) delivering pure black minimalism, stark typography, zero clutter, and 6 cinematic viewport panels. Signed-in users enter the Celestial Flight Deck (<code>/deck</code>) featuring 7 specialized spacecraft stations.</li>
+            <li><strong>Two Surfaces, One Product:</strong> Built Flight Deck public web surface (<code>/</code>) delivering pure black minimalism, stark typography, zero clutter, and 6 cinematic viewport panels. Signed-in users enter the Celestial Flight Deck (<code>/deck</code>) featuring 7 specialized spacecraft stations.</li>
             <li><strong>7 Core Stations:</strong> Bridge (main HUD &amp; gauges), Navigation (settlement radar &amp; TWAP), Engineering (true-cost engine &amp; Maker Saver), Mission Log (journal &amp; CSV importer), Sensors (large-trade tape &amp; wallet audit), Crew (Aria ship router &amp; 8 specialists), and Hangar (ship configuration).</li>
             <li><strong>Anti-Volume Game Engine:</strong> Event-sourced <code>xp_events</code> system rewarding discipline only (+10 pre-flight, +15 thesis, +10 maker limit, +20 stand-down from coin flip, +100 Brier improvement). Zero XP awarded for trade count, dollar volume, P&amp;L, or streaks.</li>
             <li><strong>Polymarket Wallet Calibration Cards:</strong> Probabilistic Brier scoring audit exposing the Favorite-Chaser Paradox (traders winning 80% of trades while underperforming a naive coin flip).</li>

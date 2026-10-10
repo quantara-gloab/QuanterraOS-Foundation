@@ -959,3 +959,60 @@ export const xpEvents = sqliteTable(
     createdAtIdx: index("xp_events_created_at_idx").on(table.createdAt),
   })
 );
+
+// ---------------------------------------------------------------------------
+// Canonical Flight Receipts: Immutable share snapshots & cost audits
+// ---------------------------------------------------------------------------
+export const flightReceipts = sqliteTable(
+  "flight_receipts",
+  {
+    id: text("id").primaryKey(),
+    publicId: text("public_id").unique(),
+    userId: text("user_id"),
+    venue: text("venue").notNull(), // 'kalshi' | 'polymarket'
+    venueProduct: text("venue_product").notNull(),
+    marketId: text("market_id").notNull(),
+    marketTitle: text("market_title").notNull(),
+    side: text("side").notNull(), // 'yes' | 'no'
+    quantity: text("quantity").notNull(),
+    entryPrice: text("entry_price").notNull(),
+    fee: text("fee").notNull(),
+    outlay: text("outlay").notNull(),
+    breakevenProbability: text("breakeven_probability").notNull(),
+    dataStatus: text("data_status").notNull().default("fresh"), // 'fresh' | 'delayed' | 'stale' | 'partial' | 'unknown'
+    quoteAsOf: text("quote_as_of").notNull(),
+    feeScheduleVersion: text("fee_schedule_version").notNull(),
+    ruleUrl: text("rule_url").notNull(),
+    referenceStatus: text("reference_status").notNull().default("unknown"),
+    assumptionsJson: text("assumptions_json").notNull(),
+    sidesJson: text("sides_json").notNull(),
+    publicSharing: integer("public_sharing").notNull().default(0),
+    publishedAt: text("published_at"),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => ({
+    publicIdIdx: index("flight_receipts_public_id_idx").on(table.publicId),
+    userIdIdx: index("flight_receipts_user_id_idx").on(table.userId),
+    marketIdIdx: index("flight_receipts_market_id_idx").on(table.marketId),
+  })
+);
+
+// ---------------------------------------------------------------------------
+// Free Crew Pass: Account-bound cosmetic unlocks & Spacecraft Council
+// ---------------------------------------------------------------------------
+export const crewPasses = sqliteTable(
+  "crew_passes",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id").notNull().unique(),
+    passTier: text("pass_tier").notNull().default("free_crew_pass"),
+    selectedSkin: text("selected_skin").notNull().default("genesis"),
+    unlockedSkinsJson: text("unlocked_skins_json").notNull(),
+    claimedAt: text("claimed_at").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (table) => ({
+    userIdIdx: index("crew_passes_user_id_idx").on(table.userId),
+  })
+);
+

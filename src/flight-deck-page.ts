@@ -3950,6 +3950,24 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
       }
     }
 
+    function toggleShadowRule(ruleId) {
+      fetch('/api/deck/shadow/rules/' + encodeURIComponent(ruleId) + '/toggle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.rule) {
+          alert('Shadow tracking rule "' + data.rule.name + '" is now ' + (data.rule.enabled ? 'ACTIVE' : 'STANDBY') + '.');
+          location.reload();
+        }
+      })
+      .catch(err => {
+        alert('Failed to update shadow rule: ' + err.message);
+      });
+    }
+
     // ===================================================================
     // ONBOARDING COCKPIT BRIEFING TUTORIAL ENGINE
     // ===================================================================
@@ -3961,10 +3979,10 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
     let deckLastTimestamp = 0;
 
     const DECK_TUTORIAL_ACTS = [
-      { start: 0, end: 15, caption: "Act 1: Pre-Flight Check — 50¢ contracts charge $1.75 fee drag. QuanterraOS saves $142.50/mo in toxic spread." },
-      { start: 15, end: 30, caption: "Act 2: 60s Settlement Radar — Tracking CME CF BRTI TWAP vs Coinbase & Kraken to prevent basis traps." },
-      { start: 30, end: 45, caption: "Act 3: Copilot Aria & Stations — 7 stations monitoring risk with $0.00 live exposure (Rule B5)." },
-      { start: 45, end: 60, caption: "Act 4: Build Your Legacy — Earn discipline XP from Cadet to Admiral and unlock Pro telemetry." }
+      { start: 0, end: 15, caption: "Act 1: Pre-Flight Check — Inspect exchange taker fees and required breakeven hurdle before entry." },
+      { start: 15, end: 30, caption: "Act 2: 60s Settlement Radar — Tracking settlement TWAP vs constituent spot exchanges to understand basis dynamics." },
+      { start: 30, end: 45, caption: "Act 3: Copilot Aria & Stations — Multi-station monitoring with zero live capital deployed ($0.00 exposure)." },
+      { start: 45, end: 60, caption: "Act 4: Build Your Legacy — Earn discipline XP from Cadet to Admiral and unlock Pilot telemetry." }
     ];
 
     function openDeckVideoBriefingModal() {
@@ -4084,17 +4102,17 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
       ctx.fillStyle = '#FFFFFF';
       ctx.font = '700 18px Inter, sans-serif';
       if (actIdx === 0) {
-        ctx.fillText("ACT 1: THE $142.50/MO HOUSE EDGE RECOVERY", 30, 65);
+        ctx.fillText("ACT 1: PRE-FLIGHT COST ENGINE", 30, 65);
         ctx.fillStyle = '#F43F5E';
         ctx.font = '700 18px "IBM Plex Mono", monospace';
         ctx.fillText("$1.75 PEAK TAKER DRAG (50¢ STRIKE)", 30, 100);
         ctx.fillStyle = '#10B981';
-        ctx.fillText("+$142.50 AVOIDABLE LOSS SAVED / MO", 30, 130);
+        ctx.fillText("FEE HURDLE AUDITED BEFORE RISK", 30, 130);
       } else if (actIdx === 1) {
         ctx.fillText("ACT 2: 60-SECOND TWAP SETTLEMENT RADAR", 30, 65);
         ctx.fillStyle = '#38BDF8';
         ctx.font = '600 14px "IBM Plex Mono", monospace';
-        ctx.fillText("CME CF BRTI Consensus vs Coinbase & Kraken Spot", 30, 100);
+        ctx.fillText("Settlement Index vs Constituent Spot Exchanges", 30, 100);
         ctx.fillStyle = '#C9A24A';
         ctx.fillText("Basis Gap Warning: Kalshi settles on index, not app.", 30, 130);
       } else if (actIdx === 2) {
@@ -4104,15 +4122,15 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
         ctx.fillText('"I can show you exactly what this costs and how it settles."', 30, 100);
         ctx.fillStyle = '#10B981';
         ctx.font = '600 13px "IBM Plex Mono", monospace';
-        ctx.fillText("Rule B5 Safe: $0.00 Live Risk exposure. 100% Paper Mode.", 30, 130);
+        ctx.fillText("Safety First: $0.00 Live Risk exposure. 100% Paper Mode.", 30, 130);
       } else {
-        ctx.fillText("ACT 4: BUILD YOUR LEGACY & SUBCRIBE TO PRO", 30, 65);
+        ctx.fillText("ACT 4: BUILD YOUR LEGACY & SUBCRIBE TO PILOT", 30, 65);
         ctx.fillStyle = '#C9A24A';
         ctx.font = '700 15px "IBM Plex Mono", monospace';
-        ctx.fillText("Cadet → Pilot → Flight Leader → Admiral", 30, 100);
+        ctx.fillText("Cadet → Pilot → Lieutenant → Commander → Admiral", 30, 100);
         ctx.fillStyle = '#FFF';
         ctx.font = '600 13px "IBM Plex Mono", monospace';
-        ctx.fillText("Pro Access: $29/mo or $199/yr with 7-Day Free Check", 30, 130);
+        ctx.fillText("Pilot Access: $39/mo or $349/yr with 14-Day Trial", 30, 130);
       }
 
       // Progress Line

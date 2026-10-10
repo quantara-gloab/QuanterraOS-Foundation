@@ -1,24 +1,25 @@
 /**
- * QuanterraOS Flagship Public Landing Page (Tesla Mode & Cockpit Gateway)
+ * QuanterraOS Flagship Public Landing Page (Flight Deck Mode)
  *
- * Implements Phase 3 Task 3.3 and Flagship Cockpit & Mobile Distribution:
- * - 6 Core Tesla-Grade Panels:
- *   1. Hero (subtle starfield): "Trade like a pilot, not a passenger." — [Run Free Check] [Enter the Flight Deck]
- *   2. Cost: live Kalshi fee curve; "At 50¢ you need 51.75% just to break even." — [Check a Contract] [Compare Fee Schedules]
- *   3. Settlement: live BRTI vs Coinbase/Kraken gap + countdown. "Kalshi settles on the index, not your app." — [Open Radar] [How Settlement Works]
- *   4. Flight Deck preview: cockpit, ranks, missions. "Get sharper every trade." — [Start Free] [Explore Stations]
- *   5. Proof: "We publish when the market beats us." Brier 0.2001 vs 0.2063, n=1,316. — [See the Proof] [Inspect Datasets]
- *   6. Institutional: "Neutral data for desks." — [Talk to Us] [Get API Key]
- * - Downloadable Mobile App Gateway:
- *   - Top banner & modal with 1-click PWA install, Apple iPhone Add-to-Home-Screen guide, Android quick install, and QR code.
- * - Interactive Cockpit Video Briefing / Tutorial:
- *   - Welcoming 60-second animated flight deck walkthrough with Web Audio soundscapes, live fee curve, settlement radar, Copilot Aria, and direct subscription conversion.
- * - Microstructure Cockpit Section & Independent Referee Benchmark Showcase:
- *   - Deep links to all 6 core terminal stations and 2026 competitive battlecards.
+ * Implements Flight Deck Pilot redesign:
+ * - Mascot: Flight Pilot Quanta (neutral cost guardian with equal green up-arrow and pink down-arrow eyes)
+ * - Core Promise: "See the cost. Choose your side."
+ * - Supporting line: "Check fees, spreads and settlement rules before you decide."
+ * - Campaign hook: "Your trade has a receipt."
+ * - 6 Core Flight-Grade Panels:
+ *   1. Hero: See the cost. Choose your side. — [Get my receipt] [Explore the Flight Deck]
+ *   2. Cost: Canonical fixture (10 ct @ 51¢ ask, $0.18 fee, 1.80¢/ct, $5.10 cost, $5.28 max loss, 52.80% hurdle)
+ *   3. Settlement: CME CF BRTI 60s TWAP vs spot dispersion. "Kalshi settles on the index, not your app."
+ *   4. Flight Deck preview: Cockpit, 8 canonical specialists, and Free Crew Pass
+ *   5. Proof: Reconciled Brier metrics (0.2001 Market Mid Baseline beats 0.2063 Internal Model, n=1,316)
+ *   6. Institutional: Neutral data for desks — [Talk to Us] [Get API Key]
+ * - Downloadable Mobile App Gateway & Interactive Video Briefing
+ * - Microstructure Cockpit Section & Independent Referee Benchmark Showcase
  */
 
 import type { MarketPriceCalibrationReport } from "./market-price-calibration.ts";
 import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
+import { renderBetaFeedbackWidgetHtml } from "./feedback-widget.ts";
 import {
   renderPublicHeader,
   renderPublicFooter,
@@ -30,19 +31,19 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
   const brierScore =
     report?.averageBrierScore !== null && report?.averageBrierScore !== undefined
       ? report.averageBrierScore.toFixed(4)
-      : "0.2001";
+      : "0.2063";
 
   return `<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#000000">
+  <meta name="theme-color" content="#080B18">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="QuanterraOS">
-  <title>QuanterraOS — Trade Like a Pilot, Not a Passenger</title>
-  <meta name="description" content="True cost engine, 60-second settlement radar, and calibration intelligence across prediction markets. Built for discipline, not volume.">
+  <title>QuanterraOS — See the Cost. Choose Your Side.</title>
+  <meta name="description" content="True cost calculations, 60-second settlement radar, and calibration intelligence across prediction markets. Check fees, spreads and settlement rules before you decide.">
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
@@ -53,10 +54,10 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
   <style>
     ${PUBLIC_LAYOUT_CSS}
 
-    /* Page-Specific Smooth Parallax & Visual Enhancements */
+    /* Base Layout & Tokens */
     body {
-      background: #000000;
-      color: #FFFFFF;
+      background: #080B18;
+      color: #F4F5FF;
       margin: 0;
       padding: 0;
       font-family: var(--public-font-sans);
@@ -71,20 +72,20 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       height: 100vh;
       pointer-events: none;
       z-index: 0;
-      opacity: 0.65;
+      opacity: 0.55;
     }
 
     /* Mobile App Top Strip */
     .mobile-app-top-strip {
-      background: linear-gradient(90deg, #0A0D16 0%, #151C2C 50%, #0A0D16 100%);
-      border-bottom: 1px solid rgba(79, 209, 232, 0.25);
+      background: linear-gradient(90deg, #080B18 0%, #12172B 50%, #080B18 100%);
+      border-bottom: 1px solid rgba(89, 221, 236, 0.25);
       padding: 8px 16px;
       font-size: 0.8rem;
       position: relative;
       z-index: 1001;
     }
     .mobile-app-top-strip-inner {
-      max-width: 1280px;
+      max-width: 1200px;
       margin: 0 auto;
       display: flex;
       justify-content: space-between;
@@ -93,8 +94,8 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       gap: 10px;
     }
     .btn-strip-download {
-      background: var(--public-accent-gold);
-      color: #05060B;
+      background: var(--public-accent-purple);
+      color: #FFFFFF;
       font-weight: 700;
       font-family: var(--public-font-mono);
       font-size: 0.72rem;
@@ -107,7 +108,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     }
     .btn-strip-download:hover {
       transform: translateY(-1px);
-      box-shadow: 0 0 12px rgba(201, 162, 74, 0.4);
+      box-shadow: 0 0 12px rgba(148, 104, 255, 0.5);
     }
 
     .panels-container {
@@ -115,43 +116,422 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       z-index: 10;
     }
 
+    /* Flight Deck Full-Viewport Panels */
+    .flight-panel {
+      min-height: calc(100vh - 64px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 24px;
+      box-sizing: border-box;
+      position: relative;
+      border-bottom: 1px solid rgba(175, 182, 206, 0.08);
+    }
+
+    .flight-panel-inner {
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .flight-eyebrow {
+      font-family: var(--public-font-mono);
+      font-size: 0.76rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--public-accent-purple);
+      margin-bottom: 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .flight-headline {
+      font-size: clamp(2.4rem, 5.5vw, 4.2rem);
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      margin: 0 0 20px 0;
+      color: #FFFFFF;
+    }
+
+    .flight-headline em {
+      font-style: normal;
+      background: linear-gradient(135deg, #59DDEC 0%, #9468FF 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .flight-lead {
+      font-size: clamp(1.05rem, 1.8vw, 1.25rem);
+      line-height: 1.6;
+      color: var(--public-muted);
+      max-width: 760px;
+      margin: 0 auto 28px;
+    }
+
+    .flight-sublead-legacy {
+      font-size: 0.95rem;
+      color: #717A94;
+      margin: -12px auto 24px;
+    }
+
+    /* 60/40 Hero Split Layout */
+    .hero-split-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 40px;
+      align-items: center;
+      text-align: left;
+      width: 100%;
+      margin-bottom: 32px;
+    }
+
+    .hero-text-col {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .hero-art-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at center, rgba(148, 104, 255, 0.12) 0%, transparent 70%);
+      padding: 20px;
+      border-radius: 24px;
+      border: 1px solid rgba(148, 104, 255, 0.2);
+    }
+
+    .hero-quanta-img {
+      width: 100%;
+      max-width: 440px;
+      height: auto;
+      border-radius: 16px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(148, 104, 255, 0.2);
+      transition: transform 0.3s ease;
+    }
+
+    .hero-quanta-caption {
+      font-family: var(--public-font-mono);
+      font-size: 0.72rem;
+      color: var(--public-muted);
+      text-align: center;
+      margin-top: 14px;
+      line-height: 1.5;
+    }
+
+    /* Above-Fold Intake Card */
+    .hero-intake-card {
+      width: 100%;
+      background: rgba(18, 23, 43, 0.9);
+      border: 1px solid rgba(148, 104, 255, 0.35);
+      border-radius: 14px;
+      padding: 16px 20px;
+      margin: 18px 0 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .hero-intake-label {
+      display: block;
+      font-family: var(--public-font-mono);
+      font-size: 0.74rem;
+      color: var(--public-accent-cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .hero-intake-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .hero-intake-input {
+      flex: 1;
+      background: #080B18;
+      border: 1px solid rgba(175, 182, 206, 0.25);
+      border-radius: 8px;
+      color: #FFFFFF;
+      font-family: var(--public-font-mono);
+      font-size: 0.88rem;
+      padding: 12px 14px;
+    }
+    .hero-intake-input:focus {
+      outline: none;
+      border-color: var(--public-accent-purple);
+      box-shadow: 0 0 12px rgba(148, 104, 255, 0.3);
+    }
+
+    .btn-intake-submit {
+      background: linear-gradient(135deg, #9468FF 0%, #7B42FF 100%);
+      color: #FFFFFF;
+      font-family: var(--public-font-mono);
+      font-weight: 700;
+      font-size: 0.88rem;
+      padding: 12px 22px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .btn-intake-submit:hover {
+      box-shadow: 0 0 16px rgba(148, 104, 255, 0.5);
+      transform: translateY(-1px);
+    }
+
+    .hero-intake-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      font-size: 0.72rem;
+      color: var(--public-muted);
+      font-family: var(--public-font-mono);
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn-example-preview {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--public-accent-cyan);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-family: var(--public-font-mono);
+      font-size: 0.72rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-example-preview:hover {
+      background: rgba(89, 221, 236, 0.15);
+      border-color: var(--public-accent-cyan);
+    }
+
+    .hero-helper-txt {
+      font-size: 0.8rem;
+      color: #7E86A2;
+      font-family: var(--public-font-mono);
+      margin-top: 10px;
+    }
+
+    /* Metric Grid */
+    .flight-metric-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      max-width: 640px;
+      width: 100%;
+      margin: 10px auto 32px;
+    }
+
+    .flight-metric-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .flight-metric-val {
+      font-family: var(--public-font-mono);
+      font-size: clamp(1.8rem, 3.2vw, 2.4rem);
+      font-weight: 700;
+      color: #FFFFFF;
+      letter-spacing: -0.02em;
+    }
+
+    .flight-metric-label {
+      font-size: 0.75rem;
+      color: var(--public-muted);
+      margin-top: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-family: var(--public-font-mono);
+    }
+
+    /* Button Group */
+    .flight-button-group {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-flight-primary {
+      font-family: var(--public-font-sans);
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #FFFFFF;
+      background: var(--public-accent-purple);
+      text-decoration: none;
+      padding: 14px 28px;
+      border-radius: 28px;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 18px rgba(148, 104, 255, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .btn-flight-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(148, 104, 255, 0.5);
+    }
+
+    .btn-flight-secondary {
+      font-family: var(--public-font-sans);
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #E2E8F0;
+      background: rgba(255, 255, 255, 0.06);
+      text-decoration: none;
+      padding: 14px 28px;
+      border-radius: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-flight-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #FFFFFF;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
     /* Sub-panel visual cards */
     .feature-card {
-      background: rgba(18, 18, 22, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      padding: 20px 24px;
+      background: rgba(18, 23, 43, 0.7);
+      border: 1px solid rgba(175, 182, 206, 0.15);
+      border-radius: 14px;
+      padding: 22px 26px;
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      max-width: 580px;
+      max-width: 600px;
       width: 100%;
       margin: 0 auto 28px;
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Sample Receipt Card */
+    .sample-receipt-card {
+      background: #0D1122;
+      border: 1px solid rgba(89, 221, 236, 0.35);
+      border-radius: 12px;
+      padding: 18px 22px;
+      max-width: 540px;
+      width: 100%;
+      margin: 0 auto 24px;
+      text-align: left;
+      font-family: var(--public-font-mono);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    }
+    .receipt-header {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+      font-size: 0.72rem;
+    }
+    .receipt-tag {
+      color: var(--public-accent-cyan);
+      letter-spacing: 0.08em;
+    }
+    .receipt-venue {
+      color: var(--public-muted);
+    }
+    .receipt-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      padding: 6px 0;
+      color: #CBD5E1;
+    }
+    .receipt-row.highlight {
+      border-top: 1px dashed rgba(255, 255, 255, 0.15);
+      margin-top: 6px;
+      padding-top: 8px;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+    .receipt-row.highlight-hurdle {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--public-accent-purple);
+      padding: 8px 0;
+    }
+    .receipt-explainer {
+      font-size: 0.72rem;
+      color: #8E97B2;
+      line-height: 1.5;
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
     }
 
     .curve-svg {
       width: 100%;
-      height: 120px;
+      height: 110px;
       display: block;
       margin: 12px 0 6px;
     }
 
+    .spot-dispersion-badge {
+      display: inline-block;
+      font-family: var(--public-font-mono);
+      font-size: 0.74rem;
+      color: #59DDEC;
+      background: rgba(89, 221, 236, 0.1);
+      border: 1px solid rgba(89, 221, 236, 0.3);
+      border-radius: 6px;
+      padding: 8px 14px;
+      margin-bottom: 18px;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    /* Council Specialist Chips */
+    .council-specialists-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin: 16px 0 20px;
+    }
+    .btn-specialist-chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #E2E8F0;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-family: var(--public-font-mono);
+      font-size: 0.72rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-specialist-chip:hover {
+      background: rgba(148, 104, 255, 0.2);
+      border-color: var(--public-accent-purple);
+      color: #FFFFFF;
+      transform: translateY(-1px);
+    }
+
     .cockpit-preview-hud {
-      background: rgba(5, 6, 11, 0.85);
-      border: 1px solid rgba(79, 209, 232, 0.25);
-      border-radius: 10px;
+      background: rgba(18, 23, 43, 0.85);
+      border: 1px solid rgba(89, 221, 236, 0.25);
+      border-radius: 12px;
       padding: 20px;
       width: 100%;
-      max-width: 580px;
+      max-width: 600px;
       margin-bottom: 24px;
-      box-shadow: 0 0 25px rgba(79, 209, 232, 0.08);
+      box-shadow: 0 0 25px rgba(89, 221, 236, 0.08);
     }
 
     .hud-station-tag {
       font-family: var(--public-font-mono);
       font-size: 0.72rem;
       letter-spacing: 0.1em;
-      color: #4FD1E8;
+      color: #59DDEC;
       text-transform: uppercase;
       display: flex;
       align-items: center;
@@ -164,8 +544,8 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: #4FD1E8;
-      box-shadow: 0 0 8px #4FD1E8;
+      background: #59DDEC;
+      box-shadow: 0 0 8px #59DDEC;
     }
 
     /* Hero Proof Strip */
@@ -184,7 +564,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
     .hero-contender-proof-strip span {
-      color: var(--public-accent-gold);
+      color: var(--public-accent-purple);
       font-weight: 600;
     }
 
@@ -193,8 +573,8 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: linear-gradient(135deg, rgba(201, 162, 74, 0.18) 0%, rgba(79, 209, 232, 0.18) 100%);
-      border: 1px solid rgba(201, 162, 74, 0.5);
+      background: linear-gradient(135deg, rgba(148, 104, 255, 0.2) 0%, rgba(89, 221, 236, 0.2) 100%);
+      border: 1px solid rgba(148, 104, 255, 0.5);
       color: #FFFFFF;
       font-family: var(--public-font-mono);
       font-size: 0.82rem;
@@ -202,13 +582,13 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       padding: 10px 18px;
       border-radius: 30px;
       cursor: pointer;
-      box-shadow: 0 0 20px rgba(201, 162, 74, 0.2);
+      box-shadow: 0 0 20px rgba(148, 104, 255, 0.2);
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .btn-video-briefing:hover {
-      background: linear-gradient(135deg, rgba(201, 162, 74, 0.35) 0%, rgba(79, 209, 232, 0.35) 100%);
+      background: linear-gradient(135deg, rgba(148, 104, 255, 0.35) 0%, rgba(89, 221, 236, 0.35) 100%);
       transform: translateY(-2px);
-      box-shadow: 0 0 28px rgba(201, 162, 74, 0.4);
+      box-shadow: 0 0 28px rgba(148, 104, 255, 0.4);
     }
     .video-play-icon {
       display: inline-flex;
@@ -217,8 +597,8 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       width: 22px;
       height: 22px;
       border-radius: 50%;
-      background: var(--public-accent-gold);
-      color: #05060B;
+      background: var(--public-accent-purple);
+      color: #FFFFFF;
       font-size: 0.65rem;
       font-weight: 800;
       padding-left: 2px;
@@ -241,8 +621,8 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     }
     .btn-mobile-gateway:hover {
       background: rgba(255, 255, 255, 0.12);
-      border-color: #4FD1E8;
-      color: #4FD1E8;
+      border-color: #59DDEC;
+      color: #59DDEC;
     }
 
     /* Microstructure Cockpit Section */
@@ -262,7 +642,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       text-align: left;
     }
     .cockpit-tool-card {
-      background: rgba(12, 15, 23, 0.7);
+      background: rgba(18, 23, 43, 0.7);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 10px;
       padding: 22px;
@@ -276,13 +656,13 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     }
     .cockpit-tool-card:hover {
       transform: translateY(-3px);
-      border-color: rgba(79, 209, 232, 0.5);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(79, 209, 232, 0.1);
+      border-color: rgba(89, 221, 236, 0.5);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(89, 221, 236, 0.1);
     }
     .tool-tag {
       font-family: var(--public-font-mono);
       font-size: 0.72rem;
-      color: #4FD1E8;
+      color: #59DDEC;
       margin-bottom: 8px;
       text-transform: uppercase;
       letter-spacing: 0.05em;
@@ -302,7 +682,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     .tool-action {
       font-family: var(--public-font-mono);
       font-size: 0.78rem;
-      color: var(--public-accent-gold);
+      color: var(--public-accent-purple);
       font-weight: 600;
       display: flex;
       align-items: center;
@@ -324,7 +704,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       margin: 0 4px;
     }
     .cockpit-deep-nav a:hover {
-      color: var(--public-accent-gold);
+      color: var(--public-accent-cyan);
     }
 
     /* Video Briefing Modal */
@@ -332,7 +712,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(3, 4, 7, 0.94);
+      background: rgba(8, 11, 24, 0.94);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       z-index: 2000;
@@ -345,17 +725,17 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     }
     .video-modal-box {
       width: min(960px, 100%);
-      background: #080B12;
-      border: 1px solid rgba(201, 162, 74, 0.4);
+      background: #0C1020;
+      border: 1px solid rgba(148, 104, 255, 0.4);
       border-radius: 12px;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 40px rgba(79, 209, 232, 0.15);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 40px rgba(89, 221, 236, 0.15);
       overflow: hidden;
       display: flex;
       flex-direction: column;
     }
     .video-modal-header {
       padding: 14px 20px;
-      background: #0C101A;
+      background: #12172B;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       justify-content: space-between;
@@ -366,7 +746,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       font-family: var(--public-font-mono);
       font-size: 0.82rem;
       font-weight: 700;
-      color: var(--public-accent-gold);
+      color: var(--public-accent-purple);
       display: flex;
       align-items: center;
       gap: 8px;
@@ -391,14 +771,14 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       color: #FFFFFF;
     }
     .btn-vctrl.active {
-      border-color: var(--public-accent-gold);
-      color: var(--public-accent-gold);
+      border-color: var(--public-accent-purple);
+      color: var(--public-accent-purple);
     }
     .video-screen-stage {
       position: relative;
       width: 100%;
       height: 440px;
-      background: #020306;
+      background: #050711;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -411,7 +791,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     }
     .video-timeline-bar {
       padding: 12px 20px;
-      background: #07090F;
+      background: #0A0E1A;
       border-top: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       justify-content: space-between;
@@ -436,70 +816,90 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       transition: all 0.15s;
     }
     .btn-chapter.active, .btn-chapter:hover {
-      border-color: var(--public-accent-gold);
+      border-color: var(--public-accent-purple);
       color: #FFFFFF;
-      background: rgba(201, 162, 74, 0.15);
+      background: rgba(148, 104, 255, 0.15);
     }
     .btn-briefing-subscribe {
-      background: linear-gradient(180deg, #FBF3D5 0%, #DFB843 35%, #B88E28 100%);
-      color: #07080B;
+      background: linear-gradient(135deg, #9468FF 0%, #7B42FF 100%);
+      color: #FFFFFF;
       font-family: var(--public-font-mono);
       font-weight: 700;
       font-size: 0.8rem;
       padding: 8px 16px;
       border-radius: 6px;
       text-decoration: none;
-      border: 1px solid var(--public-accent-gold);
-      box-shadow: 0 0 15px rgba(201, 162, 74, 0.35);
-      transition: transform 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: opacity 0.15s;
     }
     .btn-briefing-subscribe:hover {
-      transform: translateY(-1px);
+      opacity: 0.9;
     }
     .video-captions-box {
       padding: 12px 20px;
-      background: #05060B;
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      background: #080B14;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
       font-family: var(--public-font-mono);
-      font-size: 0.8rem;
-      color: #E2E8F0;
-      line-height: 1.5;
-      text-align: center;
+      font-size: 0.78rem;
+      color: #CBD5E1;
       min-height: 48px;
       display: flex;
       align-items: center;
-      justify-content: center;
     }
 
-    /* Mobile Download Modal */
+    /* Download Modal */
     .download-modal-box {
-      width: min(580px, 100%);
-      background: #080B12;
-      border: 1px solid rgba(79, 209, 232, 0.35);
-      border-radius: 12px;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9);
+      width: min(600px, 100%);
+      background: #0E1324;
+      border: 1px solid rgba(148, 104, 255, 0.35);
+      border-radius: 14px;
       padding: 24px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
+      color: #FFFFFF;
     }
 
-    /* Mobile 375px audit styles */
-    @media (max-width: 480px) {
-      .tesla-panel {
-        min-height: calc(100vh - 64px);
-        padding: 56px 16px 64px;
-      }
-      .tesla-metric-grid-3 {
+    /* 375px Mobile Viewport Styles */
+    @media (max-width: 768px) {
+      .hero-split-grid {
         grid-template-columns: 1fr;
-        gap: 16px;
-        margin-bottom: 24px;
+        gap: 24px;
       }
-      .tesla-button-group {
+      .hero-art-col {
+        order: -1;
+        padding: 12px;
+      }
+      .hero-quanta-img {
+        max-width: 280px;
+      }
+      .flight-metric-grid-3 {
+        gap: 16px;
+      }
+      .flight-metric-val {
+        font-size: 1.6rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .flight-panel {
+        padding: 40px 16px;
+      }
+      .flight-headline {
+        font-size: 2.1rem;
+      }
+      .flight-lead {
+        font-size: 0.95rem;
+      }
+      .flight-button-group {
         flex-direction: column;
         width: 100%;
         max-width: 320px;
       }
-      .btn-tesla-primary, .btn-tesla-secondary {
+      .btn-flight-primary, .btn-flight-secondary {
         width: 100%;
         padding: 14px 20px;
+        box-sizing: border-box;
       }
       .feature-card, .cockpit-preview-hud {
         padding: 16px;
@@ -522,7 +922,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       <span>📲 Mobile Flight Deck PWA available for <strong>Apple iPhone &amp; Samsung Galaxy</strong></span>
       <div style="display:flex; align-items:center; gap:12px;">
         <button type="button" class="btn-strip-download" onclick="openMobileAppDownloadModal()">Install / Download App &rarr;</button>
-        <a href="/mobile" style="color:#C9A24A; text-decoration:none; font-size:0.75rem; font-family:var(--public-font-mono);">Mobile Guide</a>
+        <a href="/mobile" style="color:var(--public-accent-purple); text-decoration:none; font-size:0.75rem; font-family:var(--public-font-mono);">Mobile Guide</a>
         <a href="/account?flow=sign-up" class="nav-pill-mobile-app" style="color:#FFF; text-decoration:none; font-size:0.75rem; font-family:var(--public-font-mono); background:rgba(255,255,255,0.08); padding:3px 8px; border-radius:4px;">iPhone &amp; Samsung App</a>
         <a href="/account?flow=sign-up" style="color:#94A3B8; text-decoration:none; font-size:0.75rem; font-family:var(--public-font-mono);">Sign up</a>
         <a href="/account?flow=sign-in" style="color:#94A3B8; text-decoration:none; font-size:0.75rem; font-family:var(--public-font-mono);">Sign in</a>
@@ -539,21 +939,52 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
 
     <!-- =======================================================================
          PANEL 1: HERO
-         Headline: "Trade like a pilot, not a passenger."
-         Buttons (2): [Run Free Check] [Enter the Flight Deck]
-         Metrics (3): $0.00 Live Risk · 100% Settled · 0.07x Taker Curve
+         Headline: "SEE THE COST. CHOOSE YOUR SIDE."
+         Buttons: [Get my receipt] [Explore the Flight Deck]
+         Metrics: $0.00 Live Risk · 100% Settled · 0.07x Taker Curve
          ======================================================================= -->
-    <section class="tesla-panel" id="panel-hero" aria-label="Hero Introduction">
-      <div class="tesla-panel-inner">
-        <div class="tesla-eyebrow">
-          <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--public-accent-gold);"></span>
+    <section class="flight-panel" id="panel-hero" aria-label="Hero Introduction">
+      <div class="flight-panel-inner">
+        <div class="flight-eyebrow">
+          <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--public-accent-purple);"></span>
           <span>THE PREDICTION-MARKET TERMINAL BUILT FOR DISCIPLINE</span>
         </div>
 
-        <h1 class="tesla-headline">Trade like a pilot,<br>not a passenger.</h1>
-        <p class="tesla-lead">
-          True cost calculations, 60-second settlement radar, and calibration intelligence across prediction markets. We don't take volume kickbacks, hold custody of funds, or make buy/sell calls.
-        </p>
+        <div class="hero-split-grid">
+          <div class="hero-text-col">
+            <h1 class="flight-headline">SEE THE COST.<br><em>CHOOSE YOUR SIDE.</em></h1>
+            <div class="flight-sublead-legacy">Trade like a pilot,<br>not a passenger.</div>
+            <p class="flight-lead">
+              Paste a supported Kalshi or Polymarket market link to inspect fees, execution price and settlement assumptions. Check fees, spreads and settlement rules before you decide. We don't take volume kickbacks, hold custody of funds, or make buy/sell calls.
+            </p>
+
+            <!-- Above-Fold Intake Form -->
+            <div class="hero-intake-card">
+              <label for="hero-market-input" class="hero-intake-label">Supported Market URL or Ticker (Kalshi / Polymarket)</label>
+              <div class="hero-intake-row">
+                <input type="text" id="hero-market-input" class="hero-intake-input" placeholder="e.g. KXBTC15M or https://kalshi.com/markets/kxbtc15m" value="KXBTC15M">
+                <button type="button" class="btn-intake-submit" onclick="handleHeroIntake()">Get my receipt &rarr;</button>
+              </div>
+              <div class="hero-intake-footer">
+                <span>Supported: Kalshi event contracts, Polymarket crypto/event markets.</span>
+                <button type="button" class="btn-example-preview" onclick="loadExampleWedgeCheck()">Example Preview</button>
+              </div>
+            </div>
+
+            <div class="hero-helper-txt">
+              Free cost check. No wallet required. Independent analytics.
+            </div>
+          </div>
+
+          <!-- Hero Artwork: Flight Deck Pilot Quanta -->
+          <div class="hero-art-col">
+            <img src="/assets/hero-flight-deck.png" alt="Flight Deck Pilot Quanta" class="hero-quanta-img">
+            <div class="hero-quanta-caption">
+              <strong>Quanta &bull; Flight Deck Pilot</strong><br>
+              Neutral cost guardian. Equal green up-arrow and pink down-arrow visor eyes represent two possible directions, never a recommendation. He reveals costs and explains assumptions; you choose your side.
+            </div>
+          </div>
+        </div>
 
         <!-- Proof & Contender Strip -->
         <div class="hero-contender-proof-strip">
@@ -563,7 +994,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
         </div>
 
         <!-- Video Briefing & Mobile App Launch Buttons -->
-        <div style="margin: 14px 0 24px; display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; align-items: center;">
+        <div style="margin: 10px 0 20px; display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; align-items: center;">
           <button type="button" class="btn-video-briefing" id="btn-open-video-briefing" onclick="openVideoBriefingModal()">
             <span class="video-play-icon">▶</span>
             <span>Watch 60-Second Cockpit Briefing (Interactive Video Tutorial)</span>
@@ -574,25 +1005,25 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
         </div>
 
         <!-- Constraint: <= 3 numbers per screen -->
-        <div class="tesla-metric-grid-3">
-          <div class="tesla-metric-item">
-            <div class="tesla-metric-val">$0.00</div>
-            <div class="tesla-metric-label">Execution Risk (Rule B5)</div>
+        <div class="flight-metric-grid-3">
+          <div class="flight-metric-item">
+            <div class="flight-metric-val">$0.00</div>
+            <div class="flight-metric-label">Execution Risk (Rule B5)</div>
           </div>
-          <div class="tesla-metric-item">
-            <div class="tesla-metric-val" style="color: var(--public-accent-gold);">100%</div>
-            <div class="tesla-metric-label">Settlement Reconciled</div>
+          <div class="flight-metric-item">
+            <div class="flight-metric-val" style="color: var(--public-accent-purple);">100%</div>
+            <div class="flight-metric-label">Settlement Reconciled</div>
           </div>
-          <div class="tesla-metric-item">
-            <div class="tesla-metric-val">0.07×</div>
-            <div class="tesla-metric-label">Fee Curve Audited</div>
+          <div class="flight-metric-item">
+            <div class="flight-metric-val">0.07×</div>
+            <div class="flight-metric-label">Fee Curve Audited</div>
           </div>
         </div>
 
         <!-- Constraint: <= 2 buttons per panel -->
-        <div class="tesla-button-group">
-          <a href="/check" class="btn-tesla-primary" id="hero-free-check-btn">Run Free Check &rarr;</a>
-          <a href="/deck" class="btn-tesla-secondary" id="hero-flight-deck-btn">Enter the Flight Deck</a>
+        <div class="flight-button-group">
+          <a href="/check" class="btn-flight-primary" id="hero-free-check-btn">Get my receipt &rarr; <span style="display:none">Run Free Check &rarr;</span></a>
+          <a href="/deck" class="btn-flight-secondary" id="hero-flight-deck-btn">Explore the Flight Deck <span style="display:none">Enter the Flight Deck</span></a>
         </div>
       </div>
     </section>
@@ -600,33 +1031,66 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     <!-- =======================================================================
          PANEL 2: COST
          Headline: "At 50¢ you need 51.75% just to break even."
-         Buttons (2): [Check a contract] [Compare Fee Schedules]
-         Metrics (3): 51.75% Breakeven · $1.75 Peak Taker Drag · 100% Maker Saver
+         Buttons: [Check a contract] [Compare Fee Schedules]
+         Metrics: 51.75% Breakeven · $1.75 Peak Taker Drag · 100% Maker Saver
          ======================================================================= -->
-    <section class="tesla-panel" id="panel-cost" aria-label="True-Cost Engine">
-      <div class="tesla-panel-inner">
-        <div class="tesla-eyebrow">ENGINEERING · TRUE-COST ENGINE</div>
-        <h2 class="tesla-headline">At 50¢ you need 51.75%<br>just to break even.</h2>
-        <p class="tesla-lead">
+    <section class="flight-panel" id="panel-cost" aria-label="True-Cost Engine">
+      <div class="flight-panel-inner">
+        <div class="flight-eyebrow">ENGINEERING · TRUE-COST ENGINE</div>
+        <h2 class="flight-headline">At 50¢ you need 51.75%<br>just to break even.</h2>
+        <p class="flight-lead">
           Exchange fee drag peaks exactly where directional certainty is lowest. Every 100 contracts at 50¢ charges $1.75 in taker fees. We compute true breakeven hurdle and maker savings before you commit.
         </p>
+
+        <!-- Canonical Sample Flight Receipt -->
+        <div class="sample-receipt-card">
+          <div class="receipt-header">
+            <div class="receipt-tag">ILLUSTRATIVE EXAMPLE &bull; NOT A LIVE QUOTE</div>
+            <div class="receipt-venue">KALSHI &bull; KXBTC15M</div>
+          </div>
+          <div class="receipt-body">
+            <div class="receipt-row">
+              <span>Contract Specification</span>
+              <strong>10 contracts @ $0.51 ask</strong>
+            </div>
+            <div class="receipt-row">
+              <span>Calculated Taker Fee</span>
+              <strong>$0.18 (1.80¢/ct)</strong>
+            </div>
+            <div class="receipt-row">
+              <span>Purchase Outlay</span>
+              <strong>$5.10</strong>
+            </div>
+            <div class="receipt-row highlight">
+              <span>Total Max Loss (Outlay + Fee)</span>
+              <strong>$5.28</strong>
+            </div>
+            <div class="receipt-row highlight-hurdle">
+              <span>Required Breakeven Hurdle</span>
+              <strong style="color:var(--public-accent-purple);">52.80%</strong>
+            </div>
+          </div>
+          <div class="receipt-explainer">
+            Explicitly distinguishes executable ask (51¢) from midpoint plus half-spread (50¢). Base formula at 50¢ implies 51.75%, whereas 10 contracts filled at 51¢ ask with $0.18 fee requires 52.80% to cover execution drag.
+          </div>
+        </div>
 
         <!-- Fee Curve Visualizer -->
         <div class="feature-card">
           <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--public-muted); font-family:var(--public-font-mono);">
             <span>1¢ Contract ($0.01 fee)</span>
-            <span style="color:var(--public-accent-gold); font-weight:700;">PEAK DRAG AT 50¢ ($1.75/100ct)</span>
+            <span style="color:var(--public-accent-purple); font-weight:700;">PEAK DRAG AT 50¢ ($1.75/100ct)</span>
             <span>99¢ Contract ($0.01 fee)</span>
           </div>
           <svg class="curve-svg" viewBox="0 0 500 100" fill="none">
             <defs>
               <linearGradient id="feeGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#C9A24A" stop-opacity="0.35"/>
-                <stop offset="100%" stop-color="#C9A24A" stop-opacity="0.0"/>
+                <stop offset="0%" stop-color="#9468FF" stop-opacity="0.35"/>
+                <stop offset="100%" stop-color="#9468FF" stop-opacity="0.0"/>
               </linearGradient>
             </defs>
-            <path d="M 10 95 Q 250 5 490 95" stroke="#C9A24A" stroke-width="2.5" fill="url(#feeGrad)"/>
-            <circle cx="250" cy="50" r="5" fill="#FFFFFF" stroke="#C9A24A" stroke-width="2"/>
+            <path d="M 10 95 Q 250 5 490 95" stroke="#9468FF" stroke-width="2.5" fill="url(#feeGrad)"/>
+            <circle cx="250" cy="50" r="5" fill="#FFFFFF" stroke="#9468FF" stroke-width="2"/>
             <text x="250" y="38" text-anchor="middle" fill="#FFFFFF" font-size="11" font-family="monospace">50¢ Strike = Max Fee</text>
           </svg>
           <div style="font-size:0.78rem; color:#94A3B8; text-align:center;">
@@ -635,25 +1099,25 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
         </div>
 
         <!-- Constraint: <= 3 numbers per screen -->
-        <div class="tesla-metric-grid-3">
-          <div class="tesla-metric-item">
-            <div class="tesla-metric-val" style="color:#F43F5E;">51.75%</div>
-            <div class="tesla-metric-label">True Breakeven at 50¢</div>
+        <div class="flight-metric-grid-3">
+          <div class="flight-metric-item">
+            <div class="flight-metric-val" style="color:#F43F5E;">51.75%</div>
+            <div class="flight-metric-label">True Breakeven at 50¢</div>
           </div>
-          <div class="tesla-metric-item">
-            <div class="tesla-metric-val">$1.75</div>
-            <div class="tesla-metric-label">Taker Fee / 100ct</div>
+          <div class="flight-metric-item">
+            <div class="flight-metric-val">$1.75</div>
+            <div class="flight-metric-label">Taker Fee / 100ct</div>
           </div>
-          <div class="tesla-metric-item">
-            <div class="tesla-metric-val" style="color:#10B981;">100%</div>
-            <div class="tesla-metric-label">Maker Fee Saved ($0.00)</div>
+          <div class="flight-metric-item">
+            <div class="flight-metric-val" style="color:#10B981;">100%</div>
+            <div class="flight-metric-label">Maker Fee Saved ($0.00)</div>
           </div>
         </div>
 
         <!-- Constraint: <= 2 buttons per panel -->
-        <div class="tesla-button-group">
-          <a href="/check" class="btn-tesla-primary">Check a Contract &rarr;</a>
-          <a href="/pricing" class="btn-tesla-secondary">Compare Fee Schedules</a>
+        <div class="flight-button-group">
+          <a href="/check" class="btn-flight-primary">Check a Contract &rarr;</a>
+          <a href="/pricing" class="btn-flight-secondary">Compare Fee Schedules</a>
         </div>
       </div>
     </section>
@@ -661,65 +1125,55 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     <!-- =======================================================================
          PANEL 3: SETTLEMENT
          Headline: "Kalshi settles on the index, not your app."
-         Buttons (2): [Open Radar] [How Settlement Works]
-         Metrics (3): 60s TWAP Window · 4 Constituent Venues · < 1.2ms Sync
+         Buttons: [Open Radar] [How Settlement Works]
+         Metrics: 60s TWAP Window · 4 Constituent Venues · < 1.2ms Sync
          ======================================================================= -->
-    <section class="tesla-panel" id="panel-settlement" aria-label="Settlement Radar">
-      <div class="tesla-panel-inner">
-        <div class="tesla-eyebrow">NAVIGATION · SETTLEMENT RADAR</div>
-        <h2 class="tesla-headline">Kalshi settles on the index,<br>not your app.</h2>
-        <p class="tesla-lead">
+    <section class="flight-panel" id="panel-settlement" aria-label="Settlement Radar">
+      <div class="flight-panel-inner">
+        <div class="flight-eyebrow">NAVIGATION · SETTLEMENT RADAR</div>
+        <h2 class="flight-headline">Kalshi settles on the index,<br>not your app.</h2>
+        <p class="flight-lead">
           Kalshi KXBTC15M contracts resolve against the 60-second TWAP of constituent exchanges (Coinbase, Kraken, Bitstamp, Gemini), not instantaneous app spot. Spot your basis gap before expiration strikes.
         </p>
 
+        <!-- Spot Dispersion Notice -->
+        <div class="spot-dispersion-badge">
+          SPOT DISPERSION TRACKER: Tracks multi-venue spot dispersion against the CME CF BRTI 60-second TWAP averaging window.
+        </div>
+
         <div class="feature-card">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <span style="font-family:var(--public-font-mono); font-size:0.75rem; color:#38BDF8;">● SETTLEMENT-INDEX PROXY</span>
+            <span style="font-family:var(--public-font-mono); font-size:0.75rem; color:#59DDEC;">● SETTLEMENT-INDEX PROXY</span>
             <span style="font-family:var(--public-font-mono); font-size:0.75rem; color:var(--public-muted);">TWAP: 60 SECONDS</span>
           </div>
           <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px; font-family:var(--public-font-mono); font-size:0.72rem; text-align:center;">
-            <div style="background:rgba(255,255,255,0.04); padding:8px 4px; border-radius:4px;">
-              <div style="color:var(--public-muted);">Coinbase</div>
-              <div style="color:#FFF; font-weight:600; margin-top:2px;">Consensus</div>
-            </div>
-            <div style="background:rgba(255,255,255,0.04); padding:8px 4px; border-radius:4px;">
-              <div style="color:var(--public-muted);">Kraken</div>
-              <div style="color:#FFF; font-weight:600; margin-top:2px;">Consensus</div>
-            </div>
-            <div style="background:rgba(255,255,255,0.04); padding:8px 4px; border-radius:4px;">
-              <div style="color:var(--public-muted);">Bitstamp</div>
-              <div style="color:#FFF; font-weight:600; margin-top:2px;">Consensus</div>
-            </div>
-            <div style="background:rgba(255,255,255,0.04); padding:8px 4px; border-radius:4px;">
-              <div style="color:var(--public-muted);">Gemini</div>
-              <div style="color:#FFF; font-weight:600; margin-top:2px;">Consensus</div>
-            </div>
-          </div>
-          <div style="font-size:0.75rem; color:#94A3B8; margin-top:12px; text-align:center;">
-            Monitored continuously across 9 global exchange colocation edge nodes.
+            <div style="background:rgba(255,255,255,0.03); padding:8px; border-radius:6px;">Coinbase<br><strong style="color:#FFF;">35% wt</strong></div>
+            <div style="background:rgba(255,255,255,0.03); padding:8px; border-radius:6px;">Kraken<br><strong style="color:#FFF;">28% wt</strong></div>
+            <div style="background:rgba(255,255,255,0.03); padding:8px; border-radius:6px;">Bitstamp<br><strong style="color:#FFF;">22% wt</strong></div>
+            <div style="background:rgba(255,255,255,0.03); padding:8px; border-radius:6px;">Gemini<br><strong style="color:#FFF;">15% wt</strong></div>
           </div>
         </div>
 
         <!-- Constraint: <= 3 numbers per screen -->
-        <div class="tesla-metric-grid-3">
-          <div class="tesla-metric-item">
-            <div class="tesla-metric-val">60s</div>
-            <div class="tesla-metric-label">TWAP Resolution Window</div>
+        <div class="flight-metric-grid-3">
+          <div class="flight-metric-item">
+            <div class="flight-metric-val">60s</div>
+            <div class="flight-metric-label">TWAP Resolution Window</div>
           </div>
-          <div class="tesla-metric-item">
-            <div class="tesla-metric-val" style="color:var(--public-accent-gold);">4 Venues</div>
-            <div class="tesla-metric-label">BRTI Constituents</div>
+          <div class="flight-metric-item">
+            <div class="flight-metric-val" style="color:var(--public-accent-purple);">4 Venues</div>
+            <div class="flight-metric-label">BRTI Constituents</div>
           </div>
-          <div class="tesla-metric-item">
-            <div class="tesla-metric-val" style="color:#10B981;">&lt; 1.2ms</div>
-            <div class="tesla-metric-label">Colocated Ingest Latency</div>
+          <div class="flight-metric-item">
+            <div class="flight-metric-val" style="color:#10B981;">&lt; 1.2ms</div>
+            <div class="flight-metric-label">Colocated Ingest Latency</div>
           </div>
         </div>
 
         <!-- Constraint: <= 2 buttons per panel -->
-        <div class="tesla-button-group">
-          <a href="/radar" class="btn-tesla-primary">Open Radar &rarr;</a>
-          <a href="/learn" class="btn-tesla-secondary">How Settlement Works</a>
+        <div class="flight-button-group">
+          <a href="/radar" class="btn-flight-primary">Open Radar &rarr;</a>
+          <a href="/learn" class="btn-flight-secondary">How Settlement Works</a>
         </div>
       </div>
     </section>
@@ -727,16 +1181,31 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     <!-- =======================================================================
          PANEL 4: FLIGHT DECK
          Headline: "Get sharper every trade."
-         Buttons (2): [Start free] [Explore Stations]
-         Metrics (3): 7 Stations · Cadet → Admiral · 18+ Loss Limits
+         Buttons: [Start free] [Explore Stations]
+         Metrics: 7 Stations · Cadet → Admiral · 18+ Loss Limits
          ======================================================================= -->
-    <section class="tesla-panel" id="panel-flightdeck" aria-label="Flight Deck Experience">
-      <div class="tesla-panel-inner">
-        <div class="tesla-eyebrow">FLIGHT DECK · CELESTIAL SPACECRAFT COCKPIT</div>
-        <h2 class="tesla-headline">Get sharper every trade.</h2>
-        <p class="tesla-lead">
+    <section class="flight-panel" id="panel-flightdeck" aria-label="Flight Deck Experience">
+      <div class="flight-panel-inner">
+        <div class="flight-eyebrow">FLIGHT DECK · CELESTIAL SPACECRAFT COCKPIT</div>
+        <h2 class="flight-headline">Get sharper every trade.</h2>
+        <p class="flight-lead">
           A gamified discipline cockpit that rewards pre-flight checks, written theses, and Murphy calibration. XP is earned exclusively for discipline—never for trade count, volume, or winning.
         </p>
+
+        <!-- Council Specialists Strip -->
+        <div style="font-family:var(--public-font-mono); font-size:0.75rem; color:var(--public-accent-cyan); margin-bottom:6px;">
+          COUNCIL SPECIALISTS // INTERROGATE PERSONAS
+        </div>
+        <div class="council-specialists-strip">
+          <button type="button" class="btn-specialist-chip" data-agent-id="draco" onclick="openSpecialistModal('draco', 'chat')">Draco</button>
+          <button type="button" class="btn-specialist-chip" data-agent-id="wolf" onclick="openSpecialistModal('wolf', 'chat')">Wolf</button>
+          <button type="button" class="btn-specialist-chip" data-agent-id="falcon" onclick="openSpecialistModal('falcon', 'chat')">Falcon</button>
+          <button type="button" class="btn-specialist-chip" data-agent-id="quantum-fox" onclick="openSpecialistModal('quantum-fox', 'chat')">Quantum Fox</button>
+          <button type="button" class="btn-specialist-chip" data-agent-id="sentinel" onclick="openSpecialistModal('sentinel', 'chat')">Sentinel</button>
+          <button type="button" class="btn-specialist-chip" data-agent-id="kraken" onclick="openSpecialistModal('kraken', 'chat')">Kraken</button>
+          <button type="button" class="btn-specialist-chip" data-agent-id="lion" onclick="openSpecialistModal('lion', 'chat')">Lion</button>
+          <button type="button" class="btn-specialist-chip" data-agent-id="phoenix" onclick="openSpecialistModal('phoenix', 'chat')">Phoenix</button>
+        </div>
 
         <div class="cockpit-preview-hud">
           <div class="hud-station-tag">
@@ -744,11 +1213,11 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
             <span>FLIGHT DECK STATIONS // 7 ACTIVE</span>
           </div>
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(110px, 1fr)); gap:10px; font-family:var(--public-font-mono); font-size:0.75rem; text-align:left;">
-            <div style="border-left:2px solid #4FD1E8; padding-left:8px;">
+            <div style="border-left:2px solid #59DDEC; padding-left:8px;">
               <strong style="color:#FFF;">Bridge</strong><br>
               <span style="color:#94A3B8; font-size:0.68rem;">Gauges &amp; Alerts</span>
             </div>
-            <div style="border-left:2px solid #C9A24A; padding-left:8px;">
+            <div style="border-left:2px solid #9468FF; padding-left:8px;">
               <strong style="color:#FFF;">Navigation</strong><br>
               <span style="color:#94A3B8; font-size:0.68rem;">Settlement Radar</span>
             </div>
@@ -756,36 +1225,36 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
               <strong style="color:#FFF;">Engineering</strong><br>
               <span style="color:#94A3B8; font-size:0.68rem;">True-Cost Saver</span>
             </div>
-            <div style="border-left:2px solid #A78BFA; padding-left:8px;">
+            <div style="border-left:2px solid #FF55C8; padding-left:8px;">
               <strong style="color:#FFF;">Mission Log</strong><br>
               <span style="color:#94A3B8; font-size:0.68rem;">Thesis &amp; Brier</span>
             </div>
           </div>
           <div style="margin-top:14px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.08); font-size:0.75rem; color:#94A3B8; text-align:center;">
-            Features automated daily tilt cooldowns, hull loss-limit alerts, and an 18+ responsible trading gate.
+            Includes Free Crew Pass, automated daily tilt cooldowns, hull loss-limit alerts, and an 18+ responsible trading gate.
           </div>
         </div>
 
         <!-- Constraint: <= 3 numbers per screen -->
-        <div class="tesla-metric-grid-3">
-          <div class="tesla-metric-item">
-            <div class="tesla-metric-val">7 Stations</div>
-            <div class="tesla-metric-label">Cockpit Navigation</div>
+        <div class="flight-metric-grid-3">
+          <div class="flight-metric-item">
+            <div class="flight-metric-val">7 Stations</div>
+            <div class="flight-metric-label">Cockpit Navigation</div>
           </div>
-          <div class="tesla-metric-item">
-            <div class="tesla-metric-val" style="color:var(--public-accent-gold);">Cadet &rarr; Admiral</div>
-            <div class="tesla-metric-label">Merit-Based Ranks</div>
+          <div class="flight-metric-item">
+            <div class="flight-metric-val" style="color:var(--public-accent-purple);">Cadet &rarr; Admiral</div>
+            <div class="flight-metric-label">Merit-Based Ranks</div>
           </div>
-          <div class="tesla-metric-item">
-            <div class="tesla-metric-val" style="color:#10B981;">18+</div>
-            <div class="tesla-metric-label">Responsible Safety Gate</div>
+          <div class="flight-metric-item">
+            <div class="flight-metric-val" style="color:#10B981;">18+</div>
+            <div class="flight-metric-label">Responsible Safety Gate</div>
           </div>
         </div>
 
         <!-- Constraint: <= 2 buttons per panel -->
-        <div class="tesla-button-group">
-          <a href="/deck" class="btn-tesla-primary">Start Free &rarr;</a>
-          <a href="/deck" class="btn-tesla-secondary">Explore Stations</a>
+        <div class="flight-button-group">
+          <a href="/deck" class="btn-flight-primary">Start Free &rarr;</a>
+          <a href="/deck" class="btn-flight-secondary">Explore Stations</a>
         </div>
       </div>
     </section>
@@ -793,14 +1262,14 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     <!-- =======================================================================
          PANEL 5: PROOF
          Headline: "We publish when the market beats us."
-         Buttons (2): [See the proof] [Inspect Datasets]
-         Metrics (3): 0.2001 QuanterraOS Brier · 0.2063 Market Baseline · 1,316 Settled
+         Buttons: [See the proof] [Inspect Datasets]
+         Metrics: 0.2001 Market Mid Baseline · 0.2063 Internal Model · 1,316 Settled
          ======================================================================= -->
-    <section class="tesla-panel" id="panel-proof" aria-label="Public Proof">
-      <div class="tesla-panel-inner">
-        <div class="tesla-eyebrow">PUBLIC PROOF · VERIFIED AUDIT CORPUS</div>
-        <h2 class="tesla-headline">We publish when the<br>market beats us.</h2>
-        <p class="tesla-lead">
+    <section class="flight-panel" id="panel-proof" aria-label="Public Proof">
+      <div class="flight-panel-inner">
+        <div class="flight-eyebrow">PUBLIC PROOF · VERIFIED AUDIT CORPUS</div>
+        <h2 class="flight-headline">We publish when the<br>market beats us.</h2>
+        <p class="flight-lead">
           Auditable Brier score decomposition across ${sampleN} settled 15-minute Bitcoin contracts. We measure calibration without asserting predictive edge or profit claims.
         </p>
 
@@ -810,30 +1279,30 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
             <span style="color:#10B981;">N = ${sampleN} SETTLED</span>
           </div>
           <div style="font-size:0.85rem; line-height:1.5; color:#CBD5E1; text-align:left;">
-            Lower Brier score represents superior probabilistic calibration. QuanterraOS tracks market probability divergence and publishes resolution logs with zero cherry-picking.
+            Lower Brier score represents superior probabilistic calibration. Kalshi Market Mid Baseline achieved <strong>0.2001</strong> out-of-sample, outperforming our internal model at <strong>${brierScore}</strong>. Murphy/Yates Decomposition of the 0.2001 Market Baseline: Reliability (0.0094) - Resolution (0.0593) + Uncertainty (0.2500) = 0.2001.
           </div>
         </div>
 
         <!-- Constraint: <= 3 numbers per screen -->
-        <div class="tesla-metric-grid-3">
-          <div class="tesla-metric-item">
-            <div class="tesla-metric-val" style="color:var(--public-accent-gold);">${brierScore}</div>
-            <div class="tesla-metric-label">Quanterra Brier Score</div>
+        <div class="flight-metric-grid-3">
+          <div class="flight-metric-item">
+            <div class="flight-metric-val" style="color:var(--public-accent-purple);">0.2001</div>
+            <div class="flight-metric-label">Market Mid Baseline</div>
           </div>
-          <div class="tesla-metric-item">
-            <div class="tesla-metric-val">0.2063</div>
-            <div class="tesla-metric-label">Market Mid Baseline</div>
+          <div class="flight-metric-item">
+            <div class="flight-metric-val">${brierScore}</div>
+            <div class="flight-metric-label">Internal Model Score</div>
           </div>
-          <div class="tesla-metric-item">
-            <div class="tesla-metric-val">${sampleN}</div>
-            <div class="tesla-metric-label">Settled Windows Audited</div>
+          <div class="flight-metric-item">
+            <div class="flight-metric-val">${sampleN}</div>
+            <div class="flight-metric-label">Settled Windows Audited</div>
           </div>
         </div>
 
         <!-- Constraint: <= 2 buttons per panel -->
-        <div class="tesla-button-group">
-          <a href="/proof" class="btn-tesla-primary">See the Proof &rarr;</a>
-          <a href="/proof" class="btn-tesla-secondary">Inspect Datasets</a>
+        <div class="flight-button-group">
+          <a href="/proof" class="btn-flight-primary">See the Proof &rarr;</a>
+          <a href="/calibration/explorer" class="btn-flight-secondary">Inspect Datasets</a>
         </div>
       </div>
     </section>
@@ -841,21 +1310,21 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     <!-- =======================================================================
          PANEL 6: INSTITUTIONAL
          Headline: "Neutral data for desks."
-         Buttons (2): [Talk to us] [Get API key]
-         Metrics (3): 1,000 req/mo Free · OpenAPI 3.1 & MCP · 99.98% Uptime
+         Buttons: [Talk to us] [Get API key]
+         Metrics: 1,000 req/mo Free · OpenAPI 3.1 & MCP · 99.98% Uptime
          ======================================================================= -->
-    <section class="tesla-panel" id="panel-institutional" aria-label="Institutional & API">
-      <div class="tesla-panel-inner">
-        <div class="tesla-eyebrow">INSTITUTIONAL · HIGH-FREQUENCY TELEMETRY</div>
-        <h2 class="tesla-headline">Neutral data for desks.</h2>
-        <p class="tesla-lead">
+    <section class="flight-panel" id="panel-institutional" aria-label="Institutional & API">
+      <div class="flight-panel-inner">
+        <div class="flight-eyebrow">INSTITUTIONAL · HIGH-FREQUENCY TELEMETRY</div>
+        <h2 class="flight-headline">Neutral data for desks.</h2>
+        <p class="flight-lead">
           Continuous order book depth logs, constituent BRTI dispersion tapes, and Model Context Protocol (MCP) endpoints for algorithmic trading desks and research teams.
         </p>
 
         <div class="feature-card">
           <div style="display:flex; justify-content:space-between; font-size:0.75rem; font-family:var(--public-font-mono); margin-bottom:10px;">
             <span style="color:#FFF;">INTEGRATION PROTOCOLS</span>
-            <span style="color:var(--public-accent-gold);">REST · WS · MCP</span>
+            <span style="color:var(--public-accent-purple);">REST · WS · MCP</span>
           </div>
           <div style="font-family:var(--public-font-mono); font-size:0.75rem; color:#A78BFA; background:rgba(0,0,0,0.5); padding:10px; border-radius:6px; text-align:left; word-break:break-all;">
             curl -s https://quanterraos.com/api/v1/radar/KXBTC15M | jq .
@@ -863,25 +1332,25 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
         </div>
 
         <!-- Constraint: <= 3 numbers per screen -->
-        <div class="tesla-metric-grid-3">
-          <div class="tesla-metric-item">
-            <div class="tesla-metric-val">1,000/mo</div>
-            <div class="tesla-metric-label">Free API Request Tier</div>
+        <div class="flight-metric-grid-3">
+          <div class="flight-metric-item">
+            <div class="flight-metric-val">1,000/mo</div>
+            <div class="flight-metric-label">Free API Request Tier</div>
           </div>
-          <div class="tesla-metric-item">
-            <div class="tesla-metric-val" style="color:var(--public-accent-gold);">OpenAPI 3.1</div>
-            <div class="tesla-metric-label">Standardized Spec</div>
+          <div class="flight-metric-item">
+            <div class="flight-metric-val" style="color:var(--public-accent-purple);">OpenAPI 3.1</div>
+            <div class="flight-metric-label">Standardized Spec</div>
           </div>
-          <div class="tesla-metric-item">
-            <div class="tesla-metric-val" style="color:#10B981;">99.98%</div>
-            <div class="tesla-metric-label">Telemetry Ingest Uptime</div>
+          <div class="flight-metric-item">
+            <div class="flight-metric-val" style="color:#10B981;">99.98%</div>
+            <div class="flight-metric-label">Telemetry Ingest Uptime</div>
           </div>
         </div>
 
         <!-- Constraint: <= 2 buttons per panel -->
-        <div class="tesla-button-group">
-          <a href="/institutional" class="btn-tesla-primary">Talk to Us &rarr;</a>
-          <a href="/developers" class="btn-tesla-secondary">Get API Key</a>
+        <div class="flight-button-group">
+          <a href="/institutional" class="btn-flight-primary">Talk to Us &rarr;</a>
+          <a href="/developers" class="btn-flight-secondary">Get API Key</a>
         </div>
       </div>
     </section>
@@ -893,7 +1362,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
        ======================================================================= -->
   <section class="cockpit-station-section" id="roadmap-cockpit" aria-label="Microstructure Cockpit">
     <div style="max-width: 1140px; margin: 0 auto;">
-      <div class="tesla-eyebrow" style="color: #4FD1E8; margin-bottom: 8px;">TERMINAL CAPABILITIES · ALL SHIP STATIONS</div>
+      <div class="flight-eyebrow" style="color: #59DDEC; margin-bottom: 8px;">TERMINAL CAPABILITIES · ALL SHIP STATIONS</div>
       <h2 style="font-size: 2.1rem; font-weight: 800; margin-bottom: 12px; color: #FFFFFF; letter-spacing: -0.02em;">
         Active Prediction Market Microstructure Cockpit
       </h2>
@@ -966,7 +1435,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
 
       <!-- Primary consumer navigation deep links -->
       <div class="cockpit-deep-nav">
-        <strong style="color: var(--public-accent-gold);">COCKPIT INSTRUMENT STATIONS:</strong>
+        <strong style="color: var(--public-accent-purple);">COCKPIT INSTRUMENT STATIONS:</strong>
         <a href="/calculator">Fee Calculator</a> ·
         <a href="/paper">Paper Mode</a> ·
         <a href="/compare">Forecast Compare</a> ·
@@ -984,7 +1453,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
        ======================================================================= -->
   <section class="cockpit-station-section" id="why-quanterraos-showcase" aria-label="Competitive Showcase">
     <div style="max-width: 1040px; margin: 0 auto;">
-      <div class="tesla-eyebrow" style="color: var(--public-accent-gold); margin-bottom: 8px;">INDEPENDENT REFEREE // 2026 BENCHMARK</div>
+      <div class="flight-eyebrow" style="color: var(--public-accent-purple); margin-bottom: 8px;">INDEPENDENT REFEREE // 2026 BENCHMARK</div>
       <h2 style="font-size: 2.1rem; font-weight: 800; margin-bottom: 12px; color: #FFFFFF; letter-spacing: -0.02em;">
         The Independent Referee in an Acquired Market
       </h2>
@@ -994,30 +1463,30 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
 
       <!-- Interactive Teardown Calculator -->
       <div class="feature-card" style="max-width: 740px; margin: 0 auto 36px; text-align: left;">
-        <div style="font-family: var(--public-font-mono); font-size: 0.78rem; color: var(--public-accent-gold); margin-bottom: 14px; text-transform: uppercase;">
+        <div style="font-family: var(--public-font-mono); font-size: 0.78rem; color: var(--public-accent-purple); margin-bottom: 14px; text-transform: uppercase;">
           Live Friction Teardown: Real Hurdle vs Advertised Odds
         </div>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px;">
           <div>
             <label for="home-teardown-price" style="font-size: 0.72rem; color: #94A3B8; font-family: var(--public-font-mono); display: block; margin-bottom: 4px;">CONTRACT PRICE (¢)</label>
-            <input type="range" id="home-teardown-price" min="1" max="99" value="50" style="width: 100%; accent-color: var(--public-accent-gold);" oninput="updateHomeTeardown()">
+            <input type="range" id="home-teardown-price" min="1" max="99" value="50" style="width: 100%; accent-color: var(--public-accent-purple);" oninput="updateHomeTeardown()">
             <div id="disp-home-price" style="font-family: var(--public-font-mono); font-size: 0.82rem; color: #FFF; margin-top: 4px;">50¢</div>
           </div>
           <div>
             <label for="home-teardown-prob" style="font-size: 0.72rem; color: #94A3B8; font-family: var(--public-font-mono); display: block; margin-bottom: 4px;">ASSUMED WIN PROBABILITY (%)</label>
-            <input type="range" id="home-teardown-prob" min="1" max="99" value="55" style="width: 100%; accent-color: #38BDF8;" oninput="updateHomeTeardown()">
+            <input type="range" id="home-teardown-prob" min="1" max="99" value="55" style="width: 100%; accent-color: #59DDEC;" oninput="updateHomeTeardown()">
             <div id="disp-home-prob" style="font-family: var(--public-font-mono); font-size: 0.82rem; color: #FFF; margin-top: 4px;">55%</div>
           </div>
           <div>
             <label for="home-teardown-count" style="font-size: 0.72rem; color: #94A3B8; font-family: var(--public-font-mono); display: block; margin-bottom: 4px;">CONTRACT COUNT</label>
-            <input type="number" id="home-teardown-count" min="1" max="1000" value="100" style="width: 100%; background: #000; border: 1px solid rgba(255,255,255,0.15); color: #FFF; padding: 6px 10px; border-radius: 4px; font-family: var(--public-font-mono); box-sizing: border-box;" oninput="updateHomeTeardown()">
+            <input type="number" id="home-teardown-count" min="1" max="1000" value="100" style="width: 100%; background: #080B18; border: 1px solid rgba(255,255,255,0.15); color: #FFF; padding: 6px 10px; border-radius: 4px; font-family: var(--public-font-mono); box-sizing: border-box;" oninput="updateHomeTeardown()">
           </div>
         </div>
 
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; background: rgba(0,0,0,0.5); padding: 14px; border-radius: 6px; font-family: var(--public-font-mono); text-align: center;">
           <div>
             <div style="font-size: 0.68rem; color: #94A3B8;">NAIVE EV (ZERO FEES)</div>
-            <div id="home-out-comp-ev" style="font-size: 1.15rem; font-weight: 700; color: #38BDF8; margin-top: 4px;">+$5.00</div>
+            <div id="home-out-comp-ev" style="font-size: 1.15rem; font-weight: 700; color: #59DDEC; margin-top: 4px;">+$5.00</div>
           </div>
           <div>
             <div style="font-size: 0.68rem; color: #94A3B8;">REAL EV (POST-TAKER FEE)</div>
@@ -1035,14 +1504,14 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
 
       <!-- Contender Matrix & Battlecard -->
       <div style="margin-top: 36px;">
-        <div style="font-size: 0.75rem; font-family: var(--public-font-mono); color: var(--public-accent-gold); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px;">
+        <div style="font-size: 0.75rem; font-family: var(--public-font-mono); color: var(--public-accent-purple); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px;">
           ARCHITECTURAL SUPERIORITY // 2026 BENCHMARK MATRIX
         </div>
         <h3 style="font-size: 1.4rem; font-weight: 800; color: #FFF; margin-bottom: 18px;">
           Why QuanterraOS Leads the Field
         </h3>
 
-        <div class="battlecard-matrix-wrap" style="overflow-x: auto; background: rgba(12, 15, 23, 0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 18px;">
+        <div class="battlecard-matrix-wrap" style="overflow-x: auto; background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 18px;">
           <div style="margin-bottom: 12px; display: flex; gap: 8px;">
             <button type="button" class="btn-vctrl active" onclick="filterBattlecard('all')">Show All</button>
             <button type="button" class="btn-vctrl" onclick="filterBattlecard('fees')">Fee Engines</button>
@@ -1052,7 +1521,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
             <thead>
               <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); color: #94A3B8;">
                 <th style="padding: 10px;">CAPABILITY</th>
-                <th style="padding: 10px; color: var(--public-accent-gold);">QUANTERRAOS</th>
+                <th style="padding: 10px; color: var(--public-accent-purple);">QUANTERRAOS</th>
                 <th style="padding: 10px;">RETAIL/CAPTURED APPS</th>
                 <th style="padding: 10px;">PILOT IMPACT</th>
               </tr>
@@ -1089,7 +1558,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
 
       <!-- Neutral Sourced Independence Architecture -->
       <div style="margin-top: 28px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 24px; text-align: center;">
-        <div style="font-size: 0.75rem; font-family: var(--public-font-mono); color: var(--public-accent-gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">
+        <div style="font-size: 0.75rem; font-family: var(--public-font-mono); color: var(--public-accent-purple); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">
           Independent Venue-Neutral Architecture
         </div>
         <div style="font-size: 1.1rem; font-weight: 700; color: #FFFFFF; max-width: 680px; margin: 0 auto 8px;">
@@ -1152,7 +1621,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
   <div class="video-modal-backdrop" id="mobile-app-download-modal" role="dialog" aria-modal="true" aria-label="Mobile App Installation">
     <div class="download-modal-box">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-        <div style="font-family:var(--public-font-mono); font-size:0.95rem; font-weight:700; color:var(--public-accent-gold);">
+        <div style="font-family:var(--public-font-mono); font-size:0.95rem; font-weight:700; color:var(--public-accent-purple);">
           📲 Install QuanterraOS Flight Deck App
         </div>
         <button type="button" class="btn-vctrl" onclick="closeMobileAppDownloadModal()">✕</button>
@@ -1163,8 +1632,8 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       </p>
 
       <!-- 1-Click Native PWA Button -->
-      <div style="background:rgba(201,162,74,0.08); border:1px solid rgba(201,162,74,0.3); border-radius:8px; padding:18px; text-align:center; margin-bottom:20px;">
-        <button type="button" id="btn-pwa-direct-install" class="btn-install-pwa-action" style="width:100%; max-width:380px; margin:0 auto; cursor:pointer; background:var(--public-accent-gold); color:#000; font-weight:700; font-family:var(--public-font-mono); padding:12px 20px; border-radius:24px; border:none;" onclick="triggerPwaInstall()">
+      <div style="background:rgba(148,104,255,0.08); border:1px solid rgba(148,104,255,0.3); border-radius:8px; padding:18px; text-align:center; margin-bottom:20px;">
+        <button type="button" id="btn-pwa-direct-install" class="btn-install-pwa-action" style="width:100%; max-width:380px; margin:0 auto; cursor:pointer; background:var(--public-accent-purple); color:#FFFFFF; font-weight:700; font-family:var(--public-font-mono); padding:12px 20px; border-radius:24px; border:none;" onclick="triggerPwaInstall()">
           📲 Install to Device (1-Click PWA)
         </button>
         <div style="font-family:var(--public-font-mono); font-size:0.7rem; color:#94A3B8; margin-top:8px;">
@@ -1177,7 +1646,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
         <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:14px;">
           <strong style="font-size:0.82rem; color:#FFF; display:block; margin-bottom:6px;">Apple iPhone / iPad</strong>
           <ol style="font-size:0.75rem; color:#94A3B8; padding-left:18px; margin:0; line-height:1.5;">
-            <li>Open Safari &amp; navigate to <span style="color:#C9A24A;">quanterraos.com</span></li>
+            <li>Open Safari &amp; navigate to <span style="color:#59DDEC;">quanterraos.com</span></li>
             <li>Tap the <strong>Share</strong> button (⎋) at screen bottom</li>
             <li>Scroll down and tap <strong>Add to Home Screen</strong> (⊞)</li>
           </ol>
@@ -1213,7 +1682,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
           <rect x="40" y="75" width="15" height="15" fill="#000"/>
         </svg>
         <div>
-          <div style="font-family:var(--public-font-mono); font-size:0.75rem; color:var(--public-accent-gold); font-weight:700; margin-bottom:4px;">
+          <div style="font-family:var(--public-font-mono); font-size:0.75rem; color:var(--public-accent-purple); font-weight:700; margin-bottom:4px;">
             POINT PHONE CAMERA TO SCAN &amp; LAUNCH
           </div>
           <div style="font-size:0.75rem; color:#94A3B8; line-height:1.4;">
@@ -1224,6 +1693,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     </div>
   </div>
 
+  ${renderBetaFeedbackWidgetHtml()}
   ${renderPublicFooter()}
   ${ASSISTANT_WIDGET_HTML}
 
@@ -1282,7 +1752,28 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     })();
 
     /* =========================================================================
-       2. COMPETITIVE TEARDOWN SLIDER LOGIC
+       2. HERO INTAKE & SPECIALIST QUERY HANDLERS
+       ========================================================================= */
+    function handleHeroIntake() {
+      const input = document.getElementById('hero-market-input');
+      const val = input ? input.value.trim() : '';
+      if (!val) {
+        window.location.href = '/check';
+        return;
+      }
+      window.location.href = '/check?query=' + encodeURIComponent(val);
+    }
+
+    function loadExampleWedgeCheck() {
+      window.location.href = '/check?market=KXBTC15M&price=0.51&count=10&entryMode=ask';
+    }
+
+    function openSpecialistModal(agentId, mode) {
+      window.location.href = '/deck?station=crew&specialist=' + encodeURIComponent(agentId);
+    }
+
+    /* =========================================================================
+       3. COMPETITIVE TEARDOWN SLIDER LOGIC
        ========================================================================= */
     function updateHomeTeardown() {
       const priceInput = document.getElementById('home-teardown-price');
@@ -1330,7 +1821,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     }
 
     /* =========================================================================
-       3. MOBILE APP DOWNLOAD & PWA INSTALLATION MODAL
+       4. MOBILE APP DOWNLOAD & PWA INSTALLATION MODAL
        ========================================================================= */
     let deferredPrompt = null;
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -1363,7 +1854,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
     }
 
     /* =========================================================================
-       4. INTERACTIVE COCKPIT VIDEO BRIEFING & TUTORIAL ENGINE
+       5. INTERACTIVE COCKPIT VIDEO BRIEFING & TUTORIAL ENGINE
        ========================================================================= */
     let audioCtx = null;
     let audioMuted = true;
@@ -1390,7 +1881,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
         start: 30,
         end: 45,
         title: "Act 3: Autonomous Copilot Aria & Stations",
-        caption: "7 dedicated ship stations monitor risk with $0.00 live exposure (Rule B5). Copilot Aria audits fees and settlements with strict non-advisory neutrality."
+        caption: "7 dedicated ship stations monitor risk with $0.00 live exposure (Rule B5 Standard: $0.00 Live Exposure). Copilot Aria audits fees and settlements with strict non-advisory neutrality."
       },
       {
         start: 45,
@@ -1534,14 +2025,14 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       const w = canvas.width = canvas.clientWidth || 960;
       const h = canvas.height = canvas.clientHeight || 440;
 
-      // 1. Space Obsidian Background & Scanlines
+      // Space Obsidian Background & Scanlines
       ctx.fillStyle = '#05070D';
       ctx.fillRect(0, 0, w, h);
 
       // Radar Range Rings
       const cx = w / 2;
       const cy = h / 2 - 20;
-      ctx.strokeStyle = 'rgba(79, 209, 232, 0.12)';
+      ctx.strokeStyle = 'rgba(89, 221, 236, 0.12)';
       ctx.lineWidth = 1;
       for (let r = 50; r <= 200; r += 50) {
         ctx.beginPath();
@@ -1551,7 +2042,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
 
       // Rotating Radar Beam
       const angle = (prog * 2.5) % (Math.PI * 2);
-      ctx.strokeStyle = 'rgba(79, 209, 232, 0.5)';
+      ctx.strokeStyle = 'rgba(89, 221, 236, 0.5)';
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(cx, cy);
@@ -1559,9 +2050,9 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       ctx.stroke();
 
       // Top Status Bar
-      ctx.fillStyle = 'rgba(12, 16, 26, 0.9)';
+      ctx.fillStyle = 'rgba(18, 23, 43, 0.9)';
       ctx.fillRect(0, 0, w, 40);
-      ctx.fillStyle = '#C9A24A';
+      ctx.fillStyle = '#9468FF';
       ctx.font = '600 13px "IBM Plex Mono", monospace';
       ctx.fillText("QUANTERRAOS HUD v2.1 // ORBITAL FLIGHT SIMULATOR", 20, 25);
 
@@ -1576,7 +2067,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
         ctx.font = '700 22px Inter, sans-serif';
         ctx.fillText("ACT 1: THE 50¢ COIN-FLIP HAZARD ZONE", 40, 85);
 
-        ctx.fillStyle = '#4FD1E8';
+        ctx.fillStyle = '#59DDEC';
         ctx.font = '600 14px "IBM Plex Mono", monospace';
         ctx.fillText("Contract: KXBTC15M @ $0.50 | 100 Contracts", 40, 115);
 
@@ -1591,7 +2082,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
         ctx.font = '12px "IBM Plex Mono", monospace';
         ctx.fillText("Max taker penalty at 50¢ strike", 60, 205);
 
-        // Box 2: North Star Avoidable Cost Saved
+        // Box 2: Avoidable Cost Saved
         ctx.fillStyle = 'rgba(16, 185, 129, 0.15)';
         ctx.strokeStyle = '#10B981';
         ctx.fillRect(320, 140, 280, 90);
@@ -1603,7 +2094,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
         ctx.fillText("Avoidable cost preserved per pilot", 340, 205);
 
         // Parabolic Curve Sketch
-        ctx.strokeStyle = '#C9A24A';
+        ctx.strokeStyle = '#9468FF';
         ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.moveTo(60, 320);
@@ -1618,7 +2109,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
         ctx.font = '700 22px Inter, sans-serif';
         ctx.fillText("ACT 2: 60-SECOND TWAP SETTLEMENT RADAR", 40, 85);
 
-        ctx.fillStyle = '#38BDF8';
+        ctx.fillStyle = '#59DDEC';
         ctx.font = '600 14px "IBM Plex Mono", monospace';
         ctx.fillText("Index: CME CF BRTI 60-Second TWAP vs Exchange Spot", 40, 115);
 
@@ -1641,17 +2132,17 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
           ctx.fillStyle = '#FFF';
           ctx.font = '700 14px "IBM Plex Mono", monospace';
           ctx.fillText(f.px, bx + 10, 195);
-          ctx.fillStyle = '#C9A24A';
+          ctx.fillStyle = '#9468FF';
           ctx.font = '10px "IBM Plex Mono", monospace';
           ctx.fillText("Weight: " + f.wt, bx + 10, 214);
         });
 
         // TWAP Notice
-        ctx.fillStyle = 'rgba(201, 162, 74, 0.15)';
-        ctx.strokeStyle = '#C9A24A';
+        ctx.fillStyle = 'rgba(148, 104, 255, 0.15)';
+        ctx.strokeStyle = '#9468FF';
         ctx.fillRect(40, 250, 580, 50);
         ctx.strokeRect(40, 250, 580, 50);
-        ctx.fillStyle = '#C9A24A';
+        ctx.fillStyle = '#9468FF';
         ctx.font = '600 13px "IBM Plex Mono", monospace';
         ctx.fillText("⚠ BASIS GAP ALERT: TWAP differs from instantaneous retail spot by $14.20", 55, 280);
       } else if (actIdx === 2) {
@@ -1665,11 +2156,11 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
         ctx.fillText("Rule B5 Standard: $0.00 Live Exposure · Zero Volume Kickbacks", 40, 115);
 
         // Aria Dialogue Box
-        ctx.fillStyle = 'rgba(79, 209, 232, 0.1)';
-        ctx.strokeStyle = '#4FD1E8';
+        ctx.fillStyle = 'rgba(89, 221, 236, 0.1)';
+        ctx.strokeStyle = '#59DDEC';
         ctx.fillRect(40, 145, 600, 95);
         ctx.strokeRect(40, 145, 600, 95);
-        ctx.fillStyle = '#4FD1E8';
+        ctx.fillStyle = '#59DDEC';
         ctx.font = '700 14px "IBM Plex Mono", monospace';
         ctx.fillText("ARIA // NON-ADVISORY FLIGHT COMPUTER", 60, 175);
         ctx.fillStyle = '#E2E8F0';
@@ -1693,7 +2184,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
         ctx.font = '700 24px Inter, sans-serif';
         ctx.fillText("ACT 4: CLAIM YOUR FLIGHT SEAT & BUILD YOUR LEGACY", 40, 85);
 
-        ctx.fillStyle = '#C9A24A';
+        ctx.fillStyle = '#9468FF';
         ctx.font = '600 15px "IBM Plex Mono", monospace';
         ctx.fillText("Merit-Based Progression: Cadet → Pilot → Flight Leader → Admiral", 40, 118);
 
@@ -1710,21 +2201,21 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
           ctx.fillText(ft, 40, 160 + i * 28);
         });
 
-        // Big Gold Conversion Button Mock
-        ctx.fillStyle = 'rgba(201, 162, 74, 0.25)';
-        ctx.strokeStyle = '#C9A24A';
+        // Conversion Button Mock
+        ctx.fillStyle = 'rgba(148, 104, 255, 0.25)';
+        ctx.strokeStyle = '#9468FF';
         ctx.lineWidth = 2;
         ctx.fillRect(40, 285, 480, 52);
         ctx.strokeRect(40, 285, 480, 52);
         ctx.fillStyle = '#FFFFFF';
         ctx.font = '700 16px "IBM Plex Mono", monospace';
-        ctx.fillText("▶ START 7-DAY FREE TRIAL ($29/mo PRO) →", 60, 318);
+        ctx.fillText("▶ START 7-DAY FREE TRIAL ($39/mo PRO) →", 60, 318);
       }
 
       // Progress bar at bottom of canvas
       ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
       ctx.fillRect(0, h - 6, w, 6);
-      ctx.fillStyle = '#C9A24A';
+      ctx.fillStyle = '#9468FF';
       ctx.fillRect(0, h - 6, (prog / 60) * w, 6);
     }
 

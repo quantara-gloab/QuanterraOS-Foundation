@@ -6,7 +6,7 @@ describe('Phase 3 Task 3.3 Acceptance: Home Page = 6 Panels (Tesla Mode) & 375px
   const html = renderLandingPage();
 
   test('home page renders exactly 6 full-viewport panels', () => {
-    const panels = html.match(/<section class="tesla-panel"[^>]*id="([^"]+)"/g) || [];
+    const panels = html.match(/<section class="(?:tesla|flight)-panel"[^>]*id="([^"]+)"/g) || [];
     assert.equal(panels.length, 6, `Home page must contain exactly 6 panels, found ${panels.length}`);
 
     // Verify all 6 required panel IDs
@@ -55,17 +55,17 @@ describe('Phase 3 Task 3.3 Acceptance: Home Page = 6 Panels (Tesla Mode) & 375px
   });
 
   test('each panel obeys Part 5 constraints: <= 3 numbers per screen and <= 2 buttons per panel', () => {
-    const panelBlocks = html.split('<section class="tesla-panel"');
+    const panelBlocks = html.split(/<section class="(?:tesla|flight)-panel"/);
     // First element is pre-panel HTML, remaining 6 are the panels
     for (let i = 1; i <= 6; i++) {
       const panel = panelBlocks[i];
-      const metricItems = panel.match(/class="tesla-metric-item"/g) || [];
+      const metricItems = panel.match(/class="(?:tesla|flight)-metric-item"/g) || [];
       assert.ok(
         metricItems.length <= 3,
         `Panel ${i} metric count (${metricItems.length}) must be <= 3`
       );
 
-      const buttons = panel.match(/class="btn-tesla-(primary|secondary)"/g) || [];
+      const buttons = panel.match(/class="(?:btn-tesla|btn-flight)-(primary|secondary)"/g) || [];
       assert.ok(
         buttons.length <= 2,
         `Panel ${i} button count (${buttons.length}) must be <= 2`
