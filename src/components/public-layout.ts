@@ -18,6 +18,7 @@ export const PUBLIC_NAV_ITEMS = [
   { label: "Check", href: "/check" },
   { label: "Radar", href: "/radar" },
   { label: "Journal", href: "/journal" },
+  { label: "Gear", href: "/merchandise" },
   { label: "Learn", href: "/learn" },
   { label: "Pricing", href: "/pricing" },
 ] as const;
@@ -508,6 +509,7 @@ export function renderPublicFooter(): string {
             <li><a href="/crew">Flight Deck Crew</a></li>
             <li><a href="/pass">Free Crew Pass</a></li>
             <li><a href="/art-gallery">Artwork Gallery</a></li>
+            <li><a href="/merchandise">Mascot Gear &amp; Suits</a></li>
             <li><a href="/research">Research</a></li>
             <li><a href="/access">Institutional</a></li>
             <li><a href="/developers">Developers API &amp; MCP</a></li>

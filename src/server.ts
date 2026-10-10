@@ -464,6 +464,17 @@ import {
 } from "./lib/crew-pass.ts";
 import { renderOddsDefendersPageHtml } from "./odds-defenders-page.ts";
 import { isCampaignEnabled, recordCampaignEvent } from "./config/campaign.ts";
+import { renderMerchandisePageHtml } from "./merchandise-page.ts";
+import {
+  getMerchandiseCatalog,
+  getMerchandiseProduct,
+  createMerchandiseOrder,
+  enterRaffle,
+  joinTournament,
+  getUserGamificationSummary,
+  ACTIVE_RAFFLES,
+  ACTIVE_TOURNAMENTS,
+} from "./lib/merchandise.ts";
 
 runMigrations();
 seedHistoricalReplay().catch((err) => console.error("Error seeding historical replay:", err));
@@ -2136,6 +2147,115 @@ app.post("/api/campaign/event", (req, res) => {
     metadata
   });
   res.json({ success: true, event: record });
+});
+
+// ---------------------------------------------------------------------------
+// Official Mascot Merchandise, Raffles & Calibration Tournaments
+// ---------------------------------------------------------------------------
+
+// Public Storefront Page
+app.get("/merchandise", (req, res) => {
+  const auth = getUserAuth(req);
+  res.type("html").send(renderMerchandisePageHtml(auth.user));
+});
+
+// Route Aliases (/gear and /shop)
+app.get(["/gear", "/shop"], (_req, res) => {
+  res.redirect(301, "/merchandise");
+});
+
+// Products Catalog API
+app.get("/api/merchandise/products", (req, res) => {
+  const category = req.query.category ? String(req.query.category) : undefined;
+  const products = getMerchandiseCatalog(category);
+  res.json({ success: true, count: products.length, products });
+});
+
+// Create Order API
+app.post("/api/merchandise/order", (req, res) => {
+  try {
+    const auth = getUserAuth(req);
+    const { productId, customerName, customerEmail, size, genderCut, quantity, usePoints, shippingAddress } = req.body || {};
+
+    if (!productId || !customerName || !customerEmail || !size) {
+      return res.status(400).json({ success: false, error: "Missing required order fields: productId, customerName, customerEmail, and size are required." });
+    }
+
+    const orderResult = createMerchandiseOrder({
+      userId: auth.user?.id || "guest",
+      customerName,
+      customerEmail,
+      productId,
+      size,
+      genderCut,
+      quantity: quantity ? parseInt(quantity, 10) : 1,
+      usePoints: Boolean(usePoints),
+      shippingAddress: shippingAddress || { street: "742 Evergreen", city: "Wilmington", state: "DE", zip: "19801", country: "US" },
+    });
+
+    res.json(orderResult);
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// Active Raffles API
+app.get("/api/merchandise/raffles", (_req, res) => {
+  res.json({ success: true, raffles: ACTIVE_RAFFLES });
+});
+
+// Enter Raffle API
+app.post("/api/merchandise/raffle/enter", (req, res) => {
+  try {
+    const auth = getUserAuth(req);
+    const { raffleId, source } = req.body || {};
+    if (!raffleId) {
+      return res.status(400).json({ success: false, error: "raffleId is required." });
+    }
+
+    const ticketResult = enterRaffle({
+      userId: auth.user?.id || "cadet_pilot",
+      raffleId,
+      source: source || "daily_check_reward",
+    });
+
+    res.json(ticketResult);
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// Active Tournaments API
+app.get("/api/merchandise/tournaments", (_req, res) => {
+  res.json({ success: true, tournaments: ACTIVE_TOURNAMENTS });
+});
+
+// Join Tournament API
+app.post("/api/merchandise/tournament/join", (req, res) => {
+  try {
+    const auth = getUserAuth(req);
+    const { tournamentId, callsign } = req.body || {};
+    if (!tournamentId) {
+      return res.status(400).json({ success: false, error: "tournamentId is required." });
+    }
+
+    const result = joinTournament({
+      userId: auth.user?.id || "cadet_pilot",
+      callsign: callsign || auth.user?.callsign || "CADET-PILOT",
+      tournamentId,
+    });
+
+    res.json(result);
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+// Gamification Summary API
+app.get("/api/merchandise/gamification/status", (req, res) => {
+  const auth = getUserAuth(req);
+  const summary = getUserGamificationSummary(auth.user?.id || "cadet-1");
+  res.json({ success: true, summary });
 });
 
 // ---------------------------------------------------------------------------

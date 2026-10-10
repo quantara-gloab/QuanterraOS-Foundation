@@ -1042,6 +1042,26 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
           </div>
         </div>
 
+        <!-- Mascot Gear, Raffles & Tournaments Card -->
+        <div class="deck-gear-rewards-card" id="deck-gear-rewards-card" style="background: linear-gradient(135deg, rgba(148, 104, 255, 0.12) 0%, rgba(223, 184, 67, 0.12) 100%); border: 1px solid rgba(148, 104, 255, 0.35); border-radius: 8px; padding: 16px 20px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+          <div style="max-width: 620px;">
+            <div style="font-family: var(--font-mono); font-size: 0.7rem; color: #DFB843; text-transform: uppercase; font-weight: 700; margin-bottom: 4px; letter-spacing: 0.08em;">
+              FLIGHT GEAR &bull; RAFFLES &bull; TOURNAMENTS
+            </div>
+            <div style="font-size: 1.05rem; font-weight: 700; color: #FFFFFF; margin-bottom: 4px;">
+              Mascot Hoodies, Aerospace Jumpsuits &amp; Bespoke Executive Suits
+            </div>
+            <div style="font-size: 0.82rem; color: var(--fg-muted);">
+              Redeem earned Flight XP or enter weekly gear raffles and calibration skill tournaments ($0.00 live risk).
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <a href="/merchandise" style="background: #9468FF; color: #FFFFFF; font-family: var(--font-mono); font-weight: 700; font-size: 0.8rem; padding: 9px 16px; border-radius: 20px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+              Explore Gear &rarr;
+            </a>
+          </div>
+        </div>
+
         <!-- Welcoming Video Briefing Banner & Onboarding Tutorial -->
         <div class="deck-welcome-briefing-card" style="background: linear-gradient(135deg, rgba(201, 162, 74, 0.14) 0%, rgba(79, 209, 232, 0.12) 100%); border: 1px solid var(--hud-gold); border-radius: 8px; padding: 18px 22px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);">
           <div style="max-width: 680px;">

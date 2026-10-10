@@ -1016,3 +1016,123 @@ export const crewPasses = sqliteTable(
   })
 );
 
+// ---------------------------------------------------------------------------
+// Merchandise Storefront & Physical Apparel Catalog
+// ---------------------------------------------------------------------------
+export const merchandiseProducts = sqliteTable(
+  "merchandise_products",
+  {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    slug: text("slug").notNull().unique(),
+    category: text("category").notNull(), // 'hoodie' | 'jumpsuit' | 'suit_mens' | 'suit_womens'
+    mascot: text("mascot").notNull(), // 'quanta' | 'destroyer' | 'terminator' | 'council'
+    description: text("description").notNull(),
+    priceCents: integer("price_cents").notNull(),
+    pointsCost: integer("points_cost").notNull(),
+    materials: text("materials").notNull(),
+    imageUrl: text("image_url").notNull(),
+    availableSizesJson: text("available_sizes_json").notNull(),
+    badge: text("badge"),
+    inStock: integer("in_stock").notNull().default(1),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => ({
+    categoryIdx: index("merch_products_category_idx").on(table.category),
+    mascotIdx: index("merch_products_mascot_idx").on(table.mascot),
+  })
+);
+
+export const merchandiseOrders = sqliteTable(
+  "merchandise_orders",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id"),
+    customerName: text("customer_name").notNull(),
+    customerEmail: text("customer_email").notNull(),
+    productId: text("product_id").notNull(),
+    productName: text("product_name").notNull(),
+    size: text("size").notNull(),
+    genderCut: text("gender_cut").notNull().default("unisex"),
+    quantity: integer("quantity").notNull().default(1),
+    totalCents: integer("total_cents").notNull(),
+    pointsSpent: integer("points_spent").notNull().default(0),
+    shippingAddressJson: text("shipping_address_json").notNull(),
+    status: text("status").notNull().default("confirmed"),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => ({
+    userIdIdx: index("merch_orders_user_id_idx").on(table.userId),
+    createdAtIdx: index("merch_orders_created_at_idx").on(table.createdAt),
+  })
+);
+
+export const raffleDrawings = sqliteTable(
+  "raffle_drawings",
+  {
+    id: text("id").primaryKey(),
+    title: text("title").notNull(),
+    prizeName: text("prize_name").notNull(),
+    prizeDescription: text("prize_description").notNull(),
+    prizeCategory: text("prize_category").notNull(),
+    ticketPointsCost: integer("ticket_points_cost").notNull().default(100),
+    endsAt: text("ends_at").notNull(),
+    totalTickets: integer("total_tickets").notNull().default(0),
+    status: text("status").notNull().default("active"),
+    winnerCallsign: text("winner_callsign"),
+    createdAt: text("created_at").notNull(),
+  }
+);
+
+export const raffleTickets = sqliteTable(
+  "raffle_tickets",
+  {
+    id: text("id").primaryKey(),
+    raffleId: text("raffle_id").notNull(),
+    userId: text("user_id").notNull(),
+    ticketNumber: text("ticket_number").notNull(),
+    source: text("source").notNull().default("daily_check_reward"),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => ({
+    userIdIdx: index("raffle_tickets_user_id_idx").on(table.userId),
+    raffleIdIdx: index("raffle_tickets_raffle_id_idx").on(table.raffleId),
+  })
+);
+
+export const disciplineTournaments = sqliteTable(
+  "discipline_tournaments",
+  {
+    id: text("id").primaryKey(),
+    title: text("title").notNull(),
+    season: text("season").notNull(),
+    description: text("description").notNull(),
+    prizeMerchandise: text("prize_merchandise").notNull(),
+    status: text("status").notNull().default("active"),
+    startsAt: text("starts_at").notNull(),
+    endsAt: text("ends_at").notNull(),
+    participantCount: integer("participant_count").notNull().default(0),
+    createdAt: text("created_at").notNull(),
+  }
+);
+
+export const tournamentLeaderboard = sqliteTable(
+  "tournament_leaderboard",
+  {
+    id: text("id").primaryKey(),
+    tournamentId: text("tournament_id").notNull(),
+    userId: text("user_id").notNull(),
+    callsign: text("callsign").notNull(),
+    brierScore: real("brier_score").notNull(),
+    calibrationAccuracy: real("calibration_accuracy").notNull(),
+    rank: integer("rank").notNull(),
+    rewardStatus: text("reward_status").notNull().default("eligible"),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (table) => ({
+    tournamentIdx: index("tournament_leaderboard_tournament_idx").on(table.tournamentId),
+    rankIdx: index("tournament_leaderboard_rank_idx").on(table.rank),
+  })
+);
+
+
