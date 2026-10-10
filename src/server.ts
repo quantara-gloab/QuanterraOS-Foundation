@@ -84,6 +84,12 @@ import {
   attestAge18,
 } from "./lib/responsible-trading.ts";
 import {
+  LAUNCH_CREW_MEMBERS,
+  routeAriaQuery,
+  evaluateAdversarialEvalSet,
+  isAdvisoryPrompt,
+} from "./lib/aria-crew.ts";
+import {
   computeExpiryRadarState,
   renderExpiryRadarPageHtml,
   simulateExpiryPayoff,
@@ -1227,6 +1233,21 @@ app.post(["/api/assistant/chat", "/api/council/:agentId/chat", "/api/council/:id
         message: `Message exceeds maximum allowed length of ${MAX_MESSAGE_LENGTH} characters.`
       });
     }
+    if (isAdvisoryPrompt(message.trim())) {
+      const ariaRes = routeAriaQuery(message.trim());
+      return res.json({
+        agentId: "aria",
+        agentName: "Aria",
+        role: "Ship's Computer // Executive Concierge",
+        reply: ariaRes.message,
+        message: ariaRes.message,
+        disclaimer: "Non-advisory response. QuanterraOS does not provide trading advice.",
+        citations: ariaRes.citations,
+        suggestedActions: ariaRes.suggestedActions,
+        isAdvisoryRefusal: true,
+      });
+    }
+
     const persona = getCouncilPersona(agentId);
     if (!persona) {
       return res.status(404).json({ error: "persona_not_found", message: `Executive persona '${agentId}' not found` });
@@ -4575,6 +4596,31 @@ app.post("/api/responsible/attest-18", (req, res) => {
   const userId = auth.user?.id || "cadet-default";
   const updated = attestAge18(userId);
   res.json({ success: true, limits: updated });
+});
+
+// ===================================================================
+// AI Launch Crew & Aria Conversational Router API (Task 5.1 / Part 3.3)
+// ===================================================================
+app.get("/api/deck/crew", (_req, res) => {
+  res.json({
+    count: Object.keys(LAUNCH_CREW_MEMBERS).length,
+    crew: Object.values(LAUNCH_CREW_MEMBERS),
+  });
+});
+
+app.post("/api/deck/crew/aria/route", (req, res) => {
+  const { query, context } = req.body || {};
+  if (!query || typeof query !== "string" || query.trim().length === 0) {
+    return res.status(400).json({ error: "missing_query", message: "Field 'query' is required." });
+  }
+  const result = routeAriaQuery(query.trim(), context);
+  res.json(result);
+});
+
+app.post("/api/deck/crew/aria/eval", (req, res) => {
+  const { prompts } = req.body || {};
+  const report = evaluateAdversarialEvalSet(Array.isArray(prompts) ? prompts : undefined);
+  res.json(report);
 });
 
 app.get("/wallet", (_req, res) => {
