@@ -424,6 +424,11 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
         </a>
       </div>
     </div>
+
+    <!-- CFTC 4.41 Statutory Disclaimer -->
+    <div style="max-width:840px; margin: 36px auto 0; font-family:var(--font-mono); font-size:0.74rem; color:var(--muted); text-align:center; line-height:1.6; border-top:1px solid rgba(255,255,255,0.08); padding-top:20px;">
+      CFTC RULE 4.41 NOTICE: HYPOTHETICAL OR SIMULATED PERFORMANCE RESULTS HAVE CERTAIN LIMITATIONS. UNLIKE AN ACTUAL PERFORMANCE RECORD, SIMULATED RESULTS DO NOT REPRESENT ACTUAL TRADING. ZERO CAPITAL DEPLOYED UNDER PERMANENT RULE B5 AUDIT LOCK. 18+.
+    </div>
   </main>
 
   ${renderPublicFooter()}
