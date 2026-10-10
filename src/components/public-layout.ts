@@ -510,6 +510,7 @@ export function renderPublicFooter(): string {
         <div class="flight-footer-col">
           <h4>Crew &amp; Cosmetics</h4>
           <ul>
+            <li><a href="/merchandise/crew">King &amp; Queen / Council Apparel</a></li>
             <li><a href="/crew">Flight Deck Crew</a></li>
             <li><a href="/pass">Free Crew Pass</a></li>
             <li><a href="/art-gallery">Artwork Gallery</a></li>

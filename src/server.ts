@@ -1355,10 +1355,13 @@ app.post(["/api/assistant/chat", "/api/council/:agentId/chat", "/api/council/:id
       const ariaRes = routeAriaQuery(message.trim());
       const selectedId = isQuantana ? "quantana" : "quanta";
       const selectedName = isQuantana ? "Quantana" : "Quanta";
+      const selectedRole = isQuantana
+        ? "Queen of the Galaxy // Cosmic Flight Pilot Captain"
+        : "King of the Galaxy // Cosmic Flight Pilot Captain";
       return res.json({
         agentId: selectedId,
         agentName: selectedName,
-        role: "Global Galactic Leader // Virtual Assistant",
+        role: selectedRole,
         reply: ariaRes.message,
         message: ariaRes.message,
         disclaimer: "Non-advisory response. QuanterraOS does not provide trading advice.",
@@ -1372,10 +1375,13 @@ app.post(["/api/assistant/chat", "/api/council/:agentId/chat", "/api/council/:id
       const assistantRes = routeAriaQuery(message.trim());
       const selectedId = isQuantana ? "quantana" : "quanta";
       const selectedName = isQuantana ? "Quantana" : "Quanta";
+      const selectedRole = isQuantana
+        ? "Queen of the Galaxy // Cosmic Flight Pilot Captain"
+        : "King of the Galaxy // Cosmic Flight Pilot Captain";
       return res.json({
         agentId: selectedId,
         agentName: selectedName,
-        role: "Global Galactic Leader // Virtual Assistant",
+        role: selectedRole,
         reply: assistantRes.message,
         message: assistantRes.message,
         disclaimer: "Non-advisory response. QuanterraOS does not provide trading advice.",

@@ -117,12 +117,12 @@ export const ORIGINAL_EIGHT_COLLECTIONS: CrewApparelCollection[] = [
   },
   {
     slug: "quanta",
-    name: "Quanta & Quantana",
-    stationRole: "Global Galactic Leader & Virtual Assistant",
-    signaturePalette: "Ceramic white / violet / gold",
-    apparelMotif: "Balanced arrow visor / Spacecraft Council compass",
-    boardImage: "/assets/quanta-leader-apparel-board.png",
-    description: "The official leader collection honoring Quanta and Quantana. Iconic ceramic white, violet Flight Deck piping, and gold calibration compass emblems.",
+    name: "Quanta & Quantana — King & Queen of the Galaxy",
+    stationRole: "Cosmic Flight Pilot Captains & Galactic Leaders",
+    signaturePalette: "Deep space violet / obsidian / bullion gold",
+    apparelMotif: "Cybernetic Arrow Visor / Celestial Crown & Galactic Constellation Street Art",
+    boardImage: "/assets/king-queen-galaxy-board.png",
+    description: "The official King & Queen of the Galaxy line honoring Cosmic Flight Pilot Captains Quanta & Quantana. Luxury deep space violet and obsidian textiles with bullion gold embroidery, holographic arrow visors, and geometric space constellation street art.",
     isLeader: true
   }
 ];
@@ -660,66 +660,66 @@ export const CREW_OUTFIT_CATALOG: CrewOutfitItem[] = [
   {
     productId: "quanta-men-street-concept",
     crewId: "quanta",
-    displayName: "Quanta Men's Leader Street Set",
+    displayName: "Quanta King of the Galaxy Men's Street Set",
     designFit: "men",
     category: "street",
-    categoryLabel: "Leader Street Set",
+    categoryLabel: "King's Street Set",
     includedPieces: ["Hoodie", "Trousers"],
-    board: "/assets/quanta-leader-apparel-board.png",
+    board: "/assets/king-queen-galaxy-board.png",
     state: "concept",
     price: null,
     checkoutEnabled: false,
     supplierVerified: false,
     isConcept: true,
-    piecesDescription: "Ceramic white 450 GSM fleece hoodie with violet piping, balanced arrow visor crest & tailored cargos."
+    piecesDescription: "480 GSM deep space violet loopback hoodie with Quanterra King geometric constellation street art & articulated tactical cargos."
   },
   {
     productId: "quanta-men-flight-concept",
     crewId: "quanta",
-    displayName: "Quanta Men's Leader Flight Set",
+    displayName: "Quanta King of the Galaxy Men's Flight Set",
     designFit: "men",
     category: "flight",
-    categoryLabel: "Leader Flight Set",
+    categoryLabel: "King's Flight Set",
     includedPieces: ["Jacket", "Trousers"],
-    board: "/assets/quanta-leader-apparel-board.png",
+    board: "/assets/king-queen-galaxy-board.png",
     state: "concept",
     price: null,
     checkoutEnabled: false,
     supplierVerified: false,
     isConcept: true,
-    piecesDescription: "Aerospace pilot flight jacket with gold Spacecraft Council compass badge & obsidian utility trousers."
+    piecesDescription: "Luxury aerospace pilot flight bomber jacket with bullion gold trim, holographic up-arrow visor insignia & obsidian trousers."
   },
   {
     productId: "quanta-women-street-concept",
     crewId: "quanta",
-    displayName: "Quantana Women's Leader Street Set",
+    displayName: "Quantana Queen of the Galaxy Women's Street Set",
     designFit: "women",
     category: "street",
-    categoryLabel: "Leader Street Set",
+    categoryLabel: "Queen's Street Set",
     includedPieces: ["Hoodie", "Trousers"],
-    board: "/assets/quanta-leader-apparel-board.png",
+    board: "/assets/king-queen-galaxy-board.png",
     state: "concept",
     price: null,
     checkoutEnabled: false,
     supplierVerified: false,
     isConcept: true,
-    piecesDescription: "Sculpted white & violet fleece hoodie with paired arrow visor back art & high-rise wide-leg trousers."
+    piecesDescription: "Sculpted violet loopback hoodie with Quanterra Queen galaxy swirl back street art & high-rise wide-leg trousers."
   },
   {
     productId: "quanta-women-flight-concept",
     crewId: "quanta",
-    displayName: "Quantana Women's Leader Flight Set",
+    displayName: "Quantana Queen of the Galaxy Women's Flight Set",
     designFit: "women",
     category: "flight",
-    categoryLabel: "Leader Flight Set",
+    categoryLabel: "Queen's Flight Set",
     includedPieces: ["Jacket", "Trousers"],
-    board: "/assets/quanta-leader-apparel-board.png",
+    board: "/assets/king-queen-galaxy-board.png",
     state: "concept",
     price: null,
     checkoutEnabled: false,
     supplierVerified: false,
     isConcept: true,
-    piecesDescription: "Architectural leader flight jacket with violet constellation silk lining & high-waisted white trousers."
+    piecesDescription: "Architectural flight bomber jacket with celestial gold crown filigree, neon pink down-arrow visor insignia & tailored trousers."
   }
 ];
 

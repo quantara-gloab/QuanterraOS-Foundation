@@ -47,9 +47,10 @@ export function renderCrewApparelPageHtml(options?: {
 
   const crewTabsHtml = ORIGINAL_EIGHT_COLLECTIONS.map(col => {
     const isActive = col.slug === currentCollection.slug;
+    const label = col.isLeader ? `👑 ${col.name}` : col.name;
     return `
-      <a href="/merchandise/crew/${col.slug}" class="crew-pill-btn ${isActive ? 'active' : ''}" data-crew="${col.slug}">
-        ${col.name} ${col.isLeader ? '⭐' : ''}
+      <a href="/merchandise/crew/${col.slug}" class="crew-pill-btn ${isActive ? 'active' : ''} ${col.isLeader ? 'leader-pill' : ''}" data-crew="${col.slug}">
+        ${label}
       </a>
     `;
   }).join("\n");

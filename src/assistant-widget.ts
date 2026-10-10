@@ -47,8 +47,8 @@ export const ASSISTANT_WIDGET_HTML = `
           <span class="qos-avatar-pulse"></span>
         </div>
         <div>
-          <div class="qos-header-title"><span id="qos-header-name-txt">Quanta</span> <span class="qos-title-badge">Virtual Assistant</span></div>
-          <div class="qos-header-sub">Global Galactic Leader · Flight Deck Guide</div>
+          <div class="qos-header-title"><span id="qos-header-name-txt">Quanta</span> <span class="qos-title-badge">Cosmic Pilot</span></div>
+          <div class="qos-header-sub" id="qos-header-role-sub">King of the Galaxy · Flight Deck &amp; Metaverse Guide</div>
         </div>
       </div>
       <div class="qos-header-actions">
@@ -59,15 +59,15 @@ export const ASSISTANT_WIDGET_HTML = `
       </div>
     </div>
 
-    <!-- Persona Switcher Bar (Quanta Male vs Quantana Female) -->
+    <!-- Persona Switcher Bar (Quanta King vs Quantana Queen) -->
     <div class="qos-persona-bar">
-      <span class="qos-persona-lbl">Assistant Voice &amp; Identity:</span>
+      <span class="qos-persona-lbl">Cosmic Pilot Captain:</span>
       <div class="qos-persona-btns">
-        <button type="button" class="qos-persona-btn active" id="btn-persona-quanta" onclick="setAssistantIdentity('quanta')" title="Quanta (Male Flight Pilot &amp; Global Galactic Leader)">
-          🧑‍✈️ Quanta (Male)
+        <button type="button" class="qos-persona-btn active" id="btn-persona-quanta" onclick="setAssistantIdentity('quanta')" title="Quanta (King of the Galaxy Cosmic Pilot Captain)">
+          👑 Quanta (King)
         </button>
-        <button type="button" class="qos-persona-btn" id="btn-persona-quantana" onclick="setAssistantIdentity('quantana')" title="Quantana (Female Flight Pilot &amp; Global Galactic Leader)">
-          👩‍✈️ Quantana (Female)
+        <button type="button" class="qos-persona-btn" id="btn-persona-quantana" onclick="setAssistantIdentity('quantana')" title="Quantana (Queen of the Galaxy Cosmic Pilot Captain)">
+          👑 Quantana (Queen)
         </button>
       </div>
     </div>
@@ -88,26 +88,26 @@ export const ASSISTANT_WIDGET_HTML = `
     <div id="qos-chat-messages" class="qos-messages-container" aria-live="polite">
       <!-- Assistant Welcome Hero Card -->
       <div class="qos-aria-hero-card">
-        <img id="qos-hero-avatar-img" src="/assets/assistant-avatar.jpg" alt="Virtual Assistant" class="qos-hero-img" />
+        <img id="qos-hero-avatar-img" src="/assets/quanta-avatar.jpg" alt="Virtual Assistant" class="qos-hero-img" />
         <div class="qos-hero-body">
-          <div class="qos-hero-name"><span id="qos-hero-name-txt">Quanta</span> <span class="qos-hero-verified">✓ Global Galactic Leader</span></div>
-          <div class="qos-hero-tagline">Flight Deck Virtual Assistant &amp; Receipt Guide</div>
+          <div class="qos-hero-name"><span id="qos-hero-name-txt">Quanta</span> <span class="qos-hero-verified" id="qos-hero-badge-txt">✓ King of the Galaxy</span></div>
+          <div class="qos-hero-tagline" id="qos-hero-tagline-txt">Cosmic Flight Pilot Captain &amp; Metaverse Guide</div>
           <div class="qos-hero-desc">Ask me to explain contract costs, verify settlement rules, or connect with our live 1-800 assistant team.</div>
         </div>
       </div>
 
       <!-- Initial greeting -->
       <div class="qos-msg qos-msg-assistant">
-        <img id="qos-initial-msg-avatar" src="/assets/assistant-avatar.jpg" alt="Virtual Assistant" class="qos-msg-avatar" />
+        <img id="qos-initial-msg-avatar" src="/assets/quanta-avatar.jpg" alt="Virtual Assistant" class="qos-msg-avatar" />
         <div class="qos-msg-content">
           <div class="qos-msg-bubble" id="qos-greeting-bubble">
-Greetings, Pilot! I am <strong id="qos-greeting-strong">Quanta</strong>, your virtual assistant and Global Galactic Leader.
+Greetings, Pilot! I am <strong id="qos-greeting-strong">Quanta</strong>, your Cosmic Flight Pilot Captain and King of the Galaxy.
 <br><br>
-I'm here to help you <strong>explain your contract costs</strong>, decode settlement rules, and <strong>revisit your decision records</strong>.
+I'm here to guide your flight deck, <strong>explain your contract costs</strong>, decode settlement rules, and <strong>revisit your decision records</strong>.
 <br><br>
 Need to talk to a live assistant right now? Call toll-free at <strong><a href="tel:18007826837" style="color:#DFB843; text-decoration:none; font-weight:700;">1-800-QUANTERRA (1-800-782-6837)</a></strong> or email <strong>support@quanterraos.com</strong>. How may I assist your flight deck today?
           </div>
-          <div class="qos-msg-meta"><span id="qos-meta-name-txt">Quanta</span> · Virtual Assistant · Online</div>
+          <div class="qos-msg-meta"><span id="qos-meta-name-txt">Quanta</span> · Cosmic Pilot Captain · Online</div>
         </div>
       </div>
     </div>
@@ -683,7 +683,8 @@ Need to talk to a live assistant right now? Call toll-free at <strong><a href="t
   function updateIdentityUI() {
     const isQuanta = currentIdentity === 'quanta';
     const name = isQuanta ? 'Quanta' : 'Quantana';
-    const avatar = isQuanta ? '/assets/merch-hoodie-quanta.jpg' : '/assets/assistant-avatar.jpg';
+    const titleRole = isQuanta ? 'King of the Galaxy' : 'Queen of the Galaxy';
+    const avatar = isQuanta ? '/assets/quanta-avatar.jpg' : '/assets/quantana-avatar.jpg';
 
     if (btnQuanta) btnQuanta.classList.toggle('active', isQuanta);
     if (btnQuantana) btnQuantana.classList.toggle('active', !isQuanta);
@@ -692,14 +693,27 @@ Need to talk to a live assistant right now? Call toll-free at <strong><a href="t
     if (bubbleNameTxt) bubbleNameTxt.textContent = name;
     if (drawerAvatarImg) drawerAvatarImg.src = avatar;
     if (headerNameTxt) headerNameTxt.textContent = name;
+    const headerRoleSub = document.getElementById('qos-header-role-sub');
+    if (headerRoleSub) headerRoleSub.textContent = titleRole + ' · Flight Deck & Metaverse Guide';
+
     if (heroAvatarImg) heroAvatarImg.src = avatar;
     if (heroNameTxt) heroNameTxt.textContent = name;
+    const heroBadgeTxt = document.getElementById('qos-hero-badge-txt');
+    if (heroBadgeTxt) heroBadgeTxt.textContent = '✓ ' + titleRole;
+    const heroTaglineTxt = document.getElementById('qos-hero-tagline-txt');
+    if (heroTaglineTxt) heroTaglineTxt.textContent = 'Cosmic Flight Pilot Captain & Metaverse Guide';
+
     if (initialMsgAvatar) initialMsgAvatar.src = avatar;
     if (greetingStrong) greetingStrong.textContent = name;
-    if (metaNameTxt) metaNameTxt.textContent = name;
+    if (metaNameTxt) metaNameTxt.textContent = name + ' (' + titleRole + ')';
+
+    const greetingBubble = document.getElementById('qos-greeting-bubble');
+    if (greetingBubble) {
+      greetingBubble.innerHTML = 'Greetings, Pilot! I am <strong>' + name + '</strong>, your Cosmic Flight Pilot Captain and ' + titleRole + '.<br><br>I am here to guide your flight deck, <strong>explain your contract costs</strong>, decode settlement rules, and <strong>revisit your decision records</strong>.<br><br>Need to talk to a live assistant right now? Call toll-free at <strong><a href="tel:18007826837" style="color:#DFB843; text-decoration:none; font-weight:700;">1-800-QUANTERRA (1-800-782-6837)</a></strong> or email <strong>support@quanterraos.com</strong>. How may I assist your flight deck today?';
+    }
 
     if (chatInput) {
-      chatInput.placeholder = 'Ask ' + name + ' to explain costs, explore the Flight Deck, or review records…';
+      chatInput.placeholder = 'Ask ' + name + ' (' + titleRole + ') to explain costs, explore the Flight Deck, or review records…';
     }
   }
 
@@ -708,7 +722,8 @@ Need to talk to a live assistant right now? Call toll-free at <strong><a href="t
     try { localStorage.setItem('qos_assistant_identity', currentIdentity); } catch (e) {}
     updateIdentityUI();
     if (isVoiceEnabled) {
-      speakText('Switched virtual assistant identity to ' + (currentIdentity === 'quanta' ? 'Quanta' : 'Quantana') + '. Global Galactic Leader active.');
+      const titleRole = currentIdentity === 'quanta' ? 'King of the Galaxy' : 'Queen of the Galaxy';
+      speakText('Switched virtual assistant identity to ' + (currentIdentity === 'quanta' ? 'Quanta' : 'Quantana') + ', ' + titleRole + '. Cosmic Flight Pilot Captain active.');
     }
   };
 

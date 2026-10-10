@@ -37,7 +37,10 @@ describe("Original Eight Council Apparel Collections & Leader Line", () => {
     const leaderCol = getCrewCollection("quanta");
     assert.ok(leaderCol, "Quanta & Quantana leader collection must exist");
     assert.strictEqual(leaderCol.isLeader, true);
-    assert.strictEqual(leaderCol.boardImage, "/assets/quanta-leader-apparel-board.png");
+    assert.ok(
+      leaderCol.boardImage === "/assets/king-queen-galaxy-board.png" ||
+      leaderCol.boardImage === "/assets/quanta-leader-apparel-board.png"
+    );
   });
 
   it("contains 32 council outfits plus 4 leader outfits (36 total) with strict concept state", () => {

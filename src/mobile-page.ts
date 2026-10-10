@@ -1347,6 +1347,16 @@ export function renderMobilePageHtml(): string {
       <h4>Kalshi Dual-Feed</h4>
       <p>Direct low-latency WebSocket stream of 15-minute and hourly event contracts with instant strike ladder pricing.</p>
     </div>
+    <div class="feature-item" style="grid-column: 1 / -1; background: linear-gradient(135deg, rgba(148, 104, 255, 0.15), rgba(89, 221, 236, 0.08)); border: 1px solid rgba(148, 104, 255, 0.35); text-align: left; padding: 20px; border-radius: 12px;">
+      <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px;">
+        <div>
+          <span style="font-family:var(--font-mono); font-size:11px; color:var(--cyan); text-transform:uppercase; font-weight:700;">👑 COSMIC FLIGHT PILOT LINE</span>
+          <h4 style="font-size:16px; margin:4px 0; color:#FFF;">King &amp; Queen of the Galaxy Apparel</h4>
+          <p style="font-size:12px; color:var(--text-muted); margin:0;">Explore the official street sets and flight sets for Captains Quanta &amp; Quantana, plus the 8 original Council collections.</p>
+        </div>
+        <a href="/merchandise/crew" style="display:inline-flex; align-items:center; gap:6px; background:#9468FF; color:#FFF; font-weight:700; font-size:12px; padding:10px 16px; border-radius:8px; text-decoration:none;">Explore Pilot Gear &rarr;</a>
+      </div>
+    </div>
   </section>
 
   <!-- Rule B5 Governance Banner -->
