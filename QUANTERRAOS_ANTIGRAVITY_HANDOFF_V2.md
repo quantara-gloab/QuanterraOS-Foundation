@@ -283,7 +283,7 @@ Tokens on `:root`, dark only for deck; public site dark-default with light-mode 
 ### PHASE 3 — Public site rebuild, Tesla mode (Week 1–2)
 - [x] **3.1** Global header/footer components; remove all per-page navs.
 - [x] **3.2** Design tokens (Part 5) in one stylesheet.
-- [ ] **3.3** Home = 6 panels (2.2). Test at 375px.
+- [x] **3.3** Home = 6 panels (2.2). Test at 375px.
 - [ ] **3.4** Route map (2.1) + 301s for every retired URL (`/calculator`→`/check`, `/compare`→`/check`, `/paper`→`/deck`, `/spread` `/matrix` `/flow` `/settlement` `/corridors` `/divergence` `/index`→`/radar`, `/calibration*` `/study` `/methodology` `/research` `/transparency` `/council` `/why`→`/proof`, `/predictions` `/autopilot` `/journal`→`/deck`, `/educators`→`/learn`, `/mcp`→`/developers`, `/radar/audio`→`/proof#sonification`, `/mobile`→`/deck`). *Accept:* old sitemap crawl → 0 × 404.
 - [ ] **3.5** SEO topic pages + FAQ schema (Part 2.1).
 - [ ] **3.6** Lighthouse mobile ≥ 90 perf/a11y on `/`, `/check`, `/radar`.
