@@ -52,6 +52,11 @@ import { renderChangelogPageHtml } from "./changelog-page.ts";
 import { renderPredictionsPage } from "./predictions-page.ts";
 import { renderAutopilotPage } from "./autopilot-page.ts";
 import { getPredictionsLedger, seedHistoricalReplay } from "./prediction-ledger.ts";
+import { retiredRouteRedirectMiddleware } from "./routes/retired-redirects.ts";
+import { renderInstitutionalPageHtml } from "./institutional-page.ts";
+import { renderDevelopersPageHtml } from "./developers-page.ts";
+import { renderNewsPageHtml } from "./news-page.ts";
+import { renderHelpPageHtml } from "./help-page.ts";
 import {
   reconcilePendingSettlements,
   getSettlementReconciliationStatus,
@@ -397,6 +402,9 @@ app.get("/api/mobile/config", (_req, res) => {
     rule_b5_status: "LOCKED_STANDBY",
   });
 });
+
+// 301 Permanent Redirects for all retired v1 routes (Part 2.1 & Task 3.4)
+app.use(retiredRouteRedirectMiddleware);
 
 // Production / Platform Health Check
 app.get(["/health", "/healthz"], (_req, res) => {
@@ -1961,8 +1969,24 @@ app.get("/signup", (_req, res) => {
   res.type("html").send(renderAccountPageHtml(auth.user, auth.tier));
 });
 
-app.get("/calculator", (_req, res) => {
+app.get(["/check", "/calculator"], (_req, res) => {
   res.type("html").send(renderCalculatorPageHtml());
+});
+
+app.get("/institutional", (_req, res) => {
+  res.type("html").send(renderInstitutionalPageHtml());
+});
+
+app.get("/developers", (_req, res) => {
+  res.type("html").send(renderDevelopersPageHtml());
+});
+
+app.get("/news", (_req, res) => {
+  res.type("html").send(renderNewsPageHtml());
+});
+
+app.get("/help", (_req, res) => {
+  res.type("html").send(renderHelpPageHtml());
 });
 
 // Expiry Radar & Microstructure Terminal (Flagship Real-Time Settlement Engine)
