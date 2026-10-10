@@ -1,14 +1,14 @@
 {
-  "name": "QuanterraOS Mobile Terminal",
+  "name": "QuanterraOS Flight Deck",
   "short_name": "QuanterraOS",
-  "description": "High-Performance Quantitative Intelligence Terminal and Predictive Council Engine",
-  "start_url": "/dashboard",
-  "id": "/dashboard",
+  "description": "Independent flight deck for prediction-market traders across Kalshi and Polymarket. True cost, settlement radar, and personal calibration.",
+  "start_url": "/deck",
+  "id": "/deck",
   "display": "standalone",
   "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
   "orientation": "portrait-primary",
-  "background_color": "#06070A",
-  "theme_color": "#06070A",
+  "background_color": "#05060B",
+  "theme_color": "#000000",
   "lang": "en-US",
   "dir": "ltr",
   "scope": "/",
@@ -48,41 +48,50 @@
   ],
   "shortcuts": [
     {
-      "name": "Live Telemetry Cockpit",
-      "short_name": "Cockpit",
-      "description": "Open live F1 race telemetry and specialist cluster",
-      "url": "/dashboard",
+      "name": "Flight Deck Cockpit",
+      "short_name": "Flight Deck",
+      "description": "Open Celestial Flight Deck cockpit and bridge telemetry",
+      "url": "/deck",
       "icons": [{ "src": "/assets/icon-192.svg", "sizes": "192x192" }]
     },
     {
-      "name": "Predictive Intelligence",
-      "short_name": "Markets",
-      "description": "Kalshi dual-feed predictive order flow",
-      "url": "/kalshi",
+      "name": "True-Cost & Breakeven Check",
+      "short_name": "Free Check",
+      "description": "Audit Kalshi and Polymarket taker fee drag and breakeven rate",
+      "url": "/check",
       "icons": [{ "src": "/assets/icon-192.svg", "sizes": "192x192" }]
     },
     {
-      "name": "Executive Council",
-      "short_name": "Council",
-      "description": "Chat with Dr. Elena Vance and Pit Wall Specialists",
-      "url": "/council",
+      "name": "Settlement Radar",
+      "short_name": "Radar",
+      "description": "Live CME CF BRTI 60s TWAP settlement index vs spot feeds",
+      "url": "/radar",
       "icons": [{ "src": "/assets/icon-192.svg", "sizes": "192x192" }]
     },
     {
-      "name": "Reserve Vault",
-      "short_name": "Vault",
-      "description": "Autonomous treasury and risk gate status",
-      "url": "/wallet",
+      "name": "Audited Calibration Proof",
+      "short_name": "Proof",
+      "description": "Public Brier calibration track record and decile breakdown",
+      "url": "/proof",
       "icons": [{ "src": "/assets/icon-192.svg", "sizes": "192x192" }]
     }
   ],
+  "share_target": {
+    "action": "/deck",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
   "screenshots": [
     {
       "src": "/assets/assistant-avatar.jpg",
       "sizes": "1024x1024",
       "type": "image/jpeg",
       "form_factor": "narrow",
-      "label": "Aria AI Executive Voice & Audio Cockpit"
+      "label": "Aria Multi-Agent Ship Computer"
     }
   ]
 }

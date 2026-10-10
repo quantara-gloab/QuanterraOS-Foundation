@@ -91,6 +91,7 @@ import {
   type ShadowModeSummary,
   type ShadowTrackingRule,
 } from "./lib/shadow-mode.ts";
+import { renderInstallPromptHtml } from "./lib/mobile-pwa.ts";
 
 export type FlightDeckStationId =
   | "bridge"
@@ -291,6 +292,9 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Flight Deck Cockpit — QuanterraOS</title>
   <meta name="description" content="Celestial spacecraft terminal for short-duration prediction markets. Discipline-driven telemetry across 7 ship stations.">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/assets/icon-192.png">
+  <link rel="icon" type="image/svg+xml" href="/assets/icon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -3857,6 +3861,7 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
       });
     }
   </script>
+  ${renderInstallPromptHtml()}
 </body>
 </html>`;
 }

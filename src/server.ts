@@ -83,6 +83,11 @@ import {
   generateMonthlyProofReportMarkdown,
   subscribeToMissionBrief,
 } from "./lib/mission-brief.ts";
+import {
+  registerPushSubscription,
+  getAllPushSubscriptions,
+  createSafePushAlert,
+} from "./lib/mobile-pwa.ts";
 import { renderHelpPageHtml } from "./help-page.ts";
 import { searchHelpArticles, createSupportTicket } from "./lib/support-escalation.ts";
 import {
@@ -2219,6 +2224,52 @@ app.post(["/api/news/subscribe", "/api/mission-brief/subscribe"], (req, res) => 
     return res.status(400).json(result);
   }
   return res.json(result);
+});
+
+// PWA Offline Shell Route (Task 8.1 / Part 3.11)
+app.get(["/offline", "/offline.html"], (_req, res) => {
+  res.sendFile(path.resolve("public/offline.html"));
+});
+
+// Web Push Telemetry & Alerts API (Task 8.1 / Part 3.11)
+app.post("/api/push/subscribe", (req, res) => {
+  const auth = getUserAuth(req);
+  const { endpoint, keys, deviceLabel } = req.body || {};
+  const result = registerPushSubscription({
+    endpoint,
+    keys,
+    userId: auth.user?.id,
+    deviceLabel,
+  });
+  if (!result.success) {
+    return res.status(400).json(result);
+  }
+  return res.json(result);
+});
+
+app.get("/api/push/status", (_req, res) => {
+  const subscriptions = getAllPushSubscriptions();
+  res.json({
+    success: true,
+    pwaReady: true,
+    activeSubscriptions: subscriptions.length,
+    serviceWorkerScope: "/",
+  });
+});
+
+app.post("/api/push/test-broadcast", (req, res) => {
+  const { title, body, url, category } = req.body || {};
+  const alert = createSafePushAlert({
+    title,
+    body: body || "Settlement basis telemetry update: CME CF BRTI 60s TWAP variance observed.",
+    url,
+    category,
+  });
+  res.json({
+    success: true,
+    broadcast: alert,
+    targetSubscribers: getAllPushSubscriptions().length,
+  });
 });
 
 app.get("/help", async (req, res) => {

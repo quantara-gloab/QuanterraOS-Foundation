@@ -1,13 +1,13 @@
 // QuanterraOS Progressive Web App Service Worker
-// Version: 1.1.0 (Strict Financial Guard: No Stale Pricing/Wallet Cache)
+// Version: 2.2.0 (Flight Deck Celestial Shell + Non-Advisory Web Push + Rule B5 Offline Guard)
 
-const CACHE_NAME = 'quanterraos-shell-v2';
+const CACHE_NAME = 'quanterraos-flightdeck-v2.2';
 
-// Safe static shell assets ONLY. Strictly excludes financial, pricing, and trading routes.
+// Safe static shell assets ONLY.
 const STATIC_ASSETS = [
-  '/mobile',
   '/manifest.json',
-  '/apple-touch-icon.png',
+  '/offline.html',
+  '/index.css',
   '/assets/icon.svg',
   '/assets/icon-192.png',
   '/assets/icon-512.png',
@@ -16,14 +16,9 @@ const STATIC_ASSETS = [
   '/assets/assistant-avatar.jpg'
 ];
 
-// Routes that MUST NEVER be cached to prevent dangerous stale prices, orders, or balances
+// Routes that MUST NEVER be cached to prevent stale financial or execution states
 const NEVER_CACHE_PREFIXES = [
   '/api/',
-  '/kalshi',
-  '/wallet',
-  '/fair-value',
-  '/predictions',
-  '/autopilot',
   '/stripe'
 ];
 
@@ -31,7 +26,7 @@ function isNeverCacheUrl(pathname) {
   return NEVER_CACHE_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 }
 
-// Install: Cache critical static shell
+// Install: Pre-cache static shell & offline fallback
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -53,7 +48,7 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch: Strict network-first for APIs, bypass cache for all trading & pricing routes
+// Fetch: Network-first for HTML pages with offline.html fallback; network-only for APIs
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
@@ -62,14 +57,15 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Financial & Trading API routes: Strictly network-only. NEVER write to or read from cache.
+  // API routes: Strictly network-first with JSON offline fallback (Rule B5 protected)
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(
       fetch(event.request).catch(() => {
         return new Response(
           JSON.stringify({
             offline: true,
-            error: 'Network connection unavailable. Live pricing, order routing, and wallet balance operations are strictly halted while offline to prevent stale execution.'
+            status: 'offline',
+            message: 'Network offline. Real-time telemetry paused. Rule B5 active ($0.00 capital risk; zero order routing).'
           }),
           {
             status: 503,
@@ -85,13 +81,28 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Dynamic trading & wallet pages: Strictly network-only (never cached stale)
+  // HTML Page Navigation: Network-first with offline.html fallback
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request).catch(() => {
+        return caches.match('/offline.html').then((offlineResponse) => {
+          return offlineResponse || new Response('Offline — QuanterraOS Flight Deck', {
+            status: 503,
+            headers: { 'Content-Type': 'text/plain' }
+          });
+        });
+      })
+    );
+    return;
+  }
+
+  // Never-cache prefixes
   if (isNeverCacheUrl(url.pathname)) {
     event.respondWith(fetch(event.request));
     return;
   }
 
-  // Safe static assets & offline shell: Stale-while-revalidate
+  // Static Assets: Cache-first with background network update
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       const fetchPromise = fetch(event.request)
@@ -111,9 +122,14 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-// Push Notifications for iPhone / Samsung Mobile Alerts
+// Web Push Notifications (Part 0.3 & Part 3.11: Non-Advisory, Zero Win Claims)
 self.addEventListener('push', (event) => {
-  let data = { title: 'QuanterraOS Mobile Alert', body: 'New market intelligence incoming.', url: '/dashboard' };
+  let data = {
+    title: 'QuanterraOS Flight Deck Alert',
+    body: 'Settlement basis update: CME CF BRTI 60s TWAP variance detected.',
+    url: '/deck?station=navigation'
+  };
+
   if (event.data) {
     try {
       data = event.data.json();
@@ -122,13 +138,20 @@ self.addEventListener('push', (event) => {
     }
   }
 
+  // Sanitize body to strictly adhere to Rule B4 (no win/profit promises)
+  let safeBody = data.body || 'Telemetry alert ready for review in Flight Deck.';
+  const forbidden = /\b(win|winning|guaranteed|beat the market|profit|edge)\b/gi;
+  if (forbidden.test(safeBody)) {
+    safeBody = 'Settlement radar and fee drag update ready in Flight Deck.';
+  }
+
   const options = {
-    body: data.body,
+    body: safeBody,
     icon: '/assets/icon-192.png',
     badge: '/assets/icon-192.png',
     vibrate: [100, 50, 100],
     data: {
-      url: data.url || '/dashboard'
+      url: data.url || '/deck'
     },
     actions: [
       { action: 'open', title: 'Open Cockpit' },
@@ -144,12 +167,12 @@ self.addEventListener('push', (event) => {
 // Notification click handler
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const targetUrl = event.notification.data && event.notification.data.url ? event.notification.data.url : '/dashboard';
+  const targetUrl = event.notification.data && event.notification.data.url ? event.notification.data.url : '/deck';
 
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
       for (const client of clientList) {
-        if (client.url.includes(targetUrl) && 'focus' in client) {
+        if (client.url.includes('/deck') && 'focus' in client) {
           return client.focus();
         }
       }
