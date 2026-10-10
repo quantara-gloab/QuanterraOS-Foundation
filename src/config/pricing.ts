@@ -74,7 +74,7 @@ export const PRICING_PLANS: PricingPlan[] = [
       "Shadow Mode: paper-follow whale flow net-of-fees",
       "Full 8-specialist AI Crew station access",
       "All missions, cosmic ranks, and ship cosmetic skins",
-      "Priority customer service (<24h SLA)"
+      "Email support (help@quanterraos.com, target <24h response)"
     ],
     ctaText: "Start 14-Day Free Trial",
     ctaHref: "/account?plan=pilot",
@@ -86,16 +86,16 @@ export const PRICING_PLANS: PricingPlan[] = [
     badge: "Professional Desk",
     priceMonthly: 399,
     priceDisplay: "$399",
-    billingPeriod: "per month (annual)",
-    description: "Institutional-grade cockpit with cross-venue net-spread scanning, multi-account ledger, and personal coaching.",
+    billingPeriod: "per month (annual commitment: $4,788/yr)",
+    description: "Institutional-grade cockpit with cross-venue net-spread scanning, multi-account ledger, and personal process onboarding.",
     features: [
       "Everything in Pilot tier included",
       "Multi-account Mission Log & portfolio segregation",
       "Cross-venue net-spread scanner (Kalshi vs Polymarket net-after-fees)",
       "Direct low-latency WebSocket live telemetry feed",
       "Full tick data & transaction ledger exports (CSV/JSON)",
-      "1 Flight Instructor human coaching session / month (process-only)",
-      "Rapid desk support (<4 business hours SLA)"
+      "Personal desk onboarding consultation (process-only)",
+      "Dedicated desk support inquiry"
     ],
     ctaText: "Launch Commander Desk",
     ctaHref: "/account?plan=commander",

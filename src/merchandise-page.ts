@@ -26,9 +26,14 @@ import {
 } from "./components/public-layout.ts";
 
 export function renderMerchandisePageHtml(user?: { email?: string; callsign?: string } | null): string {
-  const profile = getUserGamificationSummary(user?.email || "cadet-1");
+  const profile = user
+    ? getUserGamificationSummary(user?.email || "cadet-1")
+    : { flightXp: 0, streakDays: 0, raffleTicketsCount: 0, tournamentRank: 0, tier: "Guest" };
 
-  const productCardsHtml = CANONICAL_MERCHANDISE.map((p) => `
+  const productCardsHtml = CANONICAL_MERCHANDISE.map((p) => {
+    const isPreview = p.status === "preview";
+    const buttonLabel = isPreview ? "Design Preview &bull; Notify Me" : "Purchase &rarr;";
+    return `
     <article class="merch-card" data-category="${p.category}" id="card-${p.id}">
       <div class="merch-img-wrap">
         <img src="${p.imageUrl}" alt="${p.name}" class="merch-img" loading="lazy">
@@ -61,14 +66,15 @@ export function renderMerchandisePageHtml(user?: { email?: string; callsign?: st
 
           <div class="btn-group">
             <button type="button" class="btn-order" onclick="openOrderModal('${p.id}')">
-              Purchase &rarr;
+              ${buttonLabel}
             </button>
             ${p.raffleEligible ? `<button type="button" class="btn-raffle-shortcut" onclick="scrollToRaffles()" title="Win in active raffle">Raffle</button>` : ""}
           </div>
         </div>
       </div>
     </article>
-  `).join("\n");
+  `;
+  }).join("\n");
 
   const rafflesHtml = ACTIVE_RAFFLES.map((r) => `
     <div class="raffle-card" id="${r.id}">
@@ -716,25 +722,31 @@ export function renderMerchandisePageHtml(user?: { email?: string; callsign?: st
         <div class="xp-stat-group">
           <div class="xp-stat-item">
             <span class="xp-stat-label">Flight XP Balance</span>
-            <span class="xp-stat-value" id="user-xp-display">${profile.flightXp.toLocaleString()} XP</span>
+            <span class="xp-stat-value" id="user-xp-display">${user ? profile.flightXp.toLocaleString() + " XP" : "0 XP (Guest)"}</span>
           </div>
           <div class="xp-stat-item">
             <span class="xp-stat-label">Discipline Streak</span>
-            <span class="xp-stat-value">${profile.streakDays} Days</span>
+            <span class="xp-stat-value">${user ? profile.streakDays + " Days" : "0 Days"}</span>
           </div>
           <div class="xp-stat-item">
             <span class="xp-stat-label">Active Raffle Tickets</span>
-            <span class="xp-stat-value" id="user-tickets-display">${profile.raffleTicketsCount} Tickets</span>
+            <span class="xp-stat-value" id="user-tickets-display">${user ? profile.raffleTicketsCount + " Tickets" : "0 Tickets"}</span>
           </div>
           <div class="xp-stat-item">
             <span class="xp-stat-label">Tournament Rank</span>
-            <span class="xp-stat-value">#${profile.tournamentRank}</span>
+            <span class="xp-stat-value">${user ? "#" + profile.tournamentRank : "Unranked (Guest)"}</span>
           </div>
         </div>
 
+        ${user ? `
         <button type="button" class="btn-claim-daily" id="btn-daily-xp" onclick="claimDailyReward()">
           +100 Daily Check XP
         </button>
+        ` : `
+        <a href="/account?flow=sign-up" class="btn-claim-daily" style="text-decoration:none; display:inline-block; text-align:center;">
+          Sign In to Earn Flight XP &rarr;
+        </a>
+        `}
       </div>
 
       <!-- Category Filter Navigation -->
@@ -744,6 +756,7 @@ export function renderMerchandisePageHtml(user?: { email?: string; callsign?: st
         <button type="button" class="btn-filter" onclick="filterCategory('jumpsuit', this)">Flight Jumpsuits</button>
         <button type="button" class="btn-filter" onclick="filterCategory('suit_mens', this)">Executive Suits (Men's)</button>
         <button type="button" class="btn-filter" onclick="filterCategory('suit_womens', this)">Executive Suits (Women's)</button>
+        <button type="button" class="btn-filter" onclick="filterCategory('accessories', this)">Desk &amp; Accessories</button>
         <button type="button" class="btn-filter" onclick="scrollToRaffles()">Win Prizes (Raffles &amp; Tournaments)</button>
       </nav>
     </section>
@@ -841,7 +854,7 @@ export function renderMerchandisePageHtml(user?: { email?: string; callsign?: st
         <!-- Injected via JS -->
       </div>
 
-      <form id="order-form" onsubmit="submitOrder(event)">
+      <form id="order-form" onsubmit="submitMerchandiseCheckout(event)">
         <input type="hidden" id="modal-product-id">
 
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
@@ -883,10 +896,10 @@ export function renderMerchandisePageHtml(user?: { email?: string; callsign?: st
         </div>
 
         <div style="margin:20px 0 16px; display:flex; gap:12px;">
-          <button type="submit" class="btn-order" style="flex:1; background:var(--merch-accent-purple); color:#FFF; padding:12px;">
+          <button type="submit" id="modal-submit-btn" class="btn-order" style="flex:1; background:var(--merch-accent-purple); color:#FFF; padding:12px;">
             Confirm Order &bull; Standard Checkout
           </button>
-          <button type="button" class="btn-raffle-shortcut" style="flex:1;" onclick="submitPointsRedemption()">
+          <button type="button" id="modal-points-btn" class="btn-raffle-shortcut" style="flex:1;" onclick="submitPointsRedemption()">
             Claim with Flight XP
           </button>
         </div>
@@ -903,6 +916,7 @@ export function renderMerchandisePageHtml(user?: { email?: string; callsign?: st
     let activeProduct = null;
     let currentXp = ${profile.flightXp};
     let currentTickets = ${profile.raffleTicketsCount};
+    const isGuest = ${user ? "false" : "true"};
 
     function filterCategory(cat, btn) {
       document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
@@ -928,21 +942,36 @@ export function renderMerchandisePageHtml(user?: { email?: string; callsign?: st
       activeProduct = PRODUCTS_DATA.find(p => p.id === productId);
       if (!activeProduct) return;
 
+      const isPreview = activeProduct.status === 'preview';
       document.getElementById('modal-product-id').value = activeProduct.id;
-      document.getElementById('modal-product-title').textContent = activeProduct.name;
+      document.getElementById('modal-product-title').textContent = isPreview
+        ? activeProduct.name + ' (Design Preview)'
+        : activeProduct.name;
       
       const summaryEl = document.getElementById('modal-product-summary');
       summaryEl.innerHTML = \`
         <img src="\${activeProduct.imageUrl}" style="width:50px; height:50px; border-radius:6px; object-fit:cover;">
         <div>
           <div style="font-weight:700; color:#FFF; font-size:0.95rem;">\${activeProduct.name}</div>
-          <div style="font-family:var(--public-font-mono); font-size:0.82rem; color:#59DDEC;">\${activeProduct.priceFormatted} or \${activeProduct.pointsCost.toLocaleString()} XP</div>
+          <div style="font-family:var(--public-font-mono); font-size:0.82rem; color:#59DDEC;">
+            \${isPreview ? 'Design Preview · Physical Sample Stage · ' : ''}\${activeProduct.priceFormatted} or \${activeProduct.pointsCost.toLocaleString()} XP
+          </div>
         </div>
       \`;
 
       // Update available sizes select
       const sizeSelect = document.getElementById('modal-size-select');
       sizeSelect.innerHTML = activeProduct.availableSizes.map(s => \`<option value="\${s}">\${s}</option>\`).join('');
+
+      const submitBtn = document.getElementById('modal-submit-btn');
+      const pointsBtn = document.getElementById('modal-points-btn');
+      if (isPreview) {
+        submitBtn.textContent = 'Join Pilot Notification List · Free Preview';
+        pointsBtn.textContent = 'Reserve with Flight XP';
+      } else {
+        submitBtn.textContent = 'Confirm Order · Standard Checkout';
+        pointsBtn.textContent = 'Claim with Flight XP';
+      }
 
       document.getElementById('modal-feedback').style.display = 'none';
       document.getElementById('order-modal-backdrop').classList.add('open');
@@ -958,30 +987,27 @@ export function renderMerchandisePageHtml(user?: { email?: string; callsign?: st
       }
     }
 
-    async function submitOrder(e) {
+    async function submitMerchandiseCheckout(e) {
       e.preventDefault();
       if (!activeProduct) return;
 
-      const payload = {
-        productId: activeProduct.id,
-        customerName: document.getElementById('modal-customer-name').value,
-        customerEmail: document.getElementById('modal-customer-email').value,
-        size: document.getElementById('modal-size-select').value,
-        genderCut: document.getElementById('modal-cut-select').value,
-        shippingAddress: {
-          address: document.getElementById('modal-shipping-address').value
-        }
-      };
-
       const fb = document.getElementById('modal-feedback');
       fb.style.display = 'block';
-      fb.style.background = 'rgba(16, 185, 129, 0.2)';
-      fb.style.color = '#86F94A';
-      fb.style.border = '1px solid #10B981';
-      fb.innerHTML = '<strong>Order Dispatched!</strong> Tracking #QOS-FLIGHT-' + Math.floor(100000 + Math.random()*900000) + ' confirmed. Confirmation sent to email.';
 
-      currentXp += Math.round(activeProduct.priceCents / 10);
-      document.getElementById('user-xp-display').textContent = currentXp.toLocaleString() + ' XP';
+      if (activeProduct.status === 'preview') {
+        fb.style.background = 'rgba(139, 92, 246, 0.2)';
+        fb.style.color = '#C4B5FD';
+        fb.style.border = '1px solid #8B5CF6';
+        fb.innerHTML = '<strong>Design Notification Registered!</strong> You are on the notification roster for physical sample validation. No payment charged today.';
+      } else {
+        fb.style.background = 'rgba(16, 185, 129, 0.2)';
+        fb.style.color = '#86F94A';
+        fb.style.border = '1px solid #10B981';
+        fb.innerHTML = '<strong>Order Dispatched!</strong> Tracking #QOS-FLIGHT-' + Math.floor(100000 + Math.random()*900000) + ' confirmed. Confirmation sent to email.';
+
+        currentXp += Math.round(activeProduct.priceCents / 10);
+        document.getElementById('user-xp-display').textContent = currentXp.toLocaleString() + ' XP';
+      }
 
       setTimeout(() => {
         closeOrderModal();
@@ -1015,6 +1041,10 @@ export function renderMerchandisePageHtml(user?: { email?: string; callsign?: st
     }
 
     function claimDailyReward() {
+      if (isGuest) {
+        window.location.href = '/account?flow=sign-up';
+        return;
+      }
       const btn = document.getElementById('btn-daily-xp');
       currentXp += 100;
       currentTickets += 1;
@@ -1026,9 +1056,13 @@ export function renderMerchandisePageHtml(user?: { email?: string; callsign?: st
     }
 
     function enterRaffleAction(raffleId) {
+      if (isGuest) {
+        window.location.href = '/account?flow=sign-up';
+        return;
+      }
       currentTickets += 1;
       document.getElementById('user-tickets-display').textContent = currentTickets + ' Tickets';
-      alert('🎟️ Ticket Entered! Your ticket #TKT-' + Math.floor(100000 + Math.random()*900000) + ' has been entered into the drawing.');
+      alert('🎟️ Ticket Entered! Your ticket #TKT-' + Math.floor(100000 + Math.random()*900000) + ' has been entered into the preview drawing.');
     }
 
     function joinTournamentAction(tournamentId) {

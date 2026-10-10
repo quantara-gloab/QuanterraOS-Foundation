@@ -5730,16 +5730,12 @@ app.get("/api/auth/me", (req, res) => {
 });
 
 app.post("/api/auth/demo-login", (req, res) => {
-  const demoEmail = "commander@quanterraos.com";
-  let user = getUserByEmail(demoEmail);
-  if (!user) {
-    user = createUser(demoEmail, "quanterra-commander-2026", "pro");
-  } else if (user.tier !== "pro") {
-    updateUserTier(user.id, "pro");
-    user.tier = "pro";
-  }
+  // Production demo: isolated read-only synthetic data with NO paid privileges, private journals, execution or customer records
+  const demoId = randomUUID().slice(0, 8);
+  const demoEmail = `demo_${demoId}@quanterraos.sandbox`;
+  const user = createUser(demoEmail, randomUUID(), "free");
   const { sessionId } = createSession(user.id);
-  res.setHeader("Set-Cookie", `quanterraos_session=${sessionId}; Path=/; HttpOnly; SameSite=Lax; Max-Age=2592000`);
+  res.setHeader("Set-Cookie", `quanterraos_session=${sessionId}; Path=/; HttpOnly; SameSite=Lax; Max-Age=3600`);
   const redirectTarget = req.body?.redirectTo || req.query?.redirectTo || "/dashboard";
   if (req.headers["accept"]?.includes("application/json") || req.body?.redirectTo) {
     return res.json({ success: true, redirectTo: redirectTarget });

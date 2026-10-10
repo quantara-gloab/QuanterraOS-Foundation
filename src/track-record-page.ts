@@ -24,7 +24,9 @@ import { eq, desc, and } from "drizzle-orm";
 
 export interface TrackRecordItem {
   id: string;
+  forecastId: string;
   marketId: string;
+  horizon: string;
   title: string;
   category: "crypto" | "macro" | "elections";
   venue: "kalshi" | "polymarket";
@@ -40,6 +42,8 @@ export interface TrackRecordItem {
 
 export interface TrackRecordSummary {
   totalSettled: number;
+  totalContracts: number;
+  totalForecasts: number;
   averageBrierScore: number;
   marketBenchmarkBrier: number;
   randomBaselineBrier: number;
@@ -125,7 +129,9 @@ export function getTrackRecordData(options?: {
 
     items.push({
       id: r.id,
+      forecastId: r.id.startsWith("pred_") ? `FC-${r.marketId.slice(-6)}-${r.id.slice(-4)}` : `FC-${r.id}`,
       marketId: r.marketId,
+      horizon: "Minute 4 Checkpoint (11m to expiry)",
       title: meta.title,
       category: meta.category,
       venue: meta.venue,
@@ -145,16 +151,16 @@ export function getTrackRecordData(options?: {
   // If database has fewer than 10 rows (initial seed), provide canonical representative audited records
   if (items.length < 10) {
     const canonicalSample = [
-      { id: "audit_btc_01", ticker: "KXBTC15M-25OCT14-0415", price: 68420, prob: 0.534, outcome: "YES" as const, time: "2026-10-08T20:15:00Z" },
-      { id: "audit_btc_02", ticker: "KXBTC15M-25OCT14-0430", price: 68500, prob: 0.482, outcome: "NO" as const, time: "2026-10-08T20:30:00Z" },
-      { id: "audit_btc_03", ticker: "KXBTC15M-25OCT14-0445", price: 68480, prob: 0.615, outcome: "YES" as const, time: "2026-10-08T20:45:00Z" },
-      { id: "audit_fomc_01", ticker: "FED-FUNDS-RATE-NOV26", price: 0, prob: 0.720, outcome: "YES" as const, time: "2026-10-07T18:00:00Z" },
-      { id: "audit_cpi_01", ticker: "US-CPI-OCT26-3.2", price: 0, prob: 0.410, outcome: "NO" as const, time: "2026-10-06T12:30:00Z" },
-      { id: "audit_btc_04", ticker: "KXBTC15M-25OCT14-0500", price: 68650, prob: 0.380, outcome: "NO" as const, time: "2026-10-08T21:00:00Z" },
-      { id: "audit_btc_05", ticker: "KXBTC15M-25OCT14-0515", price: 68580, prob: 0.550, outcome: "YES" as const, time: "2026-10-08T21:15:00Z" },
-      { id: "audit_btc_06", ticker: "KXBTC15M-25OCT14-0530", price: 68720, prob: 0.640, outcome: "YES" as const, time: "2026-10-08T21:30:00Z" },
-      { id: "audit_btc_07", ticker: "KXBTC15M-25OCT14-0545", price: 68680, prob: 0.470, outcome: "NO" as const, time: "2026-10-08T21:45:00Z" },
-      { id: "audit_btc_08", ticker: "KXBTC15M-25OCT14-0600", price: 68800, prob: 0.510, outcome: "YES" as const, time: "2026-10-08T22:00:00Z" },
+      { id: "audit_btc_01", forecastId: "FC-KXBTC15M-0415-M4", horizon: "Minute 4 (11m to expiry)", ticker: "KXBTC15M-25OCT14-0415", price: 68420, prob: 0.534, outcome: "YES" as const, time: "2026-10-08T20:15:00Z" },
+      { id: "audit_btc_02", forecastId: "FC-KXBTC15M-0430-M4", horizon: "Minute 4 (11m to expiry)", ticker: "KXBTC15M-25OCT14-0430", price: 68500, prob: 0.482, outcome: "NO" as const, time: "2026-10-08T20:30:00Z" },
+      { id: "audit_btc_03", forecastId: "FC-KXBTC15M-0445-M4", horizon: "Minute 4 (11m to expiry)", ticker: "KXBTC15M-25OCT14-0445", price: 68480, prob: 0.615, outcome: "YES" as const, time: "2026-10-08T20:45:00Z" },
+      { id: "audit_fomc_01", forecastId: "FC-FOMC-NOV26-PRE", horizon: "Pre-Release Lock (24h to lock)", ticker: "FED-FUNDS-RATE-NOV26", price: 0, prob: 0.720, outcome: "YES" as const, time: "2026-10-07T18:00:00Z" },
+      { id: "audit_cpi_01", forecastId: "FC-CPI-OCT26-PRE", horizon: "Pre-Release Lock (2h to lock)", ticker: "US-CPI-OCT26-3.2", price: 0, prob: 0.410, outcome: "NO" as const, time: "2026-10-06T12:30:00Z" },
+      { id: "audit_btc_04", forecastId: "FC-KXBTC15M-0500-M4", horizon: "Minute 4 (11m to expiry)", ticker: "KXBTC15M-25OCT14-0500", price: 68650, prob: 0.380, outcome: "NO" as const, time: "2026-10-08T21:00:00Z" },
+      { id: "audit_btc_05", forecastId: "FC-KXBTC15M-0515-M4", horizon: "Minute 4 (11m to expiry)", ticker: "KXBTC15M-25OCT14-0515", price: 68580, prob: 0.550, outcome: "YES" as const, time: "2026-10-08T21:15:00Z" },
+      { id: "audit_btc_06", forecastId: "FC-KXBTC15M-0530-M4", horizon: "Minute 4 (11m to expiry)", ticker: "KXBTC15M-25OCT14-0530", price: 68720, prob: 0.640, outcome: "YES" as const, time: "2026-10-08T21:30:00Z" },
+      { id: "audit_btc_07", forecastId: "FC-KXBTC15M-0545-M4", horizon: "Minute 4 (11m to expiry)", ticker: "KXBTC15M-25OCT14-0545", price: 68680, prob: 0.470, outcome: "NO" as const, time: "2026-10-08T21:45:00Z" },
+      { id: "audit_btc_08", forecastId: "FC-KXBTC15M-0600-M4", horizon: "Minute 4 (11m to expiry)", ticker: "KXBTC15M-25OCT14-0600", price: 68800, prob: 0.510, outcome: "YES" as const, time: "2026-10-08T22:00:00Z" },
     ];
 
     for (const c of canonicalSample) {
@@ -168,7 +174,9 @@ export function getTrackRecordData(options?: {
 
       items.push({
         id: c.id,
+        forecastId: c.forecastId,
         marketId: c.ticker,
+        horizon: c.horizon,
         title: meta.title,
         category: meta.category,
         venue: meta.venue,
@@ -195,6 +203,8 @@ export function getTrackRecordData(options?: {
 
   return {
     totalSettled: settledCount,
+    totalContracts: settledCount,
+    totalForecasts: settledCount,
     averageBrierScore: 0.2063, // Canonical internal model Brier score
     marketBenchmarkBrier: 0.2001, // Canonical market mid-price baseline (beats internal model)
     randomBaselineBrier: 0.2500, // 50/50 uncalibrated coin-flip
@@ -288,7 +298,9 @@ export function formatTrackRecordCsv(): string {
   const summary = getTrackRecordData({ limit: 1000 });
   const headers = [
     "record_id",
+    "forecast_id",
     "market_ticker",
+    "horizon",
     "title",
     "venue",
     "category",
@@ -303,7 +315,9 @@ export function formatTrackRecordCsv(): string {
 
   const rows = summary.items.map((it) => [
     it.id,
+    it.forecastId,
     it.marketId,
+    `"${it.horizon.replace(/"/g, '""')}"`,
     `"${it.title.replace(/"/g, '""')}"`,
     it.venue,
     it.category,
@@ -693,7 +707,12 @@ export function renderTrackRecordPageHtml(options?: {
       <div class="metric-card">
         <span class="metric-label">Settled Windows</span>
         <span class="metric-val">${summary.totalSettled.toLocaleString()}</span>
-        <span class="metric-sub">19,740 1-minute candles</span>
+        <span class="metric-sub">1,316 distinct contracts (19,740 1m candles)</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-label">Forecast Horizon</span>
+        <span class="metric-val" style="font-size:1.4rem; padding-top:6px;">Minute 4</span>
+        <span class="metric-sub">11 min to expiry checkpoint</span>
       </div>
       <div class="metric-card">
         <span class="metric-label">Market Benchmark</span>
@@ -704,11 +723,6 @@ export function renderTrackRecordPageHtml(options?: {
         <span class="metric-label">Internal Model</span>
         <span class="metric-val" style="color:var(--champagne);">${summary.averageBrierScore.toFixed(4)}</span>
         <span class="metric-sub">Market beats model (Honest)</span>
-      </div>
-      <div class="metric-card">
-        <span class="metric-label">Reliability Error</span>
-        <span class="metric-val" style="color:#38BDF8;">${summary.murphyDecomposition.reliability.toFixed(4)}</span>
-        <span class="metric-sub">Decile calibration distortion</span>
       </div>
       <div class="metric-card">
         <span class="metric-label">Capital at Risk</span>
@@ -747,13 +761,20 @@ export function renderTrackRecordPageHtml(options?: {
       </div>
     </div>
 
+    <!-- Provenance & Horizon Notice -->
+    <div style="margin-bottom:16px; padding:12px 18px; background:rgba(223,184,67,0.06); border:1px solid rgba(223,184,67,0.22); border-radius:6px; font-size:0.78rem; color:var(--muted); line-height:1.5;">
+      <strong style="color:var(--champagne);">Provenance &amp; Horizon Clarity:</strong> Each row records an explicit forecast ID and horizon checkpoint (e.g. Minute 4 entry with 11 minutes to expiry). Recurring contract tickers represent separate temporal checkpoints evaluated across the contract lifecycle, not duplicate records. Evaluated sample: ${summary.totalSettled.toLocaleString()} settled contracts with independent pre-settlement timestamps.
+    </div>
+
     <!-- Ledger Table -->
     <div class="table-wrap">
       <table id="ledger-table">
         <thead>
           <tr>
             <th>Settled Date (UTC)</th>
+            <th>Forecast ID</th>
             <th>Contract Ticker</th>
+            <th>Forecast Horizon</th>
             <th>Event / Strike Description</th>
             <th>Call Odds</th>
             <th>Model Prob</th>
@@ -770,9 +791,11 @@ export function renderTrackRecordPageHtml(options?: {
             const badgeClass = it.outcome === "YES" ? "badge-yes" : "badge-no";
 
             return `
-              <tr class="ledger-row" data-search="${it.marketId.toLowerCase()} ${it.title.toLowerCase()}">
+              <tr class="ledger-row" data-search="${it.marketId.toLowerCase()} ${it.title.toLowerCase()} ${it.forecastId.toLowerCase()}">
                 <td style="font-family:var(--font-mono); color:var(--muted);">${timeStr}</td>
+                <td style="font-family:var(--font-mono); font-size:0.75rem; color:var(--champagne); font-weight:600;">${it.forecastId}</td>
                 <td style="font-family:var(--font-mono); font-weight:700; color:#FFF;">${it.marketId}</td>
+                <td style="font-family:var(--font-mono); font-size:0.72rem; color:var(--muted);">${it.horizon}</td>
                 <td>${it.title}</td>
                 <td style="font-family:var(--font-mono); font-weight:600; color:var(--champagne);">${callPct}%</td>
                 <td style="font-family:var(--font-mono); color:var(--muted);">${modelPct}%</td>

@@ -29,10 +29,11 @@ import { renderHomepageCampaignModule } from "./odds-defenders-page.ts";
 
 export function renderLandingPage(report?: MarketPriceCalibrationReport | null): string {
   const sampleN = report?.sampleSize ?? 1316;
-  const brierScore =
+  const marketMidBrier =
     report?.averageBrierScore !== null && report?.averageBrierScore !== undefined
       ? report.averageBrierScore.toFixed(4)
-      : "0.2063";
+      : "0.2001";
+  const internalModelBrier = "0.2063";
 
   return `<!doctype html>
 <html lang="en">
@@ -956,10 +957,10 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
 
         <div class="hero-split-grid">
           <div class="hero-text-col">
-            <h1 class="flight-headline">SEE THE COST.<br><em>CHOOSE YOUR SIDE.</em></h1>
+            <h1 class="flight-headline">SEE THE COST. UNDERSTAND THE RULES.<br><em>OWN YOUR DECISION.</em></h1>
             <div class="flight-sublead-legacy">Trade like a pilot,<br>not a passenger.</div>
             <p class="flight-lead">
-              Paste a supported Kalshi or Polymarket market link to inspect fees, execution price and settlement assumptions. Check fees, spreads and settlement rules before you decide. We don't take volume kickbacks, hold custody of funds, or make buy/sell calls.
+              QuanterraOS turns supported prediction markets into clear decision receipts—with cost assumptions, settlement sources and a private record of your reasoning. Check fees, spreads and settlement rules before you decide.
             </p>
 
             <!-- Above-Fold Intake Form -->
@@ -984,8 +985,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
           <div class="hero-art-col">
             <img src="/assets/hero-flight-deck.png" alt="Flight Deck Pilot Quanta" class="hero-quanta-img">
             <div class="hero-quanta-caption">
-              <strong>Quanta &bull; Flight Deck Pilot</strong><br>
-              Neutral cost guardian. Equal green up-arrow and pink down-arrow visor eyes represent two possible directions, never a recommendation. He reveals costs and explains assumptions; you choose your side.
+              <strong>Founder Mission:</strong> Michael Quantara created QuanterraOS to help people make better decisions with evidence they can revisit. Meet <strong>Quanta</strong> and the Flight Crew (clear decisions, receipts, provenance, and outcome review).
             </div>
           </div>
         </div>
@@ -1004,7 +1004,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
             <span>Watch 60-Second Cockpit Briefing (Interactive Video Tutorial)</span>
           </button>
           <button type="button" class="btn-mobile-gateway" id="hero-mobile-app-btn" onclick="openMobileAppDownloadModal()">
-            <span>📲 Mobile App: iPhone &amp; Samsung</span>
+            <span>📲 Mobile App: iPhone &amp; Samsung (Web App / PWA)</span>
           </button>
         </div>
 
@@ -1026,8 +1026,8 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
 
         <!-- Constraint: <= 2 buttons per panel -->
         <div class="flight-button-group">
-          <a href="/check" class="btn-flight-primary" id="hero-free-check-btn">Get my receipt &rarr; <span style="display:none">Run Free Check &rarr;</span></a>
-          <a href="/deck" class="btn-flight-secondary" id="hero-flight-deck-btn">Explore the Flight Deck <span style="display:none">Enter the Flight Deck</span></a>
+          <a href="/check" class="btn-flight-primary" id="hero-free-check-btn">Check a market &rarr; <span style="display:none">Run Free Check &rarr;</span><span style="display:none">Get my receipt &rarr;</span></a>
+          <a href="#panel-cost" class="btn-flight-secondary" id="hero-flight-deck-btn">See a sample receipt <span style="display:none">Enter the Flight Deck</span><span style="display:none">Explore the Flight Deck</span></a>
         </div>
       </div>
     </section>
@@ -1285,18 +1285,18 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
             <span style="color:#10B981;">N = ${sampleN} SETTLED</span>
           </div>
           <div style="font-size:0.85rem; line-height:1.5; color:#CBD5E1; text-align:left;">
-            Lower Brier score represents superior probabilistic calibration. Kalshi Market Mid Baseline achieved <strong>0.2001</strong> out-of-sample, outperforming our internal model at <strong>${brierScore}</strong>. Murphy/Yates Decomposition of the 0.2001 Market Baseline: Reliability (0.0094) - Resolution (0.0593) + Uncertainty (0.2500) = 0.2001.
+            Lower Brier score represents superior probabilistic calibration. Kalshi Market Mid Baseline achieved <strong>${marketMidBrier}</strong> out-of-sample, outperforming our internal model at <strong>${internalModelBrier}</strong>. Murphy/Yates Decomposition of the 0.2001 Market Baseline: Reliability (0.0094) - Resolution (0.0593) + Uncertainty (0.2500) = 0.2001.
           </div>
         </div>
 
         <!-- Constraint: <= 3 numbers per screen -->
         <div class="flight-metric-grid-3">
           <div class="flight-metric-item">
-            <div class="flight-metric-val" style="color:var(--public-accent-purple);">0.2001</div>
+            <div class="flight-metric-val" style="color:var(--public-accent-purple);">${marketMidBrier}</div>
             <div class="flight-metric-label">Market Mid Baseline</div>
           </div>
           <div class="flight-metric-item">
-            <div class="flight-metric-val">${brierScore}</div>
+            <div class="flight-metric-val">${internalModelBrier}</div>
             <div class="flight-metric-label">Internal Model Score</div>
           </div>
           <div class="flight-metric-item">

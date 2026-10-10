@@ -273,7 +273,7 @@ export const SEO_TOPIC_PAGES: Record<string, SeoTopicPageConfig> = {
       },
       {
         question: "What is a good Brier score for 15-minute Bitcoin forecasting?",
-        answer: "A coin-flip strategy has a Brier score of 0.2500. The market midpoint prices achieve a baseline of 0.2063 across 1,316 windows. Systematic traders aim for Brier scores below 0.2020.",
+        answer: "A naive coin-flip strategy has a Brier score of 0.2500. Kalshi market midpoint prices achieve a baseline of 0.2001 across 1,316 windows, outperforming our internal quantitative model (0.2063). Systematic forecasters aim for calibration scores below 0.2000.",
       },
     ],
     contentHtml: `

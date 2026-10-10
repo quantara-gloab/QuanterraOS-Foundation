@@ -692,7 +692,7 @@ Any directional edge is pure arithmetic (Assessed Probability - Ask - Fee), not 
   ) {
     citations.push("src/auth.ts", "/account");
     return {
-      reply: `You can log in right now at **/account**. To make your test run seamless tonight, we have added an **Instant 1-Click Test Operator Login** on the clearance terminal. Simply click "Log In As Test Operator" and you will be immediately authenticated into the Pro Terminal with real-time streaming feeds and full $10,000 paper wallet access!`,
+      reply: `You can log in or register an account at **/account**. For evaluation without registering, an isolated read-only demo sandbox is available on the clearance terminal with synthetic data and zero live execution risk.`,
       citations
     };
   }
@@ -777,7 +777,7 @@ Any directional edge is pure arithmetic (Assessed Probability - Ask - Fee), not 
         reply: `Hello! I'm **Aria**, your executive concierge and virtual desk assistant. I'm fully active and ready to communicate with you!
 
 Here is what you can do right now for your test run:
-1. **Instant Login**: Head over to **/account** and click the green **"Log In As Test Operator"** button to get full Pro access.
+1. **Sign In or Explore Demo**: Head over to **/account** to sign in or explore the isolated read-only demo sandbox.
 2. **Make 15M Kalshi Bids**: Go to **/kalshi** to view the active KXBTC15M contract, check the live countdown, and place simulated or live limit bids.
 3. **Electronic Currency Wallet**: Inspect your $10,000 USD and 0.25 BTC paper wallet balance at **/wallet**.
 4. **Calibration & Telemetry**: Inspect our 0.2001 Brier calibration proof at **/calibration** and audit the 8 Council specialists at **/council**.
