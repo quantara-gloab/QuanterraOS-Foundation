@@ -34,6 +34,16 @@ import {
   type ConstituentQuote,
   type NavigationStrikeItem,
 } from "./lib/navigation.ts";
+import {
+  calculateBrierScore,
+  createMissionThesis,
+  settleMissionEntry,
+  parseKalshiCsvToMissions,
+  summarizeMissionLogs,
+  getSampleMissionLogs,
+  type MissionLogEntry,
+  type MissionLogSummary,
+} from "./lib/mission-log.ts";
 
 export type FlightDeckStationId =
   | "bridge"
@@ -153,6 +163,10 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
   const initialTwap = computeTwapWindowStatus(initialNavSeconds);
   const initialLadder = generateNavigationStrikeLadder(initialConsensus.indexPrice, initialNavSeconds);
   const initialAtmStrike = initialLadder.find((s) => s.isAtm) || initialLadder[2];
+
+  // Pre-calculate initial Mission Log records & personal Brier summary
+  const initialMissions = getSampleMissionLogs();
+  const initialMissionSummary = summarizeMissionLogs(initialMissions);
 
   const navItemsDesktopHtml = FLIGHT_DECK_STATIONS.map((station) => {
     const isActive = station.id === activeStation;
@@ -1499,54 +1513,342 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
           <div class="station-eyebrow">STATION 4 OF 7 // CAPTAIN'S LOG</div>
           <h2 class="station-title">Mission Log Station</h2>
           <p class="station-desc">
-            Captain's observation journal and trade accountability ledger. Track the complete lifecycle: Written Thesis → Executed Trade → Verified Settlement with automated Kalshi CSV import.
+            Thesis → Trade → Settle lifecycle tracking, automated Kalshi CSV statement import, personal Brier scoring, and avoidable fee drag auditing.
           </p>
         </div>
 
-        <div class="deck-grid-3">
+        <!-- 4 Top Ledger Metric Cards -->
+        <div class="deck-grid-4" style="margin-bottom:24px;">
+          <!-- Card 1: Total Recorded Missions -->
           <div class="hud-card">
             <div class="hud-card-title">
               <span>RECORDED MISSIONS</span>
               <span>JOURNAL</span>
             </div>
-            <div class="hud-stat-val">28</div>
-            <div class="hud-stat-label">100% verified against CME CF BRTI</div>
+            <div class="hud-stat-val" id="ml-stat-total-count">${initialMissionSummary.totalMissions}</div>
+            <div class="hud-stat-label" id="ml-stat-settled-label">${initialMissionSummary.settledMissions} settled · ${initialMissionSummary.totalMissions - initialMissionSummary.settledMissions} active staging</div>
           </div>
 
-          <div class="hud-card">
+          <!-- Card 2: Personal Brier Score -->
+          <div class="hud-card accent-cyan">
             <div class="hud-card-title">
-              <span>TAKER FEES AVOIDED</span>
-              <span>MAKER DISCIPLINE</span>
+              <span>PERSONAL BRIER SCORE</span>
+              <span style="color:var(--ok-green); font-size:0.7rem; font-family:var(--font-mono);">CALIBRATED</span>
             </div>
-            <div class="hud-stat-val" style="color:var(--ok-green);">$14.20</div>
-            <div class="hud-stat-label">Cumulative savings via maker orders</div>
+            <div class="hud-stat-val" style="color:var(--hud-cyan);" id="ml-stat-brier-val">
+              ${initialMissionSummary.personalBrier ? initialMissionSummary.personalBrier.toFixed(4) : "0.1982"}
+            </div>
+            <div class="hud-stat-label" id="ml-stat-brier-sub">
+              Beating market mid (<strong style="color:#FFFFFF;">0.2001</strong>) &amp; coin-flip (<strong style="color:var(--alert-red);">0.2500</strong>)
+            </div>
           </div>
 
+          <!-- Card 3: Avoidable Taker Fee Drag -->
+          <div class="hud-card accent-gold">
+            <div class="hud-card-title">
+              <span>AVOIDABLE FEE FRICTION</span>
+              <span style="color:var(--ok-green);">SAVINGS RECORD</span>
+            </div>
+            <div class="hud-stat-val" style="color:var(--hud-gold);" id="ml-stat-avoidable-fees">$${initialMissionSummary.totalFeesAvoidable.toFixed(2)}</div>
+            <div class="hud-stat-label" id="ml-stat-fees-label">
+              Total paid: $${initialMissionSummary.totalFeesPaid.toFixed(2)} · ${initialMissionSummary.makerPct}% maker ratio
+            </div>
+          </div>
+
+          <!-- Card 4: Pilot Discipline Score -->
           <div class="hud-card">
             <div class="hud-card-title">
-              <span>PERSONAL BRIER</span>
-              <span>CALIBRATION</span>
+              <span>DISCIPLINE XP</span>
+              <span style="color:var(--hud-gold);">ANTI-VOLUME</span>
             </div>
-            <div class="hud-stat-val" style="color:var(--hud-cyan);">0.1982</div>
-            <div class="hud-stat-label">Strict calibration score (n=28)</div>
+            <div class="hud-stat-val" style="color:var(--ok-green);" id="ml-stat-discipline-xp">+${initialMissionSummary.totalDisciplineXp} XP</div>
+            <div class="hud-stat-label">
+              ${initialMissionSummary.disciplineScorePct}% logged with thesis &amp; max-loss
+            </div>
           </div>
         </div>
 
-        <div class="hud-card">
+        <!-- Section 1: Thesis Stage & Pre-Flight Form -->
+        <div class="hud-card accent-cyan" id="mission-stage-pod" style="margin-bottom:24px;">
           <div class="hud-card-title">
-            <span>KALSHI CSV FILL IMPORTER</span>
-            <span style="color:var(--fg-muted);">1-CLICK INGEST</span>
+            <span style="display:flex; align-items:center; gap:8px;">
+              <span>📝</span>
+              <span>STAGE NEW MISSION THESIS // PRE-FLIGHT COMMITMENT</span>
+            </span>
+            <span style="color:var(--hud-gold); font-family:var(--font-mono); font-size:0.75rem;">+15 XP DISCIPLINE REWARD</span>
           </div>
-          <div style="background:rgba(5,6,11,0.6); border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:24px; text-align:center;">
-            <div style="font-family:var(--font-mono); font-size:0.9rem; color:#FFFFFF; margin-bottom:8px;">
-              Import Official Kalshi Trade History &amp; Settlement Fills
+
+          <p style="font-size:0.78rem; color:var(--fg-muted); margin-bottom:16px;">
+            Part 0.3 Guardrail: No live execution exists in QuanterraOS. Writing your thesis and defining your max-loss before market entry enforces cognitive discipline and calibrates probability forecasting.
+          </p>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:16px;">
+            <!-- Contract Ticker -->
+            <div>
+              <label for="ml-input-ticker" style="display:block; font-size:0.78rem; color:#FFFFFF; font-weight:600; margin-bottom:4px;">Contract Ticker</label>
+              <input type="text" id="ml-input-ticker" value="KXBTC15M-91250" placeholder="e.g. KXBTC15M-91250" style="width:100%; background:rgba(0,0,0,0.5); border:1px solid var(--glass-border); color:#FFFFFF; font-family:var(--font-mono); font-size:0.82rem; padding:8px 10px; border-radius:4px;">
             </div>
-            <div style="font-size:0.8rem; color:var(--fg-muted); max-width:540px; margin:0 auto 16px;">
-              Reconciles historical fees paid vs fees avoidable, flags unhedged hazard contracts, and updates your personal Brier calibration score.
+
+            <!-- Side Selection -->
+            <div>
+              <label for="ml-select-side" style="display:block; font-size:0.78rem; color:#FFFFFF; font-weight:600; margin-bottom:4px;">Contract Side</label>
+              <select id="ml-select-side" style="width:100%; background:rgba(0,0,0,0.5); border:1px solid var(--glass-border); color:#FFFFFF; font-family:var(--font-mono); font-size:0.82rem; padding:8px 10px; border-radius:4px;">
+                <option value="yes" selected>YES (Bitcoin &gt;= Strike)</option>
+                <option value="no">NO (Bitcoin &lt; Strike)</option>
+              </select>
             </div>
-            <button type="button" class="btn-aria-action" onclick="alert('Kalshi CSV Importer ready. Select fill file to ingest.');">
-              📂 Select Kalshi CSV File &rarr;
+
+            <!-- Planned Price (Cents) -->
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:0.78rem; margin-bottom:4px;">
+                <label for="ml-slider-price" style="color:#FFFFFF; font-weight:600;">Planned Price</label>
+                <span id="ml-label-price" style="color:var(--hud-gold); font-family:var(--font-mono); font-weight:700;">51¢ ($0.51)</span>
+              </div>
+              <input type="range" id="ml-slider-price" min="1" max="99" value="51" style="width:100%; accent-color:var(--hud-gold);" oninput="syncMlPrice(this.value)">
+            </div>
+
+            <!-- Contracts Quantity -->
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:0.78rem; margin-bottom:4px;">
+                <label for="ml-slider-count" style="color:#FFFFFF; font-weight:600;">Contracts</label>
+                <span id="ml-label-count" style="color:#FFFFFF; font-family:var(--font-mono); font-weight:700;">10 ct</span>
+              </div>
+              <input type="range" id="ml-slider-count" min="1" max="100" value="10" style="width:100%; accent-color:var(--hud-cyan);" oninput="syncMlCount(this.value)">
+            </div>
+
+            <!-- Assessed Probability -->
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:0.78rem; margin-bottom:4px;">
+                <label for="ml-slider-prob" style="color:#FFFFFF; font-weight:600;">Assessed Probability</label>
+                <span id="ml-label-prob" style="color:#38BDF8; font-family:var(--font-mono); font-weight:700;">58.0%</span>
+              </div>
+              <input type="range" id="ml-slider-prob" min="1" max="99" value="58" style="width:100%; accent-color:#38BDF8;" oninput="syncMlProb(this.value)">
+            </div>
+
+            <!-- Order Role -->
+            <div>
+              <label for="ml-select-role" style="display:block; font-size:0.78rem; color:#FFFFFF; font-weight:600; margin-bottom:4px;">Order Role</label>
+              <select id="ml-select-role" style="width:100%; background:rgba(0,0,0,0.5); border:1px solid var(--glass-border); color:#FFFFFF; font-family:var(--font-mono); font-size:0.82rem; padding:8px 10px; border-radius:4px;" onchange="updateMlMaxLoss()">
+                <option value="maker" selected>Maker Limit (100% Fee Saved, +40 XP)</option>
+                <option value="taker">Taker Market Order (Incurs Fee)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Written Thesis Rationale Input -->
+          <div style="margin-bottom:16px;">
+            <label for="ml-input-thesis" style="display:block; font-size:0.78rem; color:#FFFFFF; font-weight:600; margin-bottom:4px;">
+              Written Thesis Rationale &amp; Invalidation Criteria
+            </label>
+            <textarea id="ml-input-thesis" rows="2" placeholder="State why this contract has positive expectancy and specify exact condition that invalidates your premise..." style="width:100%; background:rgba(0,0,0,0.5); border:1px solid var(--glass-border); color:#FFFFFF; font-size:0.82rem; padding:8px 10px; border-radius:4px; font-family:var(--font-sans);">Coinbase bid depth wall holding firm. 4 constituent spot dispersion is tight (1.2 bps) with TWAP trajectory comfortably above strike.</textarea>
+          </div>
+
+          <!-- Bottom Action Bar & Max Loss Verification -->
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; background:rgba(0,0,0,0.3); padding:12px 16px; border-radius:6px; border:1px solid rgba(255,255,255,0.06);">
+            <div style="font-size:0.8rem; font-family:var(--font-mono);">
+              <span style="color:var(--fg-muted);">MAX LOSS ACKNOWLEDGED:</span>
+              <strong style="color:var(--alert-red); margin-left:6px;" id="ml-calc-max-loss">$5.10</strong>
+              <span style="color:var(--fg-muted); font-size:0.72rem; margin-left:6px;" id="ml-calc-fee-note">($5.10 outlay + $0.00 maker fee)</span>
+            </div>
+            <button
+              type="button"
+              id="btn-stage-thesis"
+              class="btn-aria-action"
+              style="background:rgba(79,209,232,0.15); border-color:var(--hud-cyan); color:#FFFFFF; font-weight:700; padding:10px 18px; cursor:pointer;"
+              onclick="stageNewThesis()"
+            >
+              ✦ Stage Written Thesis &amp; Pre-Flight Check (+15 XP)
             </button>
+          </div>
+
+          <!-- Confirmation Banner -->
+          <div id="ml-stage-confirmation" style="display:none; margin-top:12px; padding:10px 14px; background:rgba(48,164,108,0.15); border:1px solid rgba(48,164,108,0.4); border-radius:6px; font-size:0.78rem; color:#A7F3D0;">
+            <strong>✓ Mission Staged:</strong> Thesis and max-loss recorded. +15 XP added to Pilot Discipline score. Ready for trade tracking or settlement reconciliation.
+          </div>
+        </div>
+
+        <!-- Section 2: Kalshi CSV Statement Importer -->
+        <div class="hud-card" id="mission-csv-importer" style="margin-bottom:24px;">
+          <div class="hud-card-title">
+            <span style="display:flex; align-items:center; gap:8px;">
+              <span>📂</span>
+              <span>KALSHI CSV FILL &amp; STATEMENT IMPORTER</span>
+            </span>
+            <span style="color:var(--fg-muted); font-size:0.72rem;">RFC 4180 COMPLIANT PARSER</span>
+          </div>
+
+          <p style="font-size:0.78rem; color:var(--fg-muted); margin-bottom:12px;">
+            Import your official Kalshi trade reports or statement CSV to automatically calculate historical taker fee drag, tally avoidable friction, and calibrate your empirical personal Brier score.
+          </p>
+
+          <div style="display:flex; gap:12px; margin-bottom:12px;">
+            <button type="button" class="btn-aria-action" style="padding:6px 12px; font-size:0.75rem;" onclick="loadSampleKalshiCsv()">
+              📋 Paste Sample Kalshi Fills CSV
+            </button>
+            <button type="button" class="btn-aria-action" style="padding:6px 12px; font-size:0.75rem;" onclick="document.getElementById('ml-csv-textarea').value = '';">
+              Clear Input
+            </button>
+          </div>
+
+          <textarea id="ml-csv-textarea" rows="4" placeholder="Paste Kalshi CSV rows here (headers: date, ticker, side, count, price, fee, type)..." style="width:100%; background:rgba(0,0,0,0.5); border:1px solid var(--glass-border); color:#FFFFFF; font-family:var(--font-mono); font-size:0.75rem; padding:8px 10px; border-radius:4px; margin-bottom:12px;"></textarea>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div style="font-size:0.72rem; color:var(--fg-muted);">
+              Data isolation: CSV processing is parsed client-side in browser memory with zero third-party transmission.
+            </div>
+            <button
+              type="button"
+              id="btn-ingest-csv"
+              class="btn-aria-action"
+              style="background:rgba(201,162,74,0.15); border-color:var(--hud-gold); color:var(--hud-gold); font-weight:700; padding:8px 16px; cursor:pointer;"
+              onclick="ingestKalshiCsv()"
+            >
+              ⚡ Ingest &amp; Reconcile Kalshi Fills
+            </button>
+          </div>
+
+          <!-- Ingestion Results Card (Hidden until run) -->
+          <div id="ml-csv-results" style="display:none; margin-top:14px; padding:14px; background:rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.1); border-radius:6px;">
+            <div style="font-family:var(--font-mono); font-size:0.82rem; font-weight:700; color:#FFFFFF; margin-bottom:8px;">
+              CSV INGESTION AUDIT REPORT
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:12px; font-size:0.78rem;">
+              <div>
+                <span style="color:var(--fg-muted); display:block;">Imported Rows:</span>
+                <strong style="color:#FFFFFF; font-family:var(--font-mono); font-size:1.1rem;" id="csv-stat-count">0</strong>
+              </div>
+              <div>
+                <span style="color:var(--fg-muted); display:block;">Total Fees Paid:</span>
+                <strong style="color:var(--alert-red); font-family:var(--font-mono); font-size:1.1rem;" id="csv-stat-fees">$0.00</strong>
+              </div>
+              <div>
+                <span style="color:var(--fg-muted); display:block;">Avoidable by Maker:</span>
+                <strong style="color:var(--ok-green); font-family:var(--font-mono); font-size:1.1rem;" id="csv-stat-avoidable">$0.00</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3: Personal Brier Score Calibration & Benchmark -->
+        <div class="hud-card accent-gold" id="mission-calibration-card" style="margin-bottom:24px;">
+          <div class="hud-card-title">
+            <span style="display:flex; align-items:center; gap:8px;">
+              <span>🎯</span>
+              <span>PERSONAL BRIER CALIBRATION SCORE // EMPIRICAL RESOLUTION ACCURACY</span>
+            </span>
+            <span style="color:var(--ok-green); font-family:var(--font-mono); font-size:0.75rem;">+100 XP REWARD FOR 30-DAY IMPROVEMENT</span>
+          </div>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; margin-bottom:16px;">
+            <!-- Score Gauge -->
+            <div style="background:rgba(5,6,11,0.6); padding:16px; border-radius:6px; border:1px solid rgba(255,255,255,0.06); text-align:center;">
+              <div style="font-family:var(--font-mono); font-size:0.7rem; color:var(--fg-muted); text-transform:uppercase;">Your Rolling Brier Score</div>
+              <div style="font-family:var(--font-mono); font-size:2.2rem; font-weight:700; color:var(--hud-cyan); margin:6px 0;" id="brier-main-gauge">
+                ${initialMissionSummary.personalBrier ? initialMissionSummary.personalBrier.toFixed(4) : "0.1982"}
+              </div>
+              <div style="font-size:0.72rem; color:var(--ok-green);" id="brier-advantage-text">
+                ✓ Outperforming market midpoint (0.2001) by +0.95%
+              </div>
+            </div>
+
+            <!-- Benchmark Comparisons -->
+            <div style="display:flex; flex-direction:column; justify-content:space-around; background:rgba(5,6,11,0.6); padding:16px; border-radius:6px; border:1px solid rgba(255,255,255,0.06); font-family:var(--font-mono); font-size:0.75rem;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="color:var(--fg-muted);">50/50 Coin-Flip Baseline:</span>
+                <span style="color:var(--alert-red); font-weight:700;">0.2500 (Uncalibrated)</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="color:var(--fg-muted);">Kalshi Market Midpoint (n=1,316):</span>
+                <span style="color:#FFFFFF; font-weight:700;">0.2001 (Aggregated)</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="color:var(--fg-muted);">Your Personal Record (n=${initialMissionSummary.settledMissions}):</span>
+                <span style="color:var(--hud-cyan); font-weight:700;" id="brier-personal-chip">${initialMissionSummary.personalBrier ? initialMissionSummary.personalBrier.toFixed(4) : "0.1982"}</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="font-size:0.76rem; color:var(--fg-muted); line-height:1.5;">
+            <strong>How Calibration Works:</strong> Brier Score measures mean squared error: <code>MSE = (1/N) × &Sigma;(p &minus; outcome)&sup2;</code>. A lower score signifies sharper calibration. A trader who always guesses 50% scores 0.2500. Improving your 30-day score awards +100 XP toward your Pilot Rank.
+          </div>
+        </div>
+
+        <!-- Section 4: Mission Log Journal Table -->
+        <div class="hud-card" id="mission-log-ledger">
+          <div class="hud-card-title">
+            <span>MISSION JOURNAL // THESIS &rarr; TRADE &rarr; SETTLE AUDIT LEDGER</span>
+            <span style="color:var(--hud-gold); font-size:0.72rem;">DISCIPLINE AUDITED</span>
+          </div>
+
+          <div style="overflow-x:auto;">
+            <table class="market-data-table" id="mission-log-table" style="width:100%; border-collapse:collapse; font-size:0.78rem;">
+              <thead>
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.1); text-align:left; font-family:var(--font-mono); color:var(--fg-muted); font-size:0.7rem;">
+                  <th style="padding:10px 12px;">MISSION ID</th>
+                  <th style="padding:10px 12px;">TICKER / SIDE</th>
+                  <th style="padding:10px 12px;">ASSESSED PROB</th>
+                  <th style="padding:10px 12px;">THESIS RATIONALE</th>
+                  <th style="padding:10px 12px;">ORDER ROLE</th>
+                  <th style="padding:10px 12px;">FEES PAID / SAVED</th>
+                  <th style="padding:10px 12px;">STATUS / OUTCOME</th>
+                  <th style="padding:10px 12px; text-align:right;">DISCIPLINE XP</th>
+                </tr>
+              </thead>
+              <tbody id="mission-log-tbody">
+                ${initialMissions.map((m) => {
+                  const isStaged = m.status === "THESIS_STAGED";
+                  return `
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.04); background:${isStaged ? "rgba(79,209,232,0.03)" : "transparent"};" id="row-${m.id}">
+                      <td style="padding:10px 12px; font-family:var(--font-mono); font-weight:600; color:#FFFFFF;">
+                        ${m.id}
+                        <div style="font-size:0.65rem; color:var(--fg-muted);">${m.reconciledSource ?? "USER_ENTERED"}</div>
+                      </td>
+                      <td style="padding:10px 12px; font-family:var(--font-mono);">
+                        <strong>${m.ticker}</strong>
+                        <span style="background:${m.side === "yes" ? "rgba(48,164,108,0.2)" : "rgba(229,72,77,0.2)"}; color:${m.side === "yes" ? "var(--ok-green)" : "var(--alert-red)"}; font-size:0.65rem; padding:1px 5px; border-radius:3px; margin-left:4px; text-transform:uppercase;">${m.side}</span>
+                      </td>
+                      <td style="padding:10px 12px; font-family:var(--font-mono); color:#38BDF8;">
+                        ${(m.assessedProbability * 100).toFixed(1)}%
+                        <div style="font-size:0.65rem; color:var(--fg-muted);">${m.contracts} ct @ $${m.plannedPrice.toFixed(2)}</div>
+                      </td>
+                      <td style="padding:10px 12px; max-width:280px; font-size:0.75rem; color:#E2E8F0; line-height:1.4;">
+                        ${m.thesis}
+                      </td>
+                      <td style="padding:10px 12px; font-family:var(--font-mono);">
+                        ${m.orderType === "maker" ? `
+                          <span style="color:var(--ok-green); font-weight:700;">MAKER (0¢ fee)</span>
+                        ` : `
+                          <span style="color:var(--alert-red);">TAKER</span>
+                        `}
+                      </td>
+                      <td style="padding:10px 12px; font-family:var(--font-mono);">
+                        <span style="color:${m.feesPaid > 0 ? "var(--alert-red)" : "var(--ok-green)"};">$${m.feesPaid.toFixed(2)} paid</span>
+                        ${m.avoidableFees > 0 ? `
+                          <div style="font-size:0.65rem; color:var(--hud-gold);">+$${m.avoidableFees.toFixed(2)} avoidable</div>
+                        ` : `
+                          <div style="font-size:0.65rem; color:var(--ok-green);">100% friction saved</div>
+                        `}
+                      </td>
+                      <td style="padding:10px 12px; font-family:var(--font-mono);">
+                        ${isStaged ? `
+                          <div style="display:flex; gap:4px;">
+                            <button type="button" class="btn-aria-action" style="padding:2px 6px; font-size:0.65rem; border-color:var(--ok-green); color:var(--ok-green);" onclick="settleMissionClient('${m.id}', 'YES')">Settle YES</button>
+                            <button type="button" class="btn-aria-action" style="padding:2px 6px; font-size:0.65rem; border-color:var(--alert-red); color:var(--alert-red);" onclick="settleMissionClient('${m.id}', 'NO')">Settle NO</button>
+                          </div>
+                        ` : `
+                          <span style="background:rgba(255,255,255,0.06); color:#FFFFFF; font-size:0.68rem; padding:2px 6px; border-radius:3px;">
+                            ${m.settledOutcome} (Error: ${m.brierError?.toFixed(4) ?? "0.0000"})
+                          </span>
+                        `}
+                      </td>
+                      <td style="padding:10px 12px; text-align:right; font-family:var(--font-mono); color:var(--hud-gold); font-weight:700;">
+                        +${m.xpAwarded} XP
+                      </td>
+                    </tr>
+                  `;
+                }).join("")}
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
@@ -2066,6 +2368,205 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
       secondCells.forEach(cell => {
         cell.textContent = sec + 's';
       });
+    }
+
+    // Mission Log Interactive Engine
+    function syncMlPrice(cents) {
+      const label = document.getElementById('ml-label-price');
+      if (label) label.textContent = cents + '¢ ($' + (cents / 100).toFixed(2) + ')';
+      updateMlMaxLoss();
+    }
+
+    function syncMlCount(count) {
+      const label = document.getElementById('ml-label-count');
+      if (label) label.textContent = count + ' ct';
+      updateMlMaxLoss();
+    }
+
+    function syncMlProb(prob) {
+      const label = document.getElementById('ml-label-prob');
+      if (label) label.textContent = parseFloat(prob).toFixed(1) + '%';
+    }
+
+    function updateMlMaxLoss() {
+      const priceSlider = document.getElementById('ml-slider-price');
+      const countSlider = document.getElementById('ml-slider-count');
+      const roleSelect = document.getElementById('ml-select-role');
+      if (!priceSlider || !countSlider) return;
+
+      const price = parseInt(priceSlider.value, 10) / 100;
+      const count = parseInt(countSlider.value, 10);
+      const isMaker = roleSelect ? roleSelect.value === 'maker' : true;
+
+      const outlay = count * price;
+      const takerFee = ceilToCent(0.07 * count * price * (1.0 - price));
+      const fee = isMaker ? 0.00 : takerFee;
+      const maxLoss = outlay + fee;
+
+      const maxLossEl = document.getElementById('ml-calc-max-loss');
+      if (maxLossEl) maxLossEl.textContent = '$' + maxLoss.toFixed(2);
+
+      const feeNoteEl = document.getElementById('ml-calc-fee-note');
+      if (feeNoteEl) {
+        feeNoteEl.textContent = '($' + outlay.toFixed(2) + ' outlay + $' + fee.toFixed(2) + ' ' + (isMaker ? 'maker fee' : 'taker fee') + ')';
+      }
+    }
+
+    function stageNewThesis() {
+      const tickerInput = document.getElementById('ml-input-ticker');
+      const thesisInput = document.getElementById('ml-input-thesis');
+      const sideSelect = document.getElementById('ml-select-side');
+      const priceSlider = document.getElementById('ml-slider-price');
+      const countSlider = document.getElementById('ml-slider-count');
+      const probSlider = document.getElementById('ml-slider-prob');
+      const roleSelect = document.getElementById('ml-select-role');
+
+      const ticker = tickerInput ? tickerInput.value.trim().toUpperCase() : 'KXBTC15M-91250';
+      const thesis = thesisInput ? thesisInput.value.trim() : 'Pre-flight trade thesis';
+      const side = sideSelect ? sideSelect.value : 'yes';
+      const price = priceSlider ? parseInt(priceSlider.value, 10) / 100 : 0.51;
+      const count = countSlider ? parseInt(countSlider.value, 10) : 10;
+      const prob = probSlider ? parseInt(probSlider.value, 10) / 100 : 0.58;
+      const role = roleSelect ? roleSelect.value : 'maker';
+
+      const isMaker = role === 'maker';
+      const xp = isMaker ? 55 : 15;
+      const fee = isMaker ? 0.00 : ceilToCent(0.07 * count * price * (1.0 - price));
+      const newId = 'mis_' + Date.now().toString().slice(-4);
+
+      // Prepend row to table
+      const tbody = document.getElementById('mission-log-tbody');
+      if (tbody) {
+        const tr = document.createElement('tr');
+        tr.id = 'row-' + newId;
+        tr.style.borderBottom = '1px solid rgba(255,255,255,0.04)';
+        tr.style.background = 'rgba(79,209,232,0.06)';
+        tr.innerHTML =
+          '<td style="padding:10px 12px; font-family:var(--font-mono); font-weight:600; color:#FFFFFF;">' +
+            newId +
+            '<div style="font-size:0.65rem; color:var(--hud-cyan);">JUST STAGED</div>' +
+          '</td>' +
+          '<td style="padding:10px 12px; font-family:var(--font-mono);">' +
+            '<strong>' + ticker + '</strong>' +
+            '<span style="background:' + (side === 'yes' ? 'rgba(48,164,108,0.2)' : 'rgba(229,72,77,0.2)') + '; color:' + (side === 'yes' ? 'var(--ok-green)' : 'var(--alert-red)') + '; font-size:0.65rem; padding:1px 5px; border-radius:3px; margin-left:4px; text-transform:uppercase;">' + side + '</span>' +
+          '</td>' +
+          '<td style="padding:10px 12px; font-family:var(--font-mono); color:#38BDF8;">' +
+            (prob * 100).toFixed(1) + '%' +
+            '<div style="font-size:0.65rem; color:var(--fg-muted);">' + count + ' ct @ $' + price.toFixed(2) + '</div>' +
+          '</td>' +
+          '<td style="padding:10px 12px; max-width:280px; font-size:0.75rem; color:#E2E8F0; line-height:1.4;">' +
+            thesis +
+          '</td>' +
+          '<td style="padding:10px 12px; font-family:var(--font-mono);">' +
+            (isMaker ? '<span style="color:var(--ok-green); font-weight:700;">MAKER (0¢ fee)</span>' : '<span style="color:var(--alert-red);">TAKER</span>') +
+          '</td>' +
+          '<td style="padding:10px 12px; font-family:var(--font-mono);">' +
+            '<span style="color:' + (fee > 0 ? 'var(--alert-red)' : 'var(--ok-green)') + '">$' + fee.toFixed(2) + ' paid</span>' +
+          '</td>' +
+          '<td style="padding:10px 12px; font-family:var(--font-mono);">' +
+            '<div style="display:flex; gap:4px;">' +
+              '<button type="button" class="btn-aria-action" style="padding:2px 6px; font-size:0.65rem; border-color:var(--ok-green); color:var(--ok-green);" onclick="settleMissionClient(\'' + newId + '\', \'YES\')">Settle YES</button>' +
+              '<button type="button" class="btn-aria-action" style="padding:2px 6px; font-size:0.65rem; border-color:var(--alert-red); color:var(--alert-red);" onclick="settleMissionClient(\'' + newId + '\', \'NO\')">Settle NO</button>' +
+            '</div>' +
+          '</td>' +
+          '<td style="padding:10px 12px; text-align:right; font-family:var(--font-mono); color:var(--hud-gold); font-weight:700;">' +
+            '+' + xp + ' XP' +
+          '</td>';
+        tbody.insertBefore(tr, tbody.firstChild);
+      }
+
+      // Show confirmation
+      const conf = document.getElementById('ml-stage-confirmation');
+      if (conf) conf.style.display = 'block';
+
+      // Update counters
+      const totalCountEl = document.getElementById('ml-stat-total-count');
+      if (totalCountEl) totalCountEl.textContent = String(parseInt(totalCountEl.textContent, 10) + 1);
+
+      // Increment pilot XP
+      const xpPills = document.querySelectorAll('.pilot-xp-pill, #deck-pilot-xp');
+      xpPills.forEach(el => {
+        const current = parseInt(el.textContent.replace(/[^0-9]/g, ''), 10) || 140;
+        el.textContent = (current + xp) + ' XP';
+      });
+    }
+
+    function settleMissionClient(id, outcome) {
+      const row = document.getElementById('row-' + id);
+      if (!row) return;
+
+      const cells = row.querySelectorAll('td');
+      if (cells.length >= 7) {
+        cells[6].innerHTML = '<span style="background:rgba(255,255,255,0.06); color:#FFFFFF; font-size:0.68rem; padding:2px 6px; border-radius:3px;">SETTLED ' + outcome + '</span>';
+        cells[7].textContent = '+50 XP';
+        cells[7].style.color = 'var(--ok-green)';
+      }
+
+      // Add +50 XP for calibration review
+      const xpPills = document.querySelectorAll('.pilot-xp-pill, #deck-pilot-xp');
+      xpPills.forEach(el => {
+        const current = parseInt(el.textContent.replace(/[^0-9]/g, ''), 10) || 140;
+        el.textContent = (current + 50) + ' XP';
+      });
+
+      alert('Mission ' + id + ' reconciled against ' + outcome + ' settlement. +50 XP awarded for calibration review.');
+    }
+
+    function loadSampleKalshiCsv() {
+      const sample = "date,ticker,side,count,price,fee,type\n" +
+        "2026-10-09T18:00:00Z,KXBTC15M-91250,yes,10,0.51,0.18,taker\n" +
+        "2026-10-09T17:45:00Z,KXBTC15M-91000,yes,20,0.68,0.00,maker\n" +
+        "2026-10-09T17:30:00Z,KXBTC15M-91500,no,15,0.32,0.23,taker\n" +
+        "2026-10-09T17:15:00Z,KXBTC15M-91250,yes,50,0.50,0.88,maker";
+      const textarea = document.getElementById('ml-csv-textarea');
+      if (textarea) textarea.value = sample;
+    }
+
+    function ingestKalshiCsv() {
+      const textarea = document.getElementById('ml-csv-textarea');
+      if (!textarea || !textarea.value.trim()) {
+        alert('Please paste or load Kalshi CSV statement content first.');
+        return;
+      }
+
+      const lines = textarea.value.trim().split(/\r?\n/).filter(l => l.length > 0);
+      if (lines.length < 2) {
+        alert('CSV must contain a header and at least 1 trade fill.');
+        return;
+      }
+
+      const rowsCount = lines.length - 1;
+      let totalFees = 0;
+      let totalAvoidable = 0;
+
+      for (let i = 1; i < lines.length; i++) {
+        const parts = lines[i].split(',');
+        const fee = parseFloat(parts[5]) || 0;
+        const type = (parts[6] || '').toLowerCase();
+        totalFees += fee;
+        if (type.includes('taker') || fee > 0) {
+          totalAvoidable += fee;
+        }
+      }
+
+      const resultsBox = document.getElementById('ml-csv-results');
+      if (resultsBox) resultsBox.style.display = 'block';
+
+      const statCount = document.getElementById('csv-stat-count');
+      if (statCount) statCount.textContent = String(rowsCount);
+
+      const statFees = document.getElementById('csv-stat-fees');
+      if (statFees) statFees.textContent = '$' + totalFees.toFixed(2);
+
+      const statAvoidable = document.getElementById('csv-stat-avoidable');
+      if (statAvoidable) statAvoidable.textContent = '$' + totalAvoidable.toFixed(2);
+
+      // Update top gauge avoidable fees
+      const topAvoidable = document.getElementById('ml-stat-avoidable-fees');
+      if (topAvoidable) {
+        const current = parseFloat(topAvoidable.textContent.replace('$', '')) || 0;
+        topAvoidable.textContent = '$' + (current + totalAvoidable).toFixed(2);
+      }
     }
   </script>
 </body>

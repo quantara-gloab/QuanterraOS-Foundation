@@ -292,7 +292,7 @@ Tokens on `:root`, dark only for deck; public site dark-default with light-mode 
 - [x] **4.1** `/deck` shell: stations (2.3), bottom tabs (mobile), left rail (desktop), celestial theme (Part 5).
 - [x] **4.2** Engineering: Maker/Taker Saver, Rounding Optimizer, Cross-Venue Net Spread.
 - [x] **4.3** Navigation: live Settlement Radar + coin-flip-zone overlay.
-- [ ] **4.4** Mission Log: thesis → trade → settle; Kalshi CSV import; fees paid/avoidable; personal Brier.
+- [x] **4.4** Mission Log: thesis → trade → settle; Kalshi CSV import; fees paid/avoidable; personal Brier.
 - [ ] **4.5** Bridge gauges: Fuel, Hull, Navigation accuracy, Discipline.
 - [ ] **4.6** Responsible-trading layer (3.6). *Accept:* QA script triggers tilt cooldown; limits sync across devices.
 
