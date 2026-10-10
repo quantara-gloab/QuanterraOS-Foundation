@@ -44,6 +44,14 @@ import {
   type MissionLogEntry,
   type MissionLogSummary,
 } from "./lib/mission-log.ts";
+import {
+  computeBridgeGauges,
+  computeHullGauge,
+  computeFuelGauge,
+  computeNavAccuracyGauge,
+  computeDisciplineGauge,
+  type BridgeGaugesState,
+} from "./lib/bridge-gauges.ts";
 
 export type FlightDeckStationId =
   | "bridge"
@@ -167,6 +175,18 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
   // Pre-calculate initial Mission Log records & personal Brier summary
   const initialMissions = getSampleMissionLogs();
   const initialMissionSummary = summarizeMissionLogs(initialMissions);
+
+  // Pre-calculate initial Bridge gauges (Fuel, Hull, Nav Accuracy, Discipline)
+  const initialGauges = computeBridgeGauges({
+    feeBudgetDollars: 50.0,
+    consumedFeesDollars: 8.0,
+    maxLossLimitDollars: 50.0,
+    currentLossDollars: 10.0,
+    personalBrier: initialMissionSummary.personalBrier ?? 0.1982,
+    loggedTradesCount: initialMissionSummary.totalMissions || 20,
+    tradesWithThesisCount: initialMissionSummary.disciplineScorePct ? Math.round((initialMissionSummary.disciplineScorePct / 100) * 20) : 19,
+    totalDisciplineXp: user.xp ?? 140,
+  });
 
   const navItemsDesktopHtml = FLIGHT_DECK_STATIONS.map((station) => {
     const isActive = station.id === activeStation;
@@ -939,42 +959,170 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
           </div>
         </div>
 
-        <!-- Bridge Gauges Grid -->
-        <div class="deck-grid-4">
-          <div class="hud-card accent-cyan">
+        <!-- Security Chief Stand-Down Alert (shown when Hull < 30%) -->
+        <div id="bridge-security-chief-alert" style="display:${initialGauges.hull.integrityPct < 30 ? "block" : "none"}; background:rgba(229,72,77,0.12); border:1px solid rgba(229,72,77,0.5); border-radius:8px; padding:16px 20px; margin-bottom:20px; position:relative;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div style="max-width:700px;">
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                <span style="font-family:var(--font-mono); font-size:0.85rem; font-weight:700; color:var(--alert-red);">
+                  🛡️ SECURITY CHIEF ALERT // HULL INTEGRITY CRITICAL (&lt; 30%)
+                </span>
+                <span style="background:rgba(229,72,77,0.25); color:var(--alert-red); font-size:0.65rem; padding:2px 6px; border-radius:4px; font-family:var(--font-mono); font-weight:700;">TILT COOLDOWN RECOMMENDED</span>
+              </div>
+              <p style="font-size:0.78rem; line-height:1.5; color:#FECDD3; margin:0;" id="bridge-security-chief-msg">
+                ${initialGauges.hull.securityChiefAlert ?? "Hull integrity has fallen below 30% of your voluntary loss limit. Standing down immediately is recommended to prevent cognitive tilt."}
+              </p>
+            </div>
+            <button
+              type="button"
+              id="btn-bridge-stand-down"
+              class="btn-aria-action"
+              style="background:rgba(229,72,77,0.2); border-color:var(--alert-red); color:#FFFFFF; font-weight:700; padding:10px 16px; cursor:pointer;"
+              onclick="standDownFromHullAlert()"
+            >
+              🛡️ Stand Down &amp; Activate Cooldown (+25 XP)
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 Primary Ship Gauges Grid -->
+        <div class="deck-grid-4" id="bridge-gauges-grid" style="margin-bottom:24px;">
+          <!-- Gauge 1: Hull Integrity -->
+          <div class="hud-card accent-cyan" id="gauge-card-hull">
             <div class="hud-card-title">
               <span>HULL INTEGRITY</span>
-              <span>🛡️</span>
+              <span id="gauge-hull-icon">🛡️</span>
             </div>
-            <div class="hud-stat-val" style="color:var(--ok-green);">100%</div>
-            <div class="hud-stat-label">Loss Limit: $0 / $50 utilized</div>
+            <div class="hud-stat-val" style="color:var(--ok-green);" id="bridge-hull-val">${initialGauges.hull.integrityPct}%</div>
+            <!-- Headroom Progress Bar -->
+            <div style="height:4px; background:rgba(255,255,255,0.08); border-radius:2px; margin:8px 0; overflow:hidden;">
+              <div id="bridge-hull-bar" style="height:100%; width:${initialGauges.hull.integrityPct}%; background:var(--ok-green); transition:width 0.3s ease;"></div>
+            </div>
+            <div class="hud-stat-label" id="bridge-hull-label">
+              Loss Limit: $${initialGauges.hull.currentLossDollars.toFixed(2)} / $${initialGauges.hull.maxLossLimitDollars.toFixed(2)} ($${initialGauges.hull.headroomDollars.toFixed(2)} headroom)
+            </div>
+            <div style="font-size:0.68rem; color:var(--fg-muted); margin-top:4px;">
+              Under 30% &rarr; Security Chief suggests standing down
+            </div>
           </div>
 
-          <div class="hud-card accent-gold">
+          <!-- Gauge 2: Fuel Reserve -->
+          <div class="hud-card accent-gold" id="gauge-card-fuel">
             <div class="hud-card-title">
               <span>FUEL RESERVE</span>
               <span>⚡</span>
             </div>
-            <div class="hud-stat-val" style="color:var(--hud-gold);">84%</div>
-            <div class="hud-stat-label">Voluntary fee budget intact</div>
-          </div>
-
-          <div class="hud-card">
-            <div class="hud-card-title">
-              <span>BRIER CALIBRATION</span>
-              <span>🎯</span>
+            <div class="hud-stat-val" style="color:var(--hud-gold);" id="bridge-fuel-val">${initialGauges.fuel.remainingPct}%</div>
+            <!-- Fuel Progress Bar -->
+            <div style="height:4px; background:rgba(255,255,255,0.08); border-radius:2px; margin:8px 0; overflow:hidden;">
+              <div id="bridge-fuel-bar" style="height:100%; width:${initialGauges.fuel.remainingPct}%; background:var(--hud-gold); transition:width 0.3s ease;"></div>
             </div>
-            <div class="hud-stat-val">0.2001</div>
-            <div class="hud-stat-label">Outperforming market (0.2063)</div>
+            <div class="hud-stat-label" id="bridge-fuel-label">
+              Runway: $${initialGauges.fuel.remainingDollars.toFixed(2)} of $${initialGauges.fuel.budgetDollars.toFixed(2)} fee budget
+            </div>
+            <div style="font-size:0.68rem; color:var(--ok-green); margin-top:4px;" id="bridge-fuel-warning">
+              ${initialGauges.fuel.warningMessage ?? "Fee burn rate on track with monthly runway"}
+            </div>
           </div>
 
-          <div class="hud-card">
+          <!-- Gauge 3: Navigation Accuracy -->
+          <div class="hud-card" id="gauge-card-brier">
+            <div class="hud-card-title">
+              <span>NAV ACCURACY</span>
+              <span id="bridge-brier-badge" style="color:var(--hud-cyan); font-family:var(--font-mono); font-size:0.7rem;">${initialGauges.navAccuracy.ratingLabel}</span>
+            </div>
+            <div class="hud-stat-val" style="color:var(--hud-cyan);" id="bridge-brier-val">${initialGauges.navAccuracy.personalBrier.toFixed(4)}</div>
+            <!-- Market Comparison -->
+            <div style="height:4px; background:rgba(255,255,255,0.08); border-radius:2px; margin:8px 0; overflow:hidden;">
+              <div style="height:100%; width:82%; background:var(--hud-cyan);"></div>
+            </div>
+            <div class="hud-stat-label" id="bridge-brier-label">
+              Outperforming market (0.2001) &amp; coin-flip (0.2500)
+            </div>
+            <div style="font-size:0.68rem; color:var(--ok-green); margin-top:4px;">
+              +${(initialGauges.navAccuracy.outperformingMarketBps / 100).toFixed(2)}% calibration advantage
+            </div>
+          </div>
+
+          <!-- Gauge 4: Discipline Score -->
+          <div class="hud-card" id="gauge-card-discipline">
             <div class="hud-card-title">
               <span>DISCIPLINE XP</span>
-              <span>⭐</span>
+              <span style="color:var(--hud-gold);">⭐ ANTI-VOLUME</span>
             </div>
-            <div class="hud-stat-val" style="color:var(--hud-cyan);">140</div>
-            <div class="hud-stat-label">+20 XP for pre-flight check</div>
+            <div class="hud-stat-val" style="color:var(--ok-green);" id="bridge-discipline-val">${initialGauges.discipline.disciplinePct}%</div>
+            <!-- Rank Progress Bar -->
+            <div style="height:4px; background:rgba(255,255,255,0.08); border-radius:2px; margin:8px 0; overflow:hidden;">
+              <div id="bridge-xp-bar" style="height:100%; width:${initialGauges.discipline.rankProgressPct}%; background:var(--ok-green);"></div>
+            </div>
+            <div class="hud-stat-label" id="bridge-discipline-xp">
+              +${initialGauges.discipline.totalDisciplineXp} XP (${initialGauges.discipline.rankName})
+            </div>
+            <div style="font-size:0.68rem; color:var(--fg-muted); margin-top:4px;">
+              Strictly for pre-flight checks &amp; written thesis
+            </div>
+          </div>
+        </div>
+
+        <!-- Voluntary Limits & Ship Calibration Pod -->
+        <div class="hud-card" id="bridge-limits-pod" style="margin-bottom:24px;">
+          <div class="hud-card-title">
+            <span style="display:flex; align-items:center; gap:8px;">
+              <span>⚙️</span>
+              <span>VOLUNTARY SHIP LIMITS // HEADROOM &amp; RUNWAY SIMULATOR</span>
+            </span>
+            <span style="color:var(--hud-cyan); font-family:var(--font-mono); font-size:0.72rem;">PILOT SELF-REGULATION</span>
+          </div>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; margin-bottom:14px;">
+            <!-- Daily Loss Limit -->
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:0.78rem; margin-bottom:4px;">
+                <label for="bridge-input-loss-limit" style="color:#FFFFFF; font-weight:600;">Daily Loss Limit</label>
+                <span id="bridge-label-loss-limit" style="color:var(--hud-cyan); font-family:var(--font-mono); font-weight:700;">$50.00</span>
+              </div>
+              <input type="range" id="bridge-input-loss-limit" min="10" max="250" value="50" step="5" style="width:100%; accent-color:var(--hud-cyan);" oninput="recalculateBridgeGauges()">
+            </div>
+
+            <!-- Current Loss -->
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:0.78rem; margin-bottom:4px;">
+                <label for="bridge-input-current-loss" style="color:#FFFFFF; font-weight:600;">Current Realized Loss</label>
+                <span id="bridge-label-current-loss" style="color:var(--alert-red); font-family:var(--font-mono); font-weight:700;">$10.00</span>
+              </div>
+              <input type="range" id="bridge-input-current-loss" min="0" max="250" value="10" step="5" style="width:100%; accent-color:var(--alert-red);" oninput="recalculateBridgeGauges()">
+            </div>
+
+            <!-- Monthly Fee Budget -->
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:0.78rem; margin-bottom:4px;">
+                <label for="bridge-input-fee-budget" style="color:#FFFFFF; font-weight:600;">Monthly Fee Budget</label>
+                <span id="bridge-label-fee-budget" style="color:var(--hud-gold); font-family:var(--font-mono); font-weight:700;">$50.00</span>
+              </div>
+              <input type="range" id="bridge-input-fee-budget" min="10" max="200" value="50" step="5" style="width:100%; accent-color:var(--hud-gold);" oninput="recalculateBridgeGauges()">
+            </div>
+
+            <!-- Incurred Fees -->
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:0.78rem; margin-bottom:4px;">
+                <label for="bridge-input-incurred-fees" style="color:#FFFFFF; font-weight:600;">Incurred Fees</label>
+                <span id="bridge-label-incurred-fees" style="color:var(--fg-muted); font-family:var(--font-mono); font-weight:700;">$8.00</span>
+              </div>
+              <input type="range" id="bridge-input-incurred-fees" min="0" max="200" value="8" step="1" style="width:100%; accent-color:#CBD5E1;" oninput="recalculateBridgeGauges()">
+            </div>
+          </div>
+
+          <!-- Quick Test Presets -->
+          <div style="display:flex; flex-wrap:wrap; gap:8px;">
+            <button type="button" class="btn-aria-action" style="padding:4px 10px; font-size:0.72rem;" onclick="testNominalHull()">
+              ✓ Test Nominal (80% Hull Headroom)
+            </button>
+            <button type="button" class="btn-aria-action" style="padding:4px 10px; font-size:0.72rem; border-color:var(--alert-red); color:var(--alert-red);" onclick="testTriggerSecurityChief()">
+              ⚠️ Trigger Security Chief Alert (&lt; 30% Hull)
+            </button>
+            <button type="button" class="btn-aria-action" style="padding:4px 10px; font-size:0.72rem; border-color:var(--hud-gold); color:var(--hud-gold);" onclick="testFeeExhaustion()">
+              ⚡ Test Fee Budget Burn
+            </button>
           </div>
         </div>
 
@@ -2567,6 +2715,143 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
         const current = parseFloat(topAvoidable.textContent.replace('$', '')) || 0;
         topAvoidable.textContent = '$' + (current + totalAvoidable).toFixed(2);
       }
+    }
+
+    // Bridge Gauges Interactive Engine
+    function recalculateBridgeGauges() {
+      const limitSlider = document.getElementById('bridge-input-loss-limit');
+      const lossSlider = document.getElementById('bridge-input-current-loss');
+      const budgetSlider = document.getElementById('bridge-input-fee-budget');
+      const feeSlider = document.getElementById('bridge-input-incurred-fees');
+      if (!limitSlider || !lossSlider || !budgetSlider || !feeSlider) return;
+
+      const limit = parseFloat(limitSlider.value);
+      const loss = parseFloat(lossSlider.value);
+      const budget = parseFloat(budgetSlider.value);
+      const fees = parseFloat(feeSlider.value);
+
+      // Sync labels
+      const labelLimit = document.getElementById('bridge-label-loss-limit');
+      if (labelLimit) labelLimit.textContent = '$' + limit.toFixed(2);
+      const labelLoss = document.getElementById('bridge-label-current-loss');
+      if (labelLoss) labelLoss.textContent = '$' + loss.toFixed(2);
+      const labelBudget = document.getElementById('bridge-label-fee-budget');
+      if (labelBudget) labelBudget.textContent = '$' + budget.toFixed(2);
+      const labelFees = document.getElementById('bridge-label-incurred-fees');
+      if (labelFees) labelFees.textContent = '$' + fees.toFixed(2);
+
+      // Hull calculation
+      const headroom = Math.max(0, limit - loss);
+      const hullPct = Math.round((headroom / limit) * 100);
+      const hullVal = document.getElementById('bridge-hull-val');
+      const hullBar = document.getElementById('bridge-hull-bar');
+      const hullLabel = document.getElementById('bridge-hull-label');
+      const secChiefAlert = document.getElementById('bridge-security-chief-alert');
+      const secChiefMsg = document.getElementById('bridge-security-chief-msg');
+
+      if (hullVal) {
+        hullVal.textContent = hullPct + '%';
+        hullVal.style.color = hullPct < 30 ? 'var(--alert-red)' : (hullPct < 50 ? 'var(--hud-gold)' : 'var(--ok-green)');
+      }
+      if (hullBar) {
+        hullBar.style.width = hullPct + '%';
+        hullBar.style.background = hullPct < 30 ? 'var(--alert-red)' : (hullPct < 50 ? 'var(--hud-gold)' : 'var(--ok-green)');
+      }
+      if (hullLabel) {
+        hullLabel.textContent = 'Loss Limit: $' + loss.toFixed(2) + ' / $' + limit.toFixed(2) + ' ($' + headroom.toFixed(2) + ' headroom)';
+      }
+
+      // Security Chief Alert trigger: Under 30% -> Suggests standing down
+      if (hullPct < 30) {
+        if (secChiefAlert) secChiefAlert.style.display = 'block';
+        if (secChiefMsg) {
+          secChiefMsg.textContent = 'SECURITY CHIEF ALERT: Hull integrity has fallen to ' + hullPct + '% (below 30% threshold). Standing down immediately is recommended to prevent cognitive tilt.';
+        }
+      } else {
+        if (secChiefAlert) secChiefAlert.style.display = 'none';
+      }
+
+      // Fuel calculation
+      const remainingFuel = Math.max(0, budget - fees);
+      const fuelPct = Math.round((remainingFuel / budget) * 100);
+      const fuelVal = document.getElementById('bridge-fuel-val');
+      const fuelBar = document.getElementById('bridge-fuel-bar');
+      const fuelLabel = document.getElementById('bridge-fuel-label');
+      const fuelWarning = document.getElementById('bridge-fuel-warning');
+
+      if (fuelVal) {
+        fuelVal.textContent = fuelPct + '%';
+        fuelVal.style.color = fuelPct < 25 ? 'var(--alert-red)' : 'var(--hud-gold)';
+      }
+      if (fuelBar) {
+        fuelBar.style.width = fuelPct + '%';
+        fuelBar.style.background = fuelPct < 25 ? 'var(--alert-red)' : 'var(--hud-gold)';
+      }
+      if (fuelLabel) {
+        fuelLabel.textContent = 'Runway: $' + remainingFuel.toFixed(2) + ' of $' + budget.toFixed(2) + ' fee budget';
+      }
+      if (fuelWarning) {
+        if (fuelPct === 0) {
+          fuelWarning.textContent = 'Fee budget exhausted. Switch to maker orders.';
+          fuelWarning.style.color = 'var(--alert-red)';
+        } else if (fuelPct < 40) {
+          fuelWarning.textContent = 'Burning fee fuel rapidly. Use Maker/Taker Saver.';
+          fuelWarning.style.color = 'var(--alert-red)';
+        } else {
+          fuelWarning.textContent = 'Fee burn rate on track with monthly runway';
+          fuelWarning.style.color = 'var(--ok-green)';
+        }
+      }
+    }
+
+    function testNominalHull() {
+      const limitSlider = document.getElementById('bridge-input-loss-limit');
+      const lossSlider = document.getElementById('bridge-input-current-loss');
+      if (limitSlider && lossSlider) {
+        limitSlider.value = 50;
+        lossSlider.value = 10;
+        recalculateBridgeGauges();
+      }
+    }
+
+    function testTriggerSecurityChief() {
+      const limitSlider = document.getElementById('bridge-input-loss-limit');
+      const lossSlider = document.getElementById('bridge-input-current-loss');
+      if (limitSlider && lossSlider) {
+        limitSlider.value = 50;
+        lossSlider.value = 40; // 40 / 50 = 80% loss -> 20% hull (<30%)
+        recalculateBridgeGauges();
+      }
+    }
+
+    function testFeeExhaustion() {
+      const budgetSlider = document.getElementById('bridge-input-fee-budget');
+      const feeSlider = document.getElementById('bridge-input-incurred-fees');
+      if (budgetSlider && feeSlider) {
+        budgetSlider.value = 50;
+        feeSlider.value = 50;
+        recalculateBridgeGauges();
+      }
+    }
+
+    function standDownFromHullAlert() {
+      const secChiefAlert = document.getElementById('bridge-security-chief-alert');
+      if (secChiefAlert) {
+        secChiefAlert.innerHTML =
+          '<div style="color:#A7F3D0; font-size:0.85rem; font-family:var(--font-mono); font-weight:700;">' +
+            '✓ STAND-DOWN ACTIVATED: +25 XP AWARDED FOR RESPECTING LOSS LIMITS' +
+          '</div>' +
+          '<div style="font-size:0.75rem; color:#E2E8F0; margin-top:4px;">' +
+            'Tilt cooldown engaged. Hull loss headroom preserved. Discipline logged to Mission Log.' +
+          '</div>';
+      }
+
+      // Add +25 XP
+      const xpPills = document.querySelectorAll('.pilot-xp-pill, #deck-pilot-xp');
+      xpPills.forEach(el => {
+        const current = parseInt(el.textContent.replace(/[^0-9]/g, ''), 10) || 140;
+        el.textContent = (current + 25) + ' XP';
+      });
     }
   </script>
 </body>
