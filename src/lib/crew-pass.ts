@@ -337,7 +337,7 @@ export function renderCrewShowcasePageHtml(user?: { email?: string; tier?: strin
       </p>
       <div style="display:flex; justify-content:center; gap:16px; flex-wrap:wrap;">
         <a href="/pass" class="flight-btn-freecheck" style="background:var(--public-accent-purple); color:#FFF; padding:12px 28px; font-size:0.95rem;">Claim Free Pass &rarr;</a>
-        <a href="/art-gallery" class="flight-btn-signin" style="border:1px solid rgba(255,255,255,0.15); padding:12px 24px; font-size:0.95rem;">Explore Art Gallery</a>
+        <a href="/art-gallery" class="flight-btn-signin" style="border:1px solid rgba(255,255,255,0.15); padding:12px 24px; font-size:0.95rem;">Explore The 144 Gallery &rarr;</a>
       </div>
     </div>
   </div>

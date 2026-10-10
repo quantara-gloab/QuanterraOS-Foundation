@@ -462,6 +462,8 @@ import {
   renderCrewPassClaimPageHtml,
   renderArtGalleryPageHtml,
 } from "./lib/crew-pass.ts";
+import { renderArtGallery144PageHtml } from "./art-gallery-144-page.ts";
+import { THE_144_CATALOG, getArtworkById, getArtworkBySlug } from "./lib/art-144-catalog.ts";
 import { renderOddsDefendersPageHtml } from "./odds-defenders-page.ts";
 import { isCampaignEnabled, recordCampaignEvent } from "./config/campaign.ts";
 import { renderMerchandisePageHtml } from "./merchandise-page.ts";
@@ -2366,10 +2368,65 @@ app.get("/pass", (req, res) => {
   res.type("html").send(renderCrewPassClaimPageHtml(auth.user, pass));
 });
 
-// Artwork Gallery
+// QuanterraOS: The 144 Artwork Gallery
 app.get("/art-gallery", (req, res) => {
   const auth = getUserAuth(req);
-  res.type("html").send(renderArtGalleryPageHtml(auth.user));
+  const isRollback = req.query.archive === "rollback" || req.query.rollback === "true";
+  const artSlug = req.query.art ? String(req.query.art) : undefined;
+  res.type("html").send(renderArtGallery144PageHtml({
+    user: auth.user,
+    activeArtIdOrSlug: artSlug,
+    showRollbackArchive: isRollback
+  }));
+});
+
+// Artwork Gallery Rollback Archive route
+app.get("/art-gallery/rollback", (req, res) => {
+  const auth = getUserAuth(req);
+  res.type("html").send(renderArtGallery144PageHtml({
+    user: auth.user,
+    showRollbackArchive: true
+  }));
+});
+
+// Artwork Gallery Deep Link route /art-gallery/:artworkSlug
+app.get("/art-gallery/:artworkSlug", (req, res) => {
+  const auth = getUserAuth(req);
+  const slug = req.params.artworkSlug;
+  if (slug === "rollback") {
+    return res.type("html").send(renderArtGallery144PageHtml({
+      user: auth.user,
+      showRollbackArchive: true
+    }));
+  }
+  const art = getArtworkById(slug) || getArtworkBySlug(slug);
+  if (!art) {
+    return res.status(404).send(renderArtGallery144PageHtml({
+      user: auth.user,
+      showRollbackArchive: false
+    }));
+  }
+  res.type("html").send(renderArtGallery144PageHtml({
+    user: auth.user,
+    activeArtIdOrSlug: art.id
+  }));
+});
+
+// Artwork Catalog 144 APIs
+app.get("/api/art-gallery/144", (req, res) => {
+  res.json({
+    collection: "QuanterraOS: The 144",
+    totalCount: THE_144_CATALOG.length,
+    artworks: THE_144_CATALOG
+  });
+});
+
+app.get("/api/art-gallery/144/:idOrSlug", (req, res) => {
+  const art = getArtworkById(req.params.idOrSlug) || getArtworkBySlug(req.params.idOrSlug);
+  if (!art) {
+    return res.status(404).json({ error: "Artwork not found in QuanterraOS: The 144" });
+  }
+  res.json({ artwork: art });
 });
 
 // Claim Free Crew Pass API

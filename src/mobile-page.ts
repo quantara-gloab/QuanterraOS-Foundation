@@ -1212,6 +1212,48 @@ export function renderMobilePageHtml(): string {
     </div>
   </section>
 
+  <!-- Mobile Flight Crew & The 144 Gallery Integration -->
+  <section style="background: linear-gradient(135deg, rgba(14, 18, 33, 0.95) 0%, rgba(22, 28, 52, 0.9) 100%); border: 1px solid rgba(155, 108, 255, 0.3); border-radius: 18px; padding: 32px 28px; margin-bottom: 48px; box-shadow: 0 16px 40px rgba(0,0,0,0.5);">
+    <div style="display: grid; grid-template-columns: 1fr 280px; gap: 32px; align-items: center;">
+      <div>
+        <div style="display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 11px; color: #CBFF69; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px;">
+          <span>👑 FLIGHT COMPANION // QUANTA GLOBAL GALACTIC LEADER</span>
+        </div>
+        <h3 style="font-size: clamp(20px, 3vw, 28px); font-weight: 800; color: #FFFFFF; margin: 0 0 12px; line-height: 1.25;">
+          Navigate Financial Decisions With Quanta &amp; The Flight Crew
+        </h3>
+        <p style="color: #CBD5E1; font-size: 14px; line-height: 1.6; margin-bottom: 20px;">
+          Whether checking execution drag, monitoring TWAP resolution, or reviewing decision logs, Quanta guides your path.
+          Within the mobile Crew station, explore <strong>QuanterraOS: The 144</strong> &mdash; 144 individually generated Flight Crew artworks across 18 cosmic worlds &mdash; without leaving your financial cockpit.
+        </p>
+        
+        <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+          <a href="/art-gallery" style="background: #CBFF69; color: #090A14; font-weight: 700; font-size: 13px; font-family: var(--font-mono); padding: 10px 20px; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+            <span>Explore The 144 Gallery</span> &rarr;
+          </a>
+          <a href="/merchandise/crew" style="background: rgba(155, 108, 255, 0.15); border: 1px solid #9B6CFF; color: #FFF; font-weight: 600; font-size: 13px; font-family: var(--font-mono); padding: 10px 18px; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+            <span>Council Apparel Line</span>
+          </a>
+          <a href="/check" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #CBD5E1; font-size: 13px; font-family: var(--font-mono); padding: 10px 16px; border-radius: 8px; text-decoration: none;">
+            <span>Check Workflow</span>
+          </a>
+          <a href="/journal" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #CBD5E1; font-size: 13px; font-family: var(--font-mono); padding: 10px 16px; border-radius: 8px; text-decoration: none;">
+            <span>Journal</span>
+          </a>
+        </div>
+      </div>
+
+      <div style="text-align: center;">
+        <div style="width: 100%; max-width: 240px; margin: 0 auto; border-radius: 16px; overflow: hidden; border: 1px solid rgba(155, 108, 255, 0.4); box-shadow: 0 12px 30px rgba(0,0,0,0.6); background: #05070E;">
+          <img src="/assets/quanta-leader-apparel-board.png" alt="Quanta in Cosmic Pilot Flight Gear" style="width: 100%; height: auto; display: block; object-fit: cover;">
+          <div style="padding: 10px 12px; background: rgba(9, 10, 20, 0.9); font-size: 11px; font-family: var(--font-mono); color: #CBFF69; font-weight: 700;">
+            QUANTA COSMIC PILOT
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Instant QR Camera Scan Section -->
   <section class="qr-section">
     <div class="qr-info">

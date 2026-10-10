@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
+  <defs>
+    <radialGradient id="spaceBg" cx="50%" cy="40%" r="75%">
+      <stop offset="0%" stop-color="#0D1821"/>
+      <stop offset="45%" stop-color="#0E1222"/>
+      <stop offset="100%" stop-color="#05070E"/>
+    </radialGradient>
+    <linearGradient id="neonGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7FE5D9"/>
+      <stop offset="100%" stop-color="#4A6B82"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="16" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <filter id="hardGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="28" result="blur2"/>
+      <feComposite in="SourceGraphic" in2="blur2" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Canvas Background -->
+  <rect width="1080" height="1080" fill="url(#spaceBg)"/>
+
+  <!-- Cosmic Ambient Glow & Starfield -->
+  <circle cx="540" cy="420" r="380" fill="rgba(127, 229, 217, 0.4)" opacity="0.6" filter="url(#hardGlow)"/>
+  <circle cx="280" cy="220" r="2.5" fill="#FFF" opacity="0.8"/>
+  <circle cx="820" cy="260" r="3" fill="#FFF" opacity="0.9"/>
+  <circle cx="160" cy="620" r="2" fill="#FFF" opacity="0.6"/>
+  <circle cx="910" cy="740" r="2.5" fill="#FFF" opacity="0.7"/>
+  <circle cx="340" cy="850" r="2" fill="#FFF" opacity="0.75"/>
+  <circle cx="760" cy="890" r="2" fill="#FFF" opacity="0.85"/>
+  <circle cx="540" cy="140" r="3.5" fill="#7FE5D9" opacity="0.9"/>
+
+  <!-- Orbital Chapter Rings -->
+  <ellipse cx="540" cy="460" rx="420" ry="180" fill="none" stroke="#7FE5D9" stroke-width="1.5" stroke-dasharray="12 18" opacity="0.35" transform="rotate(-15 540 460)"/>
+  <ellipse cx="540" cy="460" rx="480" ry="210" fill="none" stroke="#4A6B82" stroke-width="1.2" stroke-dasharray="6 24" opacity="0.25" transform="rotate(25 540 460)"/>
+
+  <!-- Flight Deck Cybernetic Constellation Lines -->
+  <line x1="140" y1="540" x2="380" y2="460" stroke="#7FE5D9" stroke-width="1" opacity="0.25"/>
+  <line x1="940" y1="540" x2="700" y2="460" stroke="#4A6B82" stroke-width="1" opacity="0.25"/>
+  <circle cx="380" cy="460" r="4" fill="#7FE5D9" opacity="0.6"/>
+  <circle cx="700" cy="460" r="4" fill="#4A6B82" opacity="0.6"/>
+
+  <!-- Central Flight Crew Pilot Silhouette & Helmet Halo -->
+  <circle cx="540" cy="420" r="230" fill="#080C1A" stroke="url(#neonGlow)" stroke-width="4" filter="url(#glow)"/>
+  <circle cx="540" cy="420" r="215" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1.5"/>
+
+  <!-- Flight Crew Pilot Visor & Cybernetic Collar -->
+  <path d="M420 540 C420 460 480 340 540 340 C600 340 660 460 660 540 Z" fill="#03050B" stroke="#7FE5D9" stroke-width="2" opacity="0.95"/>
+  <ellipse cx="540" cy="445" rx="80" ry="32" fill="#4A6B82" opacity="0.85" filter="url(#glow)"/>
+  <ellipse cx="540" cy="445" rx="72" ry="24" fill="#050811"/>
+
+  <!-- Guardian Signature Insignia -->
+  
+        <!-- Wolf Insignia -->
+        <polygon points="460,340 500,280 525,370" fill="#7FE5D9" filter="url(#glow)"/>
+        <polygon points="620,340 580,280 555,370" fill="#7FE5D9" filter="url(#glow)"/>
+        <polygon points="480,360 600,360 540,510" fill="#4A6B82" opacity="0.85"/>
+        <polygon points="510,380 570,380 540,470" fill="#7FE5D9"/>
+        <polygon points="505,400 525,415 510,425" fill="#FFF"/>
+        <polygon points="575,400 555,415 570,425" fill="#FFF"/>
+        <circle cx="540" cy="470" r="10" fill="#0D1821"/>
+      
+
+  <!-- Tactical HUD Compass Arc -->
+  <path d="M340 420 A200 200 0 0 1 740 420" fill="none" stroke="#7FE5D9" stroke-width="2" stroke-dasharray="8 12" opacity="0.5"/>
+  <path d="M360 420 A180 180 0 0 0 720 420" fill="none" stroke="#4A6B82" stroke-width="1.5" stroke-dasharray="4 8" opacity="0.4"/>
+
+  <!-- Outer Viewfinder Framing & Bracket Corners -->
+  <rect x="40" y="40" width="1000" height="1000" rx="16" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+  <path d="M40 90 L40 40 L90 40" fill="none" stroke="#7FE5D9" stroke-width="4"/>
+  <path d="M1040 90 L1040 40 L990 40" fill="none" stroke="#7FE5D9" stroke-width="4"/>
+  <path d="M40 990 L40 1040 L90 1040" fill="none" stroke="#4A6B82" stroke-width="4"/>
+  <path d="M1040 990 L1040 1040 L990 1040" fill="none" stroke="#4A6B82" stroke-width="4"/>
+
+  <!-- Flight Deck Header Telemetry -->
+  <text x="64" y="82" font-family="'JetBrains Mono', 'SF Pro Text', monospace" font-size="16" font-weight="700" fill="#7FE5D9" letter-spacing="3">QUANTERRAOS: THE 144 // Q144-066</text>
+  <text x="1016" y="82" text-anchor="end" font-family="'JetBrains Mono', 'SF Pro Text', monospace" font-size="14" font-weight="600" fill="#94A3B8" letter-spacing="2">CH.09 · PLASMA REEF</text>
+
+  <!-- Bottom Brand Title & Guardian Spec -->
+  <rect x="40" y="930" width="1000" height="110" rx="0" fill="rgba(8, 11, 22, 0.88)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  <text x="64" y="972" font-family="'Space Grotesk', -apple-system, sans-serif" font-size="28" font-weight="800" fill="#FFFFFF">Wolf: Trajectory in Plasma Reef</text>
+  <text x="64" y="1008" font-family="'JetBrains Mono', monospace" font-size="15" font-weight="500" fill="#7FE5D9">WOLF // ORDER BOOK QUEUE PROFILER & PACK SCOUT</text>
+  <text x="1016" y="990" text-anchor="end" font-family="'JetBrains Mono', monospace" font-size="14" font-weight="700" fill="#CBFF69">ARTWORK · NFT-READY</text>
+</svg>
