@@ -54,6 +54,7 @@ import { renderAutopilotPage } from "./autopilot-page.ts";
 import { getPredictionsLedger, seedHistoricalReplay } from "./prediction-ledger.ts";
 import { retiredRouteRedirectMiddleware } from "./routes/retired-redirects.ts";
 import { renderInstitutionalPageHtml } from "./institutional-page.ts";
+import { recordInstitutionalInquiry } from "./lib/institutional-inquiry.ts";
 import { renderDevelopersPageHtml } from "./developers-page.ts";
 import {
   OPENAPI_SPEC_V2,
@@ -2055,6 +2056,19 @@ app.get(["/check", "/calculator"], (_req, res) => {
 
 app.get("/institutional", (_req, res) => {
   res.type("html").send(renderInstitutionalPageHtml());
+});
+
+app.post("/api/institutional/book-call", (req, res) => {
+  const result = recordInstitutionalInquiry(req.body);
+  if (!result.success) {
+    return res.status(400).json({ success: false, error: result.error });
+  }
+  res.json({
+    success: true,
+    inquiry: result.inquiry,
+    sla: "<1 hour",
+    message: "Institutional inquiry received. An engineer will follow up within 1 hour.",
+  });
 });
 
 app.get("/developers", (_req, res) => {
