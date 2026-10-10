@@ -57,6 +57,7 @@ import { renderInstitutionalPageHtml } from "./institutional-page.ts";
 import { renderDevelopersPageHtml } from "./developers-page.ts";
 import { renderNewsPageHtml } from "./news-page.ts";
 import { renderHelpPageHtml } from "./help-page.ts";
+import { renderSeoTopicPageHtml } from "./seo-topic-pages.ts";
 import {
   reconcilePendingSettlements,
   getSettlementReconciliationStatus,
@@ -1987,6 +1988,22 @@ app.get("/news", (_req, res) => {
 
 app.get("/help", (_req, res) => {
   res.type("html").send(renderHelpPageHtml());
+});
+
+// SEO Topic Pages with JSON-LD FAQ Schema (Part 2.1 & Task 3.5)
+app.get([
+  "/kalshi-fee-calculator",
+  "/kalshi-btc-settlement-brti",
+  "/kalshi-vs-polymarket-fees",
+  "/bitcoin-15-minute-markets"
+], (req, res) => {
+  const slug = req.path.replace(/^\\//, "");
+  const html = renderSeoTopicPageHtml(slug);
+  if (html) {
+    res.type("html").send(html);
+  } else {
+    res.status(404).send("Page not found");
+  }
 });
 
 // Expiry Radar & Microstructure Terminal (Flagship Real-Time Settlement Engine)
