@@ -351,10 +351,43 @@ export function renderChangelogPageHtml(): string {
       Dated release history, methodology versions, and infrastructure improvements across QuanterraOS.
     </p>
 
+    <!-- Public Feature Voting Board Banner (Task 7.3) -->
+    <div style="background:rgba(201,162,74,0.08); border:1px solid rgba(201,162,74,0.3); border-radius:8px; padding:18px 24px; margin-bottom:36px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+      <div>
+        <div style="font-family:var(--font-mono); font-size:0.75rem; color:var(--accent); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:4px;">
+          Community Product Roadmap
+        </div>
+        <div style="font-weight:700; color:#FFF; font-size:1rem;">
+          Vote on upcoming Flight Deck stations, radar models, and API integrations
+        </div>
+      </div>
+      <a href="/feedback" style="background:var(--accent); color:#000; font-weight:700; padding:10px 18px; border-radius:4px; text-decoration:none; font-size:0.85rem; font-family:var(--font-mono);">
+        Open Feature Voting Board &rarr;
+      </a>
+    </div>
+
     <div class="timeline">
+      <!-- v2.0.0 Major Milestone Release -->
+      <div class="release-item">
+        <div class="release-dot" style="background:#4FD1E8; box-shadow:0 0 12px #4FD1E8;"></div>
+        <div class="release-date" style="color:var(--accent);">// 10 October 2026 (Major Release — v2.0.0)</div>
+        <div class="release-version">v2.0.0 — Celestial Flight Deck &amp; Tesla-Grade Public Surface</div>
+        <div class="release-notes">
+          <ul>
+            <li><strong>Two Surfaces, One Product:</strong> Built Tesla-mode public web surface (<code>/</code>) delivering pure black minimalism, stark typography, zero clutter, and 6 cinematic viewport panels. Signed-in users enter the Celestial Flight Deck (<code>/deck</code>) featuring 7 specialized spacecraft stations.</li>
+            <li><strong>7 Core Stations:</strong> Bridge (main HUD &amp; gauges), Navigation (settlement radar &amp; TWAP), Engineering (true-cost engine &amp; Maker Saver), Mission Log (journal &amp; CSV importer), Sensors (large-trade tape &amp; wallet audit), Crew (Aria ship router &amp; 8 specialists), and Hangar (ship configuration).</li>
+            <li><strong>Anti-Volume Game Engine:</strong> Event-sourced <code>xp_events</code> system rewarding discipline only (+10 pre-flight, +15 thesis, +10 maker limit, +20 stand-down from coin flip, +100 Brier improvement). Zero XP awarded for trade count, dollar volume, P&amp;L, or streaks.</li>
+            <li><strong>Polymarket Wallet Calibration Cards:</strong> Probabilistic Brier scoring audit exposing the Favorite-Chaser Paradox (traders winning 80% of trades while underperforming a naive coin flip).</li>
+            <li><strong>Shadow Mode:</strong> Paper-follow public whale transactions with realistic slippage (+1¢) and taker fees under CFTC Rule 4.41 compliance. Strict Rule B5 zero live order routing.</li>
+            <li><strong>Clerk Billing Plans:</strong> Cadet ($0), Pilot ($39/mo or $349/yr), Commander ($399/mo), Builder API ($49/mo), and Institutional.</li>
+            <li><strong>Community &amp; Feature Voting:</strong> Launched official Discord (<code>/discord</code>) with strict non-advisory moderation and public feature voting board (<code>/feedback</code>).</li>
+          </ul>
+        </div>
+      </div>
+
       <div class="release-item">
         <div class="release-dot" style="background:#00F2FE; box-shadow:0 0 10px #00F2FE;"></div>
-        <div class="release-date">// 9 October 2026 (Current Release)</div>
+        <div class="release-date">// 9 October 2026</div>
         <div class="release-version">v0.8.0 — Mobile Gateway (iPhone &amp; Samsung), Discord/Telegram Signal Gateway &amp; Algorithmic 15M/1H BTC Engine</div>
         <div class="release-notes">
           <ul>

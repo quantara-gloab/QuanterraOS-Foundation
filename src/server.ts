@@ -58,6 +58,13 @@ import { renderDevelopersPageHtml } from "./developers-page.ts";
 import { renderNewsPageHtml } from "./news-page.ts";
 import { renderHelpPageHtml } from "./help-page.ts";
 import { searchHelpArticles, createSupportTicket } from "./lib/support-escalation.ts";
+import {
+  renderCommunityDiscordPageHtml,
+  renderFeedbackBoardHtml,
+  getFeedbackItems,
+  upvoteFeedbackItem,
+  submitFeedbackItem,
+} from "./lib/community-feedback.ts";
 import { renderSeoTopicPageHtml } from "./seo-topic-pages.ts";
 import {
   reconcilePendingSettlements,
@@ -2079,6 +2086,39 @@ app.post("/api/support/escalate", async (req, res) => {
   } catch (err: any) {
     res.status(400).json({ error: "escalation_error", message: err.message });
   }
+});
+
+// Community & Discord Launch Portal (Task 7.3 / Part 3.7)
+app.get(["/discord", "/community"], (_req, res) => {
+  res.type("html").send(renderCommunityDiscordPageHtml());
+});
+
+// Feature Feedback & Voting Board (Task 7.3 / Part 3.7)
+app.get("/feedback", (_req, res) => {
+  res.type("html").send(renderFeedbackBoardHtml());
+});
+
+app.get("/api/feedback", (_req, res) => {
+  const items = getFeedbackItems();
+  res.json({ count: items.length, items });
+});
+
+app.post("/api/feedback", (req, res) => {
+  const { title, category, description, authorCallsign } = req.body || {};
+  try {
+    const item = submitFeedbackItem({ title, category, description, authorCallsign });
+    res.json({ success: true, item });
+  } catch (err: any) {
+    res.status(400).json({ error: "feedback_error", message: err.message });
+  }
+});
+
+app.post("/api/feedback/:id/upvote", (req, res) => {
+  const item = upvoteFeedbackItem(req.params.id);
+  if (!item) {
+    return res.status(404).json({ error: "not_found", message: "Feedback proposal not found." });
+  }
+  res.json({ success: true, item });
 });
 
 // SEO Topic Pages with JSON-LD FAQ Schema (Part 2.1 & Task 3.5)
