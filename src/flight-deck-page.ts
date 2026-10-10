@@ -72,6 +72,11 @@ import {
   getFeesSavedLeaderboard,
   MIN_CALIBRATION_SAMPLE_SIZE,
 } from "./lib/leaderboards.ts";
+import {
+  SAMPLE_LARGE_TRADE_PRINTS,
+  queryLargeTradeFeed,
+  type LargeTradePrint,
+} from "./lib/sensors-feed.ts";
 
 export type FlightDeckStationId =
   | "bridge"
@@ -2206,8 +2211,8 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
               <span>WHALE PRINTS (24H)</span>
               <span>&gt; 500 CT</span>
             </div>
-            <div class="hud-stat-val">14</div>
-            <div class="hud-stat-label">Net taker fee paid: $245.00</div>
+            <div class="hud-stat-val">${SAMPLE_LARGE_TRADE_PRINTS.length}</div>
+            <div class="hud-stat-label">Net taker fee drag: $${SAMPLE_LARGE_TRADE_PRINTS.reduce((sum, p) => sum + p.takerFeeDollars, 0).toFixed(2)}</div>
           </div>
 
           <div class="hud-card">
@@ -2229,30 +2234,95 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
           </div>
         </div>
 
-        <div class="hud-card">
-          <div class="hud-card-title">
-            <span>LIVE FLOW TELEMETRY</span>
-            <span style="color:var(--ok-green);">● STREAMING</span>
+        <!-- Large-Trade Feed Scanner (Task 6.1 / Part 3.4) -->
+        <div class="hud-card" id="sensors-whale-feed-card" style="margin-top:20px;">
+          <div class="hud-card-title" style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--ok-green); box-shadow:0 0 8px var(--ok-green);"></span>
+              <span>LARGE-TRADE FLOW TELEMETRY // NET-AFTER-FEES &amp; SETTLEMENT CONTEXT</span>
+            </div>
+            <span style="color:var(--hud-cyan); font-family:var(--font-mono); font-size:0.72rem;">CFTC &amp; ON-CHAIN TAPE</span>
           </div>
-          <div style="font-family:var(--font-mono); font-size:0.8rem; color:var(--fg-muted); line-height:1.8;">
-            <div style="padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between;">
-              <span>KXBTC15M-26OCT09-91250</span>
-              <span style="color:#FFFFFF;">100ct @ 51¢</span>
-              <span style="color:var(--alert-red);">Taker Fee: $1.75</span>
-              <span style="color:var(--hud-cyan);">Breakeven: 52.75%</span>
-            </div>
-            <div style="padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between;">
-              <span>KXBTC15M-26OCT09-91200</span>
-              <span style="color:#FFFFFF;">50ct @ 75¢</span>
-              <span style="color:var(--alert-red);">Taker Fee: $0.66</span>
-              <span style="color:var(--hud-cyan);">Breakeven: 76.32%</span>
-            </div>
-            <div style="padding:6px 0; display:flex; justify-content:space-between;">
-              <span>KXBTC15M-26OCT09-91300</span>
-              <span style="color:#FFFFFF;">250ct @ 25¢</span>
-              <span style="color:var(--ok-green);">Maker Limit ($0.00 fee)</span>
-              <span style="color:var(--hud-gold);">Maker Saved: $3.29</span>
-            </div>
+
+          <div style="font-size:0.78rem; color:var(--fg-muted); margin-bottom:14px; line-height:1.5;">
+            Every transaction is enriched with exact regulatory taker fee friction, required breakeven shifts, and settlement proximity. Volume is never an indicator of predictive edge.
+          </div>
+
+          <!-- Feed Venue Filter Selector -->
+          <div style="display:flex; gap:8px; margin-bottom:14px;">
+            <button type="button" class="btn-aria-action active" id="btn-feed-filter-all" style="padding:6px 12px; font-size:0.75rem;" onclick="filterSensorsFeed('all')">
+              All Venues
+            </button>
+            <button type="button" class="btn-aria-action" id="btn-feed-filter-kalshi" style="padding:6px 12px; font-size:0.75rem;" onclick="filterSensorsFeed('kalshi')">
+              Kalshi Tape (Anonymous)
+            </button>
+            <button type="button" class="btn-aria-action" id="btn-feed-filter-poly" style="padding:6px 12px; font-size:0.75rem;" onclick="filterSensorsFeed('polymarket')">
+              Polymarket (On-Chain)
+            </button>
+          </div>
+
+          <!-- Large-Trade Table -->
+          <div style="overflow-x:auto;">
+            <table style="width:100%; border-collapse:collapse; font-size:0.78rem; font-family:var(--font-mono);" id="sensors-feed-table">
+              <thead>
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.1); color:var(--fg-muted); text-align:left;">
+                  <th style="padding:8px 6px;">VENUE</th>
+                  <th style="padding:8px 6px;">TICKER &amp; SIDE</th>
+                  <th style="padding:8px 6px;">SIZE &amp; NOTIONAL</th>
+                  <th style="padding:8px 6px;">EXEC PRICE</th>
+                  <th style="padding:8px 6px; color:var(--hud-gold);">NET-AFTER-FEES</th>
+                  <th style="padding:8px 6px; color:var(--hud-cyan);">SETTLEMENT CONTEXT</th>
+                  <th style="padding:8px 6px;">IDENTITY</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${SAMPLE_LARGE_TRADE_PRINTS.map(p => `
+                  <tr class="sensor-trade-row venue-${p.venue}" style="border-bottom:1px solid rgba(255,255,255,0.05); color:#FFF;">
+                    <td style="padding:8px 6px;">
+                      <span style="font-size:0.65rem; padding:2px 6px; border-radius:3px; font-weight:700; background:${p.venue === 'kalshi' ? 'rgba(79,209,232,0.15)' : 'rgba(201,162,74,0.15)'}; color:${p.venue === 'kalshi' ? 'var(--hud-cyan)' : 'var(--hud-gold)'};">
+                        ${p.venue.toUpperCase()}
+                      </span>
+                    </td>
+                    <td style="padding:8px 6px;">
+                      <div style="font-weight:600; color:#FFF;">${p.ticker}</div>
+                      <div style="font-size:0.68rem; color:${p.side === 'YES' ? 'var(--ok-green)' : 'var(--alert-red)'}; font-weight:700;">${p.side} &bull; ${p.orderType.toUpperCase()}</div>
+                    </td>
+                    <td style="padding:8px 6px;">
+                      <div style="color:#FFF; font-weight:600;">${p.contracts.toLocaleString()} ct</div>
+                      <div style="font-size:0.68rem; color:var(--fg-muted);">$${p.notionalDollars.toFixed(2)}</div>
+                    </td>
+                    <td style="padding:8px 6px; color:#FFF; font-weight:700;">
+                      ${p.priceCents}¢
+                    </td>
+                    <td style="padding:8px 6px;">
+                      <div style="color:${p.orderType === 'maker' ? 'var(--ok-green)' : 'var(--alert-red)'}; font-weight:700;">
+                        Fee: $${p.takerFeeDollars.toFixed(2)}
+                      </div>
+                      <div style="font-size:0.68rem; color:var(--hud-cyan);">
+                        Breakeven: ${p.requiredBreakevenPct.toFixed(2)}%
+                      </div>
+                      <div style="font-size:0.65rem; color:var(--fg-muted);">
+                        Net Max Loss: $${p.netLossIfLoseDollars.toFixed(2)}
+                      </div>
+                    </td>
+                    <td style="padding:8px 6px;">
+                      <div style="font-size:0.7rem; color:#FFF;">${p.settlementSource}</div>
+                      <div style="font-size:0.68rem; color:${p.settlementRiskLevel === 'HAZARD_COIN_FLIP' ? 'var(--alert-red)' : 'var(--ok-green)'}; font-weight:${p.settlementRiskLevel === 'HAZARD_COIN_FLIP' ? '700' : '400'};">
+                        ${p.settlementRiskLevel === 'HAZARD_COIN_FLIP' ? '⚠️ HAZARD: ±$' + p.strikeDistanceDollars + ' (' + p.secondsToExpiry + 's)' : 'Dist: $' + p.strikeDistanceDollars + ' (' + p.secondsToExpiry + 's)'}
+                      </div>
+                    </td>
+                    <td style="padding:8px 6px; font-size:0.68rem; color:var(--fg-muted);">
+                      ${p.walletIdentifier}
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+
+          <div style="border-top:1px solid rgba(255,255,255,0.08); padding-top:10px; margin-top:14px; font-size:0.7rem; color:var(--fg-muted); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <span>QuanterraOS Sensors Layer · Rule B5 Compliant (Zero Live Execution / No Order Routing)</span>
+            <span style="color:var(--hud-cyan);">CFTC Rule 4.41 Compliant</span>
           </div>
         </div>
       </section>

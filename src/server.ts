@@ -102,6 +102,7 @@ import {
   validateLeaderboardSortingMetric,
 } from "./lib/leaderboards.ts";
 import { triggerDisciplineCelebration } from "./lib/celebrations.ts";
+import { queryLargeTradeFeed } from "./lib/sensors-feed.ts";
 import {
   computeExpiryRadarState,
   renderExpiryRadarPageHtml,
@@ -4708,6 +4709,17 @@ app.post("/api/deck/celebration/trigger", (req, res) => {
   } catch (err) {
     res.status(400).json({ error: "guardrail_violation", message: (err as Error).message });
   }
+});
+
+// ===================================================================
+// Sensors Large-Trade Feed API (Task 6.1 / Part 3.4)
+// ===================================================================
+app.get("/api/deck/sensors/trades", (req, res) => {
+  const venue = (req.query.venue as any) || "all";
+  const minContracts = req.query.minContracts ? parseInt(req.query.minContracts as string, 10) : undefined;
+  const riskLevel = (req.query.riskLevel as any) || "all";
+  const prints = queryLargeTradeFeed({ venue, minContracts, riskLevel });
+  res.json({ count: prints.length, prints });
 });
 
 app.get("/wallet", (_req, res) => {
