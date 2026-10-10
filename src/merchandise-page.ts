@@ -768,16 +768,16 @@ export function renderMerchandisePageHtml(user?: { email?: string; callsign?: st
 
     <!-- Raffles & Tournaments Gamification Section -->
     <section class="rewards-section" id="rewards-anchor" aria-label="Raffles and Tournaments">
-      <h2 class="section-headline">Win Exclusive Gear &bull; Raffles &amp; Tournaments</h2>
+      <h2 class="section-headline">Flight Gear Rewards &bull; Raffles &amp; Tournaments</h2>
       <p class="section-subtext">
-        Every pre-flight check, thesis note, and calibration score earns Flight XP. Use your earned points to enter weekly raffles or climb the tournament leaderboard for custom bespoke suits.
+        Educational Demonstration &amp; Prototype Evaluation: Every pre-flight check, thesis note, and calibration score earns Flight XP. Use your earned points to enter weekly drawings or climb the tournament leaderboard for bespoke suits. (Non-wagering educational simulation under Rule B5: $0.00 capital risk).
       </p>
 
       <div class="rewards-split-grid">
         <!-- Left: Raffles -->
         <div>
           <div style="font-family:var(--public-font-mono); font-size:0.8rem; font-weight:700; color:var(--merch-accent-cyan); text-transform:uppercase; margin-bottom:14px; letter-spacing:0.08em;">
-            🎟️ Official Flight Raffles
+            🎟️ Flight Raffles (Prototype Demonstration · Free Entry AMOE)
           </div>
           ${rafflesHtml}
         </div>
@@ -785,12 +785,12 @@ export function renderMerchandisePageHtml(user?: { email?: string; callsign?: st
         <!-- Right: Tournaments -->
         <div>
           <div style="font-family:var(--public-font-mono); font-size:0.8rem; font-weight:700; color:var(--merch-accent-purple); text-transform:uppercase; margin-bottom:14px; letter-spacing:0.08em;">
-            🏆 Forecasting Calibration Tournaments
+            🏆 Forecasting Calibration Tournaments (Simulation Leaderboard)
           </div>
 
           <div class="tournament-card">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-              <span style="font-family:var(--public-font-mono); font-size:0.75rem; color:#86F94A; font-weight:700;">LIVE COMPETITION</span>
+              <span style="font-family:var(--public-font-mono); font-size:0.75rem; color:#86F94A; font-weight:700;">SIMULATION LEADERBOARD · PROTOCOL BETA</span>
               <span style="font-family:var(--public-font-mono); font-size:0.75rem; color:#94A3B8;">Fall 2026 Season</span>
             </div>
 
@@ -835,7 +835,7 @@ export function renderMerchandisePageHtml(user?: { email?: string; callsign?: st
     <!-- Statutory Compliance & Non-Wagering Disclosure -->
     <div class="merch-disclosure-card">
       <strong>OFFICIAL MERCHANDISE &bull; REWARDS &amp; TOURNAMENTS DISCLOSURE:</strong><br>
-      QuanterraOS physical apparel (mascot hoodies, aerospace jumpsuits, bespoke suits) is manufactured and distributed by Quantara Global LLC. Mascot character names (Flight Pilot Quanta, Kalshi Destroyer, Polymarket Terminator, Spacecraft Council) are fictional creative titles. Point system (Flight XP), raffles, and calibration tournaments are non-gambling educational features with strictly $0.00 live financial risk (Rule B5 locked). Points and raffle tickets are earned through study and platform use, cannot be purchased with deposited trading funds, and cannot be wagered on prediction markets. Trading involves risk. 18+.
+      QuanterraOS physical apparel (mascot hoodies, aerospace jumpsuits, bespoke suits) is manufactured and distributed by Quantara Global LLC. Mascot character names (Flight Pilot Quanta, Kalshi Destroyer, Polymarket Terminator, Spacecraft Council) are fictional creative titles. Point system (Flight XP), raffles, and calibration tournaments are non-gambling educational features with strictly $0.00 live financial risk (Rule B5 locked). Points and raffle tickets are earned through study and platform use, cannot be purchased with deposited trading funds, and cannot be wagered on prediction markets. Unauthenticated visitors view demonstration values. Official fulfillment begins upon supplier production batch approval. Trading involves risk. 18+.
     </div>
 
   </main>

@@ -1542,13 +1542,13 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
                 <td style="padding: 10px; font-weight: 600; color: #FFF;">Parabolic Fee Deduction Engine</td>
                 <td style="padding: 10px; color: #10B981; font-weight: 600;">✓ Live Cents/Contract Formula</td>
                 <td style="padding: 10px; color: #F43F5E;">✗ Hidden / Subsidized Claims</td>
-                <td style="padding: 10px; color: #94A3B8;">Saves $142.50/mo per pilot</td>
+                <td style="padding: 10px; color: #94A3B8;">Explicit quadratic fee &amp; hurdle transparency</td>
               </tr>
               <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);" class="bcard-row" data-cat="fees">
                 <td style="padding: 10px; font-weight: 600; color: #FFF;">Empirical Murphy Brier Decomposition</td>
-                <td style="padding: 10px; color: #10B981; font-weight: 600;">✓ 0.2001 Audited Score (n=1,316)</td>
+                <td style="padding: 10px; color: #10B981; font-weight: 600;">✓ Market Mid (0.2001) vs Model (0.2063)</td>
                 <td style="padding: 10px; color: #F43F5E;">✗ Subjective Win-Rate Claims</td>
-                <td style="padding: 10px; color: #94A3B8;">Proves true calibration vs noise</td>
+                <td style="padding: 10px; color: #94A3B8;">Proves true calibration vs noise (n=1,316)</td>
               </tr>
               <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);" class="bcard-row" data-cat="settlement">
                 <td style="padding: 10px; font-weight: 600; color: #FFF;">Anti-Dispute AI Auditor</td>
@@ -1584,8 +1584,6 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       </div>
     </div>
   </section>
-
-  ${renderPublicFooter()}
 
   <!-- =======================================================================
        INTERACTIVE COCKPIT VIDEO BRIEFING & TUTORIAL MODAL
