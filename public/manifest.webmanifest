@@ -1,0 +1,97 @@
+{
+  "name": "QuanterraOS Flight Deck",
+  "short_name": "QuanterraOS",
+  "description": "Independent flight deck for prediction-market traders across Kalshi and Polymarket. True cost, settlement radar, and personal calibration.",
+  "start_url": "/deck",
+  "id": "/deck",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "background_color": "#05060B",
+  "theme_color": "#000000",
+  "lang": "en-US",
+  "dir": "ltr",
+  "scope": "/",
+  "categories": ["finance", "business", "productivity", "utilities"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/assets/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Flight Deck Cockpit",
+      "short_name": "Flight Deck",
+      "description": "Open Celestial Flight Deck cockpit and bridge telemetry",
+      "url": "/deck",
+      "icons": [{ "src": "/assets/icon-192.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "True-Cost & Breakeven Check",
+      "short_name": "Free Check",
+      "description": "Audit Kalshi and Polymarket taker fee drag and breakeven rate",
+      "url": "/check",
+      "icons": [{ "src": "/assets/icon-192.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Settlement Radar",
+      "short_name": "Radar",
+      "description": "Live CME CF BRTI 60s TWAP settlement index vs spot feeds",
+      "url": "/radar",
+      "icons": [{ "src": "/assets/icon-192.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Audited Calibration Proof",
+      "short_name": "Proof",
+      "description": "Public Brier calibration track record and decile breakdown",
+      "url": "/proof",
+      "icons": [{ "src": "/assets/icon-192.svg", "sizes": "192x192" }]
+    }
+  ],
+  "share_target": {
+    "action": "/deck",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "screenshots": [
+    {
+      "src": "/assets/assistant-avatar.jpg",
+      "sizes": "1024x1024",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Aria Multi-Agent Ship Computer"
+    }
+  ]
+}

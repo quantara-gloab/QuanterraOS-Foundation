@@ -505,7 +505,7 @@ app.get("/assets/assistant-avatar.jpg", (_req, res) => {
 });
 
 // Progressive Web App Manifest & Service Worker
-app.get("/manifest.json", (_req, res) => {
+app.get(["/manifest.json", "/manifest.webmanifest"], (_req, res) => {
   res.type("application/manifest+json").sendFile(path.resolve("public/manifest.json"));
 });
 app.get("/service-worker.js", (_req, res) => {
