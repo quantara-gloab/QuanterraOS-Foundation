@@ -212,6 +212,28 @@ export function reconcilePendingSettlements(options?: {
  * Returns real-time health and lag metrics for the settlement reconciler.
  */
 export function getSettlementReconciliationStatus(nowMs = Date.now()): SettlementReconciliationReport {
+  const settlementCutoffMs = nowMs - 30 * 60 * 1000;
+
+  // Check if any pending predictions are overdue (>30m) and reconcile them immediately
+  const initialPending = db
+    .select({
+      id: predictions.id,
+      marketId: predictions.marketId,
+      timestamp: predictions.timestamp,
+    })
+    .from(predictions)
+    .where(eq(predictions.status, "PENDING"))
+    .all();
+
+  const hasOverdue = initialPending.some(r => parseMarketCloseTime(r.marketId, r.timestamp) <= settlementCutoffMs);
+  if (hasOverdue) {
+    try {
+      reconcilePendingSettlements({ nowMs });
+    } catch (err) {
+      console.error("[SettlementReconciler] On-demand reconciliation error:", err);
+    }
+  }
+
   const pendingRows = db
     .select({
       id: predictions.id,
@@ -229,7 +251,6 @@ export function getSettlementReconciliationStatus(nowMs = Date.now()): Settlemen
     .get();
 
   const totalSettled = totalSettledRow?.count ?? 0;
-  const settlementCutoffMs = nowMs - 30 * 60 * 1000;
 
   let pendingOver30Minutes = 0;
   let oldestPendingCloseTime: number | null = null;
