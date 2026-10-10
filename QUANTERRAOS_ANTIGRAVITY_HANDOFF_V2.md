@@ -304,8 +304,8 @@ Tokens on `:root`, dark only for deck; public site dark-default with light-mode 
 
 ### PHASE 6 — Sensors & Shadow Mode (Weeks 4–6)
 - [x] **6.1** Large-trade feed (Kalshi + Polymarket) with net-after-fees & settlement context.
-- [ ] **6.2** Polymarket wallet cards with calibration score.
-- [ ] **6.3** Shadow Mode with Rule 4.41 disclosure; no order routing anywhere in code path. *Accept:* grep for any order-placement API call = 0.
+- [x] **6.2** Polymarket wallet cards with calibration score.
+- [x] **6.3** Shadow Mode with Rule 4.41 disclosure; no order routing anywhere in code path. *Accept:* grep for any order-placement API call = 0.
 
 ### PHASE 7 — Monetization, service & distribution (Weeks 4–6)
 - [ ] **7.1** Clerk Billing plans + gates (Part 4).
