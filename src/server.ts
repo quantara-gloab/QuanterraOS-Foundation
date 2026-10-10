@@ -74,6 +74,15 @@ import {
   acknowledgeCoachPolicy,
 } from "./lib/flight-instructor.ts";
 import { renderNewsPageHtml } from "./news-page.ts";
+import { renderPressPageHtml } from "./press-page.ts";
+import {
+  getLatestMissionBrief,
+  generateWeeklyMissionBriefHtml,
+  generateMonthlyProofReport,
+  generateMonthlyProofReportHtml,
+  generateMonthlyProofReportMarkdown,
+  subscribeToMissionBrief,
+} from "./lib/mission-brief.ts";
 import { renderHelpPageHtml } from "./help-page.ts";
 import { searchHelpArticles, createSupportTicket } from "./lib/support-escalation.ts";
 import {
@@ -2162,6 +2171,54 @@ app.post("/api/coach/policy-ack", (req, res) => {
 
 app.get("/news", (_req, res) => {
   res.type("html").send(renderNewsPageHtml());
+});
+
+// Press Kit & Media Citations (Task 7.8 / Part 3.12)
+app.get(["/press", "/press-kit"], (_req, res) => {
+  res.type("html").send(renderPressPageHtml());
+});
+
+// Monthly Proof Report Automation (Task 7.8 / Part 3.12)
+app.get(["/proof/monthly-report", "/proof/report"], (req, res) => {
+  const month = typeof req.query.month === "string" ? req.query.month : undefined;
+  const report = generateMonthlyProofReport({ month });
+  res.type("html").send(generateMonthlyProofReportHtml(report));
+});
+
+app.get("/api/proof/monthly-report", (req, res) => {
+  const month = typeof req.query.month === "string" ? req.query.month : undefined;
+  const report = generateMonthlyProofReport({ month });
+  res.json({ success: true, report });
+});
+
+app.get("/api/proof/monthly-report.md", (req, res) => {
+  const month = typeof req.query.month === "string" ? req.query.month : undefined;
+  const report = generateMonthlyProofReport({ month });
+  const md = generateMonthlyProofReportMarkdown(report);
+  res.setHeader("Content-Type", "text/markdown; charset=utf-8");
+  res.setHeader("Content-Disposition", `attachment; filename="${report.reportId}.md"`);
+  res.send(md);
+});
+
+// Mission Brief Digest Endpoints (Task 7.8 / Part 3.12)
+app.get("/api/mission-brief/latest", (_req, res) => {
+  const brief = getLatestMissionBrief();
+  res.json({ success: true, brief });
+});
+
+app.get("/api/mission-brief/email-preview", (_req, res) => {
+  const html = generateWeeklyMissionBriefHtml();
+  res.type("html").send(html);
+});
+
+// Mission Brief Newsletter Subscription Intake
+app.post(["/api/news/subscribe", "/api/mission-brief/subscribe"], (req, res) => {
+  const { email } = req.body || {};
+  const result = subscribeToMissionBrief(email);
+  if (!result.success) {
+    return res.status(400).json(result);
+  }
+  return res.json(result);
 });
 
 app.get("/help", async (req, res) => {

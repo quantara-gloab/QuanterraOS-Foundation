@@ -516,6 +516,7 @@ export function renderPublicFooter(): string {
           <ul>
             <li><a href="/learn">Flight School &amp; Glossary</a></li>
             <li><a href="/news">Mission Brief Digest</a></li>
+            <li><a href="/press">Press Kit &amp; Citations</a></li>
             <li><a href="/help">Help Center &amp; Support</a></li>
             <li><a href="/legal">Legal &amp; Risk Disclosure</a></li>
           </ul>

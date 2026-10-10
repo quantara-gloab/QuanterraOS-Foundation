@@ -315,7 +315,7 @@ Tokens on `:root`, dark only for deck; public site dark-default with light-mode 
 - [x] **7.5** `/developers` (OpenAPI, `llms.txt`, `agents.md`, MCP card), free + Builder keys, rate limits.
 - [x] **7.6** `/institutional` segmented page + book-a-call.
 - [x] **7.7** Flight Instructor booking + coach console (consent-gated), "do not advise" policy flow.
-- [ ] **7.8** Weekly Mission Brief email + monthly Proof Report automation.
+- [x] **7.8** Weekly Mission Brief email + monthly Proof Report automation.
 
 ### PHASE 8 — Mobile polish (Weeks 6–8)
 - [ ] **8.1** PWA manifest, icons, offline shell, install prompt, web push.
