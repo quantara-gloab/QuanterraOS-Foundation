@@ -62,7 +62,6 @@ import { renderBetaBookingPageHtml } from "./booking-page.ts";
 import { getFeatureFlags } from "./feature-flags.ts";
 import { renderPilotAuditPageHtml } from "./pilot-audit-page.ts";
 import { renderAccessTerminalPage } from "./access-terminal-page.ts";
-import { renderWalletPageHtml } from "./wallet-page.ts";
 import { renderCalculatorPageHtml } from "./calculator-page.ts";
 import {
   computeExpiryRadarState,
@@ -4454,21 +4453,12 @@ app.get("/api/predictions", (req, res) => {
 });
 
 
-app.get("/wallet", (req, res) => {
-  const auth = getUserAuth(req);
-  const userId = auth.user?.id || "demo-subscriber";
-  const summary = getWalletSummary(userId);
-  let notice: { type: "success" | "error"; message: string } | undefined;
-  if (req.query.deposit === "success") {
-    notice = { type: "success", message: "Simulated electronic currency upload confirmed! Funds are active in your sandbox portfolio." };
-  } else if (req.query.withdraw === "success") {
-    notice = { type: "success", message: "Simulated electronic withdrawal broadcasted! Transaction recorded in immutable ledger." };
-  } else if (req.query.reset === "success") {
-    notice = { type: "success", message: "Sandbox electronic wallet balance reset to default ($10,000 USD + 0.25 BTC)." };
-  } else if (req.query.error) {
-    notice = { type: "error", message: decodeURIComponent(req.query.error as string) };
-  }
-  res.type("html").send(renderWalletPageHtml(summary, notice));
+app.get("/deck", (_req, res) => {
+  res.redirect("/dashboard");
+});
+
+app.get("/wallet", (_req, res) => {
+  res.redirect(301, "/deck");
 });
 
 app.get("/api/wallet", (req, res) => {

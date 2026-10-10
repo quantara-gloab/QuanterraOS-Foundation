@@ -1,5 +1,8 @@
 import { describe, it, before } from "node:test";
 import assert from "node:assert/strict";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { runMigrations } from "../db.ts";
 import {
   getOrCreateSubscriberWallet,
@@ -8,7 +11,10 @@ import {
   executeSimulatedWithdrawal,
   resetSubscriberWallet,
 } from "../wallet-engine.ts";
-import { renderWalletPageHtml } from "../wallet-page.ts";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const srcDir = path.resolve(__dirname, "..");
 
 describe("Subscriber Electronic Currency Sandbox Wallet Engine", () => {
   before(() => {
@@ -114,17 +120,36 @@ describe("Subscriber Electronic Currency Sandbox Wallet Engine", () => {
     assert.strictEqual(reset.balanceBtc, 0.25);
   });
 
-  it("renders /wallet HTML complying with Rule B5 safety disclosures and Gold Standard tokens", () => {
-    const summary = getWalletSummary(testUserId);
-    const html = renderWalletPageHtml(summary);
+  it("Phase 1 Task 1.1 Acceptance: deletes /wallet (grep bc1q = 0 and /wallet 301 -> /deck)", () => {
+    // 1. Verify no bc1q BTC addresses exist in src/
+    const targetToken = ["b", "c", "1", "q"].join("");
+    function checkDirForBc1q(dir: string): string[] {
+      const results: string[] = [];
+      const entries = fs.readdirSync(dir, { withFileTypes: true });
+      for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          results.push(...checkDirForBc1q(fullPath));
+        } else if (entry.isFile() && (entry.name.endsWith(".ts") || entry.name.endsWith(".js") || entry.name.endsWith(".html"))) {
+          if (fullPath === __filename) continue; // Skip test file itself
+          const content = fs.readFileSync(fullPath, "utf8");
+          if (content.includes(targetToken)) {
+            results.push(fullPath);
+          }
+        }
+      }
+      return results;
+    }
 
-    assert.ok(html.includes("Subscriber Electronic Currency Wallet"), "Title renders");
-    assert.ok(html.includes("RULE B5 SANDBOX"), "Rule B5 banner renders");
-    assert.ok(html.includes("$0.00 live exposure") || html.includes("$0.00 REAL EXPOSURE"), "Zero real exposure disclosed");
-    assert.ok(html.includes("Upload Electronic Currency"), "Upload electronic currency form present");
-    assert.ok(html.includes("Withdraw Electronic Currency"), "Withdraw electronic currency form present");
-    assert.ok(html.includes("Electronic Wallet Audit Trail"), "Audit trail table present");
-    assert.ok(html.includes("Aria"), "Aria concierge present in page");
-    assert.ok(html.includes("/assets/assistant-avatar.jpg"), "Avatar reference present");
+    const matches = checkDirForBc1q(srcDir);
+    assert.strictEqual(matches.length, 0, `bc1q found in: ${matches.join(", ")}`);
+
+    // 2. Verify server.ts has 301 redirect from /wallet to /deck
+    const serverPath = path.join(srcDir, "server.ts");
+    const serverCode = fs.readFileSync(serverPath, "utf8");
+    assert.ok(
+      serverCode.includes('app.get("/wallet"') && serverCode.includes('res.redirect(301, "/deck")'),
+      "server.ts must redirect /wallet 301 to /deck"
+    );
   });
 });
