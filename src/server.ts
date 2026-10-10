@@ -5190,7 +5190,7 @@ const btc15mFairValuePage = `<!doctype html>
   </div>
 
   <div class="panel">
-    <div class="warn-banner" id="edge">Checking model edge…</div>
+    <div class="warn-banner" id="edge" style="display:none;"></div>
     <table>
       <thead><tr><th>Minute</th><th>Market Brier</th><th>Model Brier</th></tr></thead>
       <tbody id="evidence"></tbody>
@@ -5236,7 +5236,13 @@ async function load() {
       row("NO bid / ask", Number(r.quotes.noBid).toFixed(2) + " / " + Number(r.quotes.noAsk).toFixed(2)) +
       row("Fair-value model (cross-check)", r.model ? pct(r.model.pHigher) + " Higher" : "unavailable (spot ticks stale or too little history)") +
       row("Model EV after fee: YES / NO", r.model && r.model.expectedValuePerContract ? (r.model.expectedValuePerContract.yes * 100).toFixed(1) + "¢ / " + (r.model.expectedValuePerContract.no * 100).toFixed(1) + "¢" : "—");
-    document.getElementById("edge").textContent = "Edge: " + r.edge;
+    const edgeEl = document.getElementById("edge");
+    if (r.edge && r.edge !== "none") {
+      edgeEl.textContent = "Edge: " + r.edge;
+      edgeEl.style.display = "block";
+    } else {
+      edgeEl.style.display = "none";
+    }
     if (r.evidence && r.evidence.brierByMinute) {
       document.getElementById("evidence").innerHTML = Object.entries(r.evidence.brierByMinute).map(function (e) {
         return "<tr><td>" + e[0] + "</td><td>" + Number(e[1].market).toFixed(4) + "</td><td>" + Number(e[1].model).toFixed(4) + "</td></tr>";
@@ -5244,7 +5250,11 @@ async function load() {
       document.getElementById("evidence-note").textContent = "Backtest " + r.evidence.run + ", " + r.evidence.markets + " settled markets; lower Brier is better. Trading on model/market disagreement " + r.evidence.tradingOnModelDisagreement + ".";
     }
   } catch (err) {
-    document.getElementById("market").textContent = "Sync error: " + err.message;
+    const edgeEl = document.getElementById("edge");
+    if (edgeEl) {
+      edgeEl.textContent = "Sync error: " + err.message;
+      edgeEl.style.display = "block";
+    }
   }
 }
 load();
