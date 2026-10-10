@@ -2349,7 +2349,7 @@ app.get([
   "/kalshi-vs-polymarket-fees",
   "/bitcoin-15-minute-markets"
 ], (req, res) => {
-  const slug = req.path.replace(/^\\//, "");
+  const slug = req.path.replace(/^\//, "");
   const html = renderSeoTopicPageHtml(slug);
   if (html) {
     res.type("html").send(html);
