@@ -88,6 +88,7 @@ import {
   getAllPushSubscriptions,
   createSafePushAlert,
 } from "./lib/mobile-pwa.ts";
+import { parseSharedContractInput } from "./lib/share-target.ts";
 import { renderHelpPageHtml } from "./help-page.ts";
 import { searchHelpArticles, createSupportTicket } from "./lib/support-escalation.ts";
 import {
@@ -4889,12 +4890,27 @@ app.get("/api/predictions", (req, res) => {
 });
 
 
-app.get("/deck", (req, res) => {
-  const station = req.query.station as FlightDeckStationId | undefined;
+// Web Share Target Intake & Parse API (Task 8.2 / Part 3.11)
+app.get("/api/share/parse", (req, res) => {
+  const input = (req.query.input || req.query.url || req.query.text || "") as string;
+  const parsed = parseSharedContractInput(input);
+  res.json({ success: true, contract: parsed });
+});
+
+app.get(["/deck", "/cockpit"], (req, res) => {
+  const rawShare = (req.query.url || req.query.text || req.query.share) as string | undefined;
+  let sharedContract = rawShare ? parseSharedContractInput(rawShare) : undefined;
+  let station = req.query.station as FlightDeckStationId | undefined;
+
+  if (sharedContract) {
+    station = "engineering";
+  }
+
   const auth = getUserAuth(req);
   res.type("html").send(
     renderFlightDeckPageHtml({
       initialStation: station,
+      sharedContract,
       user: auth?.user
         ? {
             email: auth.user.email,

@@ -92,6 +92,7 @@ import {
   type ShadowTrackingRule,
 } from "./lib/shadow-mode.ts";
 import { renderInstallPromptHtml } from "./lib/mobile-pwa.ts";
+import { parseSharedContractInput, type ParsedSharedContract } from "./lib/share-target.ts";
 
 export type FlightDeckStationId =
   | "bridge"
@@ -164,6 +165,7 @@ export const FLIGHT_DECK_STATIONS: FlightDeckStationMeta[] = [
 
 export interface FlightDeckRenderOptions {
   initialStation?: FlightDeckStationId;
+  sharedContract?: ParsedSharedContract;
   user?: {
     email?: string;
     callsign?: string;
@@ -174,7 +176,8 @@ export interface FlightDeckRenderOptions {
 }
 
 export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}): string {
-  const activeStation = options.initialStation || "bridge";
+  const shared = options.sharedContract;
+  const activeStation = shared ? "engineering" : (options.initialStation || "bridge");
   const user = options.user || {
     email: "cadet@quanterraos.com",
     callsign: "CADET-7",
@@ -183,20 +186,25 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
     streakDays: 3,
   };
 
-  // Pre-calculate initial Engineering station metrics (10 contracts @ $0.51 ask on Kalshi KXBTC15M)
+  const initialPrice = shared ? shared.price : 0.51;
+  const initialContracts = shared ? shared.contracts : 10;
+  const initialProduct = shared ? shared.ticker : "KXBTC15M";
+  const initialVenue = shared && shared.venue === "polymarket" ? "polymarket" : "kalshi";
+
+  // Pre-calculate initial Engineering station metrics
   const initialCost = computeTrueCostCheck({
-    venue: "kalshi",
-    product: "KXBTC15M",
-    price: 0.51,
-    contracts: 10,
+    venue: initialVenue,
+    product: initialProduct,
+    price: initialPrice,
+    contracts: initialContracts,
     userAssumedProbability: 0.55,
   });
-  const initialSaver = computeMakerTakerSaver(10, 0.51, "KXBTC15M", 50);
-  const initialRounding = computeRoundingOptimizer(10, 5, 0.51);
+  const initialSaver = computeMakerTakerSaver(initialContracts, initialPrice, initialProduct, Math.round(initialPrice * 100));
+  const initialRounding = computeRoundingOptimizer(initialContracts, 5, initialPrice);
   const initialSpread = computeCrossVenueNetSpread({
-    kalshiPrice: 0.51,
-    polymarketPrice: 0.53,
-    contracts: 10,
+    kalshiPrice: initialPrice,
+    polymarketPrice: Number((initialPrice + 0.02).toFixed(2)),
+    contracts: initialContracts,
   });
 
   // Pre-calculate initial Navigation station metrics (KXBTC15M settlement consensus & ladder)
@@ -1636,6 +1644,24 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
           </p>
         </div>
 
+        <!-- Web Share Target Intake Banner (Task 8.2 / Part 3.11) -->
+        <div id="shared-contract-banner" class="hud-card" style="display:${shared ? "flex" : "none"}; background:rgba(201,162,74,0.1); border:1px solid var(--hud-gold); border-radius:8px; padding:16px 20px; margin-bottom:20px; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+          <div>
+            <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--hud-gold); font-weight:700; letter-spacing:0.1em; text-transform:uppercase;">
+              ⚡ WEB SHARE TARGET INTAKE // CONTRACT PRE-FILLED
+            </div>
+            <div id="shared-contract-title" style="font-size:1rem; font-weight:700; color:#FFFFFF; margin-top:2px;">
+              ${shared ? `${shared.marketTitle} (${shared.ticker})` : "Shared Prediction Contract"}
+            </div>
+            <div id="shared-contract-desc" style="font-size:0.75rem; color:#94A3B8;">
+              Detected from <span id="shared-contract-venue" style="color:var(--hud-cyan); font-weight:600;">${shared ? shared.venue.toUpperCase() : "EXCHANGE"}</span> &bull; Pre-set to <span id="shared-contract-price-label">${Math.round(initialPrice * 100)}¢</span> @ <span id="shared-contract-count-label">${initialContracts} ct</span>. Taker fee drag calculated below.
+            </div>
+          </div>
+          <span style="font-family:var(--font-mono); font-size:0.75rem; color:var(--ok-green); background:rgba(48,164,108,0.2); padding:4px 10px; border-radius:4px; font-weight:700;">
+            PRE-FLIGHT AUDIT READY
+          </span>
+        </div>
+
         <!-- Interactive Reactor Control Pod -->
         <div class="hud-card accent-cyan" style="margin-bottom:24px;">
           <div class="hud-card-title">
@@ -2855,12 +2881,43 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Auto-select station from URL query on load
+    // Auto-select station from URL query on load & Web Share Target Intake (Task 8.2)
     (function() {
       try {
         const params = new URLSearchParams(window.location.search);
         const qStation = params.get('station');
-        if (qStation && document.getElementById('station-panel-' + qStation)) {
+        const qShare = params.get('url') || params.get('text') || params.get('share');
+
+        if (qShare) {
+          switchStation('engineering');
+          fetch('/api/share/parse?input=' + encodeURIComponent(qShare))
+            .then(res => res.json())
+            .then(data => {
+              if (data.contract) {
+                const c = data.contract;
+                setEngPrice(c.priceCents);
+                setEngCount(c.contracts);
+                const venueSelect = document.getElementById('eng-select-venue');
+                if (venueSelect) {
+                  venueSelect.value = c.venue === 'polymarket' ? 'polymarket-15m' : 'kalshi-15m';
+                }
+                const banner = document.getElementById('shared-contract-banner');
+                if (banner) {
+                  banner.style.display = 'flex';
+                  const titleEl = document.getElementById('shared-contract-title');
+                  if (titleEl) titleEl.textContent = c.marketTitle + ' (' + c.ticker + ')';
+                  const venueEl = document.getElementById('shared-contract-venue');
+                  if (venueEl) venueEl.textContent = c.venue.toUpperCase();
+                  const priceEl = document.getElementById('shared-contract-price-label');
+                  if (priceEl) priceEl.textContent = c.priceCents + '¢';
+                  const countEl = document.getElementById('shared-contract-count-label');
+                  if (countEl) countEl.textContent = c.contracts + ' ct';
+                }
+                recalculateEngineering();
+              }
+            })
+            .catch(_ => {});
+        } else if (qStation && document.getElementById('station-panel-' + qStation)) {
           switchStation(qStation);
         }
       } catch (_) {}
