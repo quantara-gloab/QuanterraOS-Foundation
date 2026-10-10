@@ -333,7 +333,7 @@ export const PUBLIC_LAYOUT_CSS = `
     padding-top: 28px;
     font-size: 0.78rem;
     line-height: 1.65;
-    color: #64748B;
+    color: #94A3B8;
     margin-bottom: 24px;
   }
 
@@ -342,9 +342,25 @@ export const PUBLIC_LAYOUT_CSS = `
     justify-content: space-between;
     align-items: center;
     font-size: 0.78rem;
-    color: #475569;
+    color: #94A3B8;
     flex-wrap: wrap;
     gap: 12px;
+  }
+
+  /* Accessibility & Focus-Visible Standards */
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 2px solid var(--public-accent-gold) !important;
+    outline-offset: 2px !important;
+  }
+
+  /* Prefers Reduced Motion Standards */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 
   @media (max-width: 900px) {
@@ -352,7 +368,11 @@ export const PUBLIC_LAYOUT_CSS = `
       display: none;
     }
     .tesla-hamburger {
-      display: block;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 44px;
+      min-height: 44px;
     }
     .tesla-mobile-bottom-bar {
       display: block;
@@ -510,9 +530,9 @@ export function renderPublicFooter(): string {
       <div class="tesla-footer-bottom">
         <div>&copy; 2026 Quantara Global LLC. All rights reserved. Rule B5 locked ($0.00 capital deployed).</div>
         <div style="display:flex; gap:16px;">
-          <a href="/legal" style="color:#64748B; text-decoration:none;">Terms of Service</a>
-          <a href="/legal#privacy" style="color:#64748B; text-decoration:none;">Privacy Policy</a>
-          <a href="/status" style="color:#64748B; text-decoration:none;">Status</a>
+          <a href="/legal" style="color:#94A3B8; text-decoration:none;">Terms of Service</a>
+          <a href="/legal#privacy" style="color:#94A3B8; text-decoration:none;">Privacy Policy</a>
+          <a href="/status" style="color:#94A3B8; text-decoration:none;">Status</a>
         </div>
       </div>
     </div>

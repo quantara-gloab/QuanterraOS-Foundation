@@ -795,7 +795,9 @@ export function renderExpiryRadarPageHtml(
   <title>Expiry Radar & Microstructure Terminal &bull; QuanterraOS</title>
   <meta name="description" content="Independent live expiry countdown, CME CF BRTI 60-second TWAP oracle sampling visualizer, and strike-by-strike fee drag heatmap for Kalshi BTC prediction markets.">
   <meta name="theme-color" content="#06070A">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10' fill='%2306070A' stroke='%23DFB843' stroke-width='2'/><path d='M7 12h10M12 7v10' stroke='%23F7E7B4' stroke-width='2' stroke-linecap='round'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #06070A;
@@ -1382,6 +1384,7 @@ export function renderExpiryRadarPageHtml(
           <strong id="sim-spot-label">$${radar.compositeSpotPrice?.toLocaleString() ?? "91,250"}</strong>
         </div>
         <input type="range" class="sim-slider" id="sim-spot-slider"
+          aria-label="Simulated spot price at settlement"
           min="${(radar.compositeSpotPrice ?? 91250) - 600}"
           max="${(radar.compositeSpotPrice ?? 91250) + 600}"
           value="${radar.compositeSpotPrice ?? 91250}"
@@ -1565,7 +1568,7 @@ export function renderExpiryRadarPageHtml(
     <div class="modal-box">
       <div class="modal-title">
         <span>Embed Expiry Radar Widget</span>
-        <button class="close-btn" onclick="closeEmbedRadarModal()">&times;</button>
+        <button class="close-btn" onclick="closeEmbedRadarModal()" aria-label="Close embed radar modal">&times;</button>
       </div>
       <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">
         Embed this live 60-second TWAP countdown, ATM strike delta, and spot proxy card directly onto your Substack, newsletter, research portal, or Discord dashboard.

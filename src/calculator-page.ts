@@ -2,7 +2,11 @@ import { ASSISTANT_WIDGET_HTML } from "./assistant-widget.ts";
 import { renderMarketEvidenceCardHtml } from "./market-evidence-card.ts";
 import { renderBetaFeedbackWidgetHtml } from "./feedback-widget.ts";
 import { renderSystemPulseHtml } from "./system-pulse.ts";
-import { renderMobileBottomNavHtml, getMobileAppRuntimeScript } from "./mobile-install.ts";
+import {
+  renderPublicHeader,
+  renderPublicFooter,
+  PUBLIC_LAYOUT_CSS,
+} from "./components/public-layout.ts";
 
 /**
  * True Cost & Expected Value Calculator for Short-Duration Prediction Markets
@@ -25,6 +29,8 @@ export function renderCalculatorPageHtml(): string {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    ${PUBLIC_LAYOUT_CSS}
+
     :root {
       --bg: #06070A;
       --panel: rgba(14, 18, 27, 0.85);
@@ -59,69 +65,7 @@ export function renderCalculatorPageHtml(): string {
     }
     .mono { font-family: var(--font-mono); }
     
-    .live-ticker-strip {
-      background: rgba(8, 12, 18, 0.85);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-      padding: 7px 24px;
-      font-family: var(--font-mono);
-      font-size: 0.72rem;
-      color: var(--muted);
-      backdrop-filter: blur(12px);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      overflow-x: auto;
-    }
-    .ticker-content { display: flex; align-items: center; gap: 14px; white-space: nowrap; }
-    .ticker-item { display: inline-flex; align-items: center; gap: 7px; color: var(--text); }
-    .ticker-pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulseDot 2s infinite; }
-    .ticker-sep { color: rgba(255, 255, 255, 0.15); }
-    @keyframes pulseDot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.85); } }
-
-    .top-nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 18px 40px;
-      background: rgba(10, 14, 22, 0.85);
-      border-bottom: 1px solid var(--panel-border);
-      backdrop-filter: blur(20px);
-      position: sticky;
-      top: 0;
-      z-index: 50;
-    }
-    .nav-left { display: flex; align-items: center; gap: 32px; }
-    .nav-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-      color: #FFFFFF;
-      font-weight: 700;
-      font-size: 0.95rem;
-      letter-spacing: -0.02em;
-    }
-    .brand-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
-    .nav-links { display: flex; align-items: center; gap: 24px; }
-    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.84rem; font-weight: 500; transition: color 0.15s; }
-    .nav-links a:hover, .nav-links a.active { color: var(--text); }
-    .nav-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: #07080B;
-      background: linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%);
-      padding: 8px 18px;
-      border-radius: 4px;
-      border: 1px solid rgba(255, 248, 220, 0.6);
-      box-shadow: 0 4px 16px rgba(212, 175, 55, 0.3), inset 0 1px 0 #FFFFFF;
-      text-decoration: none;
-    }
-
-    .container { max-width: 1140px; margin: 0 auto; padding: 48px 24px 0; }
+    .container { max-width: 1140px; margin: 0 auto; padding: 40px 24px 80px; }
     .eyebrow {
       display: inline-flex;
       align-items: center;
@@ -148,27 +92,8 @@ export function renderCalculatorPageHtml(): string {
     }
     @media (max-width: 860px) {
       .calc-grid { grid-template-columns: 1fr; }
-      .top-nav { padding: 14px 16px; flex-wrap: wrap; gap: 10px; }
-      .nav-links { overflow-x: auto; white-space: nowrap; width: 100%; }
-      .mobile-sticky-bar { display: flex !important; }
-      body { padding-bottom: 74px; }
-    }
-
-    .mobile-sticky-bar {
-      display: none;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(10, 14, 22, 0.96);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-top: 1px solid var(--panel-border);
-      padding: 10px 16px;
-      z-index: 1000;
-      box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.7);
-      align-items: center;
-      justify-content: space-between;
+      .container { padding: 24px 16px 64px; }
+      h1 { font-size: 1.85rem; }
     }
 
     .card {
@@ -298,57 +223,7 @@ export function renderCalculatorPageHtml(): string {
   </style>
 </head>
 <body>
-  <div class="live-ticker-strip">
-    <div class="ticker-content">
-      <span class="ticker-item"><span class="ticker-pulse"></span>TRUE COST &amp; NET EV ENGINE</span>
-      <span class="ticker-sep">//</span>
-      <span class="ticker-item">KALSHI TAKER FEE FORMULA: 0.07 × P × (1 − P)</span>
-      <span class="ticker-sep">//</span>
-      <span class="ticker-item">SETTLEMENT TARGET: CME CF BRTI</span>
-      <span class="ticker-sep">//</span>
-      <span class="ticker-item">INDEPENDENT VERIFICATION LAYER</span>
-    </div>
-  </div>
-
-  <div class="live-ticker-strip">
-    <div class="ticker-content">
-      <span class="ticker-item"><span class="ticker-pulse"></span>TRUE COST &amp; NET EV ENGINE</span>
-      <span class="ticker-sep">//</span>
-      <span class="ticker-item">KALSHI TAKER FEE FORMULA: ceil(0.07 × Count × P × (1 − P))</span>
-      <span class="ticker-sep">//</span>
-      <span class="ticker-item">SETTLEMENT TARGET: CME CF BRTI</span>
-      <span class="ticker-sep">//</span>
-      <span class="ticker-item">INDEPENDENT PRE-TRADE AUDIT · $0 LIVE RISK</span>
-    </div>
-  </div>
-
-  <nav class="top-nav">
-    <div class="nav-left">
-      <a href="/" class="nav-brand"><span class="brand-dot"></span> QUANTERRAOS</a>
-      <div class="nav-links">
-        <a href="/calculator" class="active" style="color:var(--accent);font-weight:700;">Check</a>
-        <a href="/radar" style="color:var(--accent-light);font-weight:600;">Radar</a>
-        <a href="/corridors" style="color:var(--accent);font-weight:600;">Corridors</a>
-        <a href="/divergence" style="color:var(--accent);font-weight:600;">Divergence</a>
-        <a href="/settlement" style="color:var(--accent-light);font-weight:600;">Settlement</a>
-        <a href="/schedule" style="color:var(--accent);font-weight:600;">Schedule</a>
-        <a href="/webhooks" style="color:var(--accent);font-weight:600;">Webhooks</a>
-        <a href="/journal" style="color:#10B981;font-weight:600;">Journal</a>
-        <a href="/calibration" style="color:var(--muted);font-weight:500;">Learn</a>
-        <a href="/account" style="color:var(--muted);font-weight:500;">Sign in</a>
-      </div>
-    </div>
-    <div style="display:flex; gap:14px; align-items:center;">
-      <div style="display:flex; gap:12px; align-items:center; font-size:0.75rem;">
-        <a href="/why" style="color:var(--accent); text-decoration:none; font-weight:600;">Why QuanterraOS</a>
-        <span style="color:rgba(255,255,255,0.15);">|</span>
-        <a href="/research" style="color:var(--muted); text-decoration:none;">Research</a>
-        <span style="color:rgba(255,255,255,0.15);">|</span>
-        <a href="/council" style="color:var(--muted); text-decoration:none;">Institutional</a>
-      </div>
-      <a href="/journal" class="nav-cta" style="background:rgba(16,185,129,0.15); color:#10B981; border-color:rgba(16,185,129,0.4);">MY JOURNAL &rarr;</a>
-    </div>
-  </nav>
+  ${renderPublicHeader({ activePath: "/check" })}
 
   ${renderSystemPulseHtml({ page: "calculator" })}
 
@@ -392,7 +267,7 @@ export function renderCalculatorPageHtml(): string {
         <!-- Market-Link Intake Bar -->
         <div style="background: rgba(6, 9, 14, 0.7); border: 1px solid var(--panel-border-subtle); border-radius: 6px; padding: 12px; margin-bottom: 16px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
-            <label style="font-family:var(--font-mono); font-size:0.72rem; color:var(--accent-light); font-weight:600; text-transform:uppercase; letter-spacing:0.04em;">
+            <label for="calc-link-intake" style="font-family:var(--font-mono); font-size:0.72rem; color:var(--accent-light); font-weight:600; text-transform:uppercase; letter-spacing:0.04em;">
               Market-Link Intake (One-Click Populate)
             </label>
             <span id="calc-source-badge" style="font-family:var(--font-mono); font-size:0.68rem; color:var(--muted);">
@@ -400,7 +275,7 @@ export function renderCalculatorPageHtml(): string {
             </span>
           </div>
           <div style="display:flex; gap:8px; align-items:center;">
-            <input type="text" class="number-input" id="calc-link-intake" placeholder="Paste Kalshi URL or ticker (e.g. KXBTC15M or https://kalshi.com/markets/kxbtc15m)..." oninput="handleMarketLinkIntake(this.value)" style="margin:0; width:100%; font-size:0.8rem; padding:8px 10px;">
+            <input type="text" class="number-input" id="calc-link-intake" aria-label="Market-link intake URL or ticker" placeholder="Paste Kalshi URL or ticker (e.g. KXBTC15M or https://kalshi.com/markets/kxbtc15m)..." oninput="handleMarketLinkIntake(this.value)" style="margin:0; width:100%; font-size:0.8rem; padding:8px 10px;">
             <button type="button" class="preset-btn" onclick="clearMarketLinkIntake()" style="padding:7px 12px; font-size:0.75rem; white-space:nowrap;">Clear</button>
           </div>
           <div id="calc-link-feedback" style="display:none; font-family:var(--font-mono); font-size:0.72rem; margin-top:6px;"></div>
@@ -417,9 +292,9 @@ export function renderCalculatorPageHtml(): string {
           </div>
           <div style="font-size:0.72rem; color:var(--muted); margin-bottom:6px;">Per-contract purchase price. Half-spread is already factored into executable ask.</div>
           <div style="display:flex; gap:10px; align-items:center;">
-            <input type="range" id="slider-price" min="1" max="99" value="51" style="flex:1;" oninput="handleSliderSnap('slider-price', [10,25,50,51,75,90]); syncPriceFromSlider();">
+            <input type="range" id="slider-price" aria-label="Contract price slider in cents" min="1" max="99" value="51" style="flex:1;" oninput="handleSliderSnap('slider-price', [10,25,50,51,75,90]); syncPriceFromSlider();">
             <div style="display:flex; align-items:center; gap:2px;">
-              <input type="number" id="input-price-num" class="number-input" min="1" max="99" value="51" style="width:60px; text-align:center; padding:6px 4px; font-weight:700; color:#DFB843;" oninput="syncPriceFromNum();">
+              <input type="number" id="input-price-num" class="number-input" aria-label="Contract price in cents" min="1" max="99" value="51" style="width:60px; text-align:center; padding:6px 4px; font-weight:700; color:#DFB843;" oninput="syncPriceFromNum();">
               <span style="font-family:var(--font-mono); font-size:0.8rem; color:#DFB843;">¢</span>
             </div>
           </div>
@@ -440,7 +315,7 @@ export function renderCalculatorPageHtml(): string {
             <span id="label-count" style="color:var(--text); font-family:var(--font-mono); font-weight:700;">10 contracts</span>
           </div>
           <div style="font-size:0.72rem; color:var(--muted); margin-bottom:6px;">Kalshi rounds taker fees up to the nearest cent on the entire order.</div>
-          <input type="number" id="input-count" class="number-input" value="10" min="1" max="10000" oninput="recalc()">
+          <input type="number" id="input-count" class="number-input" aria-label="Contract quantity" value="10" min="1" max="10000" oninput="recalc()">
           <div style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;">
             <button type="button" class="preset-btn" onclick="setCount(1)" title="1 contract: ceil(1.75¢) = 2¢ fee (+0.25¢ rounding drag)">1 ct (2.0¢/ct)</button>
             <button type="button" class="preset-btn" onclick="setCount(10)" style="border-color:#DFB843; color:#DFB843;" title="10 contracts: ceil(17.5¢) = 18¢ fee (+0.05¢ rounding drag)">10 ct (1.8¢/ct)</button>
@@ -459,8 +334,8 @@ export function renderCalculatorPageHtml(): string {
             </div>
           </div>
           <div class="input-group" style="margin-bottom:0;">
-            <label style="font-size:0.8rem; color:var(--muted); display:block; margin-bottom:6px;">Contract Venue</label>
-            <select id="select-contract" class="number-input" style="padding:7px 10px; font-size:0.8rem;" onchange="recalc()">
+            <label for="select-contract" style="font-size:0.8rem; color:var(--muted); display:block; margin-bottom:6px;">Contract Venue</label>
+            <select id="select-contract" aria-label="Contract venue" class="number-input" style="padding:7px 10px; font-size:0.8rem;" onchange="recalc()">
               <option value="kalshi-15m" selected>Kalshi 15M (KXBTC15M)</option>
               <option value="kalshi-1h">Kalshi 1H (KXBTCD)</option>
               <option value="polymarket-15m">Polymarket 15M</option>
@@ -522,8 +397,8 @@ export function renderCalculatorPageHtml(): string {
           </summary>
           <div style="margin-top:14px;">
             <div class="input-group">
-              <label style="font-size:0.8rem; color:var(--muted); display:block; margin-bottom:6px;">Pricing Mode Reference</label>
-              <select id="select-pricing-mode" class="number-input" onchange="togglePricingMode()">
+              <label for="select-pricing-mode" style="font-size:0.8rem; color:var(--muted); display:block; margin-bottom:6px;">Pricing Mode Reference</label>
+              <select id="select-pricing-mode" aria-label="Select pricing mode reference" class="number-input" onchange="togglePricingMode()">
                 <option value="executable-ask" selected>Executable Ask Price (Crossing Spread Already Included)</option>
                 <option value="mid-price">Quoted Mid-Price (Requires Half-Spread to Cross)</option>
               </select>
@@ -542,9 +417,9 @@ export function renderCalculatorPageHtml(): string {
               </div>
               <div style="font-size:0.72rem; color:var(--muted); margin-bottom:6px;">Your subjective assessment. This is your personal opinion, NOT an automated forecast.</div>
               <div style="display:flex; gap:10px; align-items:center;">
-                <input type="range" id="slider-prob" min="1" max="99" value="55" style="flex:1;" oninput="handleSliderSnap('slider-prob', [35,50,52.8,55,65,75]); syncProbFromSlider();">
+                <input type="range" id="slider-prob" aria-label="Assessed win probability slider percentage" min="1" max="99" value="55" style="flex:1;" oninput="handleSliderSnap('slider-prob', [35,50,52.8,55,65,75]); syncProbFromSlider();">
                 <div style="display:flex; align-items:center; gap:2px;">
-                  <input type="number" id="input-prob-num" class="number-input" min="1" max="99" value="55" style="width:60px; text-align:center; padding:6px 4px; font-weight:700; color:#38BDF8;" oninput="syncProbFromNum();">
+                  <input type="number" id="input-prob-num" class="number-input" aria-label="Assessed win probability percentage" min="1" max="99" value="55" style="width:60px; text-align:center; padding:6px 4px; font-weight:700; color:#38BDF8;" oninput="syncProbFromNum();">
                   <span style="font-family:var(--font-mono); font-size:0.8rem; color:#38BDF8;">%</span>
                 </div>
               </div>
@@ -564,7 +439,7 @@ export function renderCalculatorPageHtml(): string {
                 <span id="label-spread">2.0¢</span>
               </div>
               <div style="font-size:0.72rem; color:var(--muted); margin-bottom:6px;">Full spread between best bid and best ask. Half-spread is added to mid-price.</div>
-              <input type="range" id="slider-spread" min="1" max="10" value="2" oninput="recalc()">
+              <input type="range" id="slider-spread" aria-label="Observed bid-ask spread in cents" min="1" max="10" value="2" oninput="recalc()">
             </div>
           </div>
         </details>
@@ -627,18 +502,18 @@ export function renderCalculatorPageHtml(): string {
           <span class="stat-val mono" style="color:var(--accent-light);" id="val-cadence">15-Minute Intraday (KXBTC15M)</span>
         </div>
 
-        <!-- Truth vs. Hype: Competitor Illusion Teardown Callout -->
+        <!-- Truth vs. Hype: Fee Reality Teardown Callout -->
         <div style="margin-top:16px; padding:14px; background:linear-gradient(180deg, rgba(20,26,38,0.95) 0%, rgba(10,14,22,0.98) 100%); border:1px solid rgba(212,175,55,0.28); border-radius:6px; font-size:0.78rem;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <strong style="color:var(--accent-light); font-family:var(--font-mono); font-size:0.75rem; text-transform:uppercase;">✦ Competitor Illusion vs. QuanterraOS Reality</strong>
+            <strong style="color:var(--accent-light); font-family:var(--font-mono); font-size:0.75rem; text-transform:uppercase;">✦ Published Exchange Fee Reality</strong>
             <span style="font-family:var(--font-mono); font-size:0.65rem; color:#F43F5E; background:rgba(244,63,94,0.12); padding:2px 6px; border-radius:3px;">ANTI-FRICTION</span>
           </div>
           <div style="color:var(--muted); line-height:1.45; font-size:0.75rem;">
-            Competitor apps (Verso, Predly) advertise nominal spreads without deducting Kalshi taker fees. At 50¢ mid, the exchange taker fee is 1.75¢/ct—consuming up to <strong>43.8% of your gross profit</strong> and requiring a <strong>52.75% win rate</strong> just to break even.
+            Many consumer interfaces display nominal spreads without deducting Kalshi taker fees. At 50¢ mid, the exchange taker fee is 1.75¢/ct—consuming up to <strong>43.8% of your gross profit</strong> and requiring a <strong>52.75% win rate</strong> just to break even.
           </div>
           <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
             <span style="font-family:var(--font-mono); font-size:0.7rem; color:var(--accent);">Independent Referee &bull; Zero Venue Bias</span>
-            <a href="/why" style="font-family:var(--font-mono); font-size:0.72rem; color:var(--accent-light); text-decoration:underline;">Full Benchmark &rarr;</a>
+            <a href="/proof" style="font-family:var(--font-mono); font-size:0.72rem; color:var(--accent-light); text-decoration:underline;">Full Benchmark &rarr;</a>
           </div>
         </div>
         <!-- Pre-Save Advisory Risk Check Component -->
@@ -706,8 +581,8 @@ export function renderCalculatorPageHtml(): string {
           <button type="button" onclick="previewExampleInJournal()" class="preset-btn" style="width:100%; padding:10px; font-size:0.8rem; text-align:center; color:var(--green); border-color:rgba(16,185,129,0.4); background:rgba(16,185,129,0.08); font-weight:600; cursor:pointer;">
             ⚡ Preview Example Entry in Journal (No Account Required) &rarr;
           </button>
-          <a href="/kalshi" class="btn-pricing" style="width:100%; text-align:center; padding:10px; font-size:0.8rem; text-decoration:none; color:var(--accent); border:1px solid rgba(223,184,67,0.3); border-radius:4px; display:block;">
-            TEST AGAINST LIVE KALSHI BTC DESK &rarr;
+          <a href="/deck" class="btn-pricing" style="width:100%; text-align:center; padding:10px; font-size:0.8rem; text-decoration:none; color:var(--accent); border:1px solid rgba(223,184,67,0.3); border-radius:4px; display:block;">
+            TEST IN FLIGHT DECK COCKPIT &rarr;
           </a>
           <button type="button" onclick="openEmbedModal()" class="preset-btn" style="width:100%; padding:8px 12px; font-size:0.75rem; text-align:center; color:var(--muted); border-color:rgba(212,175,55,0.25); display:flex; align-items:center; justify-content:center; gap:6px; cursor:pointer;">
             <span>&lt;/&gt;</span> Embed Calculator Widget On Your Site / Newsletter
@@ -723,14 +598,14 @@ export function renderCalculatorPageHtml(): string {
           <div style="font-family:var(--font-mono); font-size:0.9rem; font-weight:700; color:var(--accent);">
             &lt;/&gt; Embed QuanterraOS Calculator Widget
           </div>
-          <button type="button" onclick="closeEmbedModal()" style="background:none; border:none; color:var(--muted); font-size:1.2rem; cursor:pointer;">&times;</button>
+          <button type="button" onclick="closeEmbedModal()" aria-label="Close embed modal" style="background:none; border:none; color:var(--muted); font-size:1.2rem; cursor:pointer;">&times;</button>
         </div>
         <p style="font-size:0.8rem; color:var(--muted); margin-bottom:14px;">
           Embed our live taker-fee, spread-drag, and breakeven calculator directly on your blog, financial publication, research paper, or newsletter. Responsive, lightning-fast, and strictly compliant with independent auditing standards.
         </p>
         <div style="margin-bottom:12px;">
-          <div style="font-size:0.75rem; color:#FFFFFF; margin-bottom:6px; font-family:var(--font-mono);">Embed Code (HTML iFrame):</div>
-          <textarea id="embed-snippet-code" readonly style="width:100%; height:90px; background:#06080E; border:1px solid rgba(212,175,55,0.2); border-radius:4px; color:#F8FAFC; font-family:var(--font-mono); font-size:0.75rem; padding:8px; resize:none;">&lt;iframe src="https://quanterraos.com/embed/calculator" width="100%" height="480" frameborder="0" style="border:1px solid rgba(212,175,55,0.3); border-radius:8px; max-width:560px;" title="QuanterraOS Prediction Market Calculator"&gt;&lt;/iframe&gt;</textarea>
+          <label for="embed-snippet-code" style="display:block; font-size:0.75rem; color:#FFFFFF; margin-bottom:6px; font-family:var(--font-mono);">Embed Code (HTML iFrame):</label>
+          <textarea id="embed-snippet-code" readonly aria-label="Embed HTML iframe code" style="width:100%; height:90px; background:#06080E; border:1px solid rgba(212,175,55,0.2); border-radius:4px; color:#F8FAFC; font-family:var(--font-mono); font-size:0.75rem; padding:8px; resize:none;">&lt;iframe src="https://quanterraos.com/embed/calculator" width="100%" height="480" frameborder="0" style="border:1px solid rgba(212,175,55,0.3); border-radius:8px; max-width:560px;" title="QuanterraOS Prediction Market Calculator"&gt;&lt;/iframe&gt;</textarea>
         </div>
         <div style="display:flex; gap:10px; justify-content:flex-end;">
           <button type="button" onclick="copyEmbedSnippet()" id="btn-copy-embed" class="nav-cta" style="padding:8px 16px; font-size:0.75rem; cursor:pointer;">
@@ -746,17 +621,6 @@ export function renderCalculatorPageHtml(): string {
     <!-- Standardized Market Evidence Card -->
     <div class="focus-mode-peripheral" style="margin-bottom: 48px;">
       ${renderMarketEvidenceCardHtml({ ticker: "KXBTC15M", venue: "kalshi-15m", currentAsk: 0.51, contractCount: 10 })}
-    </div>
-
-    <!-- Mobile Persistent Sticky Save Bar -->
-    <div class="mobile-sticky-bar">
-      <div>
-        <div style="font-family:var(--font-mono); font-size:0.65rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.04em;">Required Breakeven</div>
-        <div style="font-family:var(--font-mono); font-size:1.15rem; font-weight:700; color:var(--accent);" id="mobile-breakeven-val">52.80%</div>
-      </div>
-      <button type="button" onclick="saveCheckToJournal()" class="nav-cta" style="padding:10px 18px; font-size:0.8rem; font-weight:700; cursor:pointer;">
-        SAVE CHECK &amp; ACTIVATE &rarr;
-      </button>
     </div>
   </main>
 
@@ -1321,8 +1185,7 @@ export function renderCalculatorPageHtml(): string {
 
     recalc();
   </script>
-  ${renderMobileBottomNavHtml("check")}
-  ${getMobileAppRuntimeScript()}
+  ${renderPublicFooter()}
   ${ASSISTANT_WIDGET_HTML}
   ${renderBetaFeedbackWidgetHtml()}
 </body>

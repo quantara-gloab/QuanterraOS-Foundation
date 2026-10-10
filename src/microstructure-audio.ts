@@ -275,8 +275,8 @@ export function renderAudioControlWidgetHtml(config: Partial<AudioTelemetryConfi
   <div style="display:flex; align-items:center; gap:12px;">
     <!-- Volume Slider -->
     <div style="display:flex; align-items:center; gap:6px;">
-      <span style="font-size:0.75rem; color:#94A3B8;">Vol:</span>
-      <input type="range" min="0" max="1" step="0.05" value="${merged.volume}" style="width:70px; accent-color:#DFB843;" oninput="setAudioMasterVolume(this.value)">
+      <label for="audio-volume-slider" style="font-size:0.75rem; color:#94A3B8;">Vol:</label>
+      <input type="range" id="audio-volume-slider" aria-label="Microstructure audio master volume" min="0" max="1" step="0.05" value="${merged.volume}" style="width:70px; accent-color:#DFB843;" oninput="setAudioMasterVolume(this.value)">
       <span id="audio-vol-readout" style="font-family:var(--font-mono, monospace); font-size:0.75rem; color:#F7E7B4; width:34px;">${Math.round(merged.volume * 100)}%</span>
     </div>
 

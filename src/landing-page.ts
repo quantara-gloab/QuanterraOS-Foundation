@@ -161,7 +161,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
 <body>
 
   <!-- Background Canvas for Subtle Starfield Parallax -->
-  <canvas id="starfield-canvas"></canvas>
+  <canvas id="starfield-canvas" aria-hidden="true"></canvas>
 
   ${renderPublicHeader({ activePath: "/" })}
 
