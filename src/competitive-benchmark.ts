@@ -300,7 +300,7 @@ export const COMPETITOR_BENCHMARK_ROWS: CompetitorComparisonRow[] = [
     detail: "QuanterraOS is the only independent referee remaining to audit cross-venue friction without commercial conflicts of interest.",
   },
   {
-    dimension: "Non-Linear CFTC Taker Fee Drag",
+    dimension: "Non-Linear Kalshi Taker Fee Drag",
     quanterraos: "Full parabolic curve ($0.07 × p × (1-p)) calculated before order placement",
     competitors: "Friction-Blind (Displays nominal spreads, hiding 1.75¢–1.80¢ taker drag per 50¢ contract)",
     verdict: "SUPERIOR",
@@ -761,7 +761,7 @@ export function generateBenchmarkSvgReceipt(teardown: FrictionTeardownResult): s
   <text x="48" y="206" class="mono label rose">Competitor Claim (Verso / Predly)</text>
   <text x="48" y="238" class="mono card-val rose">+$${teardown.competitorNominalGrossEV.toFixed(2)}</text>
   <text x="48" y="260" class="mono sub">Claimed Edge: +${teardown.competitorClaimedEdgePct}%</text>
-  <text x="48" y="292" class="mono" fill="#F43F5E" font-size="10px">❌ Ignores CFTC Taker Fees ($0.00)</text>
+  <text x="48" y="292" class="mono" fill="#F43F5E" font-size="10px">❌ Ignores Kalshi Taker Fees ($0.00)</text>
   <text x="48" y="310" class="mono" fill="#F43F5E" font-size="10px">❌ Conceals Breakeven Hurdle</text>
 
   <!-- Box 2: QuanterraOS Reality -->
@@ -1153,7 +1153,7 @@ export function renderBenchmarkPageHtml(teardown: FrictionTeardownResult): strin
         <span class="mono" style="font-size:0.8rem; color:var(--accent);">Pillar 1: Anti-Friction Reality Check</span>
       </div>
       <p style="color:var(--text-dim); font-size:0.9rem; margin-bottom:18px;">
-        Enter any contract price and subjective forecast. Watch how competitor tools pitch illusory profit while QuanterraOS calculates the real CFTC taker fee drag and breakeven hurdle.
+        Enter any contract price and subjective forecast. Watch how competitor tools pitch illusory profit while QuanterraOS calculates the real Kalshi taker fee drag and breakeven hurdle.
       </p>
 
       <form action="/why" method="GET" class="sim-grid">
@@ -1198,7 +1198,7 @@ export function renderBenchmarkPageHtml(teardown: FrictionTeardownResult): strin
           </div>
           <div class="mono sub" style="margin-bottom:14px;">True Breakeven Hurdle: <strong style="color:#FFFFFF;">${teardown.trueBreakevenHurdlePct}%</strong></div>
           <p style="font-size:0.85rem; color:#E2E8F0; line-height:1.5;">
-            QuanterraOS applies the official CFTC taker fee schedule (<strong>-$${teardown.exactTakerFeeUsd.toFixed(2)} drag</strong>). Exchange fees consume <strong>${teardown.feeDragRatioPctOfProfit}% of your gross profit</strong>.
+            QuanterraOS applies the official Kalshi taker fee schedule (<strong>-$${teardown.exactTakerFeeUsd.toFixed(2)} drag</strong>). Exchange fees consume <strong>${teardown.feeDragRatioPctOfProfit}% of your gross profit</strong>.
           </p>
           <div class="mono" style="color:var(--emerald); font-size:0.8rem; margin-top:14px; font-weight:600;">
             ✓ Know your exact hurdle before risking a single dollar.
@@ -1269,7 +1269,7 @@ export function renderBenchmarkPageHtml(teardown: FrictionTeardownResult): strin
           </div>
 
           <div style="background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:12px; margin-bottom:14px; font-family:var(--font-mono); font-size:0.78rem; line-height:1.6;">
-            <div style="display:flex; justify-content:space-between;"><span>1. Kalshi CFTC Taker Fee:</span> <strong style="color:var(--rose);" id="cross-fee-kalshi">-$17.47</strong></div>
+            <div style="display:flex; justify-content:space-between;"><span>1. Kalshi Taker Fee:</span> <strong style="color:var(--rose);" id="cross-fee-kalshi">-$17.47</strong></div>
             <div style="display:flex; justify-content:space-between;"><span>2. Polymarket Gas + Swap Drag:</span> <strong style="color:var(--rose);" id="cross-fee-poly">-$6.50</strong></div>
             <div style="display:flex; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.06); margin-top:6px; padding-top:6px;">
               <span>Total Transaction Friction:</span> <strong style="color:var(--rose);" id="cross-fee-total">-$23.97</strong>

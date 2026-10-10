@@ -7,7 +7,7 @@
  * - Volatility Wings (Out-of-the-Money Range Strangles)
  *
  * Provides institutional calculation of:
- * 1. Exact non-linear multi-leg CFTC taker fee drag:
+ * 1. Exact non-linear multi-leg Kalshi taker fee drag:
  *    Sum(ceil(0.07 * count * p_i * (1 - p_i) * 100) / 100)
  * 2. True Net Max Profit, Net Max Loss, and Fee Drag Ratio (% of gross profit lost to exchange fees).
  * 3. Exact 9-point spot price payoff curve with binary discontinuous jump points.

@@ -392,7 +392,7 @@ export function generatePaperExecutionSvgReceipt(result: PaperExecutionResult): 
   <text x="60" y="328" fill="#94A3B8" font-family="ui-monospace, monospace" font-size="11">Slippage vs Target:</text>
   <text x="220" y="328" fill="${result.slippageCents > 0 ? '#F59E0B' : '#10B981'}" font-family="ui-monospace, monospace" font-size="11">${result.slippageCents >= 0 ? '+' : ''}${result.slippageCents}&cent; per contract</text>
 
-  <text x="60" y="356" fill="#94A3B8" font-family="ui-monospace, monospace" font-size="11">CFTC Taker Fee Drag:</text>
+  <text x="60" y="356" fill="#94A3B8" font-family="ui-monospace, monospace" font-size="11">Kalshi Taker Fee Drag:</text>
   <text x="220" y="356" fill="#EF4444" font-family="ui-monospace, monospace" font-size="11">-$${result.takerFeeUsd.toFixed(2)} ($0.07 &times; P(1-P) schedule)</text>
 
   <text x="60" y="384" fill="#94A3B8" font-family="ui-monospace, monospace" font-size="11">Breakeven Hurdle:</text>
@@ -613,7 +613,7 @@ export function renderRealisticPaperPageHtml(sampleResult?: PaperExecutionResult
       <div class="eyebrow">&Sigma; 90-Day Plan Build Order #5 &bull; Strategic Move #8 &bull; Realistic Paper Mode &bull; Zero Capital Risk Practice</div>
       <h1>Practice Without Deposits</h1>
       <p class="lead">
-        Prediction market simulation counter-positioned against naive competitor paper trading. Accurately models what standard simulators ignore: matching-engine latency, multi-tier queue depth depletion, parabolic CFTC taker fees, and quote jump risk.
+        Prediction market simulation counter-positioned against naive competitor paper trading. Accurately models what standard simulators ignore: matching-engine latency, multi-tier queue depth depletion, parabolic Kalshi taker fees, and quote jump risk.
       </p>
     </div>
 
@@ -686,7 +686,7 @@ export function renderRealisticPaperPageHtml(sampleResult?: PaperExecutionResult
             <span>${res.latencyDelayMs} ms delay</span>
           </div>
           <div style="display:flex; justify-content:space-between;">
-            <span style="color:var(--muted)">CFTC Taker Fee Drag:</span>
+            <span style="color:var(--muted)">Kalshi Taker Fee Drag:</span>
             <span style="color:var(--danger)">-$${res.takerFeeUsd.toFixed(2)}</span>
           </div>
           <div style="display:flex; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.06); padding-top:6px; margin-top:8px;">
@@ -752,7 +752,7 @@ export function renderRealisticPaperPageHtml(sampleResult?: PaperExecutionResult
             <div>Executed Fill: <span style="color:var(--champagne);">${res.executedContracts} ct @ ${res.executedPriceCents}&cent; (Depth swept)</span></div>
             <div>Order Slippage: <span style="color:${res.slippageCents > 0 ? '#F59E0B' : '#10B981'};">${res.slippageCents >= 0 ? '+' : ''}${res.slippageCents}&cent; per contract</span></div>
             <div>Matching Latency: <span style="color:var(--accent);">${res.latencyDelayMs} ms delay</span></div>
-            <div>CFTC Taker Fee: <span style="color:#EF4444;">-$${res.takerFeeUsd.toFixed(2)} ($0.07 &times; P(1-P))</span></div>
+            <div>Kalshi Taker Fee: <span style="color:#EF4444;">-$${res.takerFeeUsd.toFixed(2)} ($0.07 &times; P(1-P))</span></div>
             <div style="border-top:1px solid rgba(255,255,255,0.06); padding-top:6px; margin-top:6px;">
               True Breakeven: <strong style="color:var(--accent);">${res.breakevenHurdlePct}% Win Rate (+${(res.breakevenHurdlePct - res.requestedPriceCents).toFixed(1)}% hurdle)</strong>
             </div>

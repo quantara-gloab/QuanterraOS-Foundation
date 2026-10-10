@@ -204,7 +204,7 @@ export function formatXBroadcastPayload(event: AlertEventData): XBroadcastPayloa
   if (event.eventType === "CROSS_VENUE_DIVERGENCE_SPIKE" || event.eventType === "DISCREPANCY_SCANNER_DETECTED") {
     const gross = event.metrics.GROSS_SPREAD ?? event.metrics.gross_spread ?? "5.0¢";
     const net = event.metrics.REALIZED_NET ?? event.metrics.net_discrepancy ?? "3.8¢";
-    body = `⚡ Falcon detected ${gross} spread between Kalshi & Polymarket on ${event.eventTicker ?? event.underlying}.\n\nNet spread after CFTC taker fees & Polygon gas: ${net}.\n\nAudit: ${event.targetUrl}`;
+    body = `⚡ Falcon detected ${gross} spread between Kalshi & Polymarket on ${event.eventTicker ?? event.underlying}.\n\nNet spread after Kalshi taker fees & Polygon gas: ${net}.\n\nAudit: ${event.targetUrl}`;
   } else if (event.eventType === "RESOLUTION_RISK_SPIKE") {
     const score = event.metrics.AMBIGUITY_SCORE ?? "45";
     const severity = event.metrics.SEVERITY ?? "HIGH";

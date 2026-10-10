@@ -121,7 +121,7 @@ export const WIDGET_CATALOG_LIST: WidgetDefinition[] = [
     targetAudience: "Cross-platform traders, crypto researchers, web3 market commentators.",
     keyFeatures: [
       "Side-by-side contract pricing comparison",
-      "Gas and on-chain friction vs CFTC taker fees",
+      "Gas and on-chain friction vs Kalshi taker fees",
       "Resolution oracle divergence risk indicator",
       "Rule B5 $0.00 live exposure safeguard",
     ],

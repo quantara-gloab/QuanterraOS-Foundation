@@ -2303,7 +2303,7 @@ app.post("/api/alerts/webhook/test", async (req, res) => {
         kalshi_price: "$0.52",
         polymarket_price: "$0.48",
         spread_bps: "240 bps",
-        kalshi_friction: "1.75¢ (CFTC Taker)",
+        kalshi_friction: "1.75¢ (Kalshi Taker)",
         polymarket_friction: "0.50¢ (Gas/Amortized)",
       },
       "https://quanterraos.com/divergence",

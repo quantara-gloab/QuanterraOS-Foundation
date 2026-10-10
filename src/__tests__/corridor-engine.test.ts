@@ -2,7 +2,7 @@
  * Acceptance Test Suite: Multi-Strike Binary Corridor & Vertical Spread Engine
  *
  * Validates:
- * 1. Exact multi-leg CFTC taker fee calculation across legs.
+ * 1. Exact multi-leg Kalshi taker fee calculation across legs.
  * 2. Range Pin Corridor payoff arithmetic & discontinuous jump points.
  * 3. Directional Bull & Bear Vertical Spreads and Volatility Strangle profiles.
  * 4. Fee drag percentage calculation relative to maximum gross profit.
@@ -22,7 +22,7 @@ import {
 } from "../corridor-engine.ts";
 
 describe("Multi-Strike Binary Corridor & Vertical Spread Engine", () => {
-  it("1. Multi-Leg Fee Arithmetic: computes exact aggregate CFTC taker fees on both legs", () => {
+  it("1. Multi-Leg Fee Arithmetic: computes exact aggregate Kalshi taker fees on both legs", () => {
     // 10 contracts, Leg 1 at $0.60, Leg 2 at $0.40
     // Leg 1 fee: ceil(0.07 * 10 * 0.60 * 0.40 * 100) / 100 = ceil(16.8) / 100 = $0.17
     // Leg 2 fee: ceil(0.07 * 10 * 0.40 * 0.60 * 100) / 100 = ceil(16.8) / 100 = $0.17

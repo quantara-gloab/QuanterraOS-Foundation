@@ -2290,7 +2290,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
           <div class="pipeline-badge">STAGE 01 &bull; SCAN</div>
           <h3 class="pipeline-title">Discrepancy Scanner</h3>
           <p class="pipeline-desc">
-            Monitor real-time probability divergences between Polymarket &amp; Kalshi with automatic CFTC taker fee &amp; Polygon gas deductions.
+            Monitor real-time probability divergences between Polymarket &amp; Kalshi with automatic Kalshi taker fee &amp; Polygon gas deductions.
           </p>
           <div class="pipeline-tools">
             <span class="tool-tag">Cross-Venue Scanner</span>
@@ -2789,7 +2789,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
             <div class="cockpit-badge">Build Order #5 &bull; Realistic Paper Mode</div>
             <div class="cockpit-title">Practice Without Deposits</div>
             <p class="cockpit-desc">
-              Realistic simulation incorporating matching engine network transit latency (50ms–350ms), Level-2 queue depth depletion, parabolic CFTC taker fees ($0.07&times;P(1-P)), and missed fills on fast price jumps.
+              Realistic simulation incorporating matching engine network transit latency (50ms–350ms), Level-2 queue depth depletion, parabolic Kalshi taker fees ($0.07&times;P(1-P)), and missed fills on fast price jumps.
             </p>
             <div class="cockpit-pills">
               <span class="cockpit-pill">50ms/150ms/350ms Latency</span>
@@ -3014,7 +3014,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
           <div style="display:flex; align-items:center; gap:10px;">
             <span style="display:inline-flex; align-items:center; gap:6px; background:rgba(223,184,67,0.1); border:1px solid rgba(223,184,67,0.3); color:var(--accent-light); padding:4px 10px; border-radius:999px; font-family:var(--font-mono); font-size:0.72rem; font-weight:700;">
               <span style="width:6px; height:6px; border-radius:50%; background:var(--accent); box-shadow:0 0 6px var(--accent);"></span>
-              CFTC TAKER CURVE $0.07&times;P(1-P)
+              KALSHI TAKER CURVE $0.07&times;P(1-P)
             </span>
           </div>
         </div>
@@ -3051,7 +3051,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
             </div>
 
             <div id="home-teardown-danger-zone" style="background:rgba(244,63,94,0.12); border:1px solid rgba(244,63,94,0.3); border-radius:4px; padding:10px; font-size:0.73rem; color:#FDA4AF; line-height:1.4;">
-              <strong>⚠ Parabolic Danger Zone:</strong> Contracts near 50¢ generate maximum CFTC taker fee drag (1.75¢/ct). High-frequency taker flipping at this range incurs massive friction.
+              <strong>⚠ Parabolic Danger Zone:</strong> Contracts near 50¢ generate maximum Kalshi taker fee drag (1.75¢/ct). High-frequency taker flipping at this range incurs massive friction.
             </div>
           </div>
 
@@ -3080,7 +3080,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
                   <span style="font-family:var(--font-mono); font-size:0.68rem; font-weight:700; color:var(--accent); text-transform:uppercase;">QuanterraOS Verified Reality</span>
                   <span style="font-size:0.65rem; color:var(--accent-light); background:rgba(223,184,67,0.15); padding:2px 6px; border-radius:3px;">INDEPENDENT REF</span>
                 </div>
-                <div style="font-size:0.75rem; color:var(--muted); margin-bottom:12px;">True net return after non-linear CFTC taker fee drag:</div>
+                <div style="font-size:0.75rem; color:var(--muted); margin-bottom:12px;">True net return after non-linear Kalshi taker fee drag:</div>
                 <div style="font-family:var(--font-mono); font-size:1.6rem; font-weight:800; color:#10B981;" id="home-out-real-ev">+$2.25</div>
                 <div style="font-family:var(--font-mono); font-size:0.75rem; color:var(--accent); margin-top:4px;">
                   Real Hurdle: <strong id="home-out-real-hurdle">52.75%</strong>
@@ -3152,7 +3152,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
               <div style="font-size:1.5rem; font-weight:800; color:#F43F5E; font-family:var(--font-mono); margin:6px 0 2px;" id="home-cross-gross">+$30.00</div>
               <div style="font-size:0.75rem; color:var(--muted); font-family:var(--font-mono);" id="home-cross-nominal">3.00¢ nominal spread &bull; 1,000 contracts</div>
               <div style="font-size:0.72rem; color:#FDA4AF; line-height:1.4; margin-top:10px; border-top:1px solid rgba(244,63,94,0.15); padding-top:8px;">
-                Conceals $17.50 Kalshi CFTC taker fees and $6.50 on-chain gas/friction drag.
+                Conceals $17.50 Kalshi taker fees and $6.50 on-chain gas/friction drag.
               </div>
             </div>
 

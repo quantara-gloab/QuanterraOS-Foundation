@@ -104,7 +104,7 @@ export const MCP_SERVER_MANIFEST = {
     },
     {
       name: "benchmark_competitor_claim",
-      description: "Audits a competitor claim (Verso, Predly, Dome, Oddpool) against exact Kalshi CFTC taker fees, computing true breakeven hurdle, net realized EV, fee drag ratio, and danger zone risk flag with SHA-256 provenance.",
+      description: "Audits a competitor claim (Verso, Predly, Dome, Oddpool) against exact Kalshi taker fees, computing true breakeven hurdle, net realized EV, fee drag ratio, and danger zone risk flag with SHA-256 provenance.",
       parameters: {
         type: "object",
         required: ["nominalPriceCents", "userStatedWinRatePct"],
@@ -220,7 +220,7 @@ export const MCP_SERVER_MANIFEST = {
     },
     {
       name: "simulate_realistic_paper_order",
-      description: "Simulates realistic paper order execution incorporating network latency, multi-tier queue depth depletion, parabolic CFTC taker fees, and competitor fantasy delusion delta.",
+      description: "Simulates realistic paper order execution incorporating network latency, multi-tier queue depth depletion, parabolic Kalshi taker fees, and competitor fantasy delusion delta.",
       parameters: {
         type: "object",
         required: ["ticker", "side", "orderType", "contracts"],

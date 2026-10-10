@@ -90,8 +90,8 @@ export const SEARCH_QUERY_ARTICLES: SearchQueryArticle[] = [
     ],
     readTimeMinutes: 6,
     lastUpdated: "October 2026",
-    summary: "Kalshi does not charge a flat percentage fee like stock brokerages. Instead, CFTC-regulated taker fees follow a parabolic quadratic formula peaking at exactly 1.75¢ per contract for 50¢ contracts and scaling down toward 0.33¢ for tail probabilities. Over 1,000 contracts, crossing the spread at mid-market costs $17.50, establishing a 52.75% breakeven hurdle before a trader achieves positive net expectancy.",
-    formulaHeadline: "Official Kalshi CFTC Taker Fee Equation",
+    summary: "Kalshi does not charge a flat percentage fee like stock brokerages. Instead, Kalshi taker fees follow a parabolic quadratic formula peaking at exactly 1.75¢ per contract for 50¢ contracts and scaling down toward 0.33¢ for tail probabilities. Over 1,000 contracts, crossing the spread at mid-market costs $17.50, establishing a 52.75% breakeven hurdle before a trader achieves positive net expectancy.",
+    formulaHeadline: "Official Kalshi Taker Fee Equation",
     formulaMath: "Fee per contract = ceil( $0.07 × p × (1 - p) × 100 ) / 100\nWhere p = executable contract probability (0.01 to 0.99)",
     interactivePreset: {
       priceCents: 51,
@@ -958,7 +958,7 @@ export function renderQueryHubPageHtml(): string {
       </div>
       <h1 class="hero-title">Prediction Market Guides &amp; Search Queries</h1>
       <p class="hero-sub">
-        Independent, reproducible answers to the most common questions in prediction market trading: exact CFTC taker fee formulas, 60-second settlement TWAPs, true breakeven win rate hurdles, and cross-venue spread audits.
+        Independent, reproducible answers to the most common questions in prediction market trading: exact Kalshi taker fee formulas, 60-second settlement TWAPs, true breakeven win rate hurdles, and cross-venue spread audits.
       </p>
     </div>
 

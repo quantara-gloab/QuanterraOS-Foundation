@@ -713,7 +713,7 @@ export function renderForecastComparisonPageHtml(
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Validated Forecast Comparison &amp; Prospective Outcome Evaluation &bull; QuanterraOS</title>
-  <meta name="description" content="QuanterraOS 90-Day Execution Roadmap Build Order #6: Validated Forecast Comparison. Prospective out-of-sample evaluation testing whether forecasts add value over Kalshi market mid-price after exact CFTC taker fees, slippage, and spread friction.">
+  <meta name="description" content="QuanterraOS 90-Day Execution Roadmap Build Order #6: Validated Forecast Comparison. Prospective out-of-sample evaluation testing whether forecasts add value over Kalshi market mid-price after exact Kalshi taker fees, slippage, and spread friction.">
   <style>
     :root {
       --bg: #07090e;
@@ -910,7 +910,7 @@ export function renderForecastComparisonPageHtml(
       <h1>Validated Forecast Comparison &amp; Prospective Outcome Study</h1>
       <p class="lead">
         Tests whether subjective or model forecasts add real statistical value over the Kalshi market mid-price baseline. 
-        Evaluates prospective out-of-sample accuracy (Brier score) strictly after non-linear CFTC taker fees, half-spreads, and execution slippage.
+        Evaluates prospective out-of-sample accuracy (Brier score) strictly after non-linear Kalshi taker fees, half-spreads, and execution slippage.
       </p>
     </div>
 
@@ -1079,7 +1079,7 @@ export function renderForecastComparisonPageHtml(
             <button type="submit" class="btn-submit">Calculate Friction Hurdle</button>
           </form>
           <div style="margin-top:12px; font-size:11px; color:var(--subtle);">
-            Formula: Net EV = p - Executable Price - CFTC Taker Fee.
+            Formula: Net EV = p - Executable Price - Kalshi Taker Fee.
           </div>
         </div>
 

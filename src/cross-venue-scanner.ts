@@ -219,7 +219,7 @@ export function renderCrossVenueScannerPageHtml(filterCategory?: string): string
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cross-Platform Discrepancy &amp; Net Spread Scanner — QuanterraOS</title>
-  <meta name="description" content="Real-time discrepancy scanner between Kalshi and Polymarket. Calculates true net spreads after deducting CFTC taker fees, Polygon gas, and oracle resolution risks.">
+  <meta name="description" content="Real-time discrepancy scanner between Kalshi and Polymarket. Calculates true net spreads after deducting Kalshi taker fees, Polygon gas, and oracle resolution risks.">
   <style>
     :root {
       --bg: #06070A;
@@ -425,7 +425,7 @@ export function renderCrossVenueScannerPageHtml(filterCategory?: string): string
       <div class="eyebrow">&Sigma; Strategic Move #10 &bull; Polymarket vs. Kalshi &bull; Net Spread Telemetry</div>
       <h1>Cross-Platform Discrepancy Scanner</h1>
       <p class="lead">
-        Identical prediction market contracts compared in real time. We calculate gross probability spreads, deduct Kalshi CFTC taker fees and Polymarket gas/slippage, and audit underlying oracle hazard differentials.
+        Identical prediction market contracts compared in real time. We calculate gross probability spreads, deduct Kalshi taker fees and Polymarket gas/slippage, and audit underlying oracle hazard differentials.
       </p>
     </div>
 
@@ -473,7 +473,7 @@ export function renderCrossVenueScannerPageHtml(filterCategory?: string): string
               </div>
               <div style="color:var(--muted); display:flex; flex-direction:column; gap:4px;">
                 <div>Best Bid: <span style="color:#FFF;">${d.kalshiBidCents}¢</span></div>
-                <div>CFTC Taker Fee: <span style="color:var(--danger);">-${d.kalshiTakerFeeCents}¢/ct</span></div>
+                <div>Kalshi Taker Fee: <span style="color:var(--danger);">-${d.kalshiTakerFeeCents}¢/ct</span></div>
                 <div style="font-size:0.75rem; color:#94A3B8;">Parabolic fee formula applied</div>
               </div>
             </div>

@@ -602,7 +602,7 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
     - `RANGE_PIN_CORRIDOR` / `BULL_VERTICAL`: Long Lower Strike $K_1$ (YES), Short Higher Strike $K_2$ (YES).
     - `BEAR_VERTICAL`: Long Higher Strike $K_2$ (NO), Short Lower Strike $K_1$ (NO).
     - `VOLATILITY_STRANGLE`: Long Lower Strike $K_1$ (NO), Long Higher Strike $K_2$ (YES) (profiting on violent breakout beyond both strikes).
-  - Multi-Leg Non-Linear CFTC Taker Fee Model: Accurately calculates official Kalshi aggregate fee on both legs:
+  - Multi-Leg Non-Linear Kalshi Taker Fee Model: Accurately calculates official Kalshi aggregate fee on both legs:
     $\text{Total Fee} = \text{ceil}(0.07 \cdot c \cdot p_1 \cdot (1 - p_1) \cdot 100)/100 + \text{ceil}(0.07 \cdot c \cdot p_2 \cdot (1 - p_2) \cdot 100)/100$
   - Fee Drag Ratio (% of Profit): Measures the percentage of maximum potential gross profit consumed by exchange taker fees, revealing to traders when narrow corridors destroy risk/reward expectancy.
   - 9-Point Discontinuous Binary Payoff Curve: Plots exact realized net P&L across 5 market regimes (below $K_1$, at $K_1$, inside corridor, at $K_2$, above $K_2$) taking into account discontinuous binary step-function payouts.
@@ -887,7 +887,7 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
     2. Kalshi Naive Mid-Price ($p_{\text{mid}}$)
     3. Black-Scholes Lognormal Model with Itô Drift Correction ($N(d_2)$ where $d_2 = \frac{\ln(S/K) - \frac{1}{2}\sigma^2\tau}{\sigma\sqrt{\tau}}$)
     4. Naive 50/50 Baseline ($p = 0.5000$)
-  - **Friction & Hurdle Accounting**: Incorporates non-linear CFTC taker fees ($0.07 \times P(1-P)$), half-spreads, and slippage to calculate the true breakeven hurdle.
+  - **Friction & Hurdle Accounting**: Incorporates non-linear Kalshi taker fees ($0.07 \times P(1-P)$), half-spreads, and slippage to calculate the true breakeven hurdle.
   - **Rule B4 Neutral Status Labels (`assignNeutralStatusLabel`)**: Strictly enforces non-predictive, neutral verdicts: `"Costs checked"`, `"Uncertainty high"`, `"No validated edge"`, `"Friction exceeds divergence"`.
   - **Prospective Outcome Evaluation Study Cohort (`getMockProspectiveStudyCohort`, `summarizeCohortEvaluation`)**:
     - Pre-settlement prospective logging engine timestamped with 64-char SHA-256 hashes.
@@ -999,7 +999,7 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
   - Detailed analysis of competitor vulnerabilities: venue capture (Dome & Oddpool acquisitions creating conflicts of interest), uncalibrated black-box AI claims (Predly's 89% accuracy marketing without backtests), and friction blindness (hiding Kalshi's parabolic taker fee curve).
   - Outlined QuanterraOS's 5 game-changing pillars: Anti-Friction Reality, 60s TWAP Settlement Radar, Falsifiable Brier Science, Consented Decision Memory, and Sovereign MCP Interoperability.
 - **Competitive Benchmark & Friction Teardown Engine (`src/competitive-benchmark.ts`, `/why`, `/why-quanterraos`, `/benchmark`, `/vs`)**:
-  - `computeFrictionTeardown()`: Interactive simulator showing competitor illusion vs QuanterraOS reality. E.g. for a 51¢ contract at a 55% forecast win rate, competitors claim a "+4.00% edge" and "+$4.00 gross EV", while QuanterraOS reveals the -$1.75 CFTC taker fee drag, calculates the true 52.75% breakeven hurdle, proves net EV is only +$2.25, and exposes that 43.8% of profit is consumed by the exchange.
+  - `computeFrictionTeardown()`: Interactive simulator showing competitor illusion vs QuanterraOS reality. E.g. for a 51¢ contract at a 55% forecast win rate, competitors claim a "+4.00% edge" and "+$4.00 gross EV", while QuanterraOS reveals the -$1.75 Kalshi taker fee drag, calculates the true 52.75% breakeven hurdle, proves net EV is only +$2.25, and exposes that 43.8% of profit is consumed by the exchange.
   - 6-Dimension Architectural Battlecard (`COMPETITOR_BENCHMARK_ROWS`): Side-by-side audit across Independence, Taker Fee Drag, Settlement Oracle Gauge, Calibration Rigor, Decision Memory, and Model Context Protocol (MCP) support.
   - Institutional SVG Comparison Receipt Generator (`/api/benchmark/card.svg`) & Embeddable Widget (`/embed/why`).
   - Cryptographic 64-char SHA-256 provenance hash and Rule B5 $0.00 capital lock.
@@ -1194,7 +1194,7 @@ Work strictly top to bottom. Do not start a later item while an earlier one is r
 - **Programmatic Indexable Content Engine (`src/indexable-content.ts`)**:
   - Built 8 comprehensive, quantitative query guides answering high-volume search intents:
     1. *`kalshi-fee-formula`*: How the $0.07 × p × (1-p) parabolic curve works across the 1¢–99¢ ladder.
-    2. *`kalshi-vs-polymarket-fees`*: Side-by-side fee, gas, and drag comparison between CFTC taker fees and Polygon network costs.
+    2. *`kalshi-vs-polymarket-fees`*: Side-by-side fee, gas, and drag comparison between Kalshi taker fees and Polygon network costs.
     3. *`cme-cf-brti-settlement-explained`*: Demystifying the regulated 60-second TWAP settlement window vs single-exchange spot ticks.
     4. *`prediction-market-breakeven-calculator`*: Exact mathematical derivation of the 52.75% breakeven hurdle for 51¢ contracts.
     5. *`kalshi-market-calibration-audit`*: Independent 1,316-market Brier score audit (0.2001 market vs 0.2063 model) and 10-decile distribution.

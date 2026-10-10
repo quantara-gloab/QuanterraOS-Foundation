@@ -80,7 +80,7 @@ export const CANONICAL_DATASETS: DatasetMetadata[] = [
   {
     id: "decile-calibration-benchmark",
     title: "10-Decile Brier Probability Calibration & Fee Drag Corpus",
-    description: "Audited Murphy decomposition and empirical resolution across 10 probability buckets for 1,316 settled markets, contrasting subjective forecast reliability with CFTC taker fee drag.",
+    description: "Audited Murphy decomposition and empirical resolution across 10 probability buckets for 1,316 settled markets, contrasting subjective forecast reliability with Kalshi taker fee drag.",
     category: "calibration",
     rowCount: 10,
     fileSizeBytes: 1840,
@@ -96,7 +96,7 @@ export const CANONICAL_DATASETS: DatasetMetadata[] = [
       { name: "actual_yes_count", type: "number", description: "Number of contracts in bucket resolving YES", unit: "Count" },
       { name: "actual_yes_pct", type: "number", description: "Empirical frequency of YES outcome", unit: "Percentage" },
       { name: "avg_ask_cents", type: "number", description: "Average market entry ask price", unit: "Cents" },
-      { name: "avg_taker_fee_cents", type: "number", description: "Parabolic CFTC taker fee drag", unit: "Cents" },
+      { name: "avg_taker_fee_cents", type: "number", description: "Parabolic Kalshi taker fee drag", unit: "Cents" },
       { name: "breakeven_pct", type: "number", description: "Required win frequency to overcome fee drag", unit: "Percentage" },
       { name: "brier_component", type: "number", description: "Reliability component of Murphy decomposition" }
     ]
