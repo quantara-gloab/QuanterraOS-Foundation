@@ -312,7 +312,7 @@ Tokens on `:root`, dark only for deck; public site dark-default with light-mode 
 - [x] **7.2** `/help` center, Aria→human escalation, SLA tagging by plan.
 - [x] **7.3** Discord launch + moderation rules; feedback/voting board; public changelog.
 - [x] **7.4** Widgets (3.9) + `/widgets` gallery + white-label flag.
-- [ ] **7.5** `/developers` (OpenAPI, `llms.txt`, `agents.md`, MCP card), free + Builder keys, rate limits.
+- [x] **7.5** `/developers` (OpenAPI, `llms.txt`, `agents.md`, MCP card), free + Builder keys, rate limits.
 - [ ] **7.6** `/institutional` segmented page + book-a-call.
 - [ ] **7.7** Flight Instructor booking + coach console (consent-gated), "do not advise" policy flow.
 - [ ] **7.8** Weekly Mission Brief email + monthly Proof Report automation.

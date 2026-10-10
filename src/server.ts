@@ -55,6 +55,13 @@ import { getPredictionsLedger, seedHistoricalReplay } from "./prediction-ledger.
 import { retiredRouteRedirectMiddleware } from "./routes/retired-redirects.ts";
 import { renderInstitutionalPageHtml } from "./institutional-page.ts";
 import { renderDevelopersPageHtml } from "./developers-page.ts";
+import {
+  OPENAPI_SPEC_V2,
+  LLMS_TXT_CONTENT,
+  AGENTS_MD_CONTENT,
+  WELL_KNOWN_MCP,
+  validateDeveloperApiKey,
+} from "./lib/developer-platform.ts";
 import { renderNewsPageHtml } from "./news-page.ts";
 import { renderHelpPageHtml } from "./help-page.ts";
 import { searchHelpArticles, createSupportTicket } from "./lib/support-escalation.ts";
@@ -2052,6 +2059,36 @@ app.get("/institutional", (_req, res) => {
 
 app.get("/developers", (_req, res) => {
   res.type("html").send(renderDevelopersPageHtml());
+});
+
+// Developer Machine Interfaces & OpenAPI 3.1 (Task 7.5 / Part 3.10)
+app.get(["/openapi.json", "/api/openapi.json", "/api-docs/openapi.json"], (_req, res) => {
+  res.json(OPENAPI_SPEC_V2);
+});
+
+app.get(["/llms.txt", "/.well-known/llms.txt"], (_req, res) => {
+  res.type("text/plain; charset=utf-8").send(LLMS_TXT_CONTENT);
+});
+
+app.get(["/agents.md", "/agent.md", "/.well-known/agents.md"], (_req, res) => {
+  res.type("text/markdown; charset=utf-8").send(AGENTS_MD_CONTENT);
+});
+
+app.get(["/.well-known/mcp", "/.well-known/mcp.json"], (_req, res) => {
+  res.json(WELL_KNOWN_MCP);
+});
+
+app.post("/api/v1/developers/keys/verify", (req, res) => {
+  const authHeader = req.headers.authorization || "";
+  const token = authHeader.replace(/^Bearer\s+/i, "") || req.body?.apiKey;
+  const result = validateDeveloperApiKey(token);
+  res.json({
+    valid: result.valid,
+    tier: result.tier,
+    monthlyLimit: result.limit,
+    remainingRequests: result.remaining,
+    resetSeconds: result.resetSeconds,
+  });
 });
 
 app.get("/news", (_req, res) => {
