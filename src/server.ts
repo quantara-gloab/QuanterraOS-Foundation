@@ -63,6 +63,16 @@ import {
   WELL_KNOWN_MCP,
   validateDeveloperApiKey,
 } from "./lib/developer-platform.ts";
+import {
+  renderCoachConsolePageHtml,
+  renderCoachBookingPageHtml,
+} from "./coach-console-page.ts";
+import {
+  setClientCoachConsent,
+  bookCoachSession,
+  recordCoachSessionNote,
+  acknowledgeCoachPolicy,
+} from "./lib/flight-instructor.ts";
 import { renderNewsPageHtml } from "./news-page.ts";
 import { renderHelpPageHtml } from "./help-page.ts";
 import { searchHelpArticles, createSupportTicket } from "./lib/support-escalation.ts";
@@ -2103,6 +2113,51 @@ app.post("/api/v1/developers/keys/verify", (req, res) => {
     remainingRequests: result.remaining,
     resetSeconds: result.resetSeconds,
   });
+});
+
+// Flight Instructor & Coach Console Routes (Task 7.7 / Part 3.8)
+app.get(["/coach", "/instructor", "/coach/console"], (req, res) => {
+  const coachId = typeof req.query.coachId === "string" ? req.query.coachId : "coach_sarah_chen";
+  res.type("html").send(renderCoachConsolePageHtml(coachId));
+});
+
+app.get(["/book-coach", "/coach/book", "/book-instructor"], async (req, res) => {
+  const plan = await currentPlan(req);
+  res.type("html").send(renderCoachBookingPageHtml(plan));
+});
+
+app.post("/api/coach/consent", (req, res) => {
+  const { pilotUserId, coachId, consentGranted, allowedStations } = req.body;
+  if (!pilotUserId || !coachId) {
+    return res.status(400).json({ success: false, error: "pilotUserId and coachId are required" });
+  }
+  const record = setClientCoachConsent(pilotUserId, coachId, Boolean(consentGranted), allowedStations);
+  res.json({ success: true, consent: record });
+});
+
+app.post("/api/coach/book", (req, res) => {
+  const result = bookCoachSession(req.body);
+  if (!result.success) {
+    return res.status(400).json({ success: false, error: result.error });
+  }
+  res.json({ success: true, booking: result.booking });
+});
+
+app.post("/api/coach/notes", (req, res) => {
+  const result = recordCoachSessionNote(req.body);
+  if (!result.success) {
+    return res.status(400).json({ success: false, error: result.error });
+  }
+  res.json({ success: true, note: result.note });
+});
+
+app.post("/api/coach/policy-ack", (req, res) => {
+  const { coachId, signature } = req.body;
+  const success = acknowledgeCoachPolicy(coachId, signature);
+  if (!success) {
+    return res.status(400).json({ success: false, error: "Invalid coach ID or signature" });
+  }
+  res.json({ success: true, message: "Non-advisory policy acknowledged and certified." });
 });
 
 app.get("/news", (_req, res) => {
