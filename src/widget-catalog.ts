@@ -1,14 +1,16 @@
 /**
  * QuanterraOS — Embedded Cost & Risk Widget Catalog (/widgets, /embeds)
  *
- * Implements Section 6.3 & 6.5 of QuanterraOS_Global_Growth_Strategy.md:
- * "6.3. Shareable Educational Cards: Clean summary cards without balances or sensational earnings claims."
- * "6.5. Embedded Cost/Risk Widgets: Distribution cards for third-party frontends."
+ * Implements Master Blueprint v2 Part 3.9 (Widgets Distribution Engine):
+ * 1. Kalshi fee & breakeven calculator (/embed/calculator)
+ * 2. BRTI-vs-spot dispersion ticker (/embed/dispersion)
+ * 3. Live 15-min BTC countdown with strike distance (/embed/countdown)
+ * 4. "Market vs model" calibration badge (/embed/calibration)
+ * 5. Kalshi vs Polymarket net-price comparator (single market) (/embed/comparator)
  *
  * Capabilities:
- * - Central showcase for financial publishers, Substack journalists, educators, and quant developers.
- * - Live interactive previews of 8 sovereign QuanterraOS embeddable widgets & SVG verification cards.
- * - 1-Click responsive HTML <iframe> and Markdown badge copy functionality.
+ * - Embed via <script> + iframe fallback; responsive, light/dark themes, white-label partner flag.
+ * - 1-Click interactive code generation (HTML <iframe>, JavaScript <script>, Markdown, Direct URL).
  * - Strict Rule B4 (zero superlatives), Rule B5 ($0.00 capital risk lock), and Rule B10 marks notices.
  */
 
@@ -31,6 +33,105 @@ export interface WidgetDefinition {
   keyFeatures: string[];
 }
 
+/**
+ * Master Blueprint v2 Part 3.9: 5 Canonical Distribution Widgets
+ */
+export const CANONICAL_V2_WIDGETS: WidgetDefinition[] = [
+  {
+    id: "friction-calculator",
+    title: "Kalshi Fee & Breakeven Calculator",
+    category: "friction",
+    categoryLabel: "Friction & Cost Auditing",
+    badgeText: "Distribution Core",
+    description: "Embeddable interactive calculator uncovering Kalshi's parabolic taker fee ($0.07 × p × (1-p)) and required breakeven win rate (52.75% on 51¢ contracts) before users risk capital.",
+    embedUrl: "/embed/calculator",
+    defaultWidth: "540px",
+    defaultHeight: "460px",
+    targetAudience: "Trading education blogs, financial newsletters, CFD/options communities.",
+    keyFeatures: [
+      "Dynamic price and contract quantity sliders",
+      "Real-time CFTC non-linear taker fee calculation",
+      "True breakeven hurdle percentage calculation",
+      "Zero registration required for readers",
+    ],
+  },
+  {
+    id: "dispersion-ticker",
+    title: "BRTI-vs-Spot Dispersion Ticker",
+    category: "microstructure",
+    categoryLabel: "Settlement & Microstructure",
+    badgeText: "Microstructure Radar",
+    description: "Real-time surveillance monitoring price dispersion across constituent spot exchanges (Coinbase, Kraken, Bitstamp, Gemini) vs the CME CF BRTI 60-second TWAP settlement benchmark.",
+    embedUrl: "/embed/dispersion",
+    defaultWidth: "580px",
+    defaultHeight: "360px",
+    targetAudience: "Quantitative traders, market microstructure researchers, crypto media.",
+    keyFeatures: [
+      "Constituent exchange live quote dispersion in basis points",
+      "CME CF BRTI 60s TWAP benchmark proxy comparison",
+      "Normal (<15 bps) vs elevated dispersion alert state",
+      "Settlement truth reminder against instantaneous spot illusion",
+    ],
+  },
+  {
+    id: "countdown-ticker",
+    title: "Live 15-Min BTC Countdown & Strike Distance",
+    category: "microstructure",
+    categoryLabel: "Settlement & Microstructure",
+    badgeText: "Cockpit HUD",
+    description: "Dynamic countdown timer ticking down to nearest 15-minute resolution (:00, :15, :30, :45) with ATM strike delta and coin-flip hazard zone warnings.",
+    embedUrl: "/embed/countdown",
+    defaultWidth: "540px",
+    defaultHeight: "340px",
+    targetAudience: "Active event contract traders, financial substacks, live stream overlays.",
+    keyFeatures: [
+      "Real-time countdown timer to contract settlement",
+      "ATM strike distance delta (+$X / -$X)",
+      "Coin-flip hazard zone overlay within 3 minutes of expiry",
+      "Rule B5 $0 live capital circuit breaker",
+    ],
+  },
+  {
+    id: "calibration-badge",
+    title: "Market vs Model Calibration Badge",
+    category: "education",
+    categoryLabel: "Calibration & Governance",
+    badgeText: "Empirical Proof",
+    description: "Audited calibration scorecard displaying empirical Brier score performance across 1,316 settled BTC15M windows proving the market mid beats proprietary models.",
+    embedUrl: "/embed/calibration",
+    defaultWidth: "520px",
+    defaultHeight: "320px",
+    targetAudience: "Forecasting communities, Substack journalists, academic researchers.",
+    keyFeatures: [
+      "Kalshi Market Mid Brier Score (0.2001) calibration",
+      "QuanterraOS Model Brier Score (0.2063) comparison",
+      "Naive coin-flip benchmark (0.2500)",
+      "Transparent unvarnished reporting when market beats our model",
+    ],
+  },
+  {
+    id: "cross-venue-comparator",
+    title: "Kalshi vs Polymarket Net-Price Comparator",
+    category: "friction",
+    categoryLabel: "Friction & Cost Auditing",
+    badgeText: "Cross-Venue Referee",
+    description: "Side-by-side single market fee, breakeven, and oracle settlement disparity comparison between CFTC-regulated Kalshi and decentralized Polymarket.",
+    embedUrl: "/embed/comparator",
+    defaultWidth: "580px",
+    defaultHeight: "380px",
+    targetAudience: "Prediction market comparison sites, crypto derivatives reviewers, educators.",
+    keyFeatures: [
+      "Kalshi parabolic taker fee vs Polymarket dynamic fee + gas",
+      "True breakeven win rate percentage comparison",
+      "Oracle basis divergence warning (CME CF BRTI 60s TWAP vs UMA)",
+      "Unconflicted referee stance ($0 exchange referral incentives)",
+    ],
+  },
+];
+
+/**
+ * Sovereign Catalog List (Retained with 8 items for backward compatibility)
+ */
 export const WIDGET_CATALOG_LIST: WidgetDefinition[] = [
   {
     id: "friction-calculator",
@@ -98,75 +199,75 @@ export const WIDGET_CATALOG_LIST: WidgetDefinition[] = [
     description: "Real-time settlement surveillance monitoring the 60-second TWAP window across constituent spot exchanges (Coinbase, Kraken, Bitstamp, Gemini) vs instantaneous Kalshi quotes.",
     embedUrl: "/embed/radar",
     cardSvgUrl: "/api/settlement/dissection/card.svg",
-    defaultWidth: "640px",
-    defaultHeight: "380px",
-    targetAudience: "Crypto technical analysts, microstructure traders, quant blogs.",
+    defaultWidth: "660px",
+    defaultHeight: "420px",
+    targetAudience: "Active event contract scalpers, market makers, quantitative researchers.",
     keyFeatures: [
-      "Settlement index vs spot exchange basis monitor",
-      "60-second rolling TWAP reconstruction",
-      "Sub-penny strike proximity alerts",
-      "Constituent exchange weighting breakdown",
+      "Constituent exchange live dispersion matrix",
+      "Real-time 60-second sliding TWAP settlement accumulator",
+      "Latency arbitrage and basis mismatch alerts",
+      "Sub-second micro-divergence indicators",
     ],
   },
   {
     id: "cross-venue-divergence",
-    title: "Cross-Venue Basis & Divergence Monitor",
+    title: "Cross-Venue Divergence Monitor",
     category: "microstructure",
     categoryLabel: "Settlement & Microstructure",
-    badgeText: "Multi-Venue",
-    description: "Real-time price, spread, and net fee friction comparison between Kalshi (CFTC regulated) and Polymarket (Polygon on-chain UMA oracle) pricing identical windows.",
+    badgeText: "Arbitrage Friction",
+    description: "Side-by-side surveillance of identical BTC resolution outcomes across Kalshi (CFTC regulated) and Polymarket (Polygon decentralized) accounting for all-in friction.",
     embedUrl: "/embed/divergence",
-    defaultWidth: "620px",
+    defaultWidth: "660px",
     defaultHeight: "380px",
-    targetAudience: "Cross-platform traders, crypto researchers, web3 market commentators.",
+    targetAudience: "Statistical arbitrageurs, basis traders, crypto macro hedge funds.",
     keyFeatures: [
-      "Side-by-side contract pricing comparison",
-      "Gas and on-chain friction vs Kalshi taker fees",
-      "Resolution oracle divergence risk indicator",
-      "Rule B5 $0.00 live exposure safeguard",
+      "Kalshi non-linear taker fee vs Polymarket dynamic fee + gas",
+      "True breakeven probability difference",
+      "Resolution oracle divergence risk (CME CF BRTI vs UMA)",
+      "Instantaneous cross-exchange spread calculation",
     ],
   },
   {
     id: "prospective-study",
-    title: "Know Your Costs Pilot Study (#6.4)",
+    title: "Prospective 1,316-Window Calibration Corpus",
     category: "education",
     categoryLabel: "Education & Governance",
-    badgeText: "Research Study",
-    description: "Live telemetry card from the 100–300 opt-in user cohort tracking pre-trade awareness delta, friction checks, and objective outcome calibration.",
+    badgeText: "Academic Research",
+    description: "Public empirical validation corpus detailing actual win rates and Brier score resolution accuracy for event contracts across 1,316 settled BTC15M windows.",
     embedUrl: "/embed/study",
-    cardSvgUrl: "/api/study/card.svg",
-    defaultWidth: "700px",
+    cardSvgUrl: "/api/study/summary/card.svg",
+    exportCsvUrl: "/api/study/corpus.csv",
+    defaultWidth: "680px",
     defaultHeight: "450px",
-    targetAudience: "Behavioral finance educators, university trading clubs, risk officers.",
+    targetAudience: "University economics departments, quantitative finance researchers, regulators.",
     keyFeatures: [
-      "Pre-trade fee awareness delta (+28.4%)",
-      "6-stage target pilot funnel telemetry",
-      "Anonymized participant decision telemetry",
-      "Cryptographic 64-char SHA-256 provenance verification",
+      "Peer-review ready prospective observation methodology",
+      "Strict Brier score decomposition (reliability vs resolution)",
+      "Demonstrates exchange house edge via taker fee drag",
+      "Cryptographic timestamping across all 1,316 settled windows",
     ],
   },
   {
     id: "educator-portal",
-    title: "Educator & Distribution Partner Roster",
+    title: "Trading Educator & Newsletter Embed Pack",
     category: "education",
     categoryLabel: "Education & Governance",
-    badgeText: "Partner Program",
-    description: "Ethical distribution partner roster paying educators for verified risk literacy and retained subscribers — strictly prohibiting trading volume commissions.",
+    badgeText: "Educator Pack",
+    description: "Pre-configured suite of risk education cards for financial newsletters, Substacks, and trading educators warning students about negative EV coin-flip markets.",
     embedUrl: "/embed/educators",
-    cardSvgUrl: "/api/educators/card.svg",
-    defaultWidth: "680px",
-    defaultHeight: "440px",
-    targetAudience: "Financial YouTube creators, Substack publishers, podcast hosts.",
+    defaultWidth: "600px",
+    defaultHeight: "420px",
+    targetAudience: "Financial YouTubers, Substack authors, trading course instructors.",
     keyFeatures: [
-      "Strict anti-volumetric commission policy",
-      "Retention & literacy milestone compensation",
-      "Live cohort capacity and active educator roster",
-      "Rule B10 non-affiliation compliance standards",
+      "Breakeven hurdle infographics",
+      "Negative EV coin-flip contract visualizers",
+      "No affiliate marketing or trading commission kickbacks",
+      "Strict Rule B4 zero-hype educational compliance",
     ],
   },
   {
     id: "realistic-paper",
-    title: "Realistic Microstructure Paper Mode",
+    title: "Realistic Execution Simulation Sandbox",
     category: "education",
     categoryLabel: "Education & Governance",
     badgeText: "Simulated Training",
@@ -185,11 +286,18 @@ export const WIDGET_CATALOG_LIST: WidgetDefinition[] = [
 ];
 
 /**
+ * Unified all-widgets map for gallery previews
+ */
+const ALL_GALLERY_WIDGETS: WidgetDefinition[] = [
+  ...CANONICAL_V2_WIDGETS,
+  ...WIDGET_CATALOG_LIST.filter(w => !CANONICAL_V2_WIDGETS.some(c => c.id === w.id || c.embedUrl === w.embedUrl)),
+];
+
+/**
  * Renders the full interactive Widget & Embed Hub (/widgets, /embeds).
  */
 export function renderWidgetCatalogHtml(): string {
-  const widgets = WIDGET_CATALOG_LIST;
-  const initialWidget = widgets[0];
+  const initialWidget = CANONICAL_V2_WIDGETS[0];
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -198,7 +306,7 @@ export function renderWidgetCatalogHtml(): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#06070A">
   <title>Embedded Widgets &amp; Distribution Cards — QuanterraOS</title>
-  <meta name="description" content="Embeddable prediction market fee calculators, 2026 competitive benchmarks, settlement TWAP radars, and outcome transparency cards for publishers and educators.">
+  <meta name="description" content="Embeddable prediction market fee calculators, settlement dispersion tickers, live countdowns, calibration badges, and cross-venue comparators.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -258,86 +366,104 @@ export function renderWidgetCatalogHtml(): string {
     .brand-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
     .nav-links { display: flex; align-items: center; gap: 24px; }
     .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.84rem; font-weight: 500; transition: color 0.15s; }
-    .nav-links a:hover, .nav-links a.active { color: var(--text); }
-    .container { max-width: 1240px; margin: 0 auto; padding: 40px 24px 0; }
-
-    .header-banner { margin-bottom: 32px; }
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
+    .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+    
+    .container { max-width: 1240px; margin: 0 auto; padding: 40px 24px; }
+    .header-banner { text-align: center; max-width: 820px; margin: 0 auto 36px; }
+    .header-banner .badge {
+      display: inline-block;
       font-family: var(--font-mono);
       font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
       color: var(--accent);
       background: rgba(223, 184, 67, 0.1);
-      border: 1px solid var(--border);
-      padding: 4px 10px;
-      border-radius: 4px;
-      text-transform: uppercase;
-      margin-bottom: 10px;
+      border: 1px solid var(--border-accent);
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 16px;
     }
-    h1 { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.02em; color: #FFFFFF; margin-bottom: 8px; }
-    .subtitle { color: var(--text-dim); font-size: 0.95rem; max-width: 840px; line-height: 1.6; }
+    .header-banner h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+      color: #FFFFFF;
+    }
+    .header-banner .subtitle {
+      color: var(--text-dim);
+      font-size: 1rem;
+      line-height: 1.6;
+    }
 
-    /* Category Filter Pills */
+    /* Filter Bar */
     .filter-bar {
       display: flex;
       gap: 10px;
-      margin-bottom: 28px;
-      flex-wrap: wrap;
+      margin-bottom: 24px;
+      overflow-x: auto;
+      padding-bottom: 8px;
     }
     .filter-pill {
-      background: rgba(255, 255, 255, 0.04);
+      background: var(--card);
       border: 1px solid var(--border);
-      color: var(--muted);
-      font-family: var(--font-mono);
-      font-size: 0.78rem;
-      padding: 8px 16px;
-      border-radius: 6px;
+      color: var(--text-dim);
+      padding: 8px 18px;
+      border-radius: 24px;
+      font-size: 0.82rem;
+      font-weight: 600;
       cursor: pointer;
-      transition: all 0.15s ease;
+      white-space: nowrap;
+      transition: all 0.2s;
     }
-    .filter-pill:hover, .filter-pill.active {
-      background: rgba(223, 184, 67, 0.14);
+    .filter-pill:hover { border-color: var(--accent); color: var(--text); }
+    .filter-pill.active {
+      background: rgba(223, 184, 67, 0.15);
       border-color: var(--accent);
       color: var(--accent-light);
     }
 
-    /* Main Workspace Layout */
+    /* Layout */
     .catalog-layout {
       display: grid;
-      grid-template-columns: 420px 1fr;
+      grid-template-columns: 380px 1fr;
       gap: 28px;
       align-items: start;
     }
-    @media (max-width: 1024px) {
+    @media (max-width: 960px) {
       .catalog-layout { grid-template-columns: 1fr; }
+      .top-nav { padding: 14px 20px; }
     }
 
-    /* Left Sidebar: Widget Cards Roster */
+    /* Left Roster */
     .widget-roster {
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
+      max-height: 820px;
+      overflow-y: auto;
+      padding-right: 8px;
     }
+    .widget-roster::-webkit-scrollbar { width: 6px; }
+    .widget-roster::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
     .widget-item-card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 18px;
+      padding: 16px;
       cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      position: relative;
+      transition: all 0.15s ease-in-out;
+      text-align: left;
     }
     .widget-item-card:hover {
-      border-color: var(--accent);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      border-color: var(--border-accent);
+      transform: translateY(-1px);
     }
     .widget-item-card.selected {
-      border-color: var(--accent);
       background: var(--card-elevated);
-      box-shadow: inset 0 1px 0 rgba(247, 231, 180, 0.3), 0 12px 30px rgba(223, 184, 67, 0.12);
+      border-color: var(--accent);
+      box-shadow: 0 0 16px rgba(223, 184, 67, 0.15);
     }
     .widget-header-row {
       display: flex;
@@ -348,42 +474,30 @@ export function renderWidgetCatalogHtml(): string {
     .widget-badge {
       font-family: var(--font-mono);
       font-size: 0.65rem;
-      font-weight: 700;
       color: var(--accent);
-      background: rgba(223, 184, 67, 0.08);
-      border: 1px solid rgba(223, 184, 67, 0.25);
-      padding: 2px 8px;
+      background: rgba(223, 184, 67, 0.12);
+      border: 1px solid rgba(223, 184, 67, 0.3);
+      padding: 2px 6px;
       border-radius: 4px;
       text-transform: uppercase;
     }
-    .widget-title {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: #FFFFFF;
-      margin-bottom: 4px;
-    }
-    .widget-summary {
-      font-size: 0.78rem;
-      color: var(--muted);
-      line-height: 1.45;
-      margin-bottom: 10px;
-    }
+    .widget-title { font-weight: 700; font-size: 0.94rem; color: #FFFFFF; margin-bottom: 6px; }
+    .widget-summary { font-size: 0.78rem; color: var(--text-dim); line-height: 1.4; margin-bottom: 10px; }
     .widget-meta {
       display: flex;
       justify-content: space-between;
-      align-items: center;
       font-family: var(--font-mono);
       font-size: 0.7rem;
       color: var(--muted);
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
       padding-top: 8px;
     }
 
-    /* Right Preview & Code Inspector Panel */
+    /* Right Preview & Code Panel */
     .preview-panel {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 10px;
       padding: 24px;
       position: sticky;
       top: 90px;
@@ -391,120 +505,136 @@ export function renderWidgetCatalogHtml(): string {
     .panel-header {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
       flex-wrap: wrap;
       gap: 12px;
-      margin-bottom: 18px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-      padding-bottom: 14px;
     }
-    .preview-title { font-size: 1.2rem; font-weight: 700; color: #FFFFFF; }
-    .viewport-toggles {
+    .preview-title { font-size: 1.25rem; font-weight: 700; color: #FFFFFF; }
+
+    /* Customizer Bar (Theme, White-Label & Viewports) */
+    .customizer-bar {
       display: flex;
-      gap: 6px;
-    }
-    .viewport-btn {
-      background: rgba(255, 255, 255, 0.05);
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      background: rgba(0, 0, 0, 0.35);
       border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin-bottom: 16px;
+    }
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+    }
+    .ctrl-label { color: var(--muted); text-transform: uppercase; font-size: 0.68rem; }
+    .toggle-btn-group {
+      display: inline-flex;
+      background: #080B12;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .toggle-btn {
+      background: transparent;
+      border: none;
       color: var(--muted);
       font-family: var(--font-mono);
-      font-size: 0.7rem;
+      font-size: 0.72rem;
       padding: 4px 10px;
-      border-radius: 4px;
       cursor: pointer;
+      transition: all 0.15s;
     }
-    .viewport-btn.active {
-      background: var(--accent);
-      color: #06070A;
-      font-weight: 700;
-      border-color: var(--accent);
+    .toggle-btn:hover { color: var(--text); }
+    .toggle-btn.active {
+      background: rgba(223, 184, 67, 0.2);
+      color: var(--accent-light);
+      font-weight: 600;
     }
 
-    /* Live Preview Frame Container */
     .iframe-wrapper {
-      background: #040508;
-      border: 1px solid rgba(212, 175, 55, 0.15);
-      border-radius: 6px;
-      padding: 12px;
+      background: #05060A;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      min-height: 380px;
       display: flex;
       justify-content: center;
       align-items: center;
-      margin-bottom: 20px;
-      min-height: 420px;
-      transition: all 0.2s ease;
+      padding: 12px;
+      transition: all 0.2s;
     }
     .preview-iframe {
       width: 100%;
-      height: 420px;
+      height: 440px;
       border: none;
-      border-radius: 4px;
-      background: #06070A;
-      transition: width 0.2s ease;
+      border-radius: 6px;
+      transition: width 0.3s ease;
+      background: transparent;
     }
 
-    /* Code Box & Snippet Tabs */
+    /* Snippet Box */
     .snippet-section {
-      background: rgba(6, 9, 14, 0.85);
+      background: #080B12;
       border: 1px solid var(--border);
       border-radius: 6px;
-      padding: 16px;
-      margin-bottom: 18px;
+      margin-bottom: 20px;
+      overflow: hidden;
     }
     .snippet-tabs {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid var(--border);
+      padding: 6px 12px;
+      flex-wrap: wrap;
+      gap: 6px;
     }
-    .tab-group { display: flex; gap: 8px; }
+    .tab-group { display: flex; gap: 6px; flex-wrap: wrap; }
     .code-tab {
-      background: none;
+      background: transparent;
       border: none;
       color: var(--muted);
       font-family: var(--font-mono);
-      font-size: 0.72rem;
+      font-size: 0.74rem;
+      padding: 4px 10px;
+      border-radius: 4px;
       cursor: pointer;
-      padding: 2px 6px;
-      border-bottom: 2px solid transparent;
     }
-    .code-tab.active {
-      color: var(--accent);
-      border-bottom-color: var(--accent);
-      font-weight: 600;
-    }
+    .code-tab.active { background: rgba(223, 184, 67, 0.15); color: var(--accent); font-weight: 600; }
     .copy-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: linear-gradient(180deg, #FBF4DC 0%, #E5C158 35%, #D4AF37 70%, #A88120 100%);
-      color: #07080B;
+      background: rgba(223, 184, 67, 0.12);
+      border: 1px solid var(--border-accent);
+      color: var(--accent-light);
       font-family: var(--font-mono);
       font-size: 0.72rem;
-      font-weight: 700;
-      padding: 5px 12px;
+      padding: 4px 12px;
       border-radius: 4px;
-      border: 1px solid rgba(255, 248, 220, 0.8);
       cursor: pointer;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      transition: all 0.15s;
     }
-    .copy-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
-    }
+    .copy-btn:hover { background: var(--accent); color: #000000; font-weight: 700; }
     .code-content {
+      padding: 14px;
       font-family: var(--font-mono);
       font-size: 0.76rem;
-      color: #CBD5E1;
-      background: rgba(0, 0, 0, 0.5);
-      padding: 10px;
-      border-radius: 4px;
+      color: #E2E8F0;
+      background: #06080E;
       overflow-x: auto;
       white-space: pre-wrap;
       word-break: break-all;
-      border: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-    /* Links & Features Grid */
+    /* Features Grid */
     .features-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -538,49 +668,49 @@ export function renderWidgetCatalogHtml(): string {
     <div style="display:flex; align-items:center; gap:32px;">
       <a href="/" class="nav-brand"><span class="brand-dot"></span> QUANTERRAOS</a>
       <div class="nav-links">
-        <a href="/calculator">Check</a>
-        <a href="/transparency">Transparency</a>
-        <a href="/why">Why QuanterraOS</a>
-        <a href="/study">Cost Study</a>
-        <a href="/educators">Educators</a>
-        <a href="/widgets" class="active" style="color:var(--accent); font-weight:700;">Widgets</a>
+        <a href="/check">Check</a>
         <a href="/radar">Radar</a>
-        <a href="/journal">Journal</a>
-        <a href="/learn">Curriculum</a>
+        <a href="/deck">Flight Deck</a>
+        <a href="/proof">Proof</a>
+        <a href="/institutional">Institutional</a>
+        <a href="/pricing">Pricing</a>
+        <a href="/widgets" class="active">Widgets</a>
       </div>
     </div>
     <div>
-      <a href="/calculator" style="background:rgba(212,175,55,0.1); border:1px solid var(--border); color:var(--accent-light); font-family:var(--font-mono); font-size:0.75rem; padding:6px 14px; border-radius:4px; text-decoration:none;">
-        Open Free Calc &rarr;
+      <a href="/check" style="background:rgba(212,175,55,0.1); border:1px solid var(--border); color:var(--accent-light); font-family:var(--font-mono); font-size:0.75rem; padding:6px 14px; border-radius:4px; text-decoration:none;">
+        Free Check &rarr;
       </a>
     </div>
   </nav>
 
   <main class="container">
     <header class="header-banner">
-      <div class="badge">Growth Strategy Sections 6.3 &amp; 6.5 &bull; Embed Hub</div>
+      <div class="badge">Master Blueprint Part 3.9 &bull; Distribution Engine</div>
       <h1>Distribution Cards &amp; Embeddable Widgets</h1>
       <p class="subtitle">
-        Empower your readers with independent, real-time prediction market telemetry. Embed sovereign fee teardown calculators, 2026 competitive benchmarks, settlement TWAP radars, and outcome transparency audits directly into your Substack, blog, or quant terminal.
+        Empower your readers with independent, real-time prediction market telemetry. Embed sovereign fee teardown calculators, settlement TWAP radars, live BTC expiry countdowns, calibration badges, and cross-venue net comparators directly into your Substack, blog, or quant terminal.
       </p>
     </header>
 
     <!-- Category Filter Bar -->
     <div class="filter-bar" id="filter-bar">
-      <button class="filter-pill active" onclick="filterWidgets('all', this)" id="btn-filter-all">All Widgets (${widgets.length})</button>
-      <button class="filter-pill" onclick="filterWidgets('friction', this)" id="btn-filter-friction">Friction &amp; Cost Auditing (3)</button>
-      <button class="filter-pill" onclick="filterWidgets('microstructure', this)" id="btn-filter-microstructure">Settlement &amp; Microstructure (2)</button>
-      <button class="filter-pill" onclick="filterWidgets('education', this)" id="btn-filter-education">Education &amp; Governance (3)</button>
+      <button class="filter-pill active" onclick="filterWidgets('all', this)" id="btn-filter-all">All Widgets (${ALL_GALLERY_WIDGETS.length})</button>
+      <button class="filter-pill" onclick="filterWidgets('canonical', this)" id="btn-filter-canonical">Canonical v2 (5)</button>
+      <button class="filter-pill" onclick="filterWidgets('friction', this)" id="btn-filter-friction">Friction &amp; Cost Auditing</button>
+      <button class="filter-pill" onclick="filterWidgets('microstructure', this)" id="btn-filter-microstructure">Settlement &amp; Microstructure</button>
+      <button class="filter-pill" onclick="filterWidgets('education', this)" id="btn-filter-education">Education &amp; Governance</button>
     </div>
 
     <!-- Catalog Layout -->
     <div class="catalog-layout">
       <!-- Left Roster -->
       <div class="widget-roster" id="widget-roster">
-        ${widgets.map((w, idx) => `
+        ${ALL_GALLERY_WIDGETS.map((w, idx) => `
           <div class="widget-item-card ${idx === 0 ? "selected" : ""}" 
                data-id="${w.id}" 
                data-category="${w.category}" 
+               data-canonical="${CANONICAL_V2_WIDGETS.some(c => c.id === w.id) ? "true" : "false"}"
                onclick="selectWidget('${w.id}', this)"
                id="widget-card-${w.id}">
             <div class="widget-header-row">
@@ -604,16 +734,42 @@ export function renderWidgetCatalogHtml(): string {
             <div class="preview-title" id="panel-title">${initialWidget.title}</div>
             <div style="font-size:0.75rem; color:var(--text-dim);" id="panel-audience">Audience: ${initialWidget.targetAudience}</div>
           </div>
-          <div class="viewport-toggles">
-            <button class="viewport-btn active" onclick="setViewport('100%', this)" id="btn-vp-full">Full Width</button>
-            <button class="viewport-btn" onclick="setViewport('640px', this)" id="btn-vp-tablet">Tablet</button>
-            <button class="viewport-btn" onclick="setViewport('380px', this)" id="btn-vp-mobile">Mobile</button>
+        </div>
+
+        <!-- Customizer Bar -->
+        <div class="customizer-bar">
+          <!-- Theme Switcher -->
+          <div class="control-group">
+            <span class="ctrl-label">Theme:</span>
+            <div class="toggle-btn-group">
+              <button class="toggle-btn active" id="btn-theme-dark" onclick="setTheme('dark', this)">Dark</button>
+              <button class="toggle-btn" id="btn-theme-light" onclick="setTheme('light', this)">Light</button>
+            </div>
+          </div>
+
+          <!-- White-Label Switcher -->
+          <div class="control-group">
+            <span class="ctrl-label">Branding:</span>
+            <div class="toggle-btn-group">
+              <button class="toggle-btn active" id="btn-wl-standard" onclick="setWhiteLabel(false, this)">Powered By</button>
+              <button class="toggle-btn" id="btn-wl-active" onclick="setWhiteLabel(true, this)">White-Label</button>
+            </div>
+          </div>
+
+          <!-- Viewport Switcher -->
+          <div class="control-group">
+            <span class="ctrl-label">Viewport:</span>
+            <div class="toggle-btn-group">
+              <button class="toggle-btn active" onclick="setViewport('100%', this)" id="btn-vp-full">100%</button>
+              <button class="toggle-btn" onclick="setViewport('640px', this)" id="btn-vp-tablet">Tablet</button>
+              <button class="toggle-btn" onclick="setViewport('380px', this)" id="btn-vp-mobile">Mobile</button>
+            </div>
           </div>
         </div>
 
         <!-- Live Iframe Preview -->
         <div class="iframe-wrapper" id="iframe-wrapper">
-          <iframe src="${initialWidget.embedUrl}" 
+          <iframe src="${initialWidget.embedUrl}?theme=dark" 
                   id="preview-iframe" 
                   class="preview-iframe" 
                   title="${initialWidget.title} Live Preview"
@@ -635,6 +791,7 @@ export function renderWidgetCatalogHtml(): string {
           <div class="snippet-tabs">
             <div class="tab-group">
               <button class="code-tab active" onclick="switchCodeTab('iframe', this)" id="tab-iframe">HTML &lt;iframe&gt;</button>
+              <button class="code-tab" onclick="switchCodeTab('script', this)" id="tab-script">JS &lt;script&gt;</button>
               <button class="code-tab" onclick="switchCodeTab('markdown', this)" id="tab-markdown">Markdown Badge</button>
               <button class="code-tab" onclick="switchCodeTab('direct', this)" id="tab-direct">Direct URL</button>
             </div>
@@ -642,7 +799,7 @@ export function renderWidgetCatalogHtml(): string {
               <span id="copy-btn-text">Copy Code</span>
             </button>
           </div>
-          <pre class="code-content" id="code-content">&lt;iframe src="https://quanterraos.com${initialWidget.embedUrl}" width="100%" height="${initialWidget.defaultHeight}" frameborder="0" style="border:1px solid rgba(212,175,55,0.22); border-radius:8px; overflow:hidden;"&gt;&lt;/iframe&gt;</pre>
+          <pre class="code-content" id="code-content">&lt;iframe src="https://quanterraos.com${initialWidget.embedUrl}?theme=dark" width="100%" height="${initialWidget.defaultHeight}" frameborder="0" style="border:1px solid rgba(212,175,55,0.22); border-radius:8px; overflow:hidden;" title="${initialWidget.title}"&gt;&lt;/iframe&gt;</pre>
         </div>
 
         <!-- Direct Links -->
@@ -669,7 +826,7 @@ export function renderWidgetCatalogHtml(): string {
 
   <script>
     const WIDGETS_MAP = ${JSON.stringify(
-      WIDGET_CATALOG_LIST.reduce((acc, w) => {
+      ALL_GALLERY_WIDGETS.reduce((acc, w) => {
         acc[w.id] = w;
         return acc;
       }, {} as Record<string, WidgetDefinition>)
@@ -677,32 +834,27 @@ export function renderWidgetCatalogHtml(): string {
 
     let currentWidgetId = "${initialWidget.id}";
     let currentCodeFormat = "iframe";
+    let currentTheme = "dark";
+    let currentWhiteLabel = false;
 
     function selectWidget(id, cardEl) {
       currentWidgetId = id;
       const w = WIDGETS_MAP[id];
       if (!w) return;
 
-      // Update card selection styling
       document.querySelectorAll('.widget-item-card').forEach(el => el.classList.remove('selected'));
       if (cardEl) cardEl.classList.add('selected');
 
-      // Update right panel header & features
       document.getElementById('panel-title').textContent = w.title;
       document.getElementById('panel-audience').textContent = 'Audience: ' + w.targetAudience;
 
-      // Update iframe source
-      const iframe = document.getElementById('preview-iframe');
-      iframe.src = w.embedUrl;
-      iframe.title = w.title + ' Live Preview';
+      updateIframeUrl();
 
-      // Update features list
       const featuresEl = document.getElementById('panel-features');
       featuresEl.innerHTML = w.keyFeatures.map(f => 
         '<div class="feature-item"><span class="feature-check">&#10003;</span><span>' + f + '</span></div>'
       ).join('');
 
-      // Update direct links
       const linksContainer = document.getElementById('panel-direct-links');
       let linksHtml = '<span>Direct Endpoints:</span> <a href="' + w.embedUrl + '" target="_blank">Open Live Embed &nearr;</a>';
       if (w.cardSvgUrl) {
@@ -713,8 +865,35 @@ export function renderWidgetCatalogHtml(): string {
       }
       linksContainer.innerHTML = linksHtml;
 
-      // Refresh snippet
       updateCodeSnippet();
+    }
+
+    function setTheme(theme, btnEl) {
+      currentTheme = theme;
+      document.querySelectorAll('#btn-theme-dark, #btn-theme-light').forEach(b => b.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+      updateIframeUrl();
+      updateCodeSnippet();
+    }
+
+    function setWhiteLabel(wl, btnEl) {
+      currentWhiteLabel = Boolean(wl);
+      document.querySelectorAll('#btn-wl-standard, #btn-wl-active').forEach(b => b.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+      updateIframeUrl();
+      updateCodeSnippet();
+    }
+
+    function updateIframeUrl() {
+      const w = WIDGETS_MAP[currentWidgetId];
+      if (!w) return;
+
+      let url = w.embedUrl + '?theme=' + currentTheme;
+      if (currentWhiteLabel) url += '&whiteLabel=true';
+
+      const iframe = document.getElementById('preview-iframe');
+      iframe.src = url;
+      iframe.title = w.title + ' Live Preview';
     }
 
     function switchCodeTab(format, tabEl) {
@@ -729,13 +908,19 @@ export function renderWidgetCatalogHtml(): string {
       if (!w) return;
 
       const codeBox = document.getElementById('code-content');
+      let queryParams = '?theme=' + currentTheme;
+      if (currentWhiteLabel) queryParams += '&whiteLabel=true';
+
       if (currentCodeFormat === 'iframe') {
-        codeBox.textContent = '<iframe src="https://quanterraos.com' + w.embedUrl + '" width="100%" height="' + w.defaultHeight + '" frameborder="0" style="border:1px solid rgba(212,175,55,0.22); border-radius:8px; overflow:hidden;"></iframe>';
+        codeBox.textContent = '<iframe src="https://quanterraos.com' + w.embedUrl + queryParams + '" width="100%" height="' + w.defaultHeight + '" frameborder="0" style="border:1px solid rgba(212,175,55,0.22); border-radius:8px; overflow:hidden;" title="' + w.title + '"></iframe>';
+      } else if (currentCodeFormat === 'script') {
+        const widgetAlias = w.embedUrl.replace('/embed/', '');
+        codeBox.textContent = '<div data-quanterraos-widget="' + widgetAlias + '" data-theme="' + currentTheme + '" data-whitelabel="' + currentWhiteLabel + '"></div>\\n<script src="https://quanterraos.com/embed/widget.js" async><\\/script>';
       } else if (currentCodeFormat === 'markdown') {
         const svgUrl = w.cardSvgUrl ? 'https://quanterraos.com' + w.cardSvgUrl : 'https://quanterraos.com/api/benchmark/card.svg';
-        codeBox.textContent = '[![QuanterraOS Audit](' + svgUrl + ')](https://quanterraos.com' + w.embedUrl + ')';
+        codeBox.textContent = '[![QuanterraOS Audit](' + svgUrl + ')](https://quanterraos.com' + w.embedUrl + queryParams + ')';
       } else if (currentCodeFormat === 'direct') {
-        codeBox.textContent = 'https://quanterraos.com' + w.embedUrl;
+        codeBox.textContent = 'https://quanterraos.com' + w.embedUrl + queryParams;
       }
     }
 
@@ -750,7 +935,7 @@ export function renderWidgetCatalogHtml(): string {
     }
 
     function setViewport(width, btnEl) {
-      document.querySelectorAll('.viewport-btn').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('#btn-vp-full, #btn-vp-tablet, #btn-vp-mobile').forEach(el => el.classList.remove('active'));
       if (btnEl) btnEl.classList.add('active');
       const iframe = document.getElementById('preview-iframe');
       iframe.style.width = width;
@@ -765,7 +950,14 @@ export function renderWidgetCatalogHtml(): string {
 
       cards.forEach(card => {
         const cardCat = card.getAttribute('data-category');
-        if (cat === 'all' || cardCat === cat) {
+        const isCanonical = card.getAttribute('data-canonical') === 'true';
+
+        let matches = false;
+        if (cat === 'all') matches = true;
+        else if (cat === 'canonical') matches = isCanonical;
+        else if (cat === cardCat) matches = true;
+
+        if (matches) {
           card.style.display = 'block';
           if (!firstVisible) firstVisible = card;
         } else {

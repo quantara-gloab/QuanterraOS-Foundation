@@ -140,6 +140,11 @@ import {
   renderEmbedCardHtml,
   renderEmbedRadarHtml,
   renderEmbedDivergenceHtml,
+  renderEmbedDispersionHtml,
+  renderEmbedCountdownHtml,
+  renderEmbedCalibrationHtml,
+  renderEmbedComparatorHtml,
+  renderEmbedLoaderJs,
 } from "./embed-widget.ts";
 import { renderLearnPageHtml } from "./learn-page.ts";
 import {
@@ -2217,8 +2222,45 @@ app.get("/api/radar/card.svg", (req, res) => {
   res.send(svg);
 });
 
-app.get(["/embed/calculator", "/widget/calculator", "/embed"], (_req, res) => {
-  res.type("html").send(renderEmbedCalculatorHtml());
+// Helper to extract common embed widget query parameters
+function parseEmbedWidgetOptions(req: any) {
+  const theme = req.query.theme === "light" ? "light" : "dark";
+  const whiteLabel = req.query.whiteLabel === "true" || req.query.whitelabel === "true" || req.query.wl === "1";
+  const price = req.query.price ? Number(req.query.price) : undefined;
+  const count = req.query.count ? Number(req.query.count) : undefined;
+  const spotPrice = req.query.spot ? Number(req.query.spot) : undefined;
+  return { theme, whiteLabel, price, count, spotPrice };
+}
+
+// Master Blueprint Part 3.9: 5 Canonical Embeddable Widgets
+app.get(["/embed/calculator", "/widget/calculator", "/embed"], (req, res) => {
+  const opts = parseEmbedWidgetOptions(req);
+  res.type("html").send(renderEmbedCalculatorHtml(opts));
+});
+
+app.get(["/embed/dispersion", "/widget/dispersion"], (req, res) => {
+  const opts = parseEmbedWidgetOptions(req);
+  res.type("html").send(renderEmbedDispersionHtml(opts));
+});
+
+app.get(["/embed/countdown", "/widget/countdown"], (req, res) => {
+  const opts = parseEmbedWidgetOptions(req);
+  res.type("html").send(renderEmbedCountdownHtml(opts));
+});
+
+app.get(["/embed/calibration", "/widget/calibration"], (req, res) => {
+  const opts = parseEmbedWidgetOptions(req);
+  res.type("html").send(renderEmbedCalibrationHtml(opts));
+});
+
+app.get(["/embed/comparator", "/widget/comparator"], (req, res) => {
+  const opts = parseEmbedWidgetOptions(req);
+  res.type("html").send(renderEmbedComparatorHtml(opts));
+});
+
+// JavaScript universal embed loader (<script src="/embed/widget.js" async></script>)
+app.get(["/embed/widget.js", "/widgets/embed.js", "/embed.js"], (_req, res) => {
+  res.type("application/javascript").send(renderEmbedLoaderJs());
 });
 
 app.get(["/embed/card", "/widget/card"], (req, res) => {
@@ -2231,14 +2273,13 @@ app.get(["/embed/card", "/widget/card"], (req, res) => {
 
 app.get(["/embed/radar", "/widget/radar"], (req, res) => {
   const series = (req.query.series === "1h" ? "1h" : "15m") as any;
-  const spotPrice = req.query.spot ? Number(req.query.spot) : 91250;
-  res.type("html").send(renderEmbedRadarHtml({ series, spotPrice }));
+  const opts = parseEmbedWidgetOptions(req);
+  res.type("html").send(renderEmbedRadarHtml({ series, spotPrice: opts.spotPrice, theme: opts.theme, whiteLabel: opts.whiteLabel }));
 });
 
 app.get(["/embed/divergence", "/widget/divergence"], (req, res) => {
-  const price = req.query.price ? Number(req.query.price) : 0.51;
-  const count = req.query.count ? Number(req.query.count) : 10;
-  res.type("html").send(renderEmbedDivergenceHtml({ price, count }));
+  const opts = parseEmbedWidgetOptions(req);
+  res.type("html").send(renderEmbedDivergenceHtml(opts));
 });
 
 // Phase 4 Cross-Venue Divergence Monitor (HANDOFF.md Section G)

@@ -310,8 +310,8 @@ Tokens on `:root`, dark only for deck; public site dark-default with light-mode 
 ### PHASE 7 — Monetization, service & distribution (Weeks 4–6)
 - [x] **7.1** Clerk Billing plans + gates (Part 4).
 - [x] **7.2** `/help` center, Aria→human escalation, SLA tagging by plan.
-- [ ] **7.3** Discord launch + moderation rules; feedback/voting board; public changelog.
-- [ ] **7.4** Widgets (3.9) + `/widgets` gallery + white-label flag.
+- [x] **7.3** Discord launch + moderation rules; feedback/voting board; public changelog.
+- [x] **7.4** Widgets (3.9) + `/widgets` gallery + white-label flag.
 - [ ] **7.5** `/developers` (OpenAPI, `llms.txt`, `agents.md`, MCP card), free + Builder keys, rate limits.
 - [ ] **7.6** `/institutional` segmented page + book-a-call.
 - [ ] **7.7** Flight Instructor booking + coach console (consent-gated), "do not advise" policy flow.
