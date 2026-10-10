@@ -321,7 +321,7 @@ Tokens on `:root`, dark only for deck; public site dark-default with light-mode 
 - [x] **8.1** PWA manifest, icons, offline shell, install prompt, web push.
 - [x] **8.2** Share-sheet intake (Web Share Target API).
 - [x] **8.3** Haptics + reduced-motion handling.
-- [ ] **8.4** Capacitor wrapper prepared but **not submitted** until founder approval and D30 retention ≥ 25%.
+- [x] **8.4** Capacitor wrapper prepared but **not submitted** until founder approval and D30 retention ≥ 25%.
 
 ### PHASE 9 — Measure (ongoing)
 Admin KPI dashboard (founder-only): Free Checks/day · Check→signup · signup→trial · trial→paid · churn · **avoidable cost saved per user/month (north-star)** · % trades with pre-flight check · median calibration improvement · tilt cooldowns respected · API MRR · feed latency & settlement completeness.
