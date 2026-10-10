@@ -26,6 +26,14 @@ import {
   computeKalshiTakerFee,
   ceilToCent,
 } from "./lib/fees.ts";
+import {
+  evaluateCoinFlipZone,
+  computeConstituentDispersion,
+  computeTwapWindowStatus,
+  generateNavigationStrikeLadder,
+  type ConstituentQuote,
+  type NavigationStrikeItem,
+} from "./lib/navigation.ts";
 
 export type FlightDeckStationId =
   | "bridge"
@@ -132,6 +140,19 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
     polymarketPrice: 0.53,
     contracts: 10,
   });
+
+  // Pre-calculate initial Navigation station metrics (KXBTC15M settlement consensus & ladder)
+  const initialConstituents: ConstituentQuote[] = [
+    { venue: "Coinbase", price: 91249.20, weightPct: 0.35, status: "ONLINE" },
+    { venue: "Kraken", price: 91247.80, weightPct: 0.28, status: "ONLINE" },
+    { venue: "Bitstamp", price: 91248.50, weightPct: 0.22, status: "ONLINE" },
+    { venue: "Gemini", price: 91248.10, weightPct: 0.15, status: "ONLINE" },
+  ];
+  const initialConsensus = computeConstituentDispersion(initialConstituents);
+  const initialNavSeconds = 138; // 2m 18s remaining in 15m cycle
+  const initialTwap = computeTwapWindowStatus(initialNavSeconds);
+  const initialLadder = generateNavigationStrikeLadder(initialConsensus.indexPrice, initialNavSeconds);
+  const initialAtmStrike = initialLadder.find((s) => s.isAtm) || initialLadder[2];
 
   const navItemsDesktopHtml = FLIGHT_DECK_STATIONS.map((station) => {
     const isActive = station.id === activeStation;
@@ -1005,54 +1026,219 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
           <div class="station-eyebrow">STATION 2 OF 7 // STAR MAP</div>
           <h2 class="station-title">Navigation Station</h2>
           <p class="station-desc">
-            Settlement radar and oracle trajectory. Track the 60-second CME CF BRTI TWAP averaging window, constituent spot consensus (Coinbase, Kraken, Bitstamp, Gemini), and coin-flip danger zones.
+            Live Settlement Radar and oracle trajectory. Track the 60-second CME CF BRTI TWAP averaging window, constituent spot consensus (Coinbase, Kraken, Bitstamp, Gemini), and coin-flip danger zones.
           </p>
         </div>
 
-        <div class="deck-grid-3">
+        <!-- Telemetry Status Ribbon -->
+        <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; background:rgba(79,209,232,0.06); border:1px solid rgba(79,209,232,0.2); border-radius:6px; padding:10px 16px; margin-bottom:20px; font-size:0.75rem;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--ok-green); box-shadow:0 0 8px var(--ok-green);"></span>
+            <span style="font-family:var(--font-mono); font-weight:700; color:#FFFFFF;">PRO COCKPIT TELEMETRY: REAL-TIME (0-SEC LATENCY)</span>
+          </div>
+          <div style="color:var(--fg-muted);">
+            Signed-out visitors receive 20-min delayed telemetry per Part 3.2 · Pro tier unlocked
+          </div>
+        </div>
+
+        <!-- Top Telemetry 3-Card Grid -->
+        <div class="deck-grid-3" style="margin-bottom:20px;">
+          <!-- Card 1: Settlement Consensus -->
           <div class="hud-card accent-cyan">
             <div class="hud-card-title">
               <span>SETTLEMENT TARGET</span>
-              <span>CME CF BRTI</span>
+              <span>CME CF BRTI PROXY</span>
             </div>
-            <div class="hud-stat-val">$91,248.50</div>
-            <div class="hud-stat-label">Constituent consensus across 4 venues</div>
+            <div class="hud-stat-val" id="nav-target-price">$${initialConsensus.indexPrice.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+            <div class="hud-stat-label" id="nav-dispersion-label">
+              4 venues online · <strong style="color:var(--ok-green);">${initialConsensus.dispersionBps.toFixed(2)} bps</strong> dispersion (${initialConsensus.dispersionStatus})
+            </div>
+            <!-- Constituent Chips -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:12px; font-family:var(--font-mono); font-size:0.7rem;">
+              ${initialConsensus.constituents.map((c) => `
+                <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06); border-radius:4px; padding:4px 6px; display:flex; justify-content:space-between;">
+                  <span style="color:var(--fg-muted);">${c.venue}</span>
+                  <span style="color:#FFFFFF; font-weight:600;">$${c.price.toFixed(1)}</span>
+                </div>
+              `).join("")}
+            </div>
           </div>
 
-          <div class="hud-card">
+          <!-- Card 2: Expiry Countdown & Phase -->
+          <div class="hud-card accent-gold">
             <div class="hud-card-title">
               <span>SERIES EXPIRY COUNTDOWN</span>
               <span>KXBTC15M</span>
             </div>
-            <div class="hud-stat-val" style="color:var(--hud-cyan);" id="deck-nav-countdown">04:12</div>
-            <div class="hud-stat-label">Seconds 840–900 determine resolution</div>
+            <div class="hud-stat-val" style="color:var(--hud-gold);" id="deck-nav-countdown">02:18</div>
+            <div class="hud-stat-label" id="nav-phase-label">
+              Phase: <strong style="color:var(--hud-gold);" id="nav-phase-badge">PRE_SETTLEMENT</strong> (Seconds 840–900 determine resolution)
+            </div>
+            <!-- Interactive Scrubber Controls for Testing & Replay -->
+            <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:12px;">
+              <button type="button" class="btn-aria-action" style="padding:2px 6px; font-size:0.65rem;" onclick="setNavCountdown(300)">05:00 (Nominal)</button>
+              <button type="button" class="btn-aria-action" style="padding:2px 6px; font-size:0.65rem; border-color:var(--alert-red); color:var(--alert-red);" onclick="setNavCountdown(138)">02:18 (Hazard)</button>
+              <button type="button" class="btn-aria-action" style="padding:2px 6px; font-size:0.65rem; border-color:var(--hud-cyan); color:var(--hud-cyan);" onclick="setNavCountdown(45)">00:45 (TWAP)</button>
+              <button type="button" class="btn-aria-action" style="padding:2px 6px; font-size:0.65rem;" onclick="setNavCountdown(0)">00:00 (Settled)</button>
+            </div>
           </div>
 
-          <div class="hud-card">
+          <!-- Card 3: ATM Coin-Flip Zone Hazard -->
+          <div class="hud-card" id="nav-hazard-card" style="border-color:rgba(229,72,77,0.4);">
             <div class="hud-card-title">
-              <span>COIN-FLIP ZONE HAZARD</span>
-              <span>WARNING</span>
+              <span>ATM COIN-FLIP HAZARD</span>
+              <span id="nav-hazard-icon" style="color:var(--alert-red);">⚠️ ACTIVE</span>
             </div>
-            <div class="hud-stat-val" style="color:var(--ok-green);">NOMINAL</div>
-            <div class="hud-stat-label">Spot $48 away from ATM strike ($91,200)</div>
+            <div class="hud-stat-val" id="nav-hazard-status-pill" style="color:var(--alert-red); font-size:1.4rem;">CRITICAL HAZARD</div>
+            <div class="hud-stat-label" id="nav-hazard-distance-desc">
+              Spot is $${Math.abs(initialAtmStrike.distanceDollars).toFixed(2)} from $${initialAtmStrike.strike.toLocaleString()} strike with ${initialNavSeconds}s remaining.
+            </div>
+            <div style="font-size:0.7rem; color:var(--hud-gold); margin-top:8px; font-weight:600;" id="nav-hazard-reward-cta">
+              ✦ Discipline: +20 XP awarded for standing down
+            </div>
           </div>
         </div>
 
-        <div class="hud-card">
-          <div class="hud-card-title">
-            <span>LIVE SETTLEMENT RADAR VIEWPORT</span>
-            <a href="/radar" style="color:var(--hud-cyan); font-size:0.75rem; text-decoration:none;">Open Full Radar &rarr;</a>
+        <!-- Coin-Flip Danger Zone Interactive Overlay Banner -->
+        <div id="nav-coinflip-banner" style="background:rgba(229,72,77,0.08); border:1px solid rgba(229,72,77,0.4); border-radius:8px; padding:16px 20px; margin-bottom:24px; position:relative;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
+            <div style="max-width:680px;">
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                <span style="font-family:var(--font-mono); font-size:0.85rem; font-weight:700; color:var(--alert-red);">
+                  ⚠️ ACTIVE COIN-FLIP HAZARD OVERLAY (THRESHOLD: WITHIN $50 &amp; &le; 180s)
+                </span>
+                <span style="background:rgba(229,72,77,0.2); color:var(--alert-red); font-size:0.65rem; padding:2px 6px; border-radius:4px; font-family:var(--font-mono); font-weight:700;">HIGH NEGATIVE EV DRAG</span>
+              </div>
+              <p style="font-size:0.78rem; line-height:1.5; color:#FECDD3; margin:0 0 10px 0;" id="nav-coinflip-explanation">
+                The ATM contract ($${initialAtmStrike.strike.toLocaleString()}) is currently trading at 51¢ with 2m 18s left. Microstructure data proves that within $50 of the strike during the final 3 minutes, price action mimics random Brownian noise while Kalshi exchange taker fees peak at 1.75¢/ct (52.80% breakeven hurdle).
+              </p>
+              <div style="font-size:0.72rem; color:var(--fg-muted);">
+                Rule B5 Compliant: QuanterraOS does not offer trade execution. Standing down preserves capital and strengthens calibration.
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <button
+                type="button"
+                id="btn-nav-stand-down"
+                class="btn-aria-action"
+                style="background:rgba(48,164,108,0.15); border-color:var(--ok-green); color:#FFFFFF; font-weight:700; padding:10px 18px; font-size:0.82rem; cursor:pointer;"
+                onclick="standDownCoinFlip()"
+              >
+                🛡️ Stand Down from Coin-Flip Entry (+20 XP)
+              </button>
+            </div>
           </div>
-          <div style="background:rgba(5,6,11,0.6); border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:24px; text-align:center;">
-            <div style="font-family:var(--font-mono); font-size:0.9rem; color:#FFFFFF; margin-bottom:8px;">
-              60-Second TWAP Oracle Averaging Grid Active
+
+          <!-- Stood Down Verification Box (shown upon clicking) -->
+          <div id="nav-stand-down-feedback" style="display:none; margin-top:14px; padding:10px 14px; background:rgba(48,164,108,0.12); border:1px solid rgba(48,164,108,0.4); border-radius:6px; font-size:0.78rem; color:#A7F3D0;">
+            <strong>✓ Stood Down Verified:</strong> +20 XP awarded to Pilot Discipline record. Non-entry logged to Mission Log as positive calibration behavior.
+          </div>
+        </div>
+
+        <!-- 60-Second TWAP Oracle Averaging Radar Card -->
+        <div class="hud-card" id="nav-twap-radar" style="margin-bottom:24px;">
+          <div class="hud-card-title">
+            <span>60-SECOND TWAP ORACLE RADAR // UK BMR BENCHMARK RESOLUTION</span>
+            <span style="font-family:var(--font-mono); color:var(--hud-cyan); font-size:0.72rem;" id="nav-twap-sample-status">
+              ${initialTwap.isTwapActive ? `SAMPLING ACTIVE (SUB-INTERVAL ${initialTwap.subIntervalIndex}/12)` : "STANDBY (ORACLE ACTIVATES AT T-60s)"}
+            </span>
+          </div>
+
+          <!-- 12 Sub-Interval Visualizer (5s each) -->
+          <div style="margin:16px 0 12px 0;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:0.72rem; color:var(--fg-muted); font-family:var(--font-mono);">
+              <span>Second 840 (T-60s)</span>
+              <span>12 Consecutive 5-Second Sub-Intervals</span>
+              <span>Second 900 (Settled)</span>
             </div>
-            <div style="font-size:0.8rem; color:var(--fg-muted); max-width:540px; margin:0 auto 16px;">
-              Kalshi KXBTC15M contracts resolve against the regulated UK FCA / US CFTC benchmark, not your mobile app spot.
+            <div style="display:grid; grid-template-columns:repeat(12, 1fr); gap:4px; height:24px;" id="nav-twap-blocks-container">
+              ${Array.from({ length: 12 }, (_, i) => {
+                const subInterval = i + 1;
+                const isSampled = initialTwap.isTwapActive && subInterval <= initialTwap.subIntervalIndex;
+                return `
+                  <div
+                    class="nav-twap-block ${isSampled ? "active" : ""}"
+                    id="twap-block-${subInterval}"
+                    style="background:${isSampled ? "var(--hud-cyan)" : "rgba(255,255,255,0.06)"}; border:1px solid rgba(255,255,255,0.1); border-radius:3px; display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:0.65rem; color:${isSampled ? "#05060B" : "var(--fg-muted);"}; font-weight:700;"
+                    title="Sub-interval ${subInterval}: Second ${840 + (i * 5)}–${840 + ((i + 1) * 5)}"
+                  >
+                    ${subInterval * 5}s
+                  </div>
+                `;
+              }).join("")}
             </div>
-            <a href="/radar" class="btn-aria-action" style="display:inline-block; text-decoration:none; padding:10px 20px;">
-              Launch Dedicated Microstructure Radar &rarr;
-            </a>
+          </div>
+
+          <div style="font-size:0.76rem; color:var(--fg-muted); line-height:1.5; margin-bottom:12px;">
+            Kalshi CFTC-regulated binary contracts do not settle on instantaneous spot prices from private apps. They resolve against the volume-weighted 60-second TWAP of the CME CF BRTI index sampled across 12 consecutive 5-second sub-intervals.
+          </div>
+
+          <!-- Regulatory & Licensing Disclosure (Rule B10) -->
+          <div style="background:rgba(5,6,11,0.5); border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:10px 14px; font-size:0.7rem; color:var(--fg-muted); line-height:1.4;" id="nav-licensing-notice">
+            <strong style="color:#FFFFFF;">Attribution (Rule B10):</strong> ${initialConsensus.licensingNotice}
+          </div>
+        </div>
+
+        <!-- Active Strike Ladder Microstructure Heatmap -->
+        <div class="hud-card" id="nav-strike-ladder-card">
+          <div class="hud-card-title">
+            <span>ACTIVE KXBTC15M STRIKE LADDER</span>
+            <span style="color:var(--hud-gold); font-size:0.72rem;">TOP-OF-BOOK &amp; FRICTION DRAG</span>
+          </div>
+
+          <div style="overflow-x:auto;">
+            <table class="market-data-table" id="nav-strike-ladder" style="width:100%; border-collapse:collapse; font-size:0.78rem;">
+              <thead>
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.1); text-align:left; font-family:var(--font-mono); color:var(--fg-muted); font-size:0.7rem;">
+                  <th style="padding:10px 12px;">STRIKE / TICKER</th>
+                  <th style="padding:10px 12px;">DISTANCE FROM SPOT</th>
+                  <th style="padding:10px 12px;">SECONDS LEFT</th>
+                  <th style="padding:10px 12px;">TOP OF BOOK (BID / ASK)</th>
+                  <th style="padding:10px 12px;">TAKER FEE DRAG</th>
+                  <th style="padding:10px 12px;">LIQUIDITY WALL</th>
+                  <th style="padding:10px 12px; text-align:right;">ZONE STATUS</th>
+                </tr>
+              </thead>
+              <tbody id="nav-ladder-tbody">
+                ${initialLadder.map((item) => {
+                  const isHazard = item.coinFlip.inZone;
+                  return `
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.04); background:${item.isAtm ? "rgba(79,209,232,0.03)" : "transparent"};" class="${item.isAtm ? "strike-row-atm" : ""}">
+                      <td style="padding:10px 12px; font-family:var(--font-mono); font-weight:700; color:#FFFFFF;">
+                        $${item.strike.toLocaleString()}
+                        ${item.isAtm ? `<span style="background:rgba(79,209,232,0.2); color:var(--hud-cyan); font-size:0.65rem; padding:1px 5px; border-radius:3px; margin-left:4px;">ATM</span>` : ""}
+                      </td>
+                      <td style="padding:10px 12px; font-family:var(--font-mono); color:${item.distanceDollars >= 0 ? "var(--ok-green)" : "var(--alert-red)"};">
+                        ${item.distanceDollars >= 0 ? "+" : ""}$${item.distanceDollars.toFixed(2)} (${item.distanceBps >= 0 ? "+" : ""}${item.distanceBps.toFixed(1)} bps)
+                      </td>
+                      <td style="padding:10px 12px; font-family:var(--font-mono);" class="ladder-seconds-left">
+                        ${item.secondsRemaining}s
+                      </td>
+                      <td style="padding:10px 12px; font-family:var(--font-mono);">
+                        $${item.yesBid.toFixed(2)} / $${item.yesAsk.toFixed(2)} (${item.spreadCents}¢ spread)
+                      </td>
+                      <td style="padding:10px 12px; font-family:var(--font-mono); color:var(--hud-gold);">
+                        $${(item.takerFeeCents / 100).toFixed(2)} / ct (${((item.takerFeeCents / (item.yesAsk * 100)) * 100).toFixed(1)}%)
+                      </td>
+                      <td style="padding:10px 12px; font-family:var(--font-mono); color:var(--fg-muted);">
+                        ${item.topOfBookSize} / ${item.liquidityWallContracts} ct
+                      </td>
+                      <td style="padding:10px 12px; text-align:right;">
+                        ${isHazard ? `
+                          <span style="background:rgba(229,72,77,0.18); border:1px solid rgba(229,72,77,0.4); color:var(--alert-red); font-family:var(--font-mono); font-size:0.68rem; padding:2px 8px; border-radius:4px; font-weight:700;">
+                            ⚠️ COIN-FLIP HAZARD
+                          </span>
+                        ` : `
+                          <span style="background:rgba(48,164,108,0.12); border:1px solid rgba(48,164,108,0.3); color:var(--ok-green); font-family:var(--font-mono); font-size:0.68rem; padding:2px 8px; border-radius:4px;">
+                            NOMINAL
+                          </span>
+                        `}
+                      </td>
+                    </tr>
+                  `;
+                }).join("")}
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
@@ -1784,6 +1970,102 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
       const label = document.getElementById('eng-label-prob');
       if (label) label.textContent = parseFloat(val).toFixed(1) + '%';
       recalculateEngineering();
+    }
+
+    // Navigation Station Interactive Engine
+    let navSecondsRemaining = 138;
+    let stoodDown = false;
+
+    function standDownCoinFlip() {
+      if (stoodDown) return;
+      stoodDown = true;
+      const feedback = document.getElementById('nav-stand-down-feedback');
+      if (feedback) feedback.style.display = 'block';
+
+      const btn = document.getElementById('btn-nav-stand-down');
+      if (btn) {
+        btn.textContent = '✓ Stood Down (+20 XP Recorded)';
+        btn.style.background = 'rgba(48,164,108,0.3)';
+        btn.style.borderColor = 'var(--ok-green)';
+        btn.disabled = true;
+      }
+
+      // Update pilot XP badge if visible
+      const xpPills = document.querySelectorAll('.pilot-xp-pill, #deck-pilot-xp');
+      xpPills.forEach(el => {
+        const current = parseInt(el.textContent.replace(/[^0-9]/g, ''), 10) || 140;
+        el.textContent = (current + 20) + ' XP';
+      });
+    }
+
+    function setNavCountdown(sec) {
+      navSecondsRemaining = sec;
+      const mins = Math.floor(sec / 60);
+      const remainderSecs = sec % 60;
+      const formatted = String(mins).padStart(2, '0') + ':' + String(remainderSecs).padStart(2, '0');
+
+      const countdownEl = document.getElementById('deck-nav-countdown');
+      if (countdownEl) countdownEl.textContent = formatted;
+
+      const phaseBadge = document.getElementById('nav-phase-badge');
+      const twapStatus = document.getElementById('nav-twap-sample-status');
+      const hazardPill = document.getElementById('nav-hazard-status-pill');
+      const hazardCard = document.getElementById('nav-hazard-card');
+      const coinFlipBanner = document.getElementById('nav-coinflip-banner');
+
+      // Update phase
+      if (sec === 0) {
+        if (phaseBadge) phaseBadge.textContent = 'SETTLED';
+        if (twapStatus) twapStatus.textContent = 'CYCLE RESOLVED';
+        if (hazardPill) {
+          hazardPill.textContent = 'WINDOW CLOSED';
+          hazardPill.style.color = 'var(--ok-green)';
+        }
+      } else if (sec <= 60) {
+        const subInterval = Math.min(12, Math.floor((60 - sec) / 5) + 1);
+        if (phaseBadge) phaseBadge.textContent = 'TWAP_SAMPLING_ACTIVE';
+        if (twapStatus) twapStatus.textContent = 'SAMPLING ACTIVE (SUB-INTERVAL ' + subInterval + '/12)';
+        if (hazardPill) {
+          hazardPill.textContent = 'CRITICAL HAZARD';
+          hazardPill.style.color = 'var(--alert-red)';
+        }
+      } else if (sec <= 180) {
+        if (phaseBadge) phaseBadge.textContent = 'PRE_SETTLEMENT';
+        if (twapStatus) twapStatus.textContent = 'STANDBY (ORACLE ACTIVATES AT T-60s)';
+        if (hazardPill) {
+          hazardPill.textContent = 'CRITICAL HAZARD';
+          hazardPill.style.color = 'var(--alert-red)';
+        }
+      } else {
+        if (phaseBadge) phaseBadge.textContent = 'REGULAR_TRADING';
+        if (twapStatus) twapStatus.textContent = 'STANDBY (ORACLE ACTIVATES AT T-60s)';
+        if (hazardPill) {
+          hazardPill.textContent = 'NOMINAL';
+          hazardPill.style.color = 'var(--ok-green)';
+        }
+      }
+
+      // Update 12 TWAP indicator blocks
+      const elapsedTwapSec = Math.max(0, 60 - sec);
+      const activeBlocks = sec <= 60 ? Math.min(12, Math.floor(elapsedTwapSec / 5) + 1) : (sec === 0 ? 12 : 0);
+      for (let i = 1; i <= 12; i++) {
+        const block = document.getElementById('twap-block-' + i);
+        if (block) {
+          if (i <= activeBlocks) {
+            block.style.background = 'var(--hud-cyan)';
+            block.style.color = '#05060B';
+          } else {
+            block.style.background = 'rgba(255,255,255,0.06)';
+            block.style.color = 'var(--fg-muted)';
+          }
+        }
+      }
+
+      // Update ladder seconds left
+      const secondCells = document.querySelectorAll('.ladder-seconds-left');
+      secondCells.forEach(cell => {
+        cell.textContent = sec + 's';
+      });
     }
   </script>
 </body>
