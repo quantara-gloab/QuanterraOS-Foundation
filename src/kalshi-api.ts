@@ -253,8 +253,8 @@ export async function getKalshiPortfolioBalance(): Promise<KalshiBalance> {
  *  - Records transaction in wallet_transactions table
  *  - Returns instant confirmation
  *
- * In live mode:
- *  - Submits signed order to Kalshi API: POST /trade-api/v2/portfolio/orders
+ * Rule B5 Compliance:
+ *  - Live exchange order routing is permanently disabled ($0.00 capital exposure).
  */
 export async function placeKalshi15mBid(input: PlaceBidInput): Promise<BidResult> {
   if (!input.ticker || typeof input.ticker !== "string" || input.ticker.toUpperCase().endsWith("-CURRENT")) {
@@ -267,67 +267,10 @@ export async function placeKalshi15mBid(input: PlaceBidInput): Promise<BidResult
   const now = new Date().toISOString();
 
   if (input.mode === "live") {
-    // 1. Enforce KALSHI_LIVE environment guard (Rule B5)
-    if (process.env.KALSHI_LIVE !== "true") {
-      throw new Error(
-        "Rule B5 Violation: Live trading blocked ($0.00 capital exposure). KALSHI_LIVE=true is not set in environment."
-      );
-    }
-
-    // 2. Enforce max contract count
-    const MAX_LIVE_CONTRACTS = 10;
-    if (count > MAX_LIVE_CONTRACTS) {
-      throw new Error(`Risk limit exceeded: Live orders are capped at ${MAX_LIVE_CONTRACTS} contracts per order.`);
-    }
-
-    const creds = getKalshiCredentials();
-    if (!creds) {
-      throw new Error("Live Kalshi credentials not configured or private key missing.");
-    }
-
-    const path = "/trade-api/v2/portfolio/orders";
-    const headers = signKalshiRequest(creds.keyId, creds.privateKey, "POST", path);
-    const priceCents = Math.round(price * 100);
-
-    const body = JSON.stringify({
-      action: "buy",
-      client_order_id: orderId,
-      count: count,
-      side: input.side,
-      ticker: input.ticker,
-      type: "limit",
-      yes_price: input.side === "yes" ? priceCents : (100 - priceCents),
-    });
-
-    const res = await fetch(`https://api.elections.kalshi.com${path}`, {
-      method: "POST",
-      headers,
-      body,
-    });
-
-    const data = await res.json();
-    if (!res.ok) {
-      const errMsg = data?.error?.message || data?.error?.details || JSON.stringify(data);
-      throw new Error(`Kalshi API rejected order: ${errMsg}`);
-    }
-
-    const kalshiStatus = (data.order?.status || "").toUpperCase();
-    const orderStatus: "FILLED" | "PENDING" =
-      kalshiStatus === "EXECUTED" || kalshiStatus === "FILLED" ? "FILLED" : "PENDING";
-
-    return {
-      success: true,
-      orderId: data.order?.order_id || orderId,
-      ticker: input.ticker,
-      side: input.side,
-      price,
-      count,
-      totalCost,
-      mode: "live",
-      status: orderStatus,
-      message: `Live Kalshi order placed. Status: ${orderStatus}. Order ID: ${data.order?.order_id || orderId}`,
-      timestamp: now,
-    };
+    // Enforce Rule B5: $0.00 capital exposure & zero order routing
+    throw new Error(
+      "Rule B5 Violation: Live trading blocked ($0.00 capital exposure). Live order routing is strictly disabled in QuanterraOS."
+    );
   }
 
   // SANDBOX PAPER MODE (Rule B5 Compliant)

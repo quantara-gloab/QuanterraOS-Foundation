@@ -110,6 +110,15 @@ import {
   renderWalletCardDetailsHtml,
 } from "./lib/wallet-cards.ts";
 import {
+  getShadowTrackingRules,
+  toggleShadowTrackingRule,
+  getShadowModeSummary,
+  simulateShadowTrade,
+  renderShadowModeTabHtml,
+  CFTC_RULE_441_DISCLOSURE,
+  RULE_B5_NON_ROUTING_NOTICE,
+} from "./lib/shadow-mode.ts";
+import {
   computeExpiryRadarState,
   renderExpiryRadarPageHtml,
   simulateExpiryPayoff,
@@ -4743,6 +4752,43 @@ app.get("/api/deck/sensors/wallets/:address", (req, res) => {
   }
   const card = getPolymarketWalletCard(address);
   res.json({ card, html: renderWalletCardDetailsHtml(card) });
+});
+
+// Shadow Mode Paper Tracking Endpoints (Task 6.3 / Part 3.4)
+app.get("/api/deck/shadow/rules", (_req, res) => {
+  res.json({ rules: getShadowTrackingRules() });
+});
+
+app.post("/api/deck/shadow/rules/:id/toggle", (req, res) => {
+  const { id } = req.params;
+  const { enabled } = req.body || {};
+  const updated = toggleShadowTrackingRule(id, enabled);
+  if (!updated) {
+    return res.status(404).json({ error: "rule_not_found" });
+  }
+  res.json({ rule: updated });
+});
+
+app.get("/api/deck/shadow/ledger", (_req, res) => {
+  const summary = getShadowModeSummary();
+  const rules = getShadowTrackingRules();
+  res.json({
+    summary,
+    rules,
+    cftcDisclosure: CFTC_RULE_441_DISCLOSURE,
+    ruleB5Notice: RULE_B5_NON_ROUTING_NOTICE,
+  });
+});
+
+app.post("/api/deck/shadow/simulate", (req, res) => {
+  const { print, ruleId } = req.body || {};
+  if (!print) {
+    return res.status(400).json({ error: "missing_print", message: "Trade print is required for simulation." });
+  }
+  const rules = getShadowTrackingRules();
+  const rule = (ruleId ? rules.find(r => r.id === ruleId) : rules.find(r => r.enabled)) || rules[0];
+  const paperPosition = simulateShadowTrade(print, rule);
+  res.json({ position: paperPosition, summary: getShadowModeSummary() });
 });
 
 app.get("/wallet", (_req, res) => {

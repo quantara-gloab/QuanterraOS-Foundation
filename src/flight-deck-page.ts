@@ -83,6 +83,14 @@ import {
   renderWalletCardDetailsHtml,
   type WalletCalibrationCard,
 } from "./lib/wallet-cards.ts";
+import {
+  getShadowTrackingRules,
+  getShadowPaperTrades,
+  getShadowModeSummary,
+  renderShadowModeTabHtml,
+  type ShadowModeSummary,
+  type ShadowTrackingRule,
+} from "./lib/shadow-mode.ts";
 
 export type FlightDeckStationId =
   | "bridge"
@@ -229,6 +237,11 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
   // Pre-calculate Polymarket wallet calibration cards (Task 6.2)
   const initialBenchmarkWallets = getCuratedBenchmarkWallets();
   const initialDefaultWalletCard = getPolymarketWalletCard("0x71c828b6d8efec4f0c86bb0b784a9e29a39ec70a");
+
+  // Pre-calculate Shadow Mode paper tracking (Task 6.3)
+  const initialShadowRules = getShadowTrackingRules();
+  const initialShadowSummary = getShadowModeSummary();
+  const initialShadowTrades = getShadowPaperTrades();
 
   const navItemsDesktopHtml = FLIGHT_DECK_STATIONS.map((station) => {
     const isActive = station.id === activeStation;
@@ -1918,8 +1931,21 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
           </div>
         </div>
 
-        <!-- Section 1: Thesis Stage & Pre-Flight Form -->
-        <div class="hud-card accent-cyan" id="mission-stage-pod" style="margin-bottom:24px;">
+        <!-- Mission Log Navigation Tabs (Task 6.3: Journal vs Shadow Mode) -->
+        <div style="display:flex; gap:10px; margin-bottom:20px;">
+          <button type="button" class="btn-aria-action active" id="btn-mission-tab-journal" style="padding:8px 16px; font-size:0.8rem; font-family:var(--font-mono);" onclick="switchMissionTab('journal')">
+            📖 Captain's Journal &amp; CSV Import
+          </button>
+          <button type="button" class="btn-aria-action" id="btn-mission-tab-shadow" style="padding:8px 16px; font-size:0.8rem; font-family:var(--font-mono); display:flex; align-items:center; gap:6px;" onclick="switchMissionTab('shadow')">
+            <span>🛡️</span>
+            <span>Shadow Mode (Paper Follower &bull; Rule 4.41)</span>
+          </button>
+        </div>
+
+        <!-- Container 1: Mission Journal View -->
+        <div id="mission-journal-view">
+          <!-- Section 1: Thesis Stage & Pre-Flight Form -->
+          <div class="hud-card accent-cyan" id="mission-stage-pod" style="margin-bottom:24px;">
           <div class="hud-card-title">
             <span style="display:flex; align-items:center; gap:8px;">
               <span>📝</span>
@@ -2201,6 +2227,12 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
             </table>
           </div>
         </div>
+        <!-- End of Container 1: Mission Journal View -->
+
+        <!-- Container 2: Shadow Mode Paper Tracking View (Task 6.3 / Part 3.4) -->
+        <div id="mission-shadow-view" style="display:none;">
+          ${renderShadowModeTabHtml(initialShadowSummary, initialShadowRules, initialShadowTrades)}
+        </div>
       </section>
 
       <!-- ===================================================================
@@ -2225,13 +2257,13 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
             <div class="hud-stat-label">Net taker fee drag: $${SAMPLE_LARGE_TRADE_PRINTS.reduce((sum, p) => sum + p.takerFeeDollars, 0).toFixed(2)}</div>
           </div>
 
-          <div class="hud-card">
+          <div class="hud-card" style="cursor:pointer;" onclick="switchStation('mission-log'); switchMissionTab('shadow');" title="Open Shadow Mode Paper Simulator in Mission Log">
             <div class="hud-card-title">
               <span>SHADOW MODE</span>
               <span>PAPER SIM</span>
             </div>
             <div class="hud-stat-val" style="color:var(--hud-cyan);">ACTIVE</div>
-            <div class="hud-stat-label">Simulating order fills with 0 live capital</div>
+            <div class="hud-stat-label">Simulating order fills with 0 live capital &rarr;</div>
           </div>
 
           <div class="hud-card">
@@ -3783,6 +3815,46 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
       const input = document.getElementById('wallet-address-input');
       if (input) input.value = addr;
       lookupWalletCard();
+    }
+
+    // ===================================================================
+    // MISSION LOG & SHADOW MODE ENGINES (Task 4.4 & 6.3 / Part 3.4)
+    // ===================================================================
+    function switchMissionTab(tab) {
+      const journalView = document.getElementById('mission-journal-view');
+      const shadowView = document.getElementById('mission-shadow-view');
+      const btnJournal = document.getElementById('btn-mission-tab-journal');
+      const btnShadow = document.getElementById('btn-mission-tab-shadow');
+
+      if (tab === 'shadow') {
+        if (journalView) journalView.style.display = 'none';
+        if (shadowView) shadowView.style.display = 'block';
+        if (btnJournal) btnJournal.classList.remove('active');
+        if (btnShadow) btnShadow.classList.add('active');
+      } else {
+        if (journalView) journalView.style.display = 'block';
+        if (shadowView) shadowView.style.display = 'none';
+        if (btnJournal) btnJournal.classList.add('active');
+        if (btnShadow) btnShadow.classList.remove('active');
+      }
+    }
+
+    function toggleShadowRule(ruleId) {
+      fetch('/api/deck/shadow/rules/' + encodeURIComponent(ruleId) + '/toggle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.rule) {
+          alert('Shadow tracking rule "' + data.rule.name + '" is now ' + (data.rule.enabled ? 'ACTIVE' : 'STANDBY') + '.');
+          location.reload();
+        }
+      })
+      .catch(err => {
+        alert('Failed to update shadow rule: ' + err.message);
+      });
     }
   </script>
 </body>
