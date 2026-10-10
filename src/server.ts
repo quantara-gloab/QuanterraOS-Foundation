@@ -462,6 +462,8 @@ import {
   renderCrewPassClaimPageHtml,
   renderArtGalleryPageHtml,
 } from "./lib/crew-pass.ts";
+import { renderOddsDefendersPageHtml } from "./odds-defenders-page.ts";
+import { isCampaignEnabled, recordCampaignEvent } from "./config/campaign.ts";
 
 runMigrations();
 seedHistoricalReplay().catch((err) => console.error("Error seeding historical replay:", err));
@@ -2094,8 +2096,46 @@ app.get("/signup", (_req, res) => {
   res.type("html").send(renderAccountPageHtml(auth.user, auth.tier));
 });
 
-app.get(["/check", "/calculator"], (_req, res) => {
-  res.type("html").send(renderCalculatorPageHtml());
+app.get(["/check", "/calculator"], (req, res) => {
+  const venue = req.query.venue ? String(req.query.venue).toLowerCase() : undefined;
+  const campaign = req.query.campaign ? String(req.query.campaign).toLowerCase() : undefined;
+  if (campaign) {
+    recordCampaignEvent("campaign_view", {
+      venue: venue === "kalshi" || venue === "polymarket" ? venue : "unknown",
+      deviceClass: req.headers["user-agent"] && /mobile/i.test(req.headers["user-agent"]) ? "mobile" : "desktop",
+      metadata: { source: "check_route", campaign }
+    });
+  }
+  res.type("html").send(renderCalculatorPageHtml({ venue, campaign }));
+});
+
+// ---------------------------------------------------------------------------
+// The Odds Defenders Campaign Routes
+// ---------------------------------------------------------------------------
+
+app.get("/odds-defenders", (req, res) => {
+  if (!isCampaignEnabled("campaign_odds_defenders")) {
+    return res.redirect(302, "/check");
+  }
+  recordCampaignEvent("campaign_view", {
+    deviceClass: req.headers["user-agent"] && /mobile/i.test(req.headers["user-agent"]) ? "mobile" : "desktop",
+    metadata: { source: "odds_defenders_landing" }
+  });
+  res.type("html").send(renderOddsDefendersPageHtml());
+});
+
+app.post("/api/campaign/event", (req, res) => {
+  const { eventType, venue, metadata } = req.body || {};
+  if (!eventType) {
+    return res.status(400).json({ success: false, error: "eventType is required." });
+  }
+  const deviceClass = req.headers["user-agent"] && /mobile/i.test(req.headers["user-agent"]) ? "mobile" : "desktop";
+  const record = recordCampaignEvent(eventType, {
+    venue: venue === "kalshi" || venue === "polymarket" || venue === "both" ? venue : "unknown",
+    deviceClass,
+    metadata
+  });
+  res.json({ success: true, event: record });
 });
 
 // ---------------------------------------------------------------------------

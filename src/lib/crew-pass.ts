@@ -139,6 +139,20 @@ export const QUANTA_SKINS: QuantaSkinOption[] = [
     style: "Retro Sci-Fi Cel Animation",
     description: "Hand-inked line art, rich cel shading, and classic 90s space anime cockpit aesthetic.",
     image: "/assets/quanta-2d-anime.png"
+  },
+  {
+    id: "kalshi_destroyer",
+    name: "Kalshi Destroyer",
+    style: "Odds Defender (Emerald/White)",
+    description: "Emerald and white armored flight champion with balanced YES/NO tokens and paired arrow eyes. Dedicated to Kalshi cost clarity.",
+    image: "/assets/kalshi-destroyer.png"
+  },
+  {
+    id: "polymarket_terminator",
+    name: "Polymarket Terminator",
+    style: "Odds Defender (Cobalt/Chrome)",
+    description: "Cobalt and chrome orbital pilot with balanced YES/NO tokens and paired arrow eyes. Dedicated to Polymarket fee & resolution transparency.",
+    image: "/assets/polymarket-terminator.png"
   }
 ];
 

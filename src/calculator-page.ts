@@ -14,7 +14,23 @@ import {
  * Computes exact fee friction, spread drag, net expected value (EV),
  * and required breakeven win rate for Kalshi and Polymarket contracts.
  */
-export function renderCalculatorPageHtml(): string {
+export function renderCalculatorPageHtml(options: { venue?: string; campaign?: string } = {}): string {
+  const isOddsDefenders = options.campaign === "odds-defenders";
+  const venueLabel = options.venue?.toLowerCase() === "polymarket" ? "Polymarket" : "Kalshi";
+  const campaignBannerHtml = isOddsDefenders
+    ? `<div class="odds-defenders-check-banner" style="background:linear-gradient(135deg, rgba(16,185,129,0.12) 0%, rgba(59,130,246,0.12) 100%); border:1px solid rgba(148,104,255,0.4); border-radius:8px; padding:12px 18px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+        <div>
+          <div style="font-family:var(--font-mono); font-size:0.72rem; color:var(--accent-light); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:2px;">QUANTERRAOS // ODDS DEFENDERS</div>
+          <div style="font-size:0.85rem; color:var(--text); font-weight:600;">
+            ⚡ ${venueLabel} Market Check: Inspecting contract fees, acquisition basis, and settlement rules.
+          </div>
+          <div style="font-size:0.75rem; color:var(--muted); margin-top:2px;">
+            Independent analytics tool, unaffiliated with Kalshi or Polymarket. 18+. Rule B5 locked ($0.00 capital deployed).
+          </div>
+        </div>
+        <a href="/odds-defenders" style="color:var(--accent-light); font-family:var(--font-mono); font-size:0.75rem; text-decoration:none; border:1px solid rgba(223,184,67,0.3); padding:6px 12px; border-radius:4px;">Meet the Odds Defenders &rarr;</a>
+      </div>`
+    : "";
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -228,6 +244,7 @@ export function renderCalculatorPageHtml(): string {
   ${renderSystemPulseHtml({ page: "calculator" })}
 
   <main class="container">
+    ${campaignBannerHtml}
     <div class="focus-mode-peripheral">
       <div class="eyebrow">Pre-Trade True-Cost Verification · Level 1 Consumer Tool</div>
       <h1>True Cost &amp; Net EV Check</h1>

@@ -177,9 +177,10 @@ export interface FlightDeckRenderOptions {
 }
 
 export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}): string {
-  const shared = options.sharedContract;
-  const activeStation = shared ? "engineering" : (options.initialStation || "bridge");
-  const user = options.user || {
+  const opt = options || {};
+  const shared = opt.sharedContract;
+  const activeStation = shared ? "engineering" : (opt.initialStation || "bridge");
+  const user = opt.user || {
     email: "cadet@quanterraos.com",
     callsign: "CADET-7",
     rank: "Cadet",
@@ -1007,6 +1008,38 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
           <p class="station-desc">
             Primary command cockpit. Monitor daily discipline missions, ship hull &amp; fuel telemetry, active alerts, and consult Aria for non-advisory operational calculations.
           </p>
+        </div>
+
+        <!-- Odds Defenders Campaign Card (Dismissible) -->
+        <div class="deck-campaign-card" id="deck-campaign-odds-defenders" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(59, 130, 246, 0.12) 100%); border: 1px solid rgba(148, 104, 255, 0.4); border-radius: 8px; padding: 16px 20px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+          <div style="max-width: 620px;">
+            <div style="font-family: var(--font-mono); font-size: 0.7rem; color: #59DDEC; text-transform: uppercase; font-weight: 700; margin-bottom: 4px; letter-spacing: 0.08em;">
+              THE ODDS DEFENDERS // CAMPAIGN DISPATCH
+            </div>
+            <div style="font-size: 1.1rem; font-weight: 700; color: #FFFFFF; margin-bottom: 4px;">
+              Your next decision deserves a receipt.
+            </div>
+            <div style="font-size: 0.82rem; color: var(--fg-muted);">
+              Check the assumptions and costs behind a supported market.
+            </div>
+            <!-- Onboarding Platform Question -->
+            <div style="margin-top: 10px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 0.75rem;">
+              <span style="color: #CBD5E1; font-family: var(--font-mono);">Which market platform do you use?</span>
+              <button type="button" class="btn-aria-action" onclick="setVenuePref('kalshi')" style="padding: 3px 8px; font-size: 0.72rem;">Kalshi</button>
+              <button type="button" class="btn-aria-action" onclick="setVenuePref('polymarket')" style="padding: 3px 8px; font-size: 0.72rem;">Polymarket</button>
+              <button type="button" class="btn-aria-action" onclick="setVenuePref('both')" style="padding: 3px 8px; font-size: 0.72rem;">Both</button>
+              <button type="button" class="btn-aria-action" onclick="setVenuePref('skip')" style="padding: 3px 8px; font-size: 0.72rem; color: var(--fg-muted);">Skip</button>
+              <span id="deck-campaign-venue-status" style="font-family: var(--font-mono); font-size: 0.7rem; color: #10B981;"></span>
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <a href="/check?campaign=odds-defenders" style="background: var(--hud-cyan); color: #05060B; font-family: var(--font-mono); font-weight: 700; font-size: 0.8rem; padding: 9px 16px; border-radius: 20px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+              Check a market &rarr;
+            </a>
+            <button type="button" onclick="dismissOddsDefendersCard()" style="background: none; border: 1px solid rgba(255, 255, 255, 0.15); color: var(--fg-muted); padding: 7px 12px; border-radius: 20px; font-size: 0.72rem; cursor: pointer;">
+              ✕ Dismiss
+            </button>
+          </div>
         </div>
 
         <!-- Welcoming Video Briefing Banner & Onboarding Tutorial -->
@@ -3823,6 +3856,35 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
         alert('Leaderboard preference updated locally.');
       });
     }
+
+    // Odds Defenders Mobile Campaign Card Handlers
+    function dismissOddsDefendersCard() {
+      const card = document.getElementById('deck-campaign-odds-defenders');
+      if (card) card.style.display = 'none';
+      try { localStorage.setItem('quanterra_hide_odds_defenders', '1'); } catch(e) {}
+    }
+
+    function setVenuePref(venue) {
+      try {
+        localStorage.setItem('quanterra_venue_pref', venue);
+        fetch('/api/campaign/event', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ eventType: 'venue_selected', venue: venue })
+        }).catch(() => {});
+      } catch(e) {}
+      const note = document.getElementById('deck-campaign-venue-status');
+      if (note) {
+        note.textContent = venue === 'skip' ? 'Skipped' : 'Saved: ' + venue.toUpperCase();
+      }
+    }
+
+    try {
+      if (localStorage.getItem('quanterra_hide_odds_defenders') === '1') {
+        const card = document.getElementById('deck-campaign-odds-defenders');
+        if (card) card.style.display = 'none';
+      }
+    } catch(e) {}
 
     // ===================================================================
     // DISCIPLINE CELEBRATION ENGINE (Task 5.4 / Part 3.5)

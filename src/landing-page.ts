@@ -25,6 +25,7 @@ import {
   renderPublicFooter,
   PUBLIC_LAYOUT_CSS,
 } from "./components/public-layout.ts";
+import { renderHomepageCampaignModule } from "./odds-defenders-page.ts";
 
 export function renderLandingPage(report?: MarketPriceCalibrationReport | null): string {
   const sampleN = report?.sampleSize ?? 1316;
@@ -1030,6 +1031,8 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
         </div>
       </div>
     </section>
+
+    ${renderHomepageCampaignModule()}
 
     <!-- =======================================================================
          PANEL 2: COST

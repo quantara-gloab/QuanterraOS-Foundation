@@ -66,22 +66,22 @@ describe("Lighthouse Mobile >= 90 Performance & Accessibility Audit (Task 3.6)",
         assert.match(html, /display=swap/i, `${page.name} fonts link must specify display=swap to avoid FOIT`);
       });
 
-      test("Global Tesla-mode Header is rendered with <= 6 nav items and mobile hamburger", () => {
-        assert.match(html, /class=["'][^"']*tesla-header[^"']*["']/i, `${page.name} must include .tesla-header`);
-        assert.match(html, /id=["']tesla-hamburger-btn["']/i, `${page.name} must include mobile hamburger button`);
+      test("Global Tesla/Flight-mode Header is rendered with <= 6 nav items and mobile hamburger", () => {
+        assert.match(html, /class=["'][^"']*(?:flight|tesla)-header[^"']*["']/i, `${page.name} must include .(flight|tesla)-header`);
+        assert.match(html, /id=["'](?:flight|tesla)-hamburger-btn["']/i, `${page.name} must include mobile hamburger button`);
         assert.match(html, /aria-label=["']Toggle mobile menu["']/i, `${page.name} hamburger must have accessible aria-label`);
-        assert.match(html, /id=["']tesla-mobile-menu["']/i, `${page.name} must include mobile full-screen overlay menu`);
+        assert.match(html, /id=["'](?:flight|tesla)-mobile-menu["']/i, `${page.name} must include mobile full-screen overlay menu`);
 
         // Check nav items count
         assert.ok(PUBLIC_NAV_ITEMS.length <= 6, "Public nav items must be <= 6");
       });
 
       test("Persistent mobile bottom action bar is present for mobile conversion", () => {
-        assert.match(html, /class=["'][^"']*tesla-mobile-bottom-bar[^"']*["']/i, `${page.name} must include persistent mobile bottom bar`);
+        assert.match(html, /class=["'][^"']*(?:flight|tesla)-mobile-bottom-bar[^"']*["']/i, `${page.name} must include persistent mobile bottom bar`);
       });
 
       test("Global Part 7 compliant footer is present with verbatim legal disclosure", () => {
-        assert.match(html, /class=["'][^"']*tesla-footer[^"']*["']/i, `${page.name} must include .tesla-footer`);
+        assert.match(html, /class=["'][^"']*(?:flight|tesla)-footer[^"']*["']/i, `${page.name} must include .(flight|tesla)-footer`);
         assert.match(
           html,
           /QuanterraOS is an independent analytics tool by Quantara Global LLC/i,
