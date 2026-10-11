@@ -242,4 +242,53 @@ describe("MCP Pre-Trade Risk Coprocessor & Friction Simulator", () => {
     assert.strictEqual(scan.totalPairsScanned, 4);
     assert.ok(scan.discrepancies.length === 4);
   });
+
+  it("executes verify_fighter_pilot_scenario through executeMcpTool", async () => {
+    const res = await executeMcpTool("verify_fighter_pilot_scenario", {
+      ticker: "KXBTC15M-SAMPLE",
+      venue: "kalshi",
+      side: "YES",
+      contracts: 10,
+      priceCents: 52,
+    });
+    assert.strictEqual(res.success, true);
+    assert.ok(res.missionId);
+    assert.ok(res.decisionReceiptSeal.sha256Short);
+    assert.ok(res.pilots.draco);
+    assert.ok(res.pilots.wolf);
+  });
+
+  it("executes get_fighter_pilot_telemetry through executeMcpTool", async () => {
+    const res = await executeMcpTool("get_fighter_pilot_telemetry", {
+      pilotId: "draco",
+    });
+    assert.strictEqual(res.success, true);
+    assert.strictEqual(res.pilot.name, "Draco");
+    assert.strictEqual(res.pilot.status, "VERIFIED");
+    assert.ok(res.sha256Fingerprint);
+  });
+
+  it("executes calculate_subscription_value_proof through executeMcpTool", async () => {
+    const res = await executeMcpTool("calculate_subscription_value_proof", {
+      contractsPerTrade: 10,
+      tradesPerDay: 5,
+      daysPerMonth: 20,
+      tier: "pilot",
+    });
+    assert.strictEqual(res.success, true);
+    assert.strictEqual(res.economics.subscriptionCostMonthlyDollars, 39);
+    assert.ok(res.economics.totalMonthlyValuePreservedDollars > 39);
+    assert.strictEqual(res.economics.subscriptionJustified, true);
+  });
+
+  it("executes get_fighter_pilot_track_record through executeMcpTool", async () => {
+    const res = await executeMcpTool("get_fighter_pilot_track_record", {
+      limit: 10,
+    });
+    assert.strictEqual(res.success, true);
+    assert.strictEqual(res.mode, "PAPER");
+    assert.strictEqual(res.capital, "$0.00");
+    assert.strictEqual(res.ruleB5Locked, true);
+    assert.ok(res.totalDecisions > 0);
+  });
 });

@@ -30,6 +30,9 @@ import {
 import {
   getTrackRecordData,
 } from "./track-record-page.ts";
+import { executeFighterPilotVerification } from "./lib/fighter-pilots-verifier.ts";
+import { computeSubscriptionValueProof } from "./lib/subscription-value-proof.ts";
+import { getAutopilotLedger } from "./autopilot-engine.ts";
 
 /**
  * Model Context Protocol (MCP) Manifest & Agent Integration Layer
@@ -265,6 +268,66 @@ export const MCP_SERVER_MANIFEST = {
           category: { type: "string", enum: ["all", "crypto", "macro", "elections"], default: "all", description: "Category filter" },
           outcome: { type: "string", enum: ["all", "YES", "NO"], default: "all", description: "Outcome filter" },
           limit: { type: "number", default: 10, description: "Maximum settled records to return (1-100)" }
+        }
+      }
+    },
+    {
+      name: "verify_fighter_pilot_scenario",
+      description: "Executes empirical model verification across the Elite Eleven Fighter Pilots for a prediction market scenario, evaluating orderbook depth, TWAP settlement basis, fee hurdles, and generating a cryptographic decision receipt seal.",
+      parameters: {
+        type: "object",
+        properties: {
+          ticker: { type: "string", default: "KXBTC15M-SAMPLE", description: "Contract identifier" },
+          venue: { type: "string", enum: ["kalshi", "polymarket"], default: "kalshi" },
+          side: { type: "string", enum: ["YES", "NO"], default: "YES" },
+          contracts: { type: "number", default: 10, description: "Number of contracts" },
+          priceCents: { type: "number", default: 52, description: "Executable contract price in cents (1-99)" },
+          equippedPilotIds: {
+            type: "array",
+            items: { type: "string" },
+            description: "Pilot IDs to equip (e.g. draco, wolf, kraken, sentinel, falcon, quantum-fox, lion, phoenix)"
+          }
+        }
+      }
+    },
+    {
+      name: "get_fighter_pilot_telemetry",
+      description: "Retrieves verified mathematical model basis, audited telemetry metrics, error bounds, and provenance for a specific Fighter Pilot in the Elite Eleven.",
+      parameters: {
+        type: "object",
+        required: ["pilotId"],
+        properties: {
+          pilotId: {
+            type: "string",
+            enum: ["draco", "wolf", "kraken", "sentinel", "falcon", "quantum-fox", "lion", "phoenix", "quanta", "quantana", "michael"],
+            description: "ID of the fighter pilot to inspect"
+          }
+        }
+      }
+    },
+    {
+      name: "calculate_subscription_value_proof",
+      description: "Computes deterministic Maker vs Taker fee savings, monthly capital recovery, and plan payback multiple (4.7x-9.4x return) on QuanterraOS Fighter Pilot subscriptions without speculative alpha claims.",
+      parameters: {
+        type: "object",
+        properties: {
+          contractsPerTrade: { type: "number", default: 10 },
+          tradesPerDay: { type: "number", default: 5 },
+          daysPerMonth: { type: "number", default: 20 },
+          averagePriceCents: { type: "number", default: 50 },
+          makerAdoptionRatePct: { type: "number", default: 50 },
+          tier: { type: "string", enum: ["pilot", "commander"], default: "pilot" },
+          venue: { type: "string", enum: ["kalshi", "polymarket"], default: "kalshi" }
+        }
+      }
+    },
+    {
+      name: "get_fighter_pilot_track_record",
+      description: "Queries the continuous live empirical paper-trading shadow ledger across 8,100+ 15-minute BTC contracts, returning total decisions, disciplined filter rates (98.6% toxic setups skipped), model win rates, and cumulative paper PnL under Rule B5 ($0.00 capital deployed).",
+      parameters: {
+        type: "object",
+        properties: {
+          limit: { type: "number", default: 20, description: "Number of recent shadow trades to return (1-100)" }
         }
       }
     }
@@ -881,6 +944,79 @@ export async function executeMcpTool(name: string, params: Record<string, any> =
         verificationEndpoint: "https://quanterraos.com/track-record",
         svgCardUrl: "https://quanterraos.com/api/track-record/card.svg",
         csvExportUrl: "https://quanterraos.com/api/track-record/export.csv"
+      };
+    }
+    case "verify_fighter_pilot_scenario": {
+      const result = executeFighterPilotVerification({
+        ticker: params.ticker ? String(params.ticker) : undefined,
+        venue: params.venue === "polymarket" ? "polymarket" : "kalshi",
+        side: params.side === "NO" ? "NO" : "YES",
+        contracts: Number(params.contracts || 10),
+        priceCents: Number(params.priceCents || 52),
+        equippedPilotIds: Array.isArray(params.equippedPilotIds) ? params.equippedPilotIds : undefined,
+      });
+      return {
+        success: true,
+        missionId: result.missionId,
+        verifiedAt: result.verifiedAt,
+        overallStatus: result.overallStatus,
+        consensusVerdict: result.consensusVerdict,
+        contract: result.contract,
+        decisionReceiptSeal: result.decisionReceiptSeal,
+        pilots: result.pilots,
+      };
+    }
+    case "get_fighter_pilot_telemetry": {
+      const pilotId = String(params.pilotId || "draco").toLowerCase().trim();
+      const result = executeFighterPilotVerification({ equippedPilotIds: [pilotId] });
+      const pilot = result.pilots[pilotId];
+      if (!pilot) {
+        return {
+          error: "pilot_not_found",
+          message: `Specialist pilot '${pilotId}' not found in Elite Eleven roster`,
+          availablePilots: ["draco", "wolf", "kraken", "sentinel", "falcon", "quantum-fox", "lion", "phoenix", "quanta", "quantana", "michael"],
+        };
+      }
+      return {
+        success: true,
+        pilot,
+        sha256Fingerprint: result.sha256Fingerprint,
+      };
+    }
+    case "calculate_subscription_value_proof": {
+      const proof = computeSubscriptionValueProof({
+        contractsPerTrade: Number(params.contractsPerTrade || 10),
+        tradesPerDay: Number(params.tradesPerDay || 5),
+        daysPerMonth: Number(params.daysPerMonth || 20),
+        averagePriceCents: Number(params.averagePriceCents || 50),
+        makerAdoptionRatePct: Number(params.makerAdoptionRatePct || 50),
+        tier: params.tier === "commander" ? "commander" : "pilot",
+        venue: params.venue === "polymarket" ? "polymarket" : "kalshi",
+      });
+      return {
+        success: true,
+        ...proof,
+      };
+    }
+    case "get_fighter_pilot_track_record": {
+      const limit = Math.min(100, Math.max(1, Number(params.limit || 20)));
+      const ledger = getAutopilotLedger(limit, "pro");
+      return {
+        success: true,
+        mode: ledger.mode,
+        capital: ledger.capital,
+        ruleB5Locked: ledger.ruleB5Locked,
+        totalDecisions: ledger.totalDecisions,
+        buyCount: ledger.buyCount,
+        skipCount: ledger.skipCount,
+        resolvedCount: ledger.resolvedCount,
+        winCount: ledger.winCount,
+        lossCount: ledger.lossCount,
+        winRatePct: ledger.winRatePct,
+        cumulativePnl: ledger.cumulativePnl,
+        cumulativeBaselinePnl: ledger.cumulativeBaselinePnl,
+        averageFeeDrag: ledger.averageFeeDrag,
+        trades: ledger.trades,
       };
     }
     default:
