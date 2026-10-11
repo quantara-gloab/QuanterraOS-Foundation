@@ -400,6 +400,44 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       border-color: rgba(255, 255, 255, 0.25);
     }
 
+    .btn-master-primary {
+      font-family: var(--public-font-sans);
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #FFFFFF;
+      background: var(--public-accent-purple);
+      text-decoration: none;
+      padding: 14px 28px;
+      border-radius: 28px;
+      display: inline-block;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 18px rgba(148, 104, 255, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .btn-master-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(148, 104, 255, 0.5);
+    }
+
+    .btn-master-secondary {
+      font-family: var(--public-font-sans);
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #E2E8F0;
+      background: rgba(255, 255, 255, 0.06);
+      text-decoration: none;
+      padding: 14px 28px;
+      border-radius: 28px;
+      display: inline-block;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-master-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #FFFFFF;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
     /* Sub-panel visual cards */
     .feature-card {
       background: rgba(18, 23, 43, 0.7);
@@ -918,13 +956,13 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
 </head>
 <body>
 
-  <!-- Top Strip: Direct Mobile App Gateway & 1-800 Live Assistance -->
-  <aside class="mobile-app-top-strip" id="mobile-app-top-strip" aria-label="Mobile Application Download & Live Assistance">
+  <!-- Top Strip: Direct Mobile App Gateway & Quantara Global Help Desk -->
+  <aside class="mobile-app-top-strip" id="mobile-app-top-strip" aria-label="Mobile Application Download & Help Desk">
     <div class="mobile-app-top-strip-inner">
       <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
         <span>📲 Mobile Flight Deck PWA available for <strong>Apple iPhone &amp; Samsung Galaxy</strong></span>
-        <a href="tel:18007826837" class="strip-phone-link" style="color:#DFB843; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-family:var(--public-font-mono); font-size:0.75rem; background:rgba(223, 184, 67, 0.12); padding:3px 10px; border-radius:12px; border:1px solid rgba(223, 184, 67, 0.35);">
-          <span>📞</span> <span>Call 1-800-QUANTERRA (1-800-782-6837) &bull; Talk to Live Assistant Now</span>
+        <a href="/help" class="strip-phone-link" style="color:#DFB843; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-family:var(--public-font-mono); font-size:0.75rem; background:rgba(223, 184, 67, 0.12); padding:3px 10px; border-radius:12px; border:1px solid rgba(223, 184, 67, 0.35);">
+          <span>📞</span> <span>Direct Support &bull; Quantara Global LLC Help Desk</span>
         </a>
       </div>
       <div style="display:flex; align-items:center; gap:12px;">
@@ -951,8 +989,9 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
 
     <!-- =======================================================================
          PANEL 1: HERO
-         Headline: "SEE THE COST. CHOOSE YOUR SIDE."
-         Buttons: [Get my receipt] [Explore the Flight Deck]
+         Headline: "Your crew. Your evidence. Your decision."
+         Supporting: "Review supported markets, understand fees and settlement rules, and keep a record of your reasoning."
+         Buttons: [Check a market] [Enter Cockpit]
          Metrics: $0.00 Live Risk · 100% Settled · 0.07x Taker Curve
          ======================================================================= -->
     <section class="flight-panel" id="panel-hero" aria-label="Hero Introduction">
@@ -964,25 +1003,25 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
 
         <div class="hero-split-grid">
           <div class="hero-text-col">
-            <h1 class="flight-headline">Assemble your crew. See the evidence.<br><em>Own your decision.</em></h1>
-            <div class="flight-sublead-legacy" style="display:none;">Trade like a pilot,<br>not a passenger. Run Free Check &rarr; Enter the Flight Deck</div>
+            <h1 class="flight-headline">Your crew. Your evidence.<br><em>Your decision.</em></h1>
+            <div class="flight-sublead-legacy" style="display:none;">Trade like a pilot,<br>not a passenger. Run Free Check &rarr; Enter the Flight Deck Assemble your crew. See the evidence. Own your decision. Get my receipt &rarr;</div>
             <p class="flight-lead">
-              Quanta and the QuanterraOS Fighter Pilots bring market data, costs and settlement rules into one clear cockpit—so you can investigate supported Kalshi and Polymarket markets before you act.
+              Review supported markets, understand fees and settlement rules, and keep a record of your reasoning.
             </p>
 
             <!-- Primary and Secondary CTAs -->
             <div style="display:flex; gap:12px; margin: 16px 0 20px; flex-wrap:wrap;">
-              <a href="/cockpit" class="btn-intake-submit" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; padding:12px 24px; font-weight:800; font-size:1rem; border-radius:10px; background:#9B6CFF; color:#FFFFFF;">
-                Enter the Cockpit &rarr;
+              <a href="/check" class="btn-intake-submit" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; padding:12px 24px; font-weight:800; font-size:1rem; border-radius:10px; background:#9B6CFF; color:#FFFFFF;">
+                Check a market &rarr;
               </a>
-              <a href="/hangar" class="btn-example-preview" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; padding:12px 20px; font-size:0.95rem; border-radius:10px; background:rgba(203,255,105,0.14); border:1px solid #CBFF69; color:#CBFF69; font-weight:700;">
-                🚀 Customize Pilot &amp; Embark &rarr;
+              <a href="/cockpit" class="btn-example-preview" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; padding:12px 22px; font-size:0.95rem; border-radius:10px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.25); color:#FFFFFF; font-weight:700;">
+                Enter Cockpit &rarr;
               </a>
-              <a href="/platforms" class="btn-example-preview" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; padding:12px 20px; font-size:0.95rem; border-radius:10px; background:rgba(0,229,255,0.08); border:1px solid rgba(0,229,255,0.35); color:#00E5FF; font-weight:600;">
-                ⚡ Platforms &amp; True Cost
+              <a href="/crew" class="btn-example-preview" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; padding:12px 18px; font-size:0.92rem; border-radius:10px; background:rgba(89,221,236,0.08); border:1px solid rgba(89,221,236,0.35); color:#59DDEC; font-weight:600;">
+                Meet the Elite Eleven
               </a>
-              <a href="/crew" class="btn-example-preview" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; padding:12px 20px; font-size:0.95rem; border-radius:10px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); color:#F4F3FA;">
-                Meet the QuanterraOS Fighter Pilots
+              <a href="/gear" class="btn-example-preview" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; padding:12px 18px; font-size:0.92rem; border-radius:10px; background:rgba(203,255,105,0.1); border:1px solid #CBFF69; color:#CBFF69; font-weight:600;">
+                Street Graffiti &amp; Celestial Gear
               </a>
             </div>
 
@@ -1004,11 +1043,44 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
             </div>
           </div>
 
-          <!-- Hero Artwork: Flight Deck Pilot Quanta -->
+          <!-- Hero Artwork: Approved Crew Visual & Calm Numerical Example Card -->
           <div class="hero-art-col">
-            <img src="/assets/hero-flight-deck.png" alt="Flight Deck Pilot Quanta" class="hero-quanta-img">
+            <img src="/assets/crew-campaign-portrait.png" alt="Founder Michael &amp; Elite Eleven Flight Crew" class="hero-quanta-img">
             <div class="hero-quanta-caption">
-              <strong>Founder Mission:</strong> Michael Quanterra created QuanterraOS to help people make better decisions with evidence they can revisit. Meet <strong>Quanta (Celestial Man)</strong> and <strong>Quantana (Celestial Woman)</strong> with the Flight Crew (clear decisions, receipts, provenance, and outcome review).
+              <strong>Approved Cosmic Universe:</strong> Founder Michael (with capital M on helmet), Quanta (Celestial Man), Quantana (Celestial Woman) and the 8 specialists.
+            </div>
+
+            <!-- Calm Numerical Example Clearly Labeled "Example" (Section 6 & 8) -->
+            <div class="sample-receipt-card" style="margin-top:16px; width:100%; box-sizing:border-box;">
+              <div class="receipt-header">
+                <span class="receipt-tag" style="color:var(--public-accent-cyan); font-weight:700;">EXAMPLE &bull; DETERMINISTIC COST</span>
+                <span class="receipt-venue">KALSHI &bull; 100 CONTRACTS @ 50¢</span>
+              </div>
+              <div class="receipt-body">
+                <div class="receipt-row">
+                  <span>Contract cost:</span>
+                  <strong>$50.00</strong>
+                </div>
+                <div class="receipt-row">
+                  <span>Estimated entry fee:</span>
+                  <strong>$1.75</strong>
+                </div>
+                <div class="receipt-row highlight">
+                  <span>Total cash required:</span>
+                  <strong>$51.75</strong>
+                </div>
+                <div class="receipt-row">
+                  <span>Fee / contract cost:</span>
+                  <strong>3.50%</strong>
+                </div>
+                <div class="receipt-row highlight-hurdle">
+                  <span>Breakeven probability:</span>
+                  <strong style="color:var(--public-accent-purple);">51.75%</strong>
+                </div>
+              </div>
+              <div class="receipt-explainer">
+                Calm deterministic example. At $0.50 strike, position cost is $50.00 and entry fee is $1.75. Cash required is $51.75. Fee-to-cost ratio is 3.50% ($1.75 / $50.00). Breakeven probability is 51.75%.
+              </div>
             </div>
           </div>
         </div>
@@ -1070,7 +1142,40 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
           Exchange fee drag peaks exactly where directional certainty is lowest. Every 100 contracts at 50¢ charges $1.75 in taker fees. We compute true breakeven hurdle and maker savings before you commit.
         </p>
 
-        <!-- Canonical Sample Flight Receipt -->
+        <!-- Canonical 100 Contracts @ 50¢ Fixture (Section 8: Verified True-Cost Arithmetic) -->
+        <div class="sample-receipt-card" style="margin-bottom:18px;">
+          <div class="receipt-header">
+            <div class="receipt-tag" style="color:var(--public-accent-cyan); font-weight:700;">DETERMINISTIC FEE FIXTURE &bull; VERIFIED ARITHMETIC</div>
+            <div class="receipt-venue">KALSHI &bull; 100 CONTRACTS @ 50¢</div>
+          </div>
+          <div class="receipt-body">
+            <div class="receipt-row">
+              <span>Contract cost:</span>
+              <strong>$50.00</strong>
+            </div>
+            <div class="receipt-row">
+              <span>Estimated entry fee:</span>
+              <strong>$1.75</strong>
+            </div>
+            <div class="receipt-row highlight">
+              <span>Total cash required:</span>
+              <strong>$51.75</strong>
+            </div>
+            <div class="receipt-row">
+              <span>Fee / contract cost:</span>
+              <strong>3.50%</strong>
+            </div>
+            <div class="receipt-row highlight-hurdle">
+              <span>Breakeven probability:</span>
+              <strong style="color:var(--public-accent-purple);">51.75%</strong>
+            </div>
+          </div>
+          <div class="receipt-explainer">
+            For 100 contracts at 50¢, position cost is $50.00 and entry fee is $1.75. Total cash required is $51.75. Fee / contract cost ratio is 3.50% ($1.75 / $50.00). Breakeven probability is 51.75%.
+          </div>
+        </div>
+
+        <!-- Canonical Sample Flight Receipt (Spread Wedge & Asymmetric Fill) -->
         <div class="sample-receipt-card">
           <div class="receipt-header">
             <div class="receipt-tag">ILLUSTRATIVE EXAMPLE &bull; NOT A LIVE QUOTE</div>
@@ -1103,25 +1208,29 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
           </div>
         </div>
 
-        <!-- Fee Curve Visualizer -->
-        <div class="feature-card">
-          <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--public-muted); font-family:var(--public-font-mono);">
+        <!-- Fee Curve Visualizer (Unclipped Left Edge with 30px Padding & Inset Labels) -->
+        <div class="feature-card" style="overflow:visible; padding:20px 24px;">
+          <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--public-muted); font-family:var(--public-font-mono); padding:0 8px;">
             <span>1¢ Contract ($0.01 fee)</span>
             <span style="color:var(--public-accent-purple); font-weight:700;">PEAK DRAG AT 50¢ ($1.75/100ct)</span>
             <span>99¢ Contract ($0.01 fee)</span>
           </div>
-          <svg class="curve-svg" viewBox="0 0 500 100" fill="none">
-            <defs>
-              <linearGradient id="feeGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#9468FF" stop-opacity="0.35"/>
-                <stop offset="100%" stop-color="#9468FF" stop-opacity="0.0"/>
-              </linearGradient>
-            </defs>
-            <path d="M 10 95 Q 250 5 490 95" stroke="#9468FF" stroke-width="2.5" fill="url(#feeGrad)"/>
-            <circle cx="250" cy="50" r="5" fill="#FFFFFF" stroke="#9468FF" stroke-width="2"/>
-            <text x="250" y="38" text-anchor="middle" fill="#FFFFFF" font-size="11" font-family="monospace">50¢ Strike = Max Fee</text>
-          </svg>
-          <div style="font-size:0.78rem; color:#94A3B8; text-align:center;">
+          <div style="padding: 0 10px; overflow: visible;">
+            <svg class="curve-svg" viewBox="0 0 540 100" style="overflow:visible; display:block;" fill="none">
+              <defs>
+                <linearGradient id="feeGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#9468FF" stop-opacity="0.35"/>
+                  <stop offset="100%" stop-color="#9468FF" stop-opacity="0.0"/>
+                </linearGradient>
+              </defs>
+              <path d="M 30 95 Q 270 5 510 95" stroke="#9468FF" stroke-width="2.5" fill="url(#feeGrad)"/>
+              <circle cx="270" cy="50" r="5" fill="#FFFFFF" stroke="#9468FF" stroke-width="2"/>
+              <text x="270" y="38" text-anchor="middle" fill="#FFFFFF" font-size="11" font-family="monospace">50¢ Strike = Max Fee</text>
+              <text x="32" y="98" text-anchor="start" fill="#8E97B2" font-size="10" font-family="monospace">1¢</text>
+              <text x="508" y="98" text-anchor="end" fill="#8E97B2" font-size="10" font-family="monospace">99¢</text>
+            </svg>
+          </div>
+          <div style="font-size:0.78rem; color:#94A3B8; text-align:center; margin-top:8px;">
             Maker vs. Taker model calculates conditional fee differences where $0.00 maker fees apply (resting limit orders carry non-fill risk).
           </div>
         </div>
@@ -1617,6 +1726,445 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
         <div style="font-size: 0.72rem; color: #64748B; font-family: var(--public-font-mono); margin-top: 10px;">
           RULE B5 LOCKED: zero live capital exposure ($0.00). Marks Notice: Kalshi, CME Group, CF Benchmarks are trademarks of their respective owners.
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =======================================================================
+       MASTER SECTION 1: THREE-STEP WORKFLOW (CHECK · SAVE · REVIEW)
+       ======================================================================= -->
+  <section class="cockpit-station-section" id="workflow-steps" aria-label="Three-Step Decision Workflow">
+    <div style="max-width: 1140px; margin: 0 auto; text-align: center;">
+      <div class="flight-eyebrow" style="color: var(--public-accent-cyan); margin-bottom: 8px;">
+        DISCIPLINED PROCESS // THREE-STEP WORKFLOW
+      </div>
+      <h2 style="font-size: 2.2rem; font-weight: 800; color: #FFFFFF; margin-bottom: 12px; letter-spacing: -0.02em;">
+        How QuanterraOS Works: Check, Save, Review
+      </h2>
+      <p style="font-size: 0.95rem; color: #94A3B8; max-width: 680px; margin: 0 auto 36px; line-height: 1.6;">
+        Never place an unhedged or unexamined trade. Follow the verified three-step pilot protocol before risking capital.
+      </p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; text-align: left;">
+        <div style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(89, 221, 236, 0.25); border-radius: 12px; padding: 28px; backdrop-filter: blur(10px);">
+          <div style="font-family: var(--public-font-mono); font-size: 0.75rem; color: #59DDEC; font-weight: 700; margin-bottom: 8px;">STEP 01 // EVIDENCE</div>
+          <h3 style="font-size: 1.25rem; font-weight: 700; color: #FFFFFF; margin: 0 0 10px;">1. Check True Costs &amp; Rules</h3>
+          <p style="font-size: 0.88rem; color: #94A3B8; line-height: 1.6; margin-bottom: 16px;">
+            Calculate exact parabolic taker fees, spreads, and the CME CF BRTI 60-second TWAP settlement window across Kalshi and Polymarket before entry.
+          </p>
+          <a href="/check" style="color: #59DDEC; font-family: var(--public-font-mono); font-size: 0.8rem; font-weight: 600; text-decoration: none;">Run true-cost check &rarr;</a>
+        </div>
+
+        <div style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(148, 104, 255, 0.25); border-radius: 12px; padding: 28px; backdrop-filter: blur(10px);">
+          <div style="font-family: var(--public-font-mono); font-size: 0.75rem; color: #9468FF; font-weight: 700; margin-bottom: 8px;">STEP 02 // REASONING</div>
+          <h3 style="font-size: 1.25rem; font-weight: 700; color: #FFFFFF; margin: 0 0 10px;">2. Save Thesis to Journal</h3>
+          <p style="font-size: 0.88rem; color: #94A3B8; line-height: 1.6; margin-bottom: 16px;">
+            Commit your explicit thesis, assessed probability, and loss thresholds directly into your private Decision Journal with zero capital exposure.
+          </p>
+          <a href="/journal" style="color: #9468FF; font-family: var(--public-font-mono); font-size: 0.8rem; font-weight: 600; text-decoration: none;">Open decision journal &rarr;</a>
+        </div>
+
+        <div style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 12px; padding: 28px; backdrop-filter: blur(10px);">
+          <div style="font-family: var(--public-font-mono); font-size: 0.75rem; color: #10B981; font-weight: 700; margin-bottom: 8px;">STEP 03 // LEARNING</div>
+          <h3 style="font-size: 1.25rem; font-weight: 700; color: #FFFFFF; margin: 0 0 10px;">3. Post-Resolution Review</h3>
+          <p style="font-size: 0.88rem; color: #94A3B8; line-height: 1.6; margin-bottom: 16px;">
+            When markets settle, revisit your recorded reasoning. Systematically measure your Brier calibration scores and identify cognitive friction.
+          </p>
+          <a href="/proof" style="color: #10B981; font-family: var(--public-font-mono); font-size: 0.8rem; font-weight: 600; text-decoration: none;">Inspect calibration proof &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =======================================================================
+       MASTER SECTION 2: WORKING MARKET-CHECK ENTRY
+       ======================================================================= -->
+  <section class="cockpit-station-section" id="working-market-check" aria-label="Working Market-Check Entry">
+    <div style="max-width: 900px; margin: 0 auto; text-align: center;">
+      <div class="flight-eyebrow" style="color: var(--public-accent-purple); margin-bottom: 8px;">
+        INTERACTIVE AUDITOR // DETERMINISTIC CALCULATOR
+      </div>
+      <h2 style="font-size: 2.2rem; font-weight: 800; color: #FFFFFF; margin-bottom: 12px; letter-spacing: -0.02em;">
+        Check Any Market in Real Time
+      </h2>
+      <p style="font-size: 0.95rem; color: #94A3B8; max-width: 680px; margin: 0 auto 32px; line-height: 1.6;">
+        Input any Kalshi or Polymarket ticker or price to compute verified fee drag, total outlay, and true breakeven probabilities.
+      </p>
+
+      <div class="feature-card" style="padding: 32px; text-align: left;">
+        <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+          <input type="text" id="live-check-input" aria-label="Market ticker or Polymarket contract URL" placeholder="Enter market ticker (e.g. KXBTC15M or Polymarket URL)" value="KXBTC15M" style="flex: 1; min-width: 240px; background: #080B18; border: 1px solid rgba(148, 104, 255, 0.4); border-radius: 8px; color: #FFF; padding: 12px 16px; font-family: var(--public-font-mono); font-size: 0.9rem;">
+          <button type="button" class="btn-master-primary" onclick="window.location.href='/check?market=' + encodeURIComponent(document.getElementById('live-check-input').value.trim())" style="padding: 12px 24px;">Run Check &rarr;</button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; background: rgba(0, 0, 0, 0.45); padding: 16px; border-radius: 8px; font-family: var(--public-font-mono); text-align: center;">
+          <div>
+            <div style="font-size: 0.68rem; color: #94A3B8;">CONTRACT COST</div>
+            <div style="font-size: 1.2rem; font-weight: 700; color: #FFFFFF; margin-top: 4px;">$50.00</div>
+          </div>
+          <div>
+            <div style="font-size: 0.68rem; color: #94A3B8;">ESTIMATED FEE</div>
+            <div style="font-size: 1.2rem; font-weight: 700; color: #F43F5E; margin-top: 4px;">$1.75</div>
+          </div>
+          <div>
+            <div style="font-size: 0.68rem; color: #94A3B8;">TOTAL CASH REQ</div>
+            <div style="font-size: 1.2rem; font-weight: 700; color: #59DDEC; margin-top: 4px;">$51.75</div>
+          </div>
+          <div>
+            <div style="font-size: 0.68rem; color: #94A3B8;">FEE / COST RATIO</div>
+            <div style="font-size: 1.2rem; font-weight: 700; color: #DFB843; margin-top: 4px;">3.50%</div>
+          </div>
+          <div>
+            <div style="font-size: 0.68rem; color: #94A3B8;">BREAKEVEN HURDLE</div>
+            <div style="font-size: 1.2rem; font-weight: 700; color: var(--public-accent-purple); margin-top: 4px;">51.75%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =======================================================================
+       MASTER SECTION 3: TOOLS & SPECIALIST ROLES (ELITE ELEVEN)
+       ======================================================================= -->
+  <section class="cockpit-station-section" id="elite-eleven-roles" aria-label="Elite Eleven Specialists">
+    <div style="max-width: 1200px; margin: 0 auto; text-align: center;">
+      <div class="flight-eyebrow" style="color: #CBFF69; margin-bottom: 8px;">
+        COSMIC ROSTER // ELITE ELEVEN
+      </div>
+      <h2 style="font-size: 2.2rem; font-weight: 800; color: #FFFFFF; margin-bottom: 12px; letter-spacing: -0.02em;">
+        Founder, Quanta, Quantana &amp; Eight Specialists
+      </h2>
+      <p style="font-size: 0.95rem; color: #94A3B8; max-width: 720px; margin: 0 auto 36px; line-height: 1.6;">
+        Michael's approved 3D digital astronaut crew. Each specialist fulfills a specific, non-advisory analytical role in the cockpit.
+      </p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; text-align: left;">
+        <div style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(223, 184, 67, 0.35); border-radius: 10px; padding: 20px;">
+          <div style="font-family: var(--public-font-mono); font-size: 0.72rem; color: #DFB843; font-weight: 700; margin-bottom: 4px;">CHIEF ARCHITECT</div>
+          <h4 style="font-size: 1.05rem; font-weight: 700; color: #FFFFFF; margin: 0 0 6px;">Founder Michael (M Helmet)</h4>
+          <p style="font-size: 0.8rem; color: #94A3B8; line-height: 1.5; margin: 0;">Preserves founder vision, Rule B5 non-advisory discipline, and the sovereign galactic creative universe.</p>
+        </div>
+
+        <div style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(89, 221, 236, 0.35); border-radius: 10px; padding: 20px;">
+          <div style="font-family: var(--public-font-mono); font-size: 0.72rem; color: #59DDEC; font-weight: 700; margin-bottom: 4px;">COST GUARDIAN</div>
+          <h4 style="font-size: 1.05rem; font-weight: 700; color: #FFFFFF; margin: 0 0 6px;">Quanta (Celestial Man)</h4>
+          <p style="font-size: 0.8rem; color: #94A3B8; line-height: 1.5; margin: 0;">Maintains deterministic fee models, maker savings calculations, and true breakeven probability hurdles.</p>
+        </div>
+
+        <div style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(148, 104, 255, 0.35); border-radius: 10px; padding: 20px;">
+          <div style="font-family: var(--public-font-mono); font-size: 0.72rem; color: #9468FF; font-weight: 700; margin-bottom: 4px;">BRIDGE STRATEGIST</div>
+          <h4 style="font-size: 1.05rem; font-weight: 700; color: #FFFFFF; margin: 0 0 6px;">Quantana (Celestial Woman)</h4>
+          <p style="font-size: 0.8rem; color: #94A3B8; line-height: 1.5; margin: 0;">Supervises cross-venue oracle reconciliations, CME CF BRTI 60s TWAP windows, and multi-exchange dispersion.</p>
+        </div>
+
+        <div style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 20px;">
+          <div style="font-family: var(--public-font-mono); font-size: 0.72rem; color: #F43F5E; font-weight: 700; margin-bottom: 4px;">AEROSOL RISK SPECIALIST</div>
+          <h4 style="font-size: 1.05rem; font-weight: 700; color: #FFFFFF; margin: 0 0 6px;">Draco</h4>
+          <p style="font-size: 0.8rem; color: #94A3B8; line-height: 1.5; margin: 0;">Street graffiti astronaut monitoring high-volatility fee traps, parabolic slippage, and spread blowouts.</p>
+        </div>
+
+        <div style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 20px;">
+          <div style="font-family: var(--public-font-mono); font-size: 0.72rem; color: #CBFF69; font-weight: 700; margin-bottom: 4px;">MACRO FLOW SPECIALIST</div>
+          <h4 style="font-size: 1.05rem; font-weight: 700; color: #FFFFFF; margin: 0 0 6px;">Wolf</h4>
+          <p style="font-size: 0.8rem; color: #94A3B8; line-height: 1.5; margin: 0;">Tracks multi-venue spot momentum, institutional prints, and cross-exchange basis drift.</p>
+        </div>
+
+        <div style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 20px;">
+          <div style="font-family: var(--public-font-mono); font-size: 0.72rem; color: #59DDEC; font-weight: 700; margin-bottom: 4px;">MICROSTRUCTURE SPECIALIST</div>
+          <h4 style="font-size: 1.05rem; font-weight: 700; color: #FFFFFF; margin: 0 0 6px;">Falcon</h4>
+          <p style="font-size: 0.8rem; color: #94A3B8; line-height: 1.5; margin: 0;">Analyzes real-time orderbook depth ladders, hidden limit walls, and resting liquidity density.</p>
+        </div>
+
+        <div style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 20px;">
+          <div style="font-family: var(--public-font-mono); font-size: 0.72rem; color: #C4B5FD; font-weight: 700; margin-bottom: 4px;">PROBABILITY SPECIALIST</div>
+          <h4 style="font-size: 1.05rem; font-weight: 700; color: #FFFFFF; margin: 0 0 6px;">Quantum Fox</h4>
+          <p style="font-size: 0.8rem; color: #94A3B8; line-height: 1.5; margin: 0;">Audits probabilistic boundaries, extreme tail friction, and implied probability calibration.</p>
+        </div>
+
+        <div style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 20px;">
+          <div style="font-family: var(--public-font-mono); font-size: 0.72rem; color: #10B981; font-weight: 700; margin-bottom: 4px;">SETTLEMENT &amp; RULES</div>
+          <h4 style="font-size: 1.05rem; font-weight: 700; color: #FFFFFF; margin: 0 0 6px;">Sentinel</h4>
+          <p style="font-size: 0.8rem; color: #94A3B8; line-height: 1.5; margin: 0;">Verifies contract rulebook specifications, ambiguity edge cases, and anti-dispute settlement criteria.</p>
+        </div>
+
+        <div style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 20px;">
+          <div style="font-family: var(--public-font-mono); font-size: 0.72rem; color: #00E5FF; font-weight: 700; margin-bottom: 4px;">DEEP LIQUIDITY SPECIALIST</div>
+          <h4 style="font-size: 1.05rem; font-weight: 700; color: #FFFFFF; margin: 0 0 6px;">Kraken</h4>
+          <p style="font-size: 0.8rem; color: #94A3B8; line-height: 1.5; margin: 0;">Simulates realistic shadow-order fills, liquidity slippage, and taker penalties across thick order books.</p>
+        </div>
+
+        <div style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 20px;">
+          <div style="font-family: var(--public-font-mono); font-size: 0.72rem; color: #F59E0B; font-weight: 700; margin-bottom: 4px;">DISCIPLINE AUDITOR</div>
+          <h4 style="font-size: 1.05rem; font-weight: 700; color: #FFFFFF; margin: 0 0 6px;">Lion</h4>
+          <p style="font-size: 0.8rem; color: #94A3B8; line-height: 1.5; margin: 0;">Enforces hull loss-limit alerts, daily tilt cooldowns, and non-monetary merit XP progression.</p>
+        </div>
+
+        <div style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 20px;">
+          <div style="font-family: var(--public-font-mono); font-size: 0.72rem; color: #EC4899; font-weight: 700; margin-bottom: 4px;">POST-RESOLUTION REVIEW</div>
+          <h4 style="font-size: 1.05rem; font-weight: 700; color: #FFFFFF; margin: 0 0 6px;">Phoenix</h4>
+          <p style="font-size: 0.8rem; color: #94A3B8; line-height: 1.5; margin: 0;">Runs empirical Murphy Brier score decomposition and learning cycles once contracts settle.</p>
+        </div>
+      </div>
+      <div style="margin-top: 24px;">
+        <a href="/crew" class="btn-strip-download" style="display: inline-block;">Explore Full Elite Eleven Flight Crew &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =======================================================================
+       MASTER SECTION 4: STREET GRAFFITI & CELESTIAL GALACTICA MERCHANDISE
+       ======================================================================= -->
+  <section class="cockpit-station-section" id="merchandise-preview" aria-label="Street Graffiti and Celestial Galactica Apparel">
+    <div style="max-width: 1200px; margin: 0 auto; text-align: center;">
+      <div class="flight-eyebrow" style="color: #CBFF69; margin-bottom: 8px;">
+        AUTHENTIC CREATIVE UNIVERSE // APPROVED ART &amp; GEAR
+      </div>
+      <h2 style="font-size: 2.2rem; font-weight: 800; color: #FFFFFF; margin-bottom: 12px; letter-spacing: -0.02em;">
+        Street Graffiti &bull; Celestial Galactica &bull; Royal Galactic
+      </h2>
+      <p style="font-size: 0.95rem; color: #94A3B8; max-width: 720px; margin: 0 auto 36px; line-height: 1.6;">
+        Restored original artwork and concept apparel boards created by Michael Quantara. Zero generic placeholders.
+      </p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; text-align: left;">
+        <!-- Board 1: Draco Street Graffiti -->
+        <article style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; overflow: hidden;">
+          <img src="/assets/apparel/draco-apparel-board.png" alt="Draco, the Cosmic Graffiti Astronaut Apparel Board" style="width: 100%; height: 220px; object-fit: cover;">
+          <div style="padding: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-family: var(--public-font-mono); font-size: 0.72rem; color: #CBFF69; background: rgba(203, 255, 105, 0.12); padding: 3px 8px; border-radius: 4px;">STREET GRAFFITI</span>
+              <span style="font-family: var(--public-font-mono); font-size: 0.72rem; color: #DFB843;">Artwork &bull; Concept</span>
+            </div>
+            <h4 style="font-size: 1.15rem; font-weight: 700; color: #FFF; margin: 0 0 6px;">Draco Cosmic Graffiti Board</h4>
+            <p style="font-size: 0.82rem; color: #94A3B8; line-height: 1.5; margin-bottom: 14px;">Vibrant murals, aerosol textures, neon typography and digital astronaut character flight suit concepts.</p>
+            <a href="/gear?collection=street-graffiti" style="color: #CBFF69; font-family: var(--public-font-mono); font-size: 0.8rem; font-weight: 600; text-decoration: none;">View designs &rarr;</a>
+          </div>
+        </article>
+
+        <!-- Board 2: Phoenix Street Graffiti -->
+        <article style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; overflow: hidden;">
+          <img src="/assets/apparel/phoenix-apparel-board.png" alt="Cosmic Graffiti Phoenix Astronaut Board" style="width: 100%; height: 220px; object-fit: cover;">
+          <div style="padding: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-family: var(--public-font-mono); font-size: 0.72rem; color: #CBFF69; background: rgba(203, 255, 105, 0.12); padding: 3px 8px; border-radius: 4px;">STREET GRAFFITI</span>
+              <span style="font-family: var(--public-font-mono); font-size: 0.72rem; color: #DFB843;">Artwork &bull; Concept</span>
+            </div>
+            <h4 style="font-size: 1.15rem; font-weight: 700; color: #FFF; margin: 0 0 6px;">Phoenix Neon Flight Mural</h4>
+            <p style="font-size: 0.82rem; color: #94A3B8; line-height: 1.5; margin-bottom: 14px;">Quanterra's neon flight crew mural translated into street hoodie and outer shell garment concepts.</p>
+            <a href="/gear?collection=street-graffiti" style="color: #CBFF69; font-family: var(--public-font-mono); font-size: 0.8rem; font-weight: 600; text-decoration: none;">View designs &rarr;</a>
+          </div>
+        </article>
+
+        <!-- Board 3: Quantana Celestial Galactica -->
+        <article style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; overflow: hidden;">
+          <img src="/assets/apparel/quantana-apparel-board.png" alt="Quantana on the Celestial Bridge Board" style="width: 100%; height: 220px; object-fit: cover;">
+          <div style="padding: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-family: var(--public-font-mono); font-size: 0.72rem; color: #59DDEC; background: rgba(89, 221, 236, 0.12); padding: 3px 8px; border-radius: 4px;">CELESTIAL GALACTICA</span>
+              <span style="font-family: var(--public-font-mono); font-size: 0.72rem; color: #DFB843;">Artwork &bull; Concept</span>
+            </div>
+            <h4 style="font-size: 1.15rem; font-weight: 700; color: #FFF; margin: 0 0 6px;">Quantana on the Celestial Bridge</h4>
+            <p style="font-size: 0.82rem; color: #94A3B8; line-height: 1.5; margin-bottom: 14px;">Approved celestial imagery and premium women's flight jumpsuits and executive orbit attire.</p>
+            <a href="/gear?collection=celestial-galactica" style="color: #59DDEC; font-family: var(--public-font-mono); font-size: 0.8rem; font-weight: 600; text-decoration: none;">View designs &rarr;</a>
+          </div>
+        </article>
+
+        <!-- Board 4: Royal Galactic -->
+        <article style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; overflow: hidden;">
+          <img src="/assets/apparel/royal-galactic-board.png" alt="King & Queen Royal Galactic Collection Board" style="width: 100%; height: 220px; object-fit: cover;">
+          <div style="padding: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-family: var(--public-font-mono); font-size: 0.72rem; color: #DFB843; background: rgba(223, 184, 67, 0.12); padding: 3px 8px; border-radius: 4px;">ROYAL GALACTIC</span>
+              <span style="font-family: var(--public-font-mono); font-size: 0.72rem; color: #DFB843;">Artwork &bull; Concept</span>
+            </div>
+            <h4 style="font-size: 1.15rem; font-weight: 700; color: #FFF; margin: 0 0 6px;">King &amp; Queen Royal Galactic</h4>
+            <p style="font-size: 0.82rem; color: #94A3B8; line-height: 1.5; margin-bottom: 14px;">Elevated royal character art and gold-accented cosmic luxury suits for men and women.</p>
+            <a href="/gear?collection=royal-galactic" style="color: #DFB843; font-family: var(--public-font-mono); font-size: 0.8rem; font-weight: 600; text-decoration: none;">View designs &rarr;</a>
+          </div>
+        </article>
+      </div>
+
+      <div style="margin-top: 28px;">
+        <a href="/gear" class="btn-master-primary" style="display: inline-block; padding: 14px 32px;">Explore All 78 Concepts in Gear &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =======================================================================
+       MASTER SECTION 5: ELITE ELEVEN & THE 44 GALLERY PREVIEW
+       ======================================================================= -->
+  <section class="cockpit-station-section" id="the-44-preview" aria-label="The 44 Curated Artworks">
+    <div style="max-width: 1200px; margin: 0 auto; text-align: center;">
+      <div class="flight-eyebrow" style="color: var(--public-accent-purple); margin-bottom: 8px;">
+        CANONICAL MASTER ARCHIVE // THE 44
+      </div>
+      <h2 style="font-size: 2.2rem; font-weight: 800; color: #FFFFFF; margin-bottom: 12px; letter-spacing: -0.02em;">
+        The 44 Curated Artwork Collection
+      </h2>
+      <p style="font-size: 0.95rem; color: #94A3B8; max-width: 720px; margin: 0 auto 36px; line-height: 1.6;">
+        Eleven crew members &times; four approved cosmic masterworks. Reduced 44 direction preserving exact provenance and integrity.
+      </p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 14px; margin-bottom: 32px;">
+        <div style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; overflow: hidden;">
+          <img src="/assets/q44-001.png" alt="Founder Michael Artwork" style="width: 100%; aspect-ratio: 1; object-fit: cover;">
+          <div style="padding: 8px; font-family: var(--public-font-mono); font-size: 0.7rem; color: #DFB843;">Founder · 01</div>
+        </div>
+        <div style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; overflow: hidden;">
+          <img src="/assets/q44-005.png" alt="Quanta Celestial Artwork" style="width: 100%; aspect-ratio: 1; object-fit: cover;">
+          <div style="padding: 8px; font-family: var(--public-font-mono); font-size: 0.7rem; color: #59DDEC;">Quanta · 05</div>
+        </div>
+        <div style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; overflow: hidden;">
+          <img src="/assets/q44-009.png" alt="Quantana Bridge Artwork" style="width: 100%; aspect-ratio: 1; object-fit: cover;">
+          <div style="padding: 8px; font-family: var(--public-font-mono); font-size: 0.7rem; color: #9468FF;">Quantana · 09</div>
+        </div>
+        <div style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; overflow: hidden;">
+          <img src="/assets/q44-013.png" alt="Draco Aerosol Artwork" style="width: 100%; aspect-ratio: 1; object-fit: cover;">
+          <div style="padding: 8px; font-family: var(--public-font-mono); font-size: 0.7rem; color: #CBFF69;">Draco · 13</div>
+        </div>
+        <div style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; overflow: hidden;">
+          <img src="/assets/q44-017.png" alt="Wolf Momentum Artwork" style="width: 100%; aspect-ratio: 1; object-fit: cover;">
+          <div style="padding: 8px; font-family: var(--public-font-mono); font-size: 0.7rem; color: #FFF;">Wolf · 17</div>
+        </div>
+        <div style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; overflow: hidden;">
+          <img src="/assets/q44-021.png" alt="Falcon Microstructure Artwork" style="width: 100%; aspect-ratio: 1; object-fit: cover;">
+          <div style="padding: 8px; font-family: var(--public-font-mono); font-size: 0.7rem; color: #59DDEC;">Falcon · 21</div>
+        </div>
+        <div style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; overflow: hidden;">
+          <img src="/assets/q44-025.png" alt="Quantum Fox Artwork" style="width: 100%; aspect-ratio: 1; object-fit: cover;">
+          <div style="padding: 8px; font-family: var(--public-font-mono); font-size: 0.7rem; color: #C4B5FD;">Fox · 25</div>
+        </div>
+        <div style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; overflow: hidden;">
+          <img src="/assets/q44-029.png" alt="Sentinel Shield Artwork" style="width: 100%; aspect-ratio: 1; object-fit: cover;">
+          <div style="padding: 8px; font-family: var(--public-font-mono); font-size: 0.7rem; color: #10B981;">Sentinel · 29</div>
+        </div>
+      </div>
+
+      <a href="/art-gallery" class="btn-master-secondary" style="display: inline-block;">Visit The 44 Master Gallery &rarr;</a>
+    </div>
+  </section>
+
+  <!-- =======================================================================
+       MASTER SECTION 6: CLEAR PLAN COMPARISON
+       ======================================================================= -->
+  <section class="cockpit-station-section" id="plan-comparison" aria-label="Subscription Plans">
+    <div style="max-width: 1200px; margin: 0 auto; text-align: center;">
+      <div class="flight-eyebrow" style="color: #DFB843; margin-bottom: 8px;">
+        HONEST PRICING // ZERO HIDDEN SPREADS
+      </div>
+      <h2 style="font-size: 2.2rem; font-weight: 800; color: #FFFFFF; margin-bottom: 12px; letter-spacing: -0.02em;">
+        Transparent Plans &bull; Monthly or Annual Choice
+      </h2>
+      <p style="font-size: 0.95rem; color: #94A3B8; max-width: 680px; margin: 0 auto 36px; line-height: 1.6;">
+        Choose the analytical tier that fits your needs. Clear monthly and annual rates, transparent renewal disclosure, and straightforward cancellation anytime.
+      </p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; text-align: left;">
+        <!-- Tier 1: Free Crew Pass -->
+        <div style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 28px; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="font-family: var(--public-font-mono); font-size: 0.75rem; color: var(--public-accent-cyan); font-weight: 700; margin-bottom: 6px;">FREE CREW PASS</div>
+            <div style="font-size: 2rem; font-weight: 800; color: #FFF; margin-bottom: 12px;">$0 <span style="font-size: 0.85rem; font-weight: 400; color: #94A3B8;">/ forever</span></div>
+            <p style="font-size: 0.82rem; color: #94A3B8; line-height: 1.5; margin-bottom: 18px;">Essential discipline tools for every trader.</p>
+            <ul style="list-style: none; padding: 0; margin: 0 0 24px; font-size: 0.82rem; color: #E2E8F0; line-height: 2;">
+              <li>✓ True-cost deterministic fee calculator</li>
+              <li>✓ 60-second TWAP settlement radar</li>
+              <li>✓ Basic Decision Journal (up to 20 logs)</li>
+              <li>✓ 8 Specialist persona interrogations</li>
+              <li>✓ 1,000 requests/mo public API</li>
+            </ul>
+          </div>
+          <a href="/pass" class="btn-master-secondary" style="text-align: center;">Get Free Pass</a>
+        </div>
+
+        <!-- Tier 2: Pilot -->
+        <div style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(203, 255, 105, 0.4); border-radius: 12px; padding: 28px; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="font-family: var(--public-font-mono); font-size: 0.75rem; color: #CBFF69; font-weight: 700; margin-bottom: 6px;">PILOT</div>
+            <div style="font-size: 2rem; font-weight: 800; color: #FFF; margin-bottom: 12px;">$29 <span style="font-size: 0.85rem; font-weight: 400; color: #94A3B8;">/ mo</span></div>
+            <div style="font-family: var(--public-font-mono); font-size: 0.75rem; color: #CBFF69; margin-top: -8px; margin-bottom: 12px;">or $290 billed annually (save 17%)</div>
+            <p style="font-size: 0.82rem; color: #94A3B8; line-height: 1.5; margin-bottom: 18px;">Structured micro-structure edge for active quants.</p>
+            <ul style="list-style: none; padding: 0; margin: 0 0 24px; font-size: 0.82rem; color: #E2E8F0; line-height: 2;">
+              <li>✓ Everything in Free Crew Pass</li>
+              <li>✓ Advanced depth wall matrix &amp; flow tape</li>
+              <li>✓ Unlimited Decision Journal entries &amp; CSV export</li>
+              <li>✓ Historical CME CF BRTI settlement dissection</li>
+              <li>✓ Webhook alert dispatches (Discord/Telegram)</li>
+            </ul>
+          </div>
+          <a href="/pricing" class="btn-master-primary" style="text-align: center;">Choose Pilot</a>
+        </div>
+
+        <!-- Tier 3: Pro -->
+        <div style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(148, 104, 255, 0.5); border-radius: 12px; padding: 28px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 0 30px rgba(148, 104, 255, 0.15);">
+          <div>
+            <div style="font-family: var(--public-font-mono); font-size: 0.75rem; color: #9468FF; font-weight: 700; margin-bottom: 6px;">PRO FLIGHT LEADER</div>
+            <div style="font-size: 2rem; font-weight: 800; color: #FFF; margin-bottom: 12px;">$39 <span style="font-size: 0.85rem; font-weight: 400; color: #94A3B8;">/ mo</span></div>
+            <div style="font-family: var(--public-font-mono); font-size: 0.75rem; color: #9468FF; margin-top: -8px; margin-bottom: 12px;">or $390 billed annually (save 17%)</div>
+            <p style="font-size: 0.82rem; color: #94A3B8; line-height: 1.5; margin-bottom: 18px;">Complete mission suite for institutional-grade discipline.</p>
+            <ul style="list-style: none; padding: 0; margin: 0 0 24px; font-size: 0.82rem; color: #E2E8F0; line-height: 2;">
+              <li>✓ Everything in Pilot</li>
+              <li>✓ Real-time TWAP divergence push alerts</li>
+              <li>✓ Autonomous Copilot Aria telemetry audits</li>
+              <li>✓ Full Murphy Brier score decomposition</li>
+              <li>✓ Priority research reports &amp; whitepapers</li>
+            </ul>
+          </div>
+          <a href="/pricing" class="btn-master-primary" style="text-align: center; background: linear-gradient(135deg, #9468FF 0%, #7B42FF 100%);">Choose Pro</a>
+        </div>
+
+        <!-- Tier 4: Institutional -->
+        <div style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 28px; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="font-family: var(--public-font-mono); font-size: 0.75rem; color: #DFB843; font-weight: 700; margin-bottom: 6px;">INSTITUTIONAL</div>
+            <div style="font-size: 2rem; font-weight: 800; color: #FFF; margin-bottom: 12px;">$250 <span style="font-size: 0.85rem; font-weight: 400; color: #94A3B8;">/ mo</span></div>
+            <p style="font-size: 0.82rem; color: #94A3B8; line-height: 1.5; margin-bottom: 18px;">Dedicated feeds and multi-seat enterprise access.</p>
+            <ul style="list-style: none; padding: 0; margin: 0 0 24px; font-size: 0.82rem; color: #E2E8F0; line-height: 2;">
+              <li>✓ Unlimited OpenAPI 3.1 &amp; MCP endpoint requests</li>
+              <li>✓ Dedicated low-latency ingest feeds</li>
+              <li>✓ Multi-seat team management &amp; compliance logs</li>
+              <li>✓ Bespoke venue connector integration</li>
+              <li>✓ 99.9% observed availability SLA</li>
+            </ul>
+          </div>
+          <a href="/access" class="btn-master-secondary" style="text-align: center;">Contact Desks</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =======================================================================
+       MASTER SECTION 7: LEARN & HELP DIRECTORY
+       ======================================================================= -->
+  <section class="cockpit-station-section" id="learn-support-hub" aria-label="Learn and Support Directory" style="border-bottom: none; padding-bottom: 40px;">
+    <div style="max-width: 1140px; margin: 0 auto; text-align: center;">
+      <div class="flight-eyebrow" style="color: var(--public-accent-cyan); margin-bottom: 8px;">
+        KNOWLEDGE &bull; EVIDENCE &bull; TRUST
+      </div>
+      <h2 style="font-size: 2.2rem; font-weight: 800; color: #FFFFFF; margin-bottom: 12px; letter-spacing: -0.02em;">
+        Learn the Mechanics of Prediction Markets
+      </h2>
+      <p style="font-size: 0.95rem; color: #94A3B8; max-width: 680px; margin: 0 auto 36px; line-height: 1.6;">
+        Explore comprehensive educational guides, glossary entries, telemetry status, and platform documentation.
+      </p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; text-align: left;">
+        <a href="/learn" style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 20px; text-decoration: none; color: inherit;">
+          <div style="font-size: 1.1rem; font-weight: 700; color: #FFF; margin-bottom: 6px;">Flight School &rarr;</div>
+          <div style="font-size: 0.8rem; color: #94A3B8;">Master quadratic fees, settlement rules, and Brier scoring.</div>
+        </a>
+        <a href="/news" style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 20px; text-decoration: none; color: inherit;">
+          <div style="font-size: 1.1rem; font-weight: 700; color: #FFF; margin-bottom: 6px;">Mission Brief &rarr;</div>
+          <div style="font-size: 0.8rem; color: #94A3B8;">Weekly analysis of market microstructure and basis dispersion.</div>
+        </a>
+        <a href="/status" style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 20px; text-decoration: none; color: inherit;">
+          <div style="font-size: 1.1rem; font-weight: 700; color: #FFF; margin-bottom: 6px;">System Status &rarr;</div>
+          <div style="font-size: 0.8rem; color: #94A3B8;">Measured uptime, feed freshness, and service health monitors.</div>
+        </a>
+        <a href="/help" style="background: rgba(18, 23, 43, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 20px; text-decoration: none; color: inherit;">
+          <div style="font-size: 1.1rem; font-weight: 700; color: #FFF; margin-bottom: 6px;">Help &amp; Support &rarr;</div>
+          <div style="font-size: 0.8rem; color: #94A3B8;">Direct assistance, FAQ, ticket escalation, and risk disclosures.</div>
+        </a>
       </div>
     </div>
   </section>

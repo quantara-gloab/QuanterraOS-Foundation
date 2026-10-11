@@ -13,8 +13,8 @@ import { computeExpiryRadarState, renderExpiryRadarPageHtml } from '../expiry-ra
 describe('Phase 3 Task 3.1 Acceptance: Global Header & Footer Components (Tesla Mode)', () => {
   test('header adheres strictly to <= 6 nav items requirement and includes essential CTAs', () => {
     assert.ok(PUBLIC_NAV_ITEMS.length <= 6, `Nav items count (${PUBLIC_NAV_ITEMS.length}) must be <= 6`);
-    assert.ok(PUBLIC_NAV_ITEMS.some((i) => i.label === 'Check'));
-    assert.ok(PUBLIC_NAV_ITEMS.some((i) => i.label === 'Radar'));
+    assert.ok(PUBLIC_NAV_ITEMS.some((i) => i.label === 'Cockpit'));
+    assert.ok(PUBLIC_NAV_ITEMS.some((i) => i.label === 'Gear'));
     assert.ok(PUBLIC_NAV_ITEMS.some((i) => i.label === 'Pricing'));
 
     const headerHtml = renderPublicHeader({ activePath: '/pricing' });
@@ -23,9 +23,8 @@ describe('Phase 3 Task 3.1 Acceptance: Global Header & Footer Components (Tesla 
     assert.ok(headerHtml.includes('flight-hamburger') || headerHtml.includes('tesla-hamburger'));
     assert.ok(headerHtml.includes('flight-mobile-menu') || headerHtml.includes('tesla-mobile-menu'));
     assert.ok(headerHtml.includes('flight-mobile-bottom-bar') || headerHtml.includes('tesla-mobile-bottom-bar'));
-    assert.ok(headerHtml.includes('Free Check') || headerHtml.includes('Get my receipt'));
+    assert.ok(headerHtml.includes('Check a market') || headerHtml.includes('Get my receipt'));
     assert.ok(headerHtml.includes('Sign in'));
-    assert.ok(headerHtml.includes('Run Free Check →') || headerHtml.includes('Get my receipt →'));
   });
 
   test('footer includes verbatim Part 7 compliance disclaimer and essential routes', () => {

@@ -1,11 +1,12 @@
 /**
- * QuanterraOS Flagship Public Layout (Flight Deck Mode)
+ * QuanterraOS Flagship Public Layout (Unified Master Shell)
  *
- * Requirements:
- * - Clean, minimal Flight-grade aesthetic: pure obsidian, full-bleed panels, <=6 nav items.
- * - Public top nav: Check · Radar · Journal · Crew · Learn · Pricing · [Sign in] · [Get my receipt]
- * - Mobile: Full-screen menu containing same items + persistent bottom "Get my receipt" bar.
- * - Global footer: Part 7 disclaimer, responsible-trading notices, research/institutional links, and unified sitemap.
+ * Implements Master Agent Handoff (Section 5):
+ * - Shared shell across Home, Cockpit, Crew, Gallery, Gear, Pricing, Check, Radar, Journal, Learn, Help, Status, Account.
+ * - Desktop Header: Home · Cockpit · Crew · Gallery · Gear · Pricing · Explore + Account & Check a market CTAs.
+ * - Explore Groups: Research tools, Learn & help, Business & Access.
+ * - Mobile Menu: Full screen overlay with all destinations & persistent bottom bar.
+ * - Footer: Grouped 4-column layout (Platform, Universe & Gear, Learn & Support, Business & Legal) + Part 7 disclaimer.
  */
 
 export interface PublicLayoutOptions {
@@ -15,12 +16,43 @@ export interface PublicLayoutOptions {
 }
 
 export const PUBLIC_NAV_ITEMS = [
+  { label: "Home", href: "/" },
   { label: "Cockpit", href: "/cockpit" },
-  { label: "Platforms", href: "/platforms" },
-  { label: "Check", href: "/check" },
-  { label: "Radar", href: "/radar" },
+  { label: "Crew", href: "/crew" },
+  { label: "Gallery", href: "/art-gallery" },
   { label: "Gear", href: "/merchandise" },
   { label: "Pricing", href: "/pricing" },
+] as const;
+
+export const EXPLORE_GROUPS = [
+  {
+    title: "Research Tools",
+    items: [
+      { label: "True-Cost Check", href: "/check", desc: "Live exchange fee & breakeven calculation" },
+      { label: "Settlement Radar", href: "/radar", desc: "TWAP & oracle settlement verification" },
+      { label: "Decision Journal", href: "/journal", desc: "Hypothesis, friction & outcome ledger" },
+      { label: "Calibration Proof", href: "/proof", desc: "Reconciled Brier score track record" },
+    ]
+  },
+  {
+    title: "Learn & Help",
+    items: [
+      { label: "Flight School & Glossary", href: "/learn", desc: "Prediction market math & curriculum" },
+      { label: "Mission Brief Digest", href: "/news", desc: "Weekly market intelligence teardowns" },
+      { label: "Changelog", href: "/changelog", desc: "Platform updates and version history" },
+      { label: "Help & Support", href: "/help", desc: "Documentation & customer assistance" },
+      { label: "System Status", href: "/status", desc: "Live ingestion & endpoint telemetry" },
+    ]
+  },
+  {
+    title: "Business & Access",
+    items: [
+      { label: "Research", href: "/research", desc: "Market microstructure whitepapers" },
+      { label: "Institutional", href: "/access", desc: "Custom feeds and enterprise terminal" },
+      { label: "Developers API & MCP", href: "/developers", desc: "REST endpoints, OpenAPI and agents" },
+      { label: "Free Crew Pass", href: "/pass", desc: "Complimentary access credentials" },
+    ]
+  }
 ] as const;
 
 export const PUBLIC_LAYOUT_CSS = `
@@ -42,14 +74,14 @@ export const PUBLIC_LAYOUT_CSS = `
     --public-font-mono: "IBM Plex Mono", "JetBrains Mono", ui-monospace, monospace;
   }
 
-  /* Sticky Flight Minimal Nav */
+  /* Sticky Flight Header */
   .flight-header {
     position: sticky;
     top: 0;
     left: 0;
     width: 100%;
     z-index: 1000;
-    background: rgba(8, 11, 24, 0.92);
+    background: rgba(8, 11, 24, 0.94);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--public-border);
@@ -57,7 +89,7 @@ export const PUBLIC_LAYOUT_CSS = `
   }
 
   .flight-header-inner {
-    max-width: 1200px;
+    max-width: 1320px;
     margin: 0 auto;
     padding: 0 24px;
     height: 64px;
@@ -90,7 +122,7 @@ export const PUBLIC_LAYOUT_CSS = `
   .flight-nav-links {
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: 20px;
     list-style: none;
     margin: 0;
     padding: 0;
@@ -103,8 +135,14 @@ export const PUBLIC_LAYOUT_CSS = `
     color: var(--public-muted);
     text-decoration: none;
     transition: color 0.15s ease;
-    padding: 6px 0;
+    padding: 8px 4px;
     position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
   }
 
   .flight-nav-link:hover {
@@ -119,11 +157,89 @@ export const PUBLIC_LAYOUT_CSS = `
   .flight-nav-link.active::after {
     content: "";
     position: absolute;
-    bottom: 0;
+    bottom: -2px;
     left: 0;
     width: 100%;
     height: 2px;
     background: var(--public-accent-purple);
+  }
+
+  /* Explore Dropdown */
+  .flight-dropdown-wrap {
+    position: relative;
+  }
+
+  .flight-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 12px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 640px;
+    background: rgba(12, 16, 34, 0.97);
+    border: 1px solid var(--public-border-purple);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    z-index: 1100;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .flight-dropdown-wrap:hover .flight-dropdown-menu,
+  .flight-dropdown-wrap:focus-within .flight-dropdown-menu,
+  .flight-dropdown-menu.open {
+    display: grid;
+  }
+
+  .dropdown-group-title {
+    font-family: var(--public-font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--public-accent-purple);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+
+  .dropdown-group-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .dropdown-item-link {
+    text-decoration: none;
+    display: block;
+    transition: transform 0.15s ease;
+  }
+
+  .dropdown-item-link:hover {
+    transform: translateX(2px);
+  }
+
+  .dropdown-item-label {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #F4F5FF;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .dropdown-item-link:hover .dropdown-item-label {
+    color: var(--public-accent-cyan);
+  }
+
+  .dropdown-item-desc {
+    font-size: 0.74rem;
+    color: var(--public-muted);
+    line-height: 1.35;
+    display: block;
   }
 
   .flight-nav-actions {
@@ -145,7 +261,7 @@ export const PUBLIC_LAYOUT_CSS = `
 
   .flight-btn-signin:hover {
     color: #FFFFFF;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.06);
   }
 
   .flight-btn-freecheck {
@@ -155,17 +271,20 @@ export const PUBLIC_LAYOUT_CSS = `
     color: #080B18;
     background: #FFFFFF;
     text-decoration: none;
-    padding: 8px 18px;
+    padding: 9px 20px;
     border-radius: 20px;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 2px 10px rgba(148, 104, 255, 0.2);
+    box-shadow: 0 2px 10px rgba(148, 104, 255, 0.25);
     white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
   }
 
   .flight-btn-freecheck:hover {
     background: var(--public-accent-purple);
     color: #FFFFFF;
-    box-shadow: 0 4px 18px rgba(148, 104, 255, 0.4);
+    box-shadow: 0 4px 18px rgba(148, 104, 255, 0.45);
     transform: translateY(-1px);
   }
 
@@ -198,8 +317,9 @@ export const PUBLIC_LAYOUT_CSS = `
     -webkit-backdrop-filter: blur(25px);
     z-index: 999;
     flex-direction: column;
-    padding: 32px 24px;
+    padding: 24px 20px 100px;
     overflow-y: auto;
+    box-sizing: border-box;
   }
 
   .flight-mobile-menu.open {
@@ -209,29 +329,54 @@ export const PUBLIC_LAYOUT_CSS = `
   .flight-mobile-menu-links {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 14px;
     list-style: none;
-    margin: 0 0 32px 0;
+    margin: 0 0 28px 0;
     padding: 0;
   }
 
   .flight-mobile-nav-link {
-    font-size: 1.35rem;
+    font-size: 1.2rem;
     font-weight: 600;
     color: #E2E8F0;
     text-decoration: none;
     padding: 8px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .flight-mobile-nav-link.active {
     color: var(--public-accent-purple);
   }
 
+  .flight-mobile-section-title {
+    font-family: var(--public-font-mono);
+    font-size: 0.72rem;
+    color: var(--public-accent-purple);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 16px 0 8px;
+  }
+
+  .flight-mobile-sublink {
+    font-size: 0.95rem;
+    color: var(--public-muted);
+    text-decoration: none;
+    padding: 6px 0;
+    display: block;
+  }
+
+  .flight-mobile-sublink:hover {
+    color: #FFFFFF;
+  }
+
   .flight-mobile-actions {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    margin-top: 20px;
   }
 
   /* Persistent Mobile Bottom Action Bar */
@@ -243,7 +388,7 @@ export const PUBLIC_LAYOUT_CSS = `
     width: 100%;
     z-index: 950;
     padding: 12px 16px;
-    background: rgba(8, 11, 24, 0.94);
+    background: rgba(8, 11, 24, 0.95);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-top: 1px solid var(--public-border);
@@ -257,11 +402,11 @@ export const PUBLIC_LAYOUT_CSS = `
     background: var(--public-accent-purple);
     color: #FFFFFF;
     font-weight: 700;
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     text-decoration: none;
-    padding: 14px 20px;
+    padding: 13px 18px;
     border-radius: 28px;
-    box-shadow: 0 4px 16px rgba(148, 104, 255, 0.3);
+    box-shadow: 0 4px 16px rgba(148, 104, 255, 0.35);
     box-sizing: border-box;
   }
 
@@ -275,29 +420,32 @@ export const PUBLIC_LAYOUT_CSS = `
   }
 
   .flight-footer-inner {
-    max-width: 1200px;
+    max-width: 1320px;
     margin: 0 auto;
   }
 
   .flight-footer-grid {
     display: grid;
-    grid-template-columns: 2fr repeat(3, 1fr);
-    gap: 48px;
+    grid-template-columns: 1.8fr repeat(4, 1fr);
+    gap: 36px;
     margin-bottom: 48px;
   }
 
   .flight-footer-brand {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     font-weight: 700;
     color: #FFFFFF;
     margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .flight-footer-tagline {
     font-size: 0.9rem;
     line-height: 1.6;
     color: var(--public-muted);
-    max-width: 380px;
+    max-width: 340px;
     margin-bottom: 16px;
   }
 
@@ -365,6 +513,13 @@ export const PUBLIC_LAYOUT_CSS = `
     }
   }
 
+  @media (max-width: 1080px) {
+    .flight-footer-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+  }
+
   @media (max-width: 900px) {
     .flight-nav-links, .flight-nav-actions {
       display: none;
@@ -387,30 +542,55 @@ export const PUBLIC_LAYOUT_CSS = `
 `;
 
 /**
- * Renders the global, minimal Flight Deck header.
+ * Renders the global unified QuanterraOS header with Explore dropdown.
  */
 export function renderPublicHeader(options: PublicLayoutOptions = {}): string {
   const activePath = options.activePath || "/";
   const user = options.user;
 
   const navLinksHtml = PUBLIC_NAV_ITEMS.map((item) => {
-    const isActive = activePath === item.href || (activePath !== "/" && activePath.startsWith(item.href));
+    const isActive = item.href === "/"
+      ? activePath === "/"
+      : (activePath === item.href || activePath.startsWith(item.href + "/"));
     return `<li><a href="${item.href}" class="flight-nav-link ${isActive ? 'active' : ''}">${item.label}</a></li>`;
   }).join("\n");
 
-  const mobileNavLinksHtml = PUBLIC_NAV_ITEMS.map((item) => {
-    const isActive = activePath === item.href || (activePath !== "/" && activePath.startsWith(item.href));
-    return `<li><a href="${item.href}" class="flight-mobile-nav-link ${isActive ? 'active' : ''}">${item.label}</a></li>`;
-  }).join("\n");
+  const exploreDropdownHtml = `
+    <li class="flight-dropdown-wrap">
+      <button type="button" class="flight-nav-link" id="nav-explore-trigger" aria-haspopup="true" aria-expanded="false">
+        <span>Explore</span>
+        <svg viewBox="0 0 20 20" fill="currentColor" style="width:14px; height:14px; opacity:0.7;">
+          <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+        </svg>
+      </button>
+      <div class="flight-dropdown-menu" id="nav-explore-menu" role="menu">
+        ${EXPLORE_GROUPS.map((group) => `
+          <div>
+            <div class="dropdown-group-title">${group.title}</div>
+            <ul class="dropdown-group-links">
+              ${group.items.map((item) => `
+                <li>
+                  <a href="${item.href}" class="dropdown-item-link" role="menuitem">
+                    <span class="dropdown-item-label">${item.label}</span>
+                    <span class="dropdown-item-desc">${item.desc}</span>
+                  </a>
+                </li>
+              `).join("")}
+            </ul>
+          </div>
+        `).join("")}
+      </div>
+    </li>
+  `;
 
   const authActionHtml = user
-    ? `<a href="/deck" class="flight-btn-signin">Flight Deck &rarr;</a>`
+    ? `<a href="/cockpit" class="flight-btn-signin">Flight Deck &rarr;</a>`
     : `<a href="/login" class="flight-btn-signin">Sign in</a>`;
 
   return `
   <header class="flight-header" id="main-header">
     <div class="flight-header-inner">
-      <a href="/" class="flight-brand">
+      <a href="/" class="flight-brand" aria-label="QuanterraOS Home">
         <span class="flight-brand-dot"></span>
         <span>QuanterraOS</span>
       </a>
@@ -419,20 +599,18 @@ export function renderPublicHeader(options: PublicLayoutOptions = {}): string {
       <nav aria-label="Main Navigation">
         <ul class="flight-nav-links">
           ${navLinksHtml}
+          ${exploreDropdownHtml}
         </ul>
       </nav>
 
       <!-- Desktop Actions -->
       <div class="flight-nav-actions">
-        <a href="tel:18007826837" class="flight-btn-phone" title="Call 1-800-QUANTERRA to talk to a live assistant now" style="display:inline-flex; align-items:center; gap:6px; color:#DFB843; font-family:var(--public-font-mono); font-size:0.8rem; font-weight:700; text-decoration:none; padding:6px 12px; border-radius:6px; border:1px solid rgba(223,184,67,0.35); background:rgba(223,184,67,0.1); transition:all 0.2s ease;">
-          <span>📞</span> <span>1-800-782-6837</span>
-        </a>
         ${authActionHtml}
-        <a href="/check" class="flight-btn-freecheck" id="nav-free-check-btn">Get my receipt</a>
+        <a href="/check" class="flight-btn-freecheck" id="nav-free-check-btn">Check a market &rarr;</a>
       </div>
 
       <!-- Mobile Hamburger Button -->
-      <button class="flight-hamburger" id="flight-hamburger-btn" aria-label="Toggle mobile menu" type="button">
+      <button class="flight-hamburger" id="flight-hamburger-btn" aria-label="Toggle mobile menu" type="button" aria-expanded="false">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="3" y1="12" x2="21" y2="12"></line>
           <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -442,14 +620,28 @@ export function renderPublicHeader(options: PublicLayoutOptions = {}): string {
     </div>
 
     <!-- Mobile Full-Screen Overlay Menu -->
-    <div class="flight-mobile-menu" id="flight-mobile-menu">
+    <div class="flight-mobile-menu" id="flight-mobile-menu" role="dialog" aria-modal="true" aria-label="Mobile Navigation">
       <ul class="flight-mobile-menu-links">
-        ${mobileNavLinksHtml}
+        ${PUBLIC_NAV_ITEMS.map((item) => {
+          const isActive = item.href === "/"
+            ? activePath === "/"
+            : (activePath === item.href || activePath.startsWith(item.href + "/"));
+          return `<li><a href="${item.href}" class="flight-mobile-nav-link ${isActive ? 'active' : ''}">${item.label} &rarr;</a></li>`;
+        }).join("\n")}
       </ul>
+
+      ${EXPLORE_GROUPS.map((group) => `
+        <div class="flight-mobile-section-title">${group.title}</div>
+        <div style="display:flex; flex-direction:column; gap:6px; margin-bottom:14px;">
+          ${group.items.map((item) => `
+            <a href="${item.href}" class="flight-mobile-sublink">${item.label}</a>
+          `).join("")}
+        </div>
+      `).join("")}
+
       <div class="flight-mobile-actions">
-        <a href="tel:18007826837" class="flight-btn-phone" style="text-align:center; display:flex; justify-content:center; align-items:center; gap:8px; padding:12px; border-radius:8px; border:1px solid rgba(223,184,67,0.4); background:rgba(223,184,67,0.12); color:#DFB843; text-decoration:none; font-family:var(--public-font-mono); font-weight:700; font-size:0.88rem;">📞 Call 1-800-QUANTERRA (Live Assistant)</a>
-        ${user ? `<a href="/deck" class="flight-btn-freecheck" style="text-align:center;">Launch Flight Deck</a>` : `<a href="/login" class="flight-btn-signin" style="text-align:center; border:1px solid rgba(255,255,255,0.15);">Sign in</a>`}
-        <a href="/check" class="flight-btn-freecheck" style="text-align:center; background:var(--public-accent-purple); color:#FFFFFF;">Get my receipt</a>
+        ${user ? `<a href="/cockpit" class="flight-btn-freecheck" style="text-align:center;">Launch Flight Deck</a>` : `<a href="/login" class="flight-btn-signin" style="text-align:center; border:1px solid rgba(255,255,255,0.15);">Sign in</a>`}
+        <a href="/check" class="flight-btn-freecheck" style="text-align:center; background:var(--public-accent-purple); color:#FFFFFF;">Check a market &rarr;</a>
       </div>
     </div>
   </header>
@@ -457,8 +649,8 @@ export function renderPublicHeader(options: PublicLayoutOptions = {}): string {
   <!-- Persistent Mobile Bottom Bar -->
   <div class="flight-mobile-bottom-bar" id="mobile-sticky-action">
     <div style="display:flex; gap:8px; width:100%;">
-      <a href="/check" class="flight-mobile-bottom-btn" style="flex:1;">Get my receipt →</a>
-      <a href="/hangar" class="flight-mobile-bottom-btn" style="flex:1; background:rgba(203,255,105,0.18); border:1px solid #CBFF69; color:#CBFF69; box-shadow:none;">🚀 Pilot Hangar</a>
+      <a href="/check" class="flight-mobile-bottom-btn" style="flex:1;">Check a market &rarr;</a>
+      <a href="/cockpit" class="flight-mobile-bottom-btn" style="flex:1; background:rgba(203,255,105,0.18); border:1px solid #CBFF69; color:#CBFF69; box-shadow:none;">Enter Cockpit</a>
     </div>
   </div>
 
@@ -475,13 +667,24 @@ export function renderPublicHeader(options: PublicLayoutOptions = {}): string {
             : '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>';
         });
       }
+
+      // Close mobile menu on Esc key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && menu && menu.classList.contains('open')) {
+          menu.classList.remove('open');
+          if (btn) {
+            btn.setAttribute('aria-expanded', 'false');
+            btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>';
+          }
+        }
+      });
     })();
   </script>
   `;
 }
 
 /**
- * Renders the global, Part 7 compliant Flight Deck footer.
+ * Renders the global grouped QuanterraOS footer matching Section 5.2 master specification.
  */
 export function renderPublicFooter(): string {
   return `
@@ -489,12 +692,15 @@ export function renderPublicFooter(): string {
     <div class="flight-footer-inner">
       <div class="flight-footer-grid">
         <div class="flight-footer-about">
-          <div class="flight-footer-brand">QuanterraOS</div>
+          <div class="flight-footer-brand">
+            <span class="flight-brand-dot"></span>
+            <span>QuanterraOS</span>
+          </div>
           <p class="flight-footer-tagline">
-            See the cost. Choose your side. Check fees, spreads and settlement rules before you decide.
+            Your crew. Your evidence. Your decision. Review supported prediction markets, understand fees and settlement rules, and keep a record of your reasoning.
           </p>
           <div style="font-size:0.75rem; color:#8A8F98; font-family:var(--public-font-mono);">
-            Quantara Global LLC · Wilmington, DE
+            Quantara Global LLC · Verified Independent Analytics
           </div>
         </div>
 
@@ -503,36 +709,46 @@ export function renderPublicFooter(): string {
           <ul>
             <li><a href="/check">True-Cost Check</a></li>
             <li><a href="/radar">Settlement Radar</a></li>
-            <li><a href="/journal">Calibration Journal</a></li>
-            <li><a href="/deck">Flight Deck Cockpit</a></li>
+            <li><a href="/journal">Decision Journal</a></li>
+            <li><a href="/cockpit">Cockpit Workspace</a></li>
             <li><a href="/proof">Calibration Proof</a></li>
             <li><a href="/pricing">Pricing Plans</a></li>
           </ul>
         </div>
 
         <div class="flight-footer-col">
-          <h4>Crew &amp; Cosmetics</h4>
+          <h4>Universe &amp; Gear</h4>
           <ul>
-            <li><a href="/merchandise/crew">King &amp; Queen / Council Apparel</a></li>
-            <li><a href="/crew">Flight Deck Crew</a></li>
-            <li><a href="/pass">Free Crew Pass</a></li>
-            <li><a href="/art-gallery">Artwork Gallery</a></li>
+            <li><a href="/crew">Elite Eleven Crew</a></li>
+            <li><a href="/art-gallery">The 44 Gallery</a></li>
             <li><a href="/merchandise">Mascot Gear &amp; Suits</a></li>
-            <li><a href="/research">Research</a></li>
-            <li><a href="/access">Institutional</a></li>
-            <li><a href="/developers">Developers API &amp; MCP</a></li>
+            <li><a href="/gear?collection=street-graffiti">Street Graffiti</a></li>
+            <li><a href="/gear?collection=celestial-galactica">Celestial Galactica</a></li>
+            <li><a href="/gear?collection=royal-galactic">Royal Galactic</a></li>
+            <li><a href="/pass">Free Crew Pass</a></li>
           </ul>
         </div>
 
         <div class="flight-footer-col">
-          <h4>Flight School</h4>
+          <h4>Learn &amp; Support</h4>
           <ul>
             <li><a href="/learn">Flight School &amp; Glossary</a></li>
             <li><a href="/news">Mission Brief Digest</a></li>
             <li><a href="/changelog">Changelog</a></li>
             <li><a href="/help">Help &amp; Support</a></li>
             <li><a href="/status">System Ingestion Status</a></li>
-            <li><a href="/legal">Legal &amp; Risk Disclosure</a></li>
+          </ul>
+        </div>
+
+        <div class="flight-footer-col">
+          <h4>Business &amp; Legal</h4>
+          <ul>
+            <li><a href="/research">Research</a></li>
+            <li><a href="/access">Institutional</a></li>
+            <li><a href="/developers">Developers API &amp; MCP</a></li>
+            <li><a href="/legal#terms">Terms of Service</a></li>
+            <li><a href="/legal#privacy">Privacy Policy</a></li>
+            <li><a href="/legal#risk">Risk Disclosure</a></li>
           </ul>
         </div>
       </div>
@@ -545,7 +761,7 @@ export function renderPublicFooter(): string {
       <div class="flight-footer-bottom">
         <div>&copy; 2026 Quantara Global LLC. All rights reserved. Rule B5 locked ($0.00 capital deployed).</div>
         <div style="display:flex; gap:16px;">
-          <a href="/legal" style="color:#94A3B8; text-decoration:none;">Terms of Service</a>
+          <a href="/legal#terms" style="color:#94A3B8; text-decoration:none;">Terms of Service</a>
           <a href="/legal#privacy" style="color:#94A3B8; text-decoration:none;">Privacy Policy</a>
           <a href="/status" style="color:#94A3B8; text-decoration:none;">Status</a>
         </div>

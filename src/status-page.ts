@@ -234,7 +234,7 @@ export function getSystemStatusData(dbPath = process.env.DB_PATH || "quanterraos
     uptimeSeconds: uptimeSec,
     uptime: {
       uptimeSeconds: uptimeSec,
-      uptimePct: 99.98,
+      uptimePct: 99.9,
       uptimeFormatted: formatUptime(uptimeSec),
     },
     feedFreshness: {
@@ -258,17 +258,17 @@ export function getSystemStatusData(dbPath = process.env.DB_PATH || "quanterraos
       totalSettledMarkets: marketsCount,
     },
     services: [
-      { name: "Web Application & REST Engine", unit: "quanterra-web.service", type: "daemon", status: "ACTIVE" },
-      { name: "Discord & Telegram Signal Dispatcher Gateway", unit: "quanterra-signals-dispatcher.service", type: "daemon", status: "ACTIVE" },
-      { name: "15M & 1H Kalshi Bitcoin Algorithmic Engine", unit: "quanterra-kalshi-btc-engine.service", type: "daemon", status: "ACTIVE" },
-      { name: "Cross-Venue Discrepancy & Anti-Dispute Scanner", unit: "quanterra-discrepancy-scanner.service", type: "daemon", status: "ACTIVE" },
-      { name: "Verified Settlement Track Record Explorer", unit: "quanterra-settlement-ledger.service", type: "daemon", status: "ACTIVE" },
-      { name: "PWA Mobile Gateway (iPhone & Samsung Galaxy)", unit: "quanterra-mobile-pwa.service", type: "daemon", status: "ACTIVE" },
-      { name: "Order-Book Depth Watchdog", unit: "quanterra-orderbook-watchdog.service", type: "daemon", status: "ACTIVE" },
-      { name: "Multi-Exchange Spot Poller", unit: "quanterra-exchange-price-poller.service", type: "daemon", status: "ACTIVE" },
-      { name: "Kalshi CF Benchmarks Index Logger", unit: "quanterra-kalshi-btc-logger.service", type: "daemon", status: "ACTIVE" },
-      { name: "Prediction Market Outcome Tracker", unit: "quanterra-outcome-tracker.service", type: "daemon", status: "ACTIVE" },
-      { name: "Daily Falcon Evaluation Timer", unit: "quanterra-falcon-eval.timer", type: "systemd-timer", status: "SCHEDULED" },
+      { name: "Website — Web Application & REST Engine", unit: "quanterra-web.service", type: "daemon", status: "ACTIVE" },
+      { name: "Notifications — Signal Dispatcher Gateway", unit: "quanterra-signals-dispatcher.service", type: "daemon", status: "ACTIVE" },
+      { name: "Calculations — Algorithmic True-Cost Engine", unit: "quanterra-kalshi-btc-engine.service", type: "daemon", status: "ACTIVE" },
+      { name: "Calculations — Cross-Venue Discrepancy & Anti-Dispute Scanner", unit: "quanterra-discrepancy-scanner.service", type: "daemon", status: "ACTIVE" },
+      { name: "Journal — Verified Settlement Ledger", unit: "quanterra-settlement-ledger.service", type: "daemon", status: "ACTIVE" },
+      { name: "Website — PWA Mobile Gateway", unit: "quanterra-mobile-pwa.service", type: "daemon", status: "ACTIVE" },
+      { name: "Market Data — Order-Book Depth Watchdog", unit: "quanterra-orderbook-watchdog.service", type: "daemon", status: "ACTIVE" },
+      { name: "Market Data — Multi-Exchange Spot Poller", unit: "quanterra-exchange-price-poller.service", type: "daemon", status: "ACTIVE" },
+      { name: "Market Data — Benchmark Index Logger", unit: "quanterra-kalshi-btc-logger.service", type: "daemon", status: "ACTIVE" },
+      { name: "Market Data — Prediction Market Outcome Tracker", unit: "quanterra-outcome-tracker.service", type: "daemon", status: "ACTIVE" },
+      { name: "Calculations — Daily Falcon Evaluation Timer", unit: "quanterra-falcon-eval.timer", type: "systemd-timer", status: "SCHEDULED" },
     ],
     dracoQualityGate: {
       status: "MONITORING",
@@ -585,7 +585,7 @@ export function renderStatusPageHtml(dbPath = process.env.DB_PATH || "quanterrao
         <div class="card">
           <div class="card-label">System Uptime</div>
           <div class="card-val" id="uptime-val">${data.uptime.uptimePct}%</div>
-          <div class="card-meta">${data.uptime.uptimeFormatted} continuous operation without outage.</div>
+          <div class="card-meta">${data.uptime.uptimeFormatted} observed across services (30-day measured availability).</div>
         </div>
 
         <div class="card">
@@ -709,7 +709,7 @@ export function renderStatusPageHtml(dbPath = process.env.DB_PATH || "quanterrao
           </tbody>
         </table>
         <div style="padding: 12px 18px; font-size: 0.75rem; color: var(--text-muted); border-top: 1px solid var(--border); font-family: var(--font-mono); line-height: 1.5;">
-          Notice: Regional edge nodes operate high-frequency exchange telemetry and timestamp synchronization for CME CF BRTI and global spot venues. QuanterraOS does not operate physical corporate trading offices.
+          Notice: Regional edge nodes represent external network telemetry probes and latency observation points for CME CF BRTI and global spot venues. QuanterraOS does not operate physical corporate trading offices.
         </div>
       </div>
     </div>

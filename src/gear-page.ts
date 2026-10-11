@@ -297,6 +297,75 @@ export function renderGearPageHtml(options?: GearPageOptions): string {
     .btn-notify:hover {
       background: var(--gear-violet);
     }
+
+    /* Modal Styling */
+    .design-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(4, 6, 15, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .design-modal-overlay.open {
+      display: flex;
+    }
+    .design-modal {
+      background: #0E1222;
+      border: 1px solid rgba(155, 108, 255, 0.35);
+      border-radius: 16px;
+      max-width: 840px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 32px;
+      position: relative;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 35px rgba(155, 108, 255, 0.15);
+    }
+    .modal-close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #FFF;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    .modal-close-btn:hover {
+      background: rgba(244, 63, 94, 0.25);
+      border-color: #F43F5E;
+      color: #F43F5E;
+    }
+    .btn-gear-view {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #FFFFFF;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    .btn-gear-view:hover {
+      background: rgba(155, 108, 255, 0.25);
+      border-color: var(--gear-violet);
+    }
   </style>
 </head>
 <body>
@@ -307,7 +376,7 @@ export function renderGearPageHtml(options?: GearPageOptions): string {
       <div class="gear-badge">QuanterraOS Fighter Pilots Apparel Concepts</div>
       <h1 class="gear-title">Wear your flight crew.</h1>
       <p class="gear-subhead">
-        Seventy-eight design concepts spanning Crew Essentials, Executive Orbit, King Royal Galactic, Queen Royal Galactic, and Founder M Edition.
+        Seventy-eight design concepts spanning Street Graffiti, Celestial Galactica, Crew Essentials, Executive Orbit, King Royal Galactic, Queen Royal Galactic, and Founder M Edition.
       </p>
     </header>
 
@@ -315,15 +384,23 @@ export function renderGearPageHtml(options?: GearPageOptions): string {
     <div class="concept-notice-banner">
       <span class="concept-notice-icon">⚠️</span>
       <div class="concept-notice-text">
-        <strong>Design Concept Notice:</strong> All 78 garments are design concepts presented across 13 presentation boards. Images represent aesthetic inspiration, not manufactured product photos. Commercial checkout is disabled until physical manufacturer tech packs and fabric samples are approved.
+        <strong>Design Concept Notice:</strong> All 78 garments are design concepts presented across 13 presentation boards. Images represent authentic approved creative artwork and garment placement inspiration, not generic off-the-shelf photos. Commercial checkout is disabled until physical manufacturer tech packs and fabric samples are approved.
       </div>
     </div>
 
     <!-- Filters -->
     <section class="gear-filters" aria-label="Apparel filters">
       <div class="filter-row">
-        <span class="filter-label">Collection:</span>
+        <span class="filter-label">Master Line:</span>
         <button type="button" class="gear-btn active" data-col="all" onclick="filterCol('all')">All Collections (78)</button>
+        <button type="button" class="gear-btn" data-col="street-graffiti" onclick="filterCol('street-graffiti')">Street Graffiti</button>
+        <button type="button" class="gear-btn" data-col="celestial-galactica" onclick="filterCol('celestial-galactica')">Celestial Galactica</button>
+        <button type="button" class="gear-btn" data-col="elite-eleven" onclick="filterCol('elite-eleven')">Elite Eleven Flight Collection</button>
+        <button type="button" class="gear-btn" data-col="royal-galactic" onclick="filterCol('royal-galactic')">King &amp; Queen Royal Galactic</button>
+      </div>
+
+      <div class="filter-row" style="padding-top: 6px; border-top: 1px dashed rgba(255, 255, 255, 0.08);">
+        <span class="filter-label">Collections:</span>
         <button type="button" class="gear-btn" data-col="Crew Essentials" onclick="filterCol('Crew Essentials')">Crew Essentials</button>
         <button type="button" class="gear-btn" data-col="Executive Orbit" onclick="filterCol('Executive Orbit')">Executive Orbit</button>
         <button type="button" class="gear-btn" data-col="King Royal Galactic" onclick="filterCol('King Royal Galactic')">King Royal Galactic</button>
@@ -351,17 +428,42 @@ export function renderGearPageHtml(options?: GearPageOptions): string {
     <div class="garment-grid" id="garment-grid"></div>
   </main>
 
+  <!-- View Design Detail Modal -->
+  <div id="design-modal" class="design-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" onclick="if(event.target === this) closeDesignModal()">
+    <div class="design-modal">
+      <button type="button" class="modal-close-btn" aria-label="Close design modal" onclick="closeDesignModal()">&times;</button>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
   ${renderPublicFooter()}
 
   <script>
     const CATALOG = ${catalogJsonSafe};
-    let currentCol = "all";
+    let currentCol = "${options?.collectionFilter || 'all'}";
     let currentType = "all";
     let currentFit = "all";
 
+    function matchCollection(g, col) {
+      if (col === "all") return true;
+      if (col === "street-graffiti" || col === "Street Graffiti" || col === "Cosmic Street") {
+        return g.collection === "Crew Essentials" || g.boardSlug?.includes("draco") || g.boardSlug?.includes("phoenix") || g.boardSlug?.includes("quanta");
+      }
+      if (col === "celestial-galactica" || col === "Celestial Galactica") {
+        return g.collection === "Executive Orbit" || g.boardSlug?.includes("quantana") || g.boardSlug?.includes("quantum-fox") || g.boardSlug?.includes("falcon");
+      }
+      if (col === "elite-eleven" || col === "Elite Eleven") {
+        return g.collection === "Crew Essentials" || g.collection === "Executive Orbit" || g.collection === "Founder M Edition";
+      }
+      if (col === "royal-galactic" || col === "Royal Galactic" || col === "King & Queen Royal Galactic") {
+        return g.collection === "King Royal Galactic" || g.collection === "Queen Royal Galactic";
+      }
+      return g.collection === col;
+    }
+
     function renderGrid() {
       const filtered = CATALOG.filter(g => {
-        if (currentCol !== "all" && g.collection !== currentCol) return false;
+        if (!matchCollection(g, currentCol)) return false;
         if (currentType !== "all" && g.garmentType !== currentType) return false;
         if (currentFit !== "all" && g.fit !== currentFit) return false;
         return true;
@@ -386,8 +488,11 @@ export function renderGearPageHtml(options?: GearPageOptions): string {
             <div class="garment-pieces">✦ \${g.includedPieces.join(" + ")}</div>
             <p class="garment-desc">\${g.description}</p>
             <div class="garment-footer">
-              <span class="price-notice">Pricing pending sample approval</span>
-              <button type="button" class="btn-notify" onclick="notifyInterest('\${g.sku}', '\${g.displayName}')">Notify Me &rarr;</button>
+              <span class="price-notice">Concept — sample pending</span>
+              <div style="display: flex; gap: 8px;">
+                <button type="button" class="btn-gear-view" aria-label="View design for \${g.displayName}" onclick="openDesignModal('\${g.sku}')">View design</button>
+                <button type="button" class="btn-notify" aria-label="Join release list for \${g.displayName}" onclick="notifyInterest('\${g.sku}', '\${g.displayName}')">Join release list &rarr;</button>
+              </div>
             </div>
           </div>
         </article>
@@ -412,15 +517,73 @@ export function renderGearPageHtml(options?: GearPageOptions): string {
       renderGrid();
     }
 
+    function openDesignModal(sku) {
+      const item = CATALOG.find(g => g.sku === sku);
+      if (!item) return;
+
+      const modalContent = document.getElementById("modal-content");
+      modalContent.innerHTML = \`
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; align-items: start;">
+          <div>
+            <div style="border-radius: 12px; overflow: hidden; background: #070914; border: 1px solid rgba(155, 108, 255, 0.3);">
+              <img src="\${item.parentBoardImage}" alt="\${item.displayName}" style="width: 100%; display: block;">
+            </div>
+            <div style="margin-top: 12px; text-align: center; font-size: 0.75rem; color: var(--gear-muted); font-family: var(--public-font-mono);">
+              Approved Presentation Board Reference
+            </div>
+          </div>
+          <div>
+            <div style="display: inline-block; font-size: 0.72rem; font-family: var(--public-font-mono); color: var(--gear-mint); background: rgba(203, 255, 105, 0.1); border: 1px solid rgba(203, 255, 105, 0.3); padding: 3px 8px; border-radius: 4px; margin-bottom: 8px;">
+              \${item.collection} · \${item.sku}
+            </div>
+            <h2 id="modal-title" style="font-size: 1.6rem; font-weight: 700; margin: 0 0 8px; color: #FFF;">\${item.displayName}</h2>
+            <div style="font-size: 0.85rem; color: var(--gear-mint); font-family: var(--public-font-mono); margin-bottom: 14px;">
+              Pieces: \${item.includedPieces.join(" + ")} · Fit: \${item.fitLabel}
+            </div>
+            <p style="font-size: 0.9rem; color: #C4B5FD; line-height: 1.6; margin-bottom: 18px;">
+              \${item.description}
+            </p>
+
+            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 14px; margin-bottom: 20px; font-size: 0.8rem; line-height: 1.5;">
+              <div style="font-weight: 600; color: #FFF; margin-bottom: 6px;">✦ Artwork Placement &amp; Structure</div>
+              <div style="color: var(--gear-muted);">Precision front chest insignia, rear full-width cosmic mural panel, engineered ergonomic sleeve ribbing, and contrast lining.</div>
+              <div style="font-weight: 600; color: #FFF; margin: 10px 0 4px;">✦ Proposed Sizing Range</div>
+              <div style="color: var(--gear-muted);">Unisex/Structured: XS, S, M, L, XL, 2XL (Tailored sizing chart provided upon sample release).</div>
+              <div style="font-weight: 600; color: #FFF; margin: 10px 0 4px;">✦ Physical Production Status</div>
+              <div style="color: var(--gear-gold);">Concept Phase: Technical fabric composition and physical tech packs pending final sample sign-off. Commercial checkout disabled.</div>
+            </div>
+
+            <button type="button" class="btn-notify" style="width: 100%; padding: 12px; font-size: 0.95rem;" onclick="notifyInterest('\${item.sku}', '\${item.displayName}')">Join Release List &rarr;</button>
+          </div>
+        </div>
+      \`;
+
+      const modal = document.getElementById("design-modal");
+      modal.classList.add("open");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeDesignModal() {
+      const modal = document.getElementById("design-modal");
+      modal.classList.remove("open");
+      document.body.style.overflow = "";
+    }
+
     function notifyInterest(sku, name) {
       const email = prompt("Enter your email to receive production updates and tech-pack notifications for " + name + ":");
       if (email && email.includes("@")) {
-        alert("Thank you. We have recorded your interest for " + name + " (" + sku + "). No spam, only sample announcements.");
+        alert("Thank you. We have recorded your interest for " + name + " (" + sku + "). You will receive official release notifications as samples are approved.");
       }
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      renderGrid();
+      const params = new URLSearchParams(window.location.search);
+      const colParam = params.get('collection');
+      if (colParam) {
+        filterCol(colParam);
+      } else {
+        renderGrid();
+      }
     });
   </script>
 </body>

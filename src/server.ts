@@ -507,6 +507,16 @@ app.use(
   })
 );
 app.use(express.urlencoded({ extended: true }));
+
+// Canonical Homepage Route (Unified Master Shell & Report)
+app.get(["/", "/home"], async (_req, res) => {
+  let report: MarketPriceCalibrationReport | null = null;
+  try {
+    report = await getOrComputeCalibrationReport();
+  } catch (_) {}
+  res.type("html").send(renderLandingPage(report));
+});
+
 app.use(express.static(path.resolve("public")));
 app.use("/assets", express.static(path.resolve("public/assets")));
 app.get("/assets/assistant-avatar.jpg", (_req, res) => {
@@ -2235,9 +2245,12 @@ app.get("/crew", (req, res) => {
 });
 
 // QuanterraOS Fighter Pilots Apparel Concepts (5 Collections, 78 Concepts)
-app.get("/gear", (req, res) => {
+app.get(["/gear", "/shop"], (req, res) => {
   const auth = getUserAuth(req);
-  res.type("html").send(renderGearPageHtml({ user: auth.user }));
+  res.type("html").send(renderGearPageHtml({
+    user: auth.user,
+    collectionFilter: req.query.collection ? String(req.query.collection) : undefined,
+  }));
 });
 
 // Platforms Page: Flight Deck at Top, True Cost Check at Bottom Above Pricing
@@ -2270,13 +2283,16 @@ app.get("/api/gear/concepts", (_req, res) => {
   });
 });
 
-// Public Storefront Page
+// Public Storefront Page: Restores Approved Street Graffiti & Celestial Galactica Gear
 app.get("/merchandise", (req, res) => {
   const auth = getUserAuth(req);
-  if (req.query.concepts === "true" || req.query.gear === "true") {
-    return res.type("html").send(renderGearPageHtml({ user: auth.user }));
+  if (req.query.store === "true") {
+    return res.type("html").send(renderMerchandisePageHtml(auth.user));
   }
-  res.type("html").send(renderMerchandisePageHtml(auth.user));
+  res.type("html").send(renderGearPageHtml({
+    user: auth.user,
+    collectionFilter: req.query.collection ? String(req.query.collection) : undefined,
+  }));
 });
 
 // ---------------------------------------------------------------------------
@@ -2331,11 +2347,6 @@ app.post("/api/merchandise/interest", (req, res) => {
   } catch (err: any) {
     res.status(400).json({ success: false, error: err.message });
   }
-});
-
-// Route Aliases (/gear and /shop)
-app.get(["/gear", "/shop"], (_req, res) => {
-  res.redirect(301, "/merchandise");
 });
 
 // Products Catalog API
