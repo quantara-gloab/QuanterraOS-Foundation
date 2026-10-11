@@ -473,6 +473,7 @@ import { renderPlatformsPageHtml } from "./platforms-page.ts";
 import { renderPilotHangarPageHtml } from "./pilot-hangar-page.ts";
 import { MERCHANDISE_78_CATALOG, getGarmentBySku } from "./lib/merchandise-44-catalog.ts";
 import { ELITE_ELEVEN_REGISTRY } from "./lib/elite-eleven-catalog.ts";
+import { executeFighterPilotVerification } from "./lib/fighter-pilots-verifier.ts";
 import { renderOddsDefendersPageHtml } from "./odds-defenders-page.ts";
 import { isCampaignEnabled, recordCampaignEvent } from "./config/campaign.ts";
 import { renderMerchandisePageHtml } from "./merchandise-page.ts";
@@ -2281,6 +2282,62 @@ app.get("/api/gear/concepts", (_req, res) => {
     totalConcepts: MERCHANDISE_78_CATALOG.length,
     concepts: MERCHANDISE_78_CATALOG,
   });
+});
+
+// ---------------------------------------------------------------------------
+// AI Fighter Pilots & Model Verification API
+// ---------------------------------------------------------------------------
+
+// Execute live empirical verification mission across equipped fighter pilots
+app.post(["/api/cockpit/verify-mission", "/api/cockpit/verify"], (req, res) => {
+  try {
+    const payload = req.body || {};
+    const result = executeFighterPilotVerification(payload);
+    res.json({
+      success: true,
+      ...result,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "verification_failed", message: (error as Error).message });
+  }
+});
+
+// Telemetry & mathematical model proof for an individual fighter pilot
+app.get("/api/cockpit/specialist-telemetry/:pilotId", (req, res) => {
+  try {
+    const pilotId = req.params.pilotId.toLowerCase().trim();
+    const result = executeFighterPilotVerification({
+      equippedPilotIds: [pilotId],
+    });
+    const pilot = result.pilots[pilotId];
+    if (!pilot) {
+      return res.status(404).json({ error: "pilot_not_found", message: `Specialist pilot '${pilotId}' not found in Elite Eleven roster` });
+    }
+    res.json({
+      success: true,
+      pilot,
+      sha256Fingerprint: result.sha256Fingerprint,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "telemetry_failed", message: (error as Error).message });
+  }
+});
+
+// Return all fighter pilots' telemetry metrics in batch
+app.get("/api/cockpit/specialists-telemetry", (_req, res) => {
+  try {
+    const result = executeFighterPilotVerification({
+      equippedPilotIds: ["draco", "wolf", "falcon", "quantum-fox", "sentinel", "kraken", "lion", "phoenix", "quanta", "quantana", "michael"],
+    });
+    res.json({
+      success: true,
+      pilots: result.pilots,
+      consensusVerdict: result.consensusVerdict,
+      sha256Fingerprint: result.sha256Fingerprint,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "telemetry_batch_failed", message: (error as Error).message });
+  }
 });
 
 // Public Storefront Page: Restores Approved Street Graffiti & Celestial Galactica Gear

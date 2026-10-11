@@ -15,6 +15,7 @@
  */
 
 import { ELITE_ELEVEN_REGISTRY, type EliteCrewMember } from "./lib/elite-eleven-catalog.ts";
+import { executeFighterPilotVerification } from "./lib/fighter-pilots-verifier.ts";
 import { renderPublicHeader, renderPublicFooter, PUBLIC_LAYOUT_CSS } from "./components/public-layout.ts";
 
 export interface CockpitPageOptions {
@@ -28,8 +29,47 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
   const user = options?.user;
   const initialVenue = options?.venue || "kalshi";
   const initialSide = options?.side || "YES";
+  const initialTicker = options?.ticker || "KXBTC15M-SAMPLE";
+
+  const initialVerification = executeFighterPilotVerification({
+    ticker: initialTicker,
+    venue: initialVenue,
+    side: initialSide,
+    contracts: 10,
+    priceCents: 52,
+    equippedPilotIds: ["draco", "wolf", "kraken", "sentinel"],
+  });
+
+  const initialEquippedIds = ["draco", "wolf", "kraken", "sentinel"];
+  const initialEvidenceCardsHtml = initialEquippedIds.map(id => {
+    const p = initialVerification.pilots[id];
+    if (!p) return "";
+    const badgeBg = p.status === "HAZARD" ? "rgba(255,85,200,0.15)" : p.status === "RESEARCH_AUDITED" ? "rgba(223,184,67,0.15)" : "rgba(203,255,105,0.15)";
+    const badgeColor = p.status === "HAZARD" ? "var(--cockpit-danger)" : p.status === "RESEARCH_AUDITED" ? "var(--cockpit-gold)" : "var(--cockpit-mint)";
+    return `
+      <div class="station-evidence-card" style="background:rgba(255,255,255,0.03); border:1px solid var(--cockpit-border-subtle); border-radius:8px; padding:14px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
+          <div style="font-family:var(--public-font-mono); font-size:0.75rem; color:var(--cockpit-mint); text-transform:uppercase;">
+            \${p.role} · \${p.name} // \${p.mathematicalModel.split('&')[0]}
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:0.68rem; font-family:var(--public-font-mono); color:var(--cockpit-muted);">\${p.latencyMs}ms</span>
+            <span style="font-size:0.68rem; font-family:var(--public-font-mono); padding:2px 6px; border-radius:4px; background:\${badgeBg}; color:\${badgeColor}; font-weight:700;">\${p.status}</span>
+          </div>
+        </div>
+        <div style="font-size:0.85rem; color:var(--cockpit-chalk); line-height:1.4; margin-bottom:10px;">
+          \${p.summary}
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+          <span style="font-size:0.72rem; color:var(--cockpit-muted); font-family:var(--public-font-mono);">\${p.provenanceSource}</span>
+          <button type="button" class="btn-inspect-telemetry" onclick="inspectPilotTelemetry('\${p.id}')" style="background:rgba(155,108,255,0.15); border:1px solid var(--cockpit-border); color:var(--cockpit-chalk); border-radius:4px; padding:3px 8px; font-size:0.72rem; font-family:var(--public-font-mono); cursor:pointer;">Inspect Telemetry ↗</button>
+        </div>
+      </div>
+    `;
+  }).filter(Boolean).join("");
 
   const registryJson = JSON.stringify(ELITE_ELEVEN_REGISTRY).replace(/</g, '\\u003c');
+  const initialVerificationJson = JSON.stringify(initialVerification).replace(/</g, '\\u003c');
 
   return `<!doctype html>
 <html lang="en">
@@ -671,12 +711,30 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
             </a>
           </div>
 
+          <div class="mission-action-bar" style="display:flex; justify-content:space-between; align-items:center; background:rgba(155,108,255,0.08); border:1px solid rgba(155,108,255,0.25); border-radius:10px; padding:12px 16px; margin:14px 0; flex-wrap:wrap; gap:10px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:1.3rem;">🚀</span>
+              <div>
+                <div style="font-weight:700; font-size:0.88rem; color:var(--cockpit-chalk);">AI Fighter Pilots Live Model Verification Mission</div>
+                <div style="font-size:0.75rem; color:var(--cockpit-muted);">Verifies L2 depth, CME CF BRTI 60s TWAP basis, fees &amp; 1,316-window calibration</div>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span id="mission-status-pill" style="font-family:var(--public-font-mono); font-size:0.72rem; padding:4px 8px; border-radius:4px; background:rgba(203,255,105,0.15); color:var(--cockpit-mint); font-weight:700;">
+                ✓ \${initialVerification.decisionReceiptSeal.sealText}
+              </span>
+              <button type="button" id="btn-verify-mission" onclick="runMissionVerification()" style="background:var(--cockpit-mint); color:#090A14; border:none; border-radius:6px; padding:8px 14px; font-weight:700; font-size:0.8rem; cursor:pointer; font-family:var(--public-font-mono);">
+                Execute Verification Mission ⚡
+              </button>
+            </div>
+          </div>
+
           <div class="inputs-grid">
             <div class="input-field">
               <label>Outcome Side</label>
               <div class="side-pill-group">
-                <button type="button" class="side-btn yes ${initialSide === 'YES' ? 'active' : ''}" onclick="setSide('YES')">YES</button>
-                <button type="button" class="side-btn no ${initialSide === 'NO' ? 'active' : ''}" onclick="setSide('NO')">NO</button>
+                <button type="button" class="side-btn yes \${initialSide === 'YES' ? 'active' : ''}" onclick="setSide('YES')">YES</button>
+                <button type="button" class="side-btn no \${initialSide === 'NO' ? 'active' : ''}" onclick="setSide('NO')">NO</button>
               </div>
             </div>
 
@@ -712,23 +770,7 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
 
           <!-- Dynamic Station Output -->
           <div id="station-evidence-box" style="display:flex; flex-direction:column; gap:12px;">
-            <div style="background:rgba(255,255,255,0.03); border:1px solid var(--cockpit-border-subtle); border-radius:8px; padding:14px;">
-              <div style="font-family:var(--public-font-mono); font-size:0.75rem; color:var(--cockpit-mint); text-transform:uppercase; margin-bottom:4px;">
-                Liquidity · Wolf // Order Book &amp; Depth Check
-              </div>
-              <div style="font-size:0.85rem; color:var(--cockpit-chalk);">
-                Top-of-book depth: 250 contracts available at 52¢ ask. Your 10-contract order fills without slippage. Spread drag is 2.0¢.
-              </div>
-            </div>
-
-            <div style="background:rgba(255,255,255,0.03); border:1px solid var(--cockpit-border-subtle); border-radius:8px; padding:14px;">
-              <div style="font-family:var(--public-font-mono); font-size:0.75rem; color:var(--cockpit-violet); text-transform:uppercase; margin-bottom:4px;">
-                Settlement · Kraken // Settlement Rule Audit
-              </div>
-              <div style="font-size:0.85rem; color:var(--cockpit-chalk);">
-                Contract resolves to <strong>CME CF Bitcoin Real-Time Index (BRTI) 60-Second TWAP</strong>. Spot exchange prices on Coinbase/Kraken may diverge up to ±15 bps during final 60 seconds.
-              </div>
-            </div>
+            \${initialEvidenceCardsHtml}
           </div>
         </div>
       </section>
@@ -787,6 +829,19 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
           <strong>Settlement Definition:</strong> Resolves YES if BRTI 60-second TWAP ≥ Strike at expiration window close. Non-advisory paper calculation.
         </div>
 
+        <div class="receipt-box receipt-seal-box" id="receipt-seal-box" style="margin-top:10px; border-color:rgba(203,255,105,0.3); background:rgba(203,255,105,0.03);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <strong style="color:var(--cockpit-mint); font-family:var(--public-font-mono); font-size:0.78rem;">QUANTA DECISION RECEIPT SEAL</strong>
+            <span id="receipt-seal-badge" style="font-family:var(--public-font-mono); font-size:0.7rem; color:var(--cockpit-mint); font-weight:700;">✓ \${initialVerification.decisionReceiptSeal.sealText}</span>
+          </div>
+          <div style="font-family:var(--public-font-mono); font-size:0.72rem; color:var(--cockpit-muted); word-break:break-all;">
+            SHA-256: <span id="receipt-seal-hash" style="color:var(--cockpit-chalk);">\${initialVerification.decisionReceiptSeal.sha256Short}…</span>
+          </div>
+          <div style="margin-top:6px; font-size:0.72rem; color:var(--cockpit-muted);">
+            Pure research model. Live capital deployed: <strong style="color:var(--cockpit-mint);">$0.00</strong>. Rule B5 protocol invariant active.
+          </div>
+        </div>
+
         <div class="receipt-actions">
           <button type="button" class="btn-receipt-save" onclick="saveDecisionReceipt()">Save to Private Journal</button>
           <button type="button" class="btn-receipt-share" onclick="shareDecisionReceipt()">Share Anonymized Receipt</button>
@@ -823,6 +878,7 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
   <!-- Client-side Interactive Cockpit Script -->
   <script>
     const REGISTRY = ${registryJson};
+    let currentVerification = ${initialVerificationJson};
     let currentVenue = "${initialVenue}";
     let currentSide = "${initialSide}";
     let equippedStationIds = new Set(["draco", "wolf", "kraken", "sentinel"]);
@@ -841,6 +897,7 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
         deepLink.textContent = "View official market on Polymarket →";
       }
       recomputeCost();
+      runMissionVerification();
     }
 
     function setSide(s) {
@@ -851,6 +908,7 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
       document.getElementById("receipt-side").textContent = s + " @ " + document.getElementById("assumed-fill-price").value + "¢";
       document.getElementById("receipt-side").style.color = s === "YES" ? "var(--cockpit-yes)" : "var(--cockpit-no)";
       recomputeCost();
+      runMissionVerification();
     }
 
     function recomputeCost() {
@@ -888,6 +946,115 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
       document.getElementById("receipt-breakeven").textContent = breakevenPct.toFixed(1) + "%";
     }
 
+    function renderStationEvidence() {
+      const box = document.getElementById("station-evidence-box");
+      if (!box || !currentVerification || !currentVerification.pilots) return;
+      
+      const pilots = currentVerification.pilots;
+      const equippedList = Array.from(equippedStationIds);
+      
+      const cardsHtml = equippedList.map(id => {
+        const cleanId = (id === "fox" ? "quantum-fox" : id === "michael-quanterra" ? "michael" : id).toLowerCase();
+        const p = pilots[cleanId] || pilots[id];
+        if (!p) return "";
+        const badgeBg = p.status === "HAZARD" ? "rgba(255,85,200,0.15)" : p.status === "RESEARCH_AUDITED" ? "rgba(223,184,67,0.15)" : "rgba(203,255,105,0.15)";
+        const badgeColor = p.status === "HAZARD" ? "var(--cockpit-danger)" : p.status === "RESEARCH_AUDITED" ? "var(--cockpit-gold)" : "var(--cockpit-mint)";
+        return \`
+          <div class="station-evidence-card" style="background:rgba(255,255,255,0.03); border:1px solid var(--cockpit-border-subtle); border-radius:8px; padding:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
+              <div style="font-family:var(--public-font-mono); font-size:0.75rem; color:var(--cockpit-mint); text-transform:uppercase;">
+                \${p.role} · \${p.name} // \${p.mathematicalModel.split('&')[0]}
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:0.68rem; font-family:var(--public-font-mono); color:var(--cockpit-muted);">\${p.latencyMs}ms</span>
+                <span style="font-size:0.68rem; font-family:var(--public-font-mono); padding:2px 6px; border-radius:4px; background:\${badgeBg}; color:\${badgeColor}; font-weight:700;">\${p.status}</span>
+              </div>
+            </div>
+            <div style="font-size:0.85rem; color:var(--cockpit-chalk); line-height:1.4; margin-bottom:10px;">
+              \${p.summary}
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+              <span style="font-size:0.72rem; color:var(--cockpit-muted); font-family:var(--public-font-mono);">\${p.provenanceSource}</span>
+              <button type="button" class="btn-inspect-telemetry" onclick="inspectPilotTelemetry('\${p.id}')" style="background:rgba(155,108,255,0.15); border:1px solid var(--cockpit-border); color:var(--cockpit-chalk); border-radius:4px; padding:3px 8px; font-size:0.72rem; font-family:var(--public-font-mono); cursor:pointer;">Inspect Telemetry ↗</button>
+            </div>
+          </div>
+        \`;
+      }).filter(Boolean).join("");
+      
+      box.innerHTML = cardsHtml || '<div style="color:var(--cockpit-muted); font-size:0.85rem; padding:12px;">Equip fighter pilots from the dock below to run telemetry checks.</div>';
+    }
+
+    async function runMissionVerification() {
+      const btn = document.getElementById("btn-verify-mission");
+      const statusPill = document.getElementById("mission-status-pill");
+      if (btn) btn.textContent = "Verifying...";
+      if (statusPill) statusPill.textContent = "VERIFYING TELEMETRY...";
+      
+      const qty = parseInt(document.getElementById("order-quantity").value) || 10;
+      const priceCents = parseInt(document.getElementById("assumed-fill-price").value) || 52;
+      const ticker = document.getElementById("market-select").value;
+      
+      try {
+        const res = await fetch("/api/cockpit/verify-mission", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ticker,
+            venue: currentVenue,
+            side: currentSide,
+            contracts: qty,
+            priceCents,
+            equippedPilotIds: Array.from(equippedStationIds),
+          }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          currentVerification = data;
+          renderStationEvidence();
+          if (data.decisionReceiptSeal) {
+            const sealBadge = document.getElementById("receipt-seal-badge");
+            const sealHash = document.getElementById("receipt-seal-hash");
+            if (sealBadge) sealBadge.textContent = "✓ " + data.decisionReceiptSeal.sealText;
+            if (sealHash) sealHash.textContent = data.decisionReceiptSeal.sha256Short + "…";
+            if (statusPill) statusPill.textContent = "✓ " + data.decisionReceiptSeal.sealText;
+          }
+        }
+      } catch (err) {
+        console.warn("Mission verification error:", err);
+      } finally {
+        if (btn) btn.textContent = "Execute Verification Mission ⚡";
+      }
+    }
+
+    function inspectPilotTelemetry(pilotId) {
+      if (!currentVerification || !currentVerification.pilots) return;
+      const cleanId = (pilotId === "fox" ? "quantum-fox" : pilotId === "michael-quanterra" ? "michael" : pilotId).toLowerCase();
+      const p = currentVerification.pilots[cleanId] || currentVerification.pilots[pilotId];
+      if (!p) {
+        alert("Telemetry record not found for " + pilotId);
+        return;
+      }
+      
+      document.getElementById("modal-pilot-title").textContent = p.name + " // " + p.role;
+      document.getElementById("modal-pilot-callsign").textContent = p.callsign + " · " + p.status + " (" + p.latencyMs + "ms)";
+      document.getElementById("modal-pilot-summary").textContent = p.summary;
+      document.getElementById("modal-pilot-model").textContent = p.mathematicalModel;
+      document.getElementById("modal-pilot-metrics").textContent = JSON.stringify({
+        telemetryMetrics: p.telemetryMetrics,
+        rawInputs: p.rawInputs,
+        findingsNotes: p.findingsNotes,
+      }, null, 2);
+      document.getElementById("modal-pilot-provenance").innerHTML = "Source: " + p.provenanceSource + "<br>Audit SHA-256: " + (currentVerification.sha256Fingerprint || "N/A");
+      
+      const modal = document.getElementById("pilot-telemetry-modal");
+      if (modal) modal.style.display = "flex";
+    }
+
+    function closeTelemetryModal() {
+      const modal = document.getElementById("pilot-telemetry-modal");
+      if (modal) modal.style.display = "none";
+    }
+
     function renderCrewDock() {
       const container = document.getElementById("crew-station-list");
       let customPilotCard = "";
@@ -908,12 +1075,14 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
 
       const plainRoleMap = {
         "michael": "Tour · Founder",
+        "michael-quanterra": "Tour · Founder",
         "quanta": "Navigation · Quanta",
         "quantana": "Review · Quantana",
         "draco": "Fees · Draco",
         "wolf": "Limits · Wolf",
         "falcon": "Alerts · Falcon",
         "fox": "Scenarios · Quantum Fox",
+        "quantum-fox": "Scenarios · Quantum Fox",
         "sentinel": "Data · Sentinel",
         "kraken": "Liquidity · Kraken",
         "lion": "Playbook · Lion",
@@ -921,10 +1090,11 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
       };
 
       container.innerHTML = customPilotCard + REGISTRY.map(member => {
-        const isEquipped = equippedStationIds.has(member.id);
-        const plainLabel = plainRoleMap[member.id] || member.name;
+        const canonicalId = (member.canonicalId || member.id).toLowerCase();
+        const isEquipped = equippedStationIds.has(member.id) || equippedStationIds.has(canonicalId);
+        const plainLabel = plainRoleMap[canonicalId] || plainRoleMap[member.id] || member.name;
         return \`
-          <div class="crew-station-card \${isEquipped ? 'equipped' : ''}" onclick="toggleStation('\${member.id}')" title="\${member.productResponsibility}">
+          <div class="crew-station-card \${isEquipped ? 'equipped' : ''}" onclick="toggleStation('\${canonicalId}')" title="\${member.productResponsibility}">
             <img src="\${member.avatarImage}" alt="\${member.name}" class="station-avatar">
             <span class="station-name">\${plainLabel}</span>
             <span class="station-role-label">\${member.productResponsibility || member.title.split('&')[0]}</span>
@@ -953,12 +1123,14 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
         // Quanta is permanent fixed guide
         return;
       }
-      if (equippedStationIds.has(id)) {
-        equippedStationIds.delete(id);
+      const canonicalId = (id === "fox" ? "quantum-fox" : id === "michael-quanterra" ? "michael" : id).toLowerCase();
+      if (equippedStationIds.has(canonicalId)) {
+        equippedStationIds.delete(canonicalId);
       } else {
-        equippedStationIds.add(id);
+        equippedStationIds.add(canonicalId);
       }
       renderCrewDock();
+      runMissionVerification();
     }
 
     function saveDecisionReceipt() {
@@ -1012,13 +1184,51 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
     function onMarketChange(val) {
       document.getElementById("receipt-market-id").textContent = val;
       recomputeCost();
+      runMissionVerification();
     }
 
     document.addEventListener("DOMContentLoaded", () => {
       renderCrewDock();
       recomputeCost();
+      renderStationEvidence();
     });
   </script>
+  <!-- Pilot Telemetry Modal -->
+  <div id="pilot-telemetry-modal" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(4,6,12,0.85); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:20px;">
+    <div style="background:#0D1122; border:1px solid var(--cockpit-border); border-radius:14px; max-width:680px; width:100%; max-height:85vh; overflow-y:auto; padding:24px; box-shadow:0 20px 40px rgba(0,0,0,0.8); display:flex; flex-direction:column; gap:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid var(--cockpit-border-subtle); padding-bottom:14px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span id="modal-pilot-avatar" style="font-size:1.6rem;">🧑‍✈️</span>
+          <div>
+            <h3 id="modal-pilot-title" style="margin:0; font-size:1.15rem; color:var(--cockpit-chalk);">Specialist</h3>
+            <div id="modal-pilot-callsign" style="font-family:var(--public-font-mono); font-size:0.75rem; color:var(--cockpit-mint);">F1 · VERIFIED</div>
+          </div>
+        </div>
+        <button type="button" onclick="closeTelemetryModal()" style="background:none; border:none; color:var(--cockpit-muted); font-size:1.6rem; cursor:pointer; padding:0 6px; line-height:1;">&times;</button>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:12px; font-size:0.85rem;">
+        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--cockpit-border-subtle); border-radius:8px; padding:12px;">
+          <span style="font-family:var(--public-font-mono); font-size:0.72rem; color:var(--cockpit-violet); text-transform:uppercase;">Empirical Summary</span>
+          <p id="modal-pilot-summary" style="margin:6px 0 0; color:var(--cockpit-chalk); line-height:1.4;"></p>
+        </div>
+        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--cockpit-border-subtle); border-radius:8px; padding:12px;">
+          <span style="font-family:var(--public-font-mono); font-size:0.72rem; color:var(--cockpit-mint); text-transform:uppercase;">Mathematical Model &amp; Domain</span>
+          <p id="modal-pilot-model" style="margin:6px 0 0; color:var(--cockpit-chalk); font-family:var(--public-font-mono); font-size:0.78rem;"></p>
+        </div>
+        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--cockpit-border-subtle); border-radius:8px; padding:12px;">
+          <span style="font-family:var(--public-font-mono); font-size:0.72rem; color:var(--cockpit-gold); text-transform:uppercase;">Telemetry &amp; Audit Metrics</span>
+          <pre id="modal-pilot-metrics" style="margin:6px 0 0; color:var(--cockpit-chalk); font-family:var(--public-font-mono); font-size:0.75rem; background:rgba(0,0,0,0.4); padding:10px; border-radius:6px; overflow-x:auto; white-space:pre-wrap;"></pre>
+        </div>
+        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--cockpit-border-subtle); border-radius:8px; padding:12px;">
+          <span style="font-family:var(--public-font-mono); font-size:0.72rem; color:var(--cockpit-muted); text-transform:uppercase;">Provenance Source &amp; Fingerprint</span>
+          <div id="modal-pilot-provenance" style="margin-top:6px; font-size:0.75rem; color:var(--cockpit-muted); font-family:var(--public-font-mono); line-height:1.4;"></div>
+        </div>
+      </div>
+      <div style="display:flex; justify-content:flex-end;">
+        <button type="button" onclick="closeTelemetryModal()" style="background:var(--cockpit-violet); color:#FFF; border:none; border-radius:6px; padding:8px 18px; font-weight:700; cursor:pointer;">Close Telemetry</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>`;
 }
