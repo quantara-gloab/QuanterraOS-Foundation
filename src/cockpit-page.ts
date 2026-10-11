@@ -626,7 +626,6 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
       font-weight: 700;
     }
 
-    /* Non-advisory guardrail notice */
     .cockpit-guardrail-banner {
       font-size: 0.78rem;
       color: var(--cockpit-muted);
@@ -634,6 +633,92 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
       padding: 12px;
       border-top: 1px solid var(--cockpit-border-subtle);
       line-height: 1.5;
+    }
+
+    /* Mobile Quick-Action Floating Dock & PWA Touch Enhancements */
+    .mobile-quick-action-bar {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      background: rgba(7, 10, 20, 0.95);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid var(--cockpit-border);
+      z-index: 900;
+      padding: 0 12px;
+      box-sizing: border-box;
+      justify-content: space-around;
+      align-items: center;
+    }
+    @media (max-width: 768px) {
+      .mobile-quick-action-bar {
+        display: flex;
+      }
+      .cockpit-shell {
+        padding-bottom: 96px; /* Avoid floating bar overlap on mobile */
+      }
+      .market-bar {
+        padding: 12px;
+      }
+      .market-bar-left {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .market-select {
+        max-width: 100%;
+        width: 100%;
+      }
+      .market-bar-right {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .tab-nav {
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        gap: 6px;
+      }
+      .tab-nav-btn {
+        padding: 8px 12px;
+        font-size: 0.82rem;
+      }
+      .crew-station-list {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    .mobile-quick-btn {
+      background: transparent;
+      border: none;
+      color: var(--cockpit-muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding: 6px 10px;
+      min-width: 60px;
+      min-height: 48px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      touch-action: manipulation;
+    }
+    .mobile-quick-btn.active, .mobile-quick-btn:active {
+      color: var(--cockpit-mint);
+      background: rgba(203, 255, 105, 0.1);
+    }
+    .mq-icon {
+      font-size: 1.15rem;
+    }
+    .mq-label {
+      font-family: var(--public-font-mono);
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
     }
   </style>
 </head>
@@ -856,7 +941,7 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
     </div>
 
     <!-- Bottom Crew Dock -->
-    <section class="crew-dock" aria-label="QuanterraOS Fighter Pilots Crew Stations">
+    <section class="crew-dock" id="crew-station-dock" aria-label="QuanterraOS Fighter Pilots Crew Stations">
       <div class="crew-dock-header">
         <div>
           <span class="crew-dock-title">Specialist Stations // Decision Evidence Roster</span>
@@ -879,6 +964,26 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
     </footer>
   </div>
 
+  <!-- Mobile Quick-Action Floating Dock -->
+  <nav class="mobile-quick-action-bar" aria-label="Cockpit Mobile Quick Actions">
+    <button type="button" class="mobile-quick-btn active" id="mq-calc" onclick="mobileJumpTo('calc')">
+      <span class="mq-icon">⚡</span>
+      <span class="mq-label">Scenario</span>
+    </button>
+    <button type="button" class="mobile-quick-btn" id="mq-pilots" onclick="mobileJumpTo('pilots')">
+      <span class="mq-icon">👨‍✈️</span>
+      <span class="mq-label">Pilots</span>
+    </button>
+    <button type="button" class="mobile-quick-btn" id="mq-savings" onclick="mobileJumpTo('savings')">
+      <span class="mq-icon">🛡️</span>
+      <span class="mq-label">Savings</span>
+    </button>
+    <button type="button" class="mobile-quick-btn" id="mq-receipt" onclick="mobileJumpTo('receipt')">
+      <span class="mq-icon">🧾</span>
+      <span class="mq-label">Receipt</span>
+    </button>
+  </nav>
+
   ${renderPublicFooter()}
 
   <!-- Client-side Interactive Cockpit Script -->
@@ -890,6 +995,7 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
     let equippedStationIds = new Set(["draco", "wolf", "kraken", "sentinel"]);
 
     function selectVenue(v) {
+      triggerHaptic("light");
       currentVenue = v;
       document.querySelectorAll(".venue-btn").forEach(btn => {
         btn.classList.toggle("active", btn.textContent.toLowerCase() === v);
@@ -907,6 +1013,7 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
     }
 
     function setSide(s) {
+      triggerHaptic("medium");
       currentSide = s;
       document.querySelectorAll(".side-btn").forEach(btn => {
         btn.classList.toggle("active", btn.textContent === s);
@@ -1140,6 +1247,7 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
     }
 
     function saveDecisionReceipt() {
+      triggerHaptic("success");
       const qty = parseInt(document.getElementById("order-quantity").value) || 1;
       const priceCents = parseInt(document.getElementById("assumed-fill-price").value) || 50;
       const grossOutlay = (qty * priceCents) / 100;
@@ -1203,6 +1311,40 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
       document.getElementById("receipt-market-id").textContent = val;
       recomputeCost();
       runMissionVerification();
+    }
+
+    function triggerHaptic(type = "light") {
+      if (typeof window !== "undefined" && window.navigator && window.navigator.vibrate) {
+        try {
+          if (type === "medium") window.navigator.vibrate(25);
+          else if (type === "success") window.navigator.vibrate([15, 50, 20]);
+          else window.navigator.vibrate(12);
+        } catch (e) {}
+      }
+    }
+
+    function mobileJumpTo(target) {
+      triggerHaptic("light");
+      document.querySelectorAll(".mobile-quick-btn").forEach(btn => btn.classList.remove("active"));
+      const activeBtn = document.getElementById("mq-" + target);
+      if (activeBtn) activeBtn.classList.add("active");
+
+      if (target === "calc") {
+        switchTab("evidence");
+        const el = document.getElementById("tab-content-evidence");
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      } else if (target === "pilots") {
+        switchTab("evidence");
+        const el = document.getElementById("crew-station-dock");
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      } else if (target === "savings") {
+        switchTab("value");
+        const el = document.getElementById("tab-content-value");
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      } else if (target === "receipt") {
+        const el = document.querySelector(".receipt-panel");
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      }
     }
 
     document.addEventListener("DOMContentLoaded", () => {
