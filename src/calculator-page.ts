@@ -479,13 +479,13 @@ export function renderCalculatorPageHtml(options: { venue?: string; campaign?: s
       <div class="card">
         <div class="card-title">
           <span>2. Net Expected Value &amp; Hurdle</span>
-          <span id="badge-verdict" class="mono" style="font-size:0.75rem; padding:2px 8px; border-radius:3px; background:rgba(16,185,129,0.15); color:var(--green); border:1px solid var(--green);">POSITIVE EDGE</span>
+          <span id="badge-verdict" class="mono" style="font-size:0.75rem; padding:2px 8px; border-radius:3px; background:rgba(16,185,129,0.15); color:var(--green); border:1px solid var(--green);">POSITIVE ESTIMATED EV</span>
         </div>
 
         <div class="result-hero" id="hero-box">
-          <div class="result-hero-label">Net EV Per Contract</div>
+          <div class="result-hero-label">Net EV Per Contract (Under Stated Assumptions)</div>
           <div class="result-hero-value" id="val-net-ev-contract" style="color:var(--green);">+$0.0220</div>
-          <div class="result-hero-sub" id="val-total-pnl" style="color:var(--green);">+$0.22 net expectancy on 10 contracts</div>
+          <div class="result-hero-sub" id="val-total-pnl" style="color:var(--green);">+$0.22 net expectancy on 10 contracts (user thesis: 55.0%)</div>
         </div>
 
         <div class="friction-breakdown">
@@ -516,7 +516,7 @@ export function renderCalculatorPageHtml(options: { venue?: string; campaign?: s
           <span class="stat-val" style="color:var(--accent); font-weight:700;" id="val-breakeven">52.80%</span>
         </div>
         <div class="stat-row">
-          <span class="stat-label">Gross Model Edge (55.0% - 51.0%)</span>
+          <span class="stat-label">Stated User Thesis vs. Ask (55.0% - 51.0%)</span>
           <span class="stat-val" id="val-gross-edge">+4.00¢</span>
         </div>
         <div class="stat-row">
@@ -535,7 +535,7 @@ export function renderCalculatorPageHtml(options: { venue?: string; campaign?: s
             <span style="font-family:var(--font-mono); font-size:0.65rem; color:#F43F5E; background:rgba(244,63,94,0.12); padding:2px 6px; border-radius:3px;">ANTI-FRICTION</span>
           </div>
           <div style="color:var(--muted); line-height:1.45; font-size:0.75rem;">
-            Many consumer interfaces display nominal spreads without deducting Kalshi taker fees. At 50¢ mid, the exchange taker fee is 1.75¢/ct—consuming up to <strong>43.8% of your gross profit</strong> and requiring a <strong>52.75% win rate</strong> just to break even.
+            Many consumer interfaces display nominal spreads without deducting Kalshi taker fees. At 51¢ ask, the exchange taker fee is 1.75¢/ct—consuming up to <strong>43.8% of gross profit</strong> on a 50¢ mid baseline, requiring a <strong>52.75% win rate</strong> (or <strong>52.80%</strong> for 10 contracts due to discrete cent-rounding) just to break even.
           </div>
           <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
             <span style="font-family:var(--font-mono); font-size:0.7rem; color:var(--accent);">Independent Referee &bull; Zero Venue Bias</span>
@@ -818,7 +818,7 @@ export function renderCalculatorPageHtml(options: { venue?: string; campaign?: s
 
       const badge = document.getElementById('badge-verdict');
       if (badge) {
-        badge.textContent = isPositive ? 'POSITIVE EDGE' : 'NEGATIVE DRAG';
+        badge.textContent = isPositive ? 'POSITIVE ESTIMATED EV' : 'NEGATIVE DRAG';
         badge.style.background = isPositive ? 'rgba(16,185,129,0.15)' : 'rgba(244,63,94,0.15)';
         badge.style.color = isPositive ? 'var(--green)' : 'var(--rose)';
         badge.style.border = '1px solid ' + (isPositive ? 'var(--green)' : 'var(--rose)');

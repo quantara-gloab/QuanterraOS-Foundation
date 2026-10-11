@@ -4289,8 +4289,8 @@ app.post("/api/journal/resolve", (req, res) => {
   }
 
   const { id, outcome, notes } = req.body || {};
-  if (!id || !["WON", "LOST", "VOID"].includes(outcome)) {
-    return res.status(400).json({ error: "Invalid resolution payload: id and outcome (WON|LOST|VOID) required" });
+  if (!id || !["WON", "LOST", "VOID", "STOOD_DOWN"].includes(outcome)) {
+    return res.status(400).json({ error: "Invalid resolution payload: id and outcome (WON|LOST|VOID|STOOD_DOWN) required" });
   }
 
   const existing = db
@@ -4313,7 +4313,7 @@ app.post("/api/journal/resolve", (req, res) => {
     realizedPnl = Number(((1.00 * count) - cost - fee).toFixed(2));
   } else if (outcome === "LOST") {
     realizedPnl = Number((-(cost + fee)).toFixed(2));
-  } else if (outcome === "VOID") {
+  } else if (outcome === "VOID" || outcome === "STOOD_DOWN") {
     realizedPnl = 0.00;
   }
 

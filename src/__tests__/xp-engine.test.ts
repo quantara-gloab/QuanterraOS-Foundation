@@ -23,6 +23,7 @@ describe("Phase 5 Task 5.2 Acceptance: Event-Sourced XP Engine & Anti-Volume Gam
       assert.strictEqual(XP_ACTION_AWARDS.PRE_FLIGHT_CHECK.xp, 10);
       assert.strictEqual(XP_ACTION_AWARDS.WRITTEN_THESIS.xp, 15);
       assert.strictEqual(XP_ACTION_AWARDS.MAKER_SAVER_DISCIPLINE.xp, 10);
+      assert.strictEqual(XP_ACTION_AWARDS.OUTCOME_REVIEW_REFLECTION.xp, 20);
       assert.strictEqual(XP_ACTION_AWARDS.COIN_FLIP_STAND_DOWN.xp, 20);
       assert.strictEqual(XP_ACTION_AWARDS.FLIGHT_SCHOOL_LESSON.xp, 25);
       assert.strictEqual(XP_ACTION_AWARDS.WEEKLY_DEBRIEF.xp, 30);

@@ -906,7 +906,7 @@ export function renderJournalPageHtml(
 
         <div style="margin-bottom:16px;">
           <label style="font-size:0.8rem; color:var(--text-dim); display:block; margin-bottom:8px;">Settlement Outcome</label>
-          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+          <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px;">
             <button type="button" id="btn-outcome-won" class="btn-outcome" onclick="selectOutcome('WON')">
               WON (100¢)
             </button>
@@ -915,6 +915,9 @@ export function renderJournalPageHtml(
             </button>
             <button type="button" id="btn-outcome-void" class="btn-outcome" onclick="selectOutcome('VOID')">
               VOID
+            </button>
+            <button type="button" id="btn-outcome-stood_down" class="btn-outcome" onclick="selectOutcome('STOOD_DOWN')" title="Chose not to trade / disciplined stand down">
+              STOOD DOWN
             </button>
           </div>
         </div>
@@ -975,6 +978,7 @@ export function renderJournalPageHtml(
             <option value="WON">WON (Settled at $1.00 full value)</option>
             <option value="LOST">LOST (Settled at $0.00 total loss)</option>
             <option value="EARLY_EXIT">EARLY_EXIT (Exited before settlement)</option>
+            <option value="STOOD_DOWN">STOOD_DOWN (Chose not to trade / disciplined stand down)</option>
             <option value="VOID">VOID (Market canceled / refunded)</option>
           </select>
         </div>
@@ -1193,11 +1197,12 @@ export function renderJournalPageHtml(
 
     function selectOutcome(outcome) {
       selectedOutcome = outcome;
-      ['won', 'lost', 'void'].forEach(function(o) {
+      ['won', 'lost', 'void', 'stood_down'].forEach(function(o) {
         const btn = document.getElementById('btn-outcome-' + o);
+        if (!btn) return;
         if (o === outcome.toLowerCase()) {
-          btn.style.background = o === 'won' ? 'rgba(16,185,129,0.2)' : o === 'lost' ? 'rgba(244,63,94,0.2)' : 'rgba(255,255,255,0.15)';
-          btn.style.borderColor = o === 'won' ? 'var(--green)' : o === 'lost' ? 'var(--rose)' : 'var(--text)';
+          btn.style.background = o === 'won' ? 'rgba(16,185,129,0.2)' : o === 'lost' ? 'rgba(244,63,94,0.2)' : o === 'stood_down' ? 'rgba(155,108,255,0.25)' : 'rgba(255,255,255,0.15)';
+          btn.style.borderColor = o === 'won' ? 'var(--green)' : o === 'lost' ? 'var(--rose)' : o === 'stood_down' ? 'var(--accent)' : 'var(--text)';
           btn.style.color = '#FFFFFF';
         } else {
           btn.style.background = 'rgba(255,255,255,0.05)';

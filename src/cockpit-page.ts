@@ -714,7 +714,7 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
           <div id="station-evidence-box" style="display:flex; flex-direction:column; gap:12px;">
             <div style="background:rgba(255,255,255,0.03); border:1px solid var(--cockpit-border-subtle); border-radius:8px; padding:14px;">
               <div style="font-family:var(--public-font-mono); font-size:0.75rem; color:var(--cockpit-mint); text-transform:uppercase; margin-bottom:4px;">
-                Wolf // Order Book & Liquidity Check
+                Liquidity · Wolf // Order Book &amp; Depth Check
               </div>
               <div style="font-size:0.85rem; color:var(--cockpit-chalk);">
                 Top-of-book depth: 250 contracts available at 52¢ ask. Your 10-contract order fills without slippage. Spread drag is 2.0¢.
@@ -723,7 +723,7 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
 
             <div style="background:rgba(255,255,255,0.03); border:1px solid var(--cockpit-border-subtle); border-radius:8px; padding:14px;">
               <div style="font-family:var(--public-font-mono); font-size:0.75rem; color:var(--cockpit-violet); text-transform:uppercase; margin-bottom:4px;">
-                Kraken // Settlement Rule Audit
+                Settlement · Kraken // Settlement Rule Audit
               </div>
               <div style="font-size:0.85rem; color:var(--cockpit-chalk);">
                 Contract resolves to <strong>CME CF Bitcoin Real-Time Index (BRTI) 60-Second TWAP</strong>. Spot exchange prices on Coinbase/Kraken may diverge up to ±15 bps during final 60 seconds.
@@ -797,8 +797,14 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
     <!-- Bottom Crew Dock -->
     <section class="crew-dock" aria-label="QuanterraOS Fighter Pilots Crew Stations">
       <div class="crew-dock-header">
-        <span class="crew-dock-title">Fighter Pilot Stations // Assemble Your Investigation Roster</span>
-        <span class="crew-dock-help">Default: Draco, Wolf, Kraken, Sentinel. Toggle specialist stations to expand analysis.</span>
+        <div>
+          <span class="crew-dock-title">Specialist Stations // Decision Evidence Roster</span>
+          <div class="crew-dock-help">Default: Fees (Draco), Liquidity (Wolf), Settlement (Kraken), Quality (Sentinel). Plain labels precede character names.</div>
+        </div>
+        <label style="font-size:0.75rem; color:var(--cockpit-muted); display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
+          <input type="checkbox" id="toggle-expert-mode" onchange="toggleExpertMode(this.checked)">
+          Expert Mode (Hide Artwork)
+        </label>
       </div>
 
       <div class="crew-station-list" id="crew-station-list">
@@ -900,18 +906,46 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
         }
       } catch (e) {}
 
+      const plainRoleMap = {
+        "michael": "Tour · Founder",
+        "quanta": "Navigation · Quanta",
+        "quantana": "Review · Quantana",
+        "draco": "Fees · Draco",
+        "wolf": "Limits · Wolf",
+        "falcon": "Alerts · Falcon",
+        "fox": "Scenarios · Quantum Fox",
+        "sentinel": "Data · Sentinel",
+        "kraken": "Liquidity · Kraken",
+        "lion": "Playbook · Lion",
+        "phoenix": "Reflection · Phoenix"
+      };
+
       container.innerHTML = customPilotCard + REGISTRY.map(member => {
         const isEquipped = equippedStationIds.has(member.id);
-        const isGuide = member.category === "founder" || member.category === "leader";
+        const plainLabel = plainRoleMap[member.id] || member.name;
         return \`
           <div class="crew-station-card \${isEquipped ? 'equipped' : ''}" onclick="toggleStation('\${member.id}')" title="\${member.productResponsibility}">
             <img src="\${member.avatarImage}" alt="\${member.name}" class="station-avatar">
-            <span class="station-name">\${member.name}</span>
-            <span class="station-role-label">\${member.title.split('&')[0]}</span>
+            <span class="station-name">\${plainLabel}</span>
+            <span class="station-role-label">\${member.productResponsibility || member.title.split('&')[0]}</span>
             <span class="station-status-pill">\${isEquipped ? 'EQUIPPED' : 'STANDBY'}</span>
           </div>
         \`;
       }).join("");
+
+      const expertCheck = document.getElementById("toggle-expert-mode");
+      if (expertCheck && expertCheck.checked) {
+        toggleExpertMode(true);
+      }
+    }
+
+    function toggleExpertMode(hide) {
+      document.querySelectorAll('.station-avatar, .quanta-avatar-box').forEach(el => {
+        el.style.display = hide ? 'none' : '';
+      });
+      try {
+        localStorage.setItem('quanterraos_expert_mode', hide ? 'true' : 'false');
+      } catch (e) {}
     }
 
     function toggleStation(id) {
@@ -928,7 +962,29 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
     }
 
     function saveDecisionReceipt() {
-      alert("Decision receipt saved to your private journal (paper mission logged).");
+      const qty = parseInt(document.getElementById("order-quantity").value) || 1;
+      const priceCents = parseInt(document.getElementById("assumed-fill-price").value) || 50;
+      const grossOutlay = (qty * priceCents) / 100;
+      const fee = currentVenue === "kalshi" ? Math.max(0.01, Math.ceil(0.07 * qty * (priceCents / 100) * (1 - priceCents / 100) * 100) / 100) : 0.00;
+      const totalRisk = grossOutlay + fee;
+      const breakevenPct = Math.round((totalRisk / ((qty * 100) / 100)) * 1000) / 10;
+
+      const payload = {
+        venue: currentVenue,
+        contractTicker: document.getElementById("market-select").value,
+        side: currentSide,
+        price: priceCents / 100,
+        count: qty,
+        purchaseCost: grossOutlay,
+        exchangeFee: fee,
+        breakevenWinProb: breakevenPct,
+        savedAt: new Date().toISOString()
+      };
+      try {
+        localStorage.setItem('quanterraos_pending_check', JSON.stringify(payload));
+      } catch (e) {}
+      alert("Decision receipt saved privately to your local workspace. Opening your Decision Journal...");
+      window.location.href = "/journal";
     }
 
     function shareDecisionReceipt() {

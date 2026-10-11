@@ -1059,9 +1059,8 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
 
     <!-- =======================================================================
          PANEL 2: COST
-         Headline: "At 50¢ you need 51.75% just to break even."
          Buttons: [Check a contract] [Compare Fee Schedules]
-         Metrics: 51.75% Breakeven · $1.75 Peak Taker Drag · 100% Maker Saver
+         Metrics: 51.75% Breakeven · $1.75 Peak Taker Drag · Maker vs. Taker Friction Model
          ======================================================================= -->
     <section class="flight-panel" id="panel-cost" aria-label="True-Cost Engine">
       <div class="flight-panel-inner">
@@ -1123,7 +1122,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
             <text x="250" y="38" text-anchor="middle" fill="#FFFFFF" font-size="11" font-family="monospace">50¢ Strike = Max Fee</text>
           </svg>
           <div style="font-size:0.78rem; color:#94A3B8; text-align:center;">
-            Maker/Taker Saver calculates instantaneous savings if you post passive limit liquidity instead of paying taker spread.
+            Maker vs. Taker model calculates conditional fee differences where $0.00 maker fees apply (resting limit orders carry non-fill risk).
           </div>
         </div>
 
@@ -1138,8 +1137,8 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
             <div class="flight-metric-label">Taker Fee / 100ct</div>
           </div>
           <div class="flight-metric-item">
-            <div class="flight-metric-val" style="color:#10B981;">100%</div>
-            <div class="flight-metric-label">Maker Fee Saved ($0.00)</div>
+            <div class="flight-metric-val" style="color:#10B981;">$0.00</div>
+            <div class="flight-metric-label">Kalshi General Maker Fee</div>
           </div>
         </div>
 

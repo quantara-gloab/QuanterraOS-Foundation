@@ -15,6 +15,7 @@ export type XpActionType =
   | "PRE_FLIGHT_CHECK"
   | "WRITTEN_THESIS"
   | "MAKER_SAVER_DISCIPLINE"
+  | "OUTCOME_REVIEW_REFLECTION"
   | "COIN_FLIP_STAND_DOWN"
   | "FLIGHT_SCHOOL_LESSON"
   | "WEEKLY_DEBRIEF"
@@ -22,7 +23,7 @@ export type XpActionType =
   | "TILT_COOLDOWN_RESPECTED";
 
 /**
- * Strict XP Award Matrix from Blueprint Part 3.5
+ * Strict XP Award Matrix from Blueprint Part 3.5 & Strategy Update
  */
 export const XP_ACTION_AWARDS: Record<XpActionType, { xp: number; description: string }> = {
   PRE_FLIGHT_CHECK: {
@@ -35,7 +36,11 @@ export const XP_ACTION_AWARDS: Record<XpActionType, { xp: number; description: s
   },
   MAKER_SAVER_DISCIPLINE: {
     xp: 10,
-    description: "Choose maker/limit when Saver showed savings",
+    description: "Audit maker vs. taker fee assumptions before saving a decision",
+  },
+  OUTCOME_REVIEW_REFLECTION: {
+    xp: 20,
+    description: "Review resolved contract outcome with reflection, including stand downs",
   },
   COIN_FLIP_STAND_DOWN: {
     xp: 20,
@@ -470,6 +475,7 @@ export function computeUserXpState(userId: string, events?: XpEvent[]): UserXpSt
     PRE_FLIGHT_CHECK: 0,
     WRITTEN_THESIS: 0,
     MAKER_SAVER_DISCIPLINE: 0,
+    OUTCOME_REVIEW_REFLECTION: 0,
     COIN_FLIP_STAND_DOWN: 0,
     FLIGHT_SCHOOL_LESSON: 0,
     WEEKLY_DEBRIEF: 0,

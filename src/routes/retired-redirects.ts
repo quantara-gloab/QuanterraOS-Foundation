@@ -53,7 +53,6 @@ export const RETIRED_URL_REDIRECTS: Record<string, string> = {
   "/paper": "/deck",
   "/predictions": "/deck",
   "/autopilot": "/deck",
-  "/journal": "/deck",
   "/mobile": "/deck",
   "/wallet": "/deck",
 

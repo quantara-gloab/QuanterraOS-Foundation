@@ -1086,7 +1086,7 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
               <span>Watch Video Briefing</span>
             </button>
             <a href="/pricing" style="background: rgba(255, 255, 255, 0.06); color: #FFFFFF; border: 1px solid rgba(255, 255, 255, 0.15); font-family: var(--font-mono); font-weight: 600; font-size: 0.78rem; padding: 9px 16px; border-radius: 20px; text-decoration: none;">
-              Upgrade Pro ($29/mo) &rarr;
+              Upgrade Pilot ($39/mo) &rarr;
             </a>
           </div>
         </div>

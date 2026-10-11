@@ -31,7 +31,6 @@ describe('Phase 3 Task 3.4 Acceptance: Route Map & 301 Redirects for Retired URL
     { url: '/why', expected: '/proof' },
     { url: '/predictions', expected: '/deck' },
     { url: '/autopilot', expected: '/deck' },
-    { url: '/journal', expected: '/deck' },
     { url: '/educators', expected: '/learn' },
     { url: '/mcp', expected: '/developers' },
     { url: '/radar/audio', expected: '/proof#sonification' },
@@ -55,7 +54,7 @@ describe('Phase 3 Task 3.4 Acceptance: Route Map & 301 Redirects for Retired URL
     assert.equal(getRetiredRouteRedirect('/CALCULATOR/'), '/check');
     assert.equal(getRetiredRouteRedirect('/Matrix///'), '/radar');
     assert.equal(getRetiredRouteRedirect('/Calibration/Explorer/'), '/proof');
-    assert.equal(getRetiredRouteRedirect('/JOURNAL'), '/deck');
+    assert.equal(getRetiredRouteRedirect('/JOURNAL'), null); // Canonical route, not retired
   });
 
   test('express middleware executes HTTP 301 Permanent Redirect on retired URLs', () => {

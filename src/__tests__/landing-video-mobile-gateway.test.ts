@@ -98,7 +98,7 @@ describe("Flagship Landing Page & Mobile App Gateway Acceptance", () => {
       assert.ok(deckHtml.includes('id="deck-video-briefing-modal"'), "Flight deck must embed briefing modal");
       assert.ok(deckHtml.includes('id="deck-tutorial-hud-canvas"'), "Flight deck must have HUD tutorial canvas");
       assert.ok(deckHtml.includes("openDeckVideoBriefingModal()"), "Must provide opening controller");
-      assert.ok(deckHtml.includes("Upgrade Pro ($29/mo)"), "Must provide direct subscription upgrade link");
+      assert.ok(deckHtml.includes("Upgrade Pilot ($39/mo)"), "Must provide direct subscription upgrade link");
     });
   });
 
