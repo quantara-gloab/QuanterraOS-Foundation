@@ -622,25 +622,30 @@ export function renderStatusPageHtml(dbPath = process.env.DB_PATH || "quanterrao
       </div>
 
       <div class="table-container">
-        <div class="table-header">Continuous Ingestion &amp; Evaluation Services</div>
+        <div class="table-header">Public User Services &bull; Measured Telemetry (Market Data, Calculations, Journal, Notifications, Website)</div>
         <table>
           <thead>
             <tr>
-              <th>Service Name</th>
-              <th>Systemd Unit</th>
-              <th>Type</th>
-              <th>Status</th>
+              <th>Public User Service</th>
+              <th>System Role &amp; Unit</th>
+              <th>Expected Cadence</th>
+              <th>Observed Health</th>
             </tr>
           </thead>
           <tbody>
-            ${data.services.map(s => `
+            ${data.services.map(s => {
+              const cadence = s.name.startsWith("Market Data") ? "1–5s continuous feed" :
+                              s.name.startsWith("Calculations") ? "Real-time on demand" :
+                              s.name.startsWith("Journal") ? "Append-only persistent" :
+                              s.name.startsWith("Notifications") ? "Threshold event trigger" : "Continuous (< 50ms)";
+              return `
               <tr>
-                <td><strong>${s.name}</strong></td>
-                <td class="mono">${s.unit}</td>
-                <td>${s.type}</td>
-                <td><span class="badge ${s.status === 'ACTIVE' ? 'badge-active' : 'badge-scheduled'}">${s.status}</span></td>
+                <td><strong style="color:#FFF;">${s.name.split(' — ')[0]}</strong><br><span style="font-size:0.75rem; color:var(--text-muted);">${s.name.split(' — ')[1] || s.name}</span></td>
+                <td><span class="mono" style="font-size:0.75rem; color:#A78BFA;">${s.unit}</span><br><span style="font-size:0.7rem; color:var(--text-muted);">${s.type}</span></td>
+                <td style="font-size:0.8rem; color:var(--accent-light); font-family:var(--font-mono);">${cadence}</td>
+                <td><span class="badge ${s.status === 'ACTIVE' ? 'badge-active' : 'badge-scheduled'}">${s.status === 'ACTIVE' ? 'OPERATIONAL' : 'SCHEDULED'}</span></td>
               </tr>
-            `).join('')}
+            `;}).join('')}
           </tbody>
         </table>
       </div>
