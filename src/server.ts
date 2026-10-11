@@ -468,6 +468,7 @@ import { renderArtGallery44PageHtml } from "./art-gallery-44-page.ts";
 import { THE_44_CATALOG, getArtwork44ById, getArtwork44BySlug } from "./lib/art-44-catalog.ts";
 import { renderCockpitPageHtml } from "./cockpit-page.ts";
 import { renderTransferPageHtml } from "./transfer-page.ts";
+import { renderPolymarketTerminalHtml } from "./polymarket-terminal-page.ts";
 import { renderCrewPageHtml } from "./crew-page.ts";
 import { renderGearPageHtml } from "./gear-page.ts";
 import { renderPlatformsPageHtml } from "./platforms-page.ts";
@@ -6720,6 +6721,26 @@ app.get(["/kalshi/1h", "/kalshi-1h", "/kalshi/hourly", "/fair-value/btc1h"], (re
 app.get(["/kalshi/15m", "/kalshi-15m"], (req, res) => {
   const auth = getUserAuth(req);
   res.type("html").send(renderKalshiTerminalHtml(auth.user?.email, auth.tier, "15m"));
+});
+
+// Polymarket Intelligence & Wallet Calibration Terminal
+app.get(["/polymarket", "/wallet", "/polymarket-terminal"], (req, res) => {
+  const auth = getUserAuth(req);
+  const initialAddress = (req.query.address || req.query.wallet) as string | undefined;
+  res.type("html").send(renderPolymarketTerminalHtml({ user: auth.user, initialAddress }));
+});
+
+// Polymarket Wallet Card API Alias
+app.get("/api/polymarket/wallet/:address", (req, res) => {
+  const address = req.params.address;
+  if (!isValidPolymarketAddress(address)) {
+    return res.status(400).json({
+      error: "invalid_address",
+      message: "Address must be a valid 42-character 0x hex string or standard truncated format (e.g. 0x71c8...c70a)",
+    });
+  }
+  const card = getPolymarketWalletCard(address);
+  res.json({ card, html: renderWalletCardDetailsHtml(card) });
 });
 
 app.get("/api/kalshi/specs", (_req, res) => {
