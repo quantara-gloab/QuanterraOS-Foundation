@@ -41,7 +41,7 @@ export interface MarketQuote {
 }
 
 export interface PaperTradeInput {
-  owner: string;
+  owner?: string;
   contract: string;
   modelProbability: number;
   modelSource: ModelSource;
@@ -227,7 +227,7 @@ export function buildPaperTradeRow(
 
   return {
     id: generateId(),
-    owner: input.owner,
+    owner: input.owner ?? "system",
     contract: input.contract,
     modelProbability: input.modelProbability,
     modelSource: input.modelSource,

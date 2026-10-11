@@ -10,3 +10,4 @@ data/*.db-shm
 data/*.db-wal
 quanterraos.db*
 tmp*
+extracted_kit

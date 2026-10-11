@@ -15,11 +15,11 @@ export interface PublicLayoutOptions {
 }
 
 export const PUBLIC_NAV_ITEMS = [
+  { label: "Cockpit", href: "/cockpit" },
+  { label: "Platforms", href: "/platforms" },
   { label: "Check", href: "/check" },
   { label: "Radar", href: "/radar" },
-  { label: "Journal", href: "/journal" },
   { label: "Gear", href: "/merchandise" },
-  { label: "Learn", href: "/learn" },
   { label: "Pricing", href: "/pricing" },
 ] as const;
 
@@ -456,7 +456,10 @@ export function renderPublicHeader(options: PublicLayoutOptions = {}): string {
 
   <!-- Persistent Mobile Bottom Bar -->
   <div class="flight-mobile-bottom-bar" id="mobile-sticky-action">
-    <a href="/check" class="flight-mobile-bottom-btn">Get my receipt →</a>
+    <div style="display:flex; gap:8px; width:100%;">
+      <a href="/check" class="flight-mobile-bottom-btn" style="flex:1;">Get my receipt →</a>
+      <a href="/hangar" class="flight-mobile-bottom-btn" style="flex:1; background:rgba(203,255,105,0.18); border:1px solid #CBFF69; color:#CBFF69; box-shadow:none;">🚀 Pilot Hangar</a>
+    </div>
   </div>
 
   <script>

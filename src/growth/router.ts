@@ -19,9 +19,10 @@ import type { Complete } from "./llm.ts";
 
 export interface GrowthDeps {
   db: DB;
-  cfg: GrowthConfig;
-  llm: Complete | null;
-  send: SendEmail;
+  cfg?: GrowthConfig;
+  config?: GrowthConfig;
+  llm?: Complete | null;
+  send?: SendEmail;
   pagePath?: string; // path to growth.html; served at GET /growth
 }
 
@@ -74,7 +75,8 @@ main{max-width:440px;background:#121a2e;border:1px solid #24304d;border-radius:1
 }
 
 export function createGrowthHandler(deps: GrowthDeps) {
-  const { db, cfg } = deps;
+  const db = deps.db;
+  const cfg = (deps.cfg || deps.config)!;
   const chatLimit = makeRateLimiter(20, 60_000);
   const signupLimit = makeRateLimiter(5, 60_000);
   const pageHtml = deps.pagePath && existsSync(deps.pagePath) ? readFileSync(deps.pagePath, "utf8") : null;
@@ -107,7 +109,7 @@ export function createGrowthHandler(deps: GrowthDeps) {
             `Thanks for creating your QuanterraOS account.${r.callbackScheduled ? " Our AI assistant will call you during business hours, as you asked." : ""}\n\nReply to this email any time to reach the team.\n\nThe QuanterraOS team`,
             "You're receiving this because you created an account at quanterraos.com.",
           );
-          deps.send(mail).catch(() => {});
+          if (deps.send) deps.send(mail).catch(() => {});
         }
         return json(res, 200, { ok: true, callbackScheduled: r.callbackScheduled });
       }

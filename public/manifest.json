@@ -1,7 +1,7 @@
 {
   "name": "QuanterraOS Flight Deck",
   "short_name": "QuanterraOS",
-  "description": "Independent flight deck for prediction-market traders across Kalshi and Polymarket. True cost, settlement radar, and personal calibration.",
+  "description": "QuanterraOS Flight Deck: Live CME CF BRTI telemetry, CME settlement radar, and disciplined execution cockpit.",
   "start_url": "/deck",
   "id": "/deck",
   "display": "standalone",
@@ -48,6 +48,20 @@
   ],
   "shortcuts": [
     {
+      "name": "Pilot Hangar & Customizer",
+      "short_name": "Pilot Hangar",
+      "description": "Customize your pilot avatar, apparel, hair & visor, and embark spaceship",
+      "url": "/hangar",
+      "icons": [{ "src": "/assets/icon-192.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Platforms & Flight Deck",
+      "short_name": "Platforms",
+      "description": "Explore Flight Deck command suite and True Cost Check",
+      "url": "/platforms",
+      "icons": [{ "src": "/assets/icon-192.svg", "sizes": "192x192" }]
+    },
+    {
       "name": "Flight Deck Cockpit",
       "short_name": "Flight Deck",
       "description": "Open Celestial Flight Deck cockpit and bridge telemetry",
@@ -91,7 +105,7 @@
       "sizes": "1024x1024",
       "type": "image/jpeg",
       "form_factor": "narrow",
-      "label": "Aria Multi-Agent Ship Computer"
+      "label": "Quanta & Quantana (Celestial Man & Celestial Woman) Assistant"
     }
   ]
 }

@@ -246,7 +246,16 @@ export function renderCalculatorPageHtml(options: { venue?: string; campaign?: s
   <main class="container">
     ${campaignBannerHtml}
     <div class="focus-mode-peripheral">
-      <div class="eyebrow">Pre-Trade True-Cost Verification · Level 1 Consumer Tool</div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+        <div class="eyebrow" style="margin-bottom:0;">Pre-Trade True-Cost Verification · Level 1 Consumer Tool</div>
+        <div style="display:flex; gap:12px; font-size:0.75rem; font-family:var(--public-font-mono);">
+          <a href="/check" style="color:var(--accent); text-decoration:none; font-weight:700;">Check</a>
+          <span style="color:rgba(255,255,255,0.2);">·</span>
+          <a href="/journal" style="color:var(--muted); text-decoration:none;">Journal</a>
+          <span style="color:rgba(255,255,255,0.2);">·</span>
+          <a href="/learn" style="color:var(--muted); text-decoration:none;">Learn</a>
+        </div>
+      </div>
       <h1>True Cost &amp; Net EV Check</h1>
       <p class="lead">
         Short-duration prediction markets are zero-sum before fees, and strictly negative-sum after exchange fees and spreads. Enter your price and quantity to verify exact fee drag and your true breakeven hurdle before entering any contract.

@@ -12,7 +12,7 @@
  * 7. Feature flag gating: Governed by FEATURE_MOBILE_INSTALL / ?feature=mobile-install.
  */
 
-export function renderMobileBottomNavHtml(activeTab?: "check" | "radar" | "journal" | "review" | "account"): string {
+export function renderMobileBottomNavHtml(activeTab?: "check" | "platforms" | "hangar" | "radar" | "journal" | "review" | "account"): string {
   const current = activeTab || "check";
 
   const tabs = [
@@ -21,6 +21,18 @@ export function renderMobileBottomNavHtml(activeTab?: "check" | "radar" | "journ
       label: "Check",
       href: "/calculator",
       iconSvg: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`,
+    },
+    {
+      id: "platforms",
+      label: "Platforms",
+      href: "/platforms",
+      iconSvg: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`,
+    },
+    {
+      id: "hangar",
+      label: "Pilot",
+      href: "/hangar",
+      iconSvg: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path></svg>`,
     },
     {
       id: "radar",

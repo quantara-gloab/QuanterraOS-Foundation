@@ -137,7 +137,7 @@ describe("QuanterraOS Odds Defenders Campaign Acceptance Suite", () => {
 
   describe("4. Mobile Flight Deck Cockpit Card & Onboarding Question", () => {
     it("renders dismissible cockpit card on /deck with venue onboarding question", () => {
-      const deckHtml = renderFlightDeckPageHtml(null);
+      const deckHtml = renderFlightDeckPageHtml();
 
       assert.ok(deckHtml.includes('id="deck-campaign-odds-defenders"'), "Must contain dismissible card");
       assert.ok(deckHtml.includes("Your next decision deserves a receipt."), "Must contain campaign headline");

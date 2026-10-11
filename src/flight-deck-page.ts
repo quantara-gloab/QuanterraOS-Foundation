@@ -166,11 +166,15 @@ export const FLIGHT_DECK_STATIONS: FlightDeckStationMeta[] = [
 
 export interface FlightDeckRenderOptions {
   initialStation?: FlightDeckStationId;
+  activeStation?: FlightDeckStationId;
+  reqPath?: string;
   sharedContract?: ParsedSharedContract;
   user?: {
+    id?: string;
     email?: string;
     callsign?: string;
     rank?: string;
+    tier?: string;
     xp?: number;
     streakDays?: number;
   } | null;
@@ -179,7 +183,7 @@ export interface FlightDeckRenderOptions {
 export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}): string {
   const opt = options || {};
   const shared = opt.sharedContract;
-  const activeStation = shared ? "engineering" : (opt.initialStation || "bridge");
+  const activeStation = shared ? "engineering" : (opt.activeStation || opt.initialStation || "bridge");
   const user = opt.user || {
     email: "cadet@quanterraos.com",
     callsign: "CADET-7",
@@ -1339,7 +1343,7 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
           <!-- Ranks Stepper -->
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:10px; margin-bottom:16px;">
             ${PILOT_RANKS.map(rank => `
-              <div style="background:rgba(0,0,0,0.4); border:1px solid ${rank.minXp <= user.xp ? 'var(--hud-cyan)' : 'var(--border-subtle)'}; padding:10px; border-radius:4px; opacity:${rank.minXp <= user.xp ? '1' : '0.6'};">
+              <div style="background:rgba(0,0,0,0.4); border:1px solid ${rank.minXp <= (user.xp ?? 0) ? 'var(--hud-cyan)' : 'var(--border-subtle)'}; padding:10px; border-radius:4px; opacity:${rank.minXp <= (user.xp ?? 0) ? '1' : '0.6'};">
                 <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
                   <div style="width:18px; height:18px;">${rank.badgeSvg}</div>
                   <strong style="font-size:0.8rem; color:#FFF;">${rank.rankName}</strong>
@@ -1355,7 +1359,7 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
             Unlocked Cosmetic Inventory:
           </div>
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px;">
-            ${PILOT_RANKS.filter(r => r.minXp <= user.xp).flatMap(r => r.cosmetics).map(c => `
+            ${PILOT_RANKS.filter(r => r.minXp <= (user.xp ?? 0)).flatMap(r => r.cosmetics).map(c => `
               <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:4px; padding:10px;">
                 <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--hud-cyan); margin-bottom:2px;">
                   <span>${c.category.replace('_', ' ').toUpperCase()}</span>

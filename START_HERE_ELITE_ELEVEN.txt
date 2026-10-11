@@ -1,0 +1,68 @@
+================================================================================
+QUANTERRAOS: ELITE ELEVEN IMPLEMENTATION & DESIGN PACKAGE
+Owner: Michael Quanterra | Revision: 10 October 2026
+Supersedes: 144- and 81-piece active gallery plans
+Canonical Active Art Collection: The 44 (q44-001 through q44-044)
+Historical Records: Preserved with rollback archive at /art-gallery?archive=rollback
+================================================================================
+
+1. START HERE
+--------------------------------------------------------------------------------
+Build one calm product around the Elite Eleven:
+- Founder: Michael Quanterra (Permanent visual signature: capital M on helmet forehead,
+  entirely digital LED face, violet star eyes, cyan smile, black/pearl/gold founder suit.
+  Brand character and creative provenance, NOT a trading engine).
+- Leaders: Quanta (Assistant & Galactic Leader, paired green up / pink down arrow eyes)
+  and Quantana (Queen & Companion, violet curved smiling eyes, celestial tiara & veil).
+- Eight Specialists: Draco (Data Quality), Wolf (Order Book), Falcon (Research),
+  Quantum Fox (Calibration), Sentinel (Feed Health), Kraken (Settlement Rules),
+  Lion (Synthesis), Phoenix (Recovery).
+- Total: Exactly 11 members (not 12). Aria and obsolete references removed.
+
+2. HERO COPY & CORE CTAs
+--------------------------------------------------------------------------------
+Hero Copy:     Assemble your crew. See the evidence. Own your decision.
+Subhead:       Quanta and the Elite Eleven bring market data, costs and settlement
+               rules into one clear cockpit—so you can investigate supported Kalshi
+               and Polymarket markets before you act.
+Primary CTA:   Enter the Cockpit (/cockpit)
+Secondary CTA: Meet the Elite Eleven (/crew)
+
+3. DELIVERABLES & EXACT ALLOCATION
+--------------------------------------------------------------------------------
+- 44 Collectible Artworks: IDs q44-001 through q44-044 across 4 chapters:
+  Origin Command, Cosmic Street, Executive Orbit, Royal Ascension.
+  Eleven per chapter; four per member. Founder 1st, Quanta 2nd, Quantana 3rd.
+  Source of truth: asset-catalog.json
+  Original PNG Masters: assets/art-44/ and public/assets/art-44/
+- 13 Apparel Boards: 11 member boards + 2 Royal Galactic boards (King & Queen).
+  Original PNG Masters: assets/apparel/ and public/assets/apparel/
+- 78 Garment Concepts: Described by the 13 boards (6 looks per board: Men's/Women's
+  Hoodie, Jumpsuit, Business Attire). All flagged state: concept_only, price: null,
+  checkout disabled, "Design concept — final product may vary."
+  Source of truth: merchandise-catalog.json
+- 1 Campaign Portrait: elite-eleven-campaign-portrait.png in assets/ and public/assets/
+- Total Master Assets: Exactly 58 PNGs (44 artworks + 13 apparel boards + 1 campaign portrait).
+  Validated with dimensions, bytes, SHA-256 in asset-validation.json.
+- Package Status: build-status.json matching exact handoff requirements.
+- Interactive Local Preview: website-mobile-preview.html (Home, Cockpit, Gallery, Gear
+  across Desktop 1440px and Mobile 390px).
+
+4. VERIFIED ACCEPTANCE SUITES
+--------------------------------------------------------------------------------
+- Acceptance Test Suite:
+  node --experimental-strip-types --test src/__tests__/elite-eleven-catalog.test.ts
+  Result: 15/15 tests passing (0 failures).
+- Regression Test Suites:
+  node --experimental-strip-types --test src/__tests__/art-144-gallery.test.ts src/__tests__/home-panels.test.ts src/__tests__/global-layout.test.ts src/__tests__/merchandise-and-gamification.test.ts
+  Result: 28/28 tests passing (0 failures).
+
+5. KEY REPOSITORY ROUTES
+--------------------------------------------------------------------------------
+- /              -> Hero copy, 3-step evidence workflow, compact crew preview
+- /cockpit       -> Canonical decision workspace with Quanta guide, 8-specialist dock,
+                    scenario cost math, and Quanta Decision Receipt
+- /crew          -> Eleven member identities, verified product roles, Founder story
+- /art-gallery   -> The 44 active gallery (with link to /art-gallery?archive=rollback)
+- /gear          -> 5 collections, 78 apparel concepts, concept disclosures
+================================================================================

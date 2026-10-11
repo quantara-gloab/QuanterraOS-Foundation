@@ -1,0 +1,68 @@
+[
+  {
+    "id": "michael-quanterra",
+    "name": "Michael Quanterra",
+    "role": "Founder and Creator",
+    "identity": "Founder digital astronaut, no human face. Pearl ceramic armor, black and gold tailored panels, violet energy piping. Glossy black visor with two violet angular star-eye LEDs and cyan friendly digital smile. A single clear capital M permanently on the helmet forehead, not on the human skin. Gold Q chest emblem. Broader executive silhouette, no weapon. Creator of the ten-member QuanterraOS team."
+  },
+  {
+    "id": "quanta",
+    "name": "Quanta",
+    "role": "Global Galactic Leader",
+    "identity": "Friendly male-coded digital astronaut. Pearl ceramic armor, purple and gold trim, glossy black round visor with one green up-arrow eye and one pink down-arrow eye, violet smiling mouth; royal gold crown with violet orb. Same Quanta identity as reference image 1. Both arrows together, equal weight."
+  },
+  {
+    "id": "quantana",
+    "name": "Quantana",
+    "role": "Queen and Galactic Companion",
+    "identity": "Friendly female-coded digital astronaut. Sculpted pearl ceramic astronaut armor, violet and gold trim, glossy black visor with two happy violet curved closed-eye LEDs and violet smiling mouth; ornate gold tiara with purple gem, long translucent cosmic violet ribbon veil. Same Quantana identity as reference image 1. No exposed human skin."
+  },
+  {
+    "id": "draco",
+    "name": "Draco",
+    "role": "Data Quality",
+    "identity": "Digital dragon-inspired astronaut, pearl armor with graphite and ember-red trim, black visor with two amber angular dragon-eye LEDs and smiling pixel mouth. Subtle swept-back dragon crest integrated into helmet, compact data-quality scanner. Clearly a friendly astronaut robot, not a biological dragon."
+  },
+  {
+    "id": "wolf",
+    "name": "Wolf",
+    "role": "Market Microstructure",
+    "identity": "Digital wolf-inspired astronaut, pearl armor with gunmetal and icy teal trim, black visor with two ice-cyan chevron-eye LEDs and smiling pixel mouth, subtle two pointed wolf-like helmet fins. Compact translucent order-book depth prism with abstract bars, no text. Clearly a friendly astronaut robot, not a biological wolf."
+  },
+  {
+    "id": "falcon",
+    "name": "Falcon",
+    "role": "Short-Horizon Research",
+    "identity": "Digital falcon-inspired astronaut, pearl armor with cobalt and silver trim, black visor with two electric-blue keen falcon-wing-shaped eye LEDs and friendly pixel smile. Swept aerodynamic helmet fins, compact blue probability orb with abstract rings. Clearly a friendly astronaut robot, not a biological falcon."
+  },
+  {
+    "id": "quantum-fox",
+    "name": "Quantum Fox",
+    "role": "Statistical Validation",
+    "identity": "Digital fox-inspired astronaut, pearl armor with violet and copper trim, black visor with two violet diamond-eye LEDs and friendly pixel smile. Small pointed fox-like helmet fins; translucent probability lattice sphere. Clearly a friendly astronaut robot, not a biological fox."
+  },
+  {
+    "id": "sentinel",
+    "name": "Sentinel",
+    "role": "Systems Monitoring",
+    "identity": "Digital guardian astronaut, pearl armor with emerald and titanium trim, black visor with two mint-green hexagonal eye LEDs and friendly pixel smile. Broad smooth guardian helmet, transparent emerald diagnostic shield with abstract monitoring paths. No weapon."
+  },
+  {
+    "id": "kraken",
+    "name": "Kraken",
+    "role": "Basis and Settlement",
+    "identity": "Digital ocean-themed astronaut, pearl armor with deep teal and indigo trim, black visor with two aqua spiral-eye LEDs and friendly pixel smile. Smooth bulbous helmet with four small mechanical articulated sensor arms on backpack, translucent tide-like basis chart orb, no text. Clearly friendly astronaut robot."
+  },
+  {
+    "id": "lion",
+    "name": "Lion",
+    "role": "Crew Synthesis",
+    "identity": "Digital lion-inspired astronaut, pearl armor with warm gold and ivory trim, black visor with two amber sun-disc eye LEDs and friendly pixel smile. Golden circular mechanical mane collar and regal lion-like helmet silhouette; constellation synthesis orb. Clearly friendly astronaut robot, not biological lion."
+  },
+  {
+    "id": "phoenix",
+    "name": "Phoenix",
+    "role": "Reliability and Recovery",
+    "identity": "Digital phoenix-inspired astronaut, pearl armor with coral, rose and gold trim, black visor with two warm pink crescent-eye LEDs and friendly pixel smile. Swept feather-like mechanical helmet crest and translucent coral winglike solar fins; compact reconnect beacon. Clearly friendly astronaut robot, not biological bird."
+  }
+]

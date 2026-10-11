@@ -1,0 +1,582 @@
+{
+  "q44-001.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "d34c84a3bb0c3a9c5c13dce9bfea0f6d57ff7a0255279ab46f557abe966a7965",
+    "sizeBytes": 3399708,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-002.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "82ae80b6f67e462519c46dbec5f9e5de0bd4b04c0868e95105ea2ded30dbf818",
+    "sizeBytes": 3229920,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-003.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "35bc39e14aefb17c85ff806558a1780a0d3edd3f7f10b39c3b38ec246b245d6a",
+    "sizeBytes": 3266349,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-004.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "4612346e32114406f643293f9c948e0b5d2593140a67df7fbec0e81b9fa90713",
+    "sizeBytes": 3256827,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-005.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "c4354e65c001c64a84d209ef6e4c2c0ff5d551eafbb468250c84bf46b74c6992",
+    "sizeBytes": 3408856,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-006.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "4d55fc41406ee5465cb7207e32d86c4ed55f6613c267fbdd81bbec73760001d4",
+    "sizeBytes": 3367985,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-007.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "bfa3286ff1c56f7c9aa0e36c5ccb34b38130105edbef69c58b51e42b7390854a",
+    "sizeBytes": 3214967,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-008.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "d00322a3634aa926460b24f95ddce91d7d250202b3fe6b018517e79944debdc1",
+    "sizeBytes": 3333031,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-009.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "368b8afb485274eeca5e5eeefe2c848bc95d0fface5dcc8fa5eb1ce57e0d4e71",
+    "sizeBytes": 3432856,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-010.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "2eeabeb7e8c0f0e894e5fc65c138cb9d04c267c08ef93aa25ba30a6e9b6cb86c",
+    "sizeBytes": 3247636,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-011.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "477cef60b299b7443f9d8cc83e83f632cb0032238cb86bd9aada39385a363ed1",
+    "sizeBytes": 3242849,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-012.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "b667c48e625940825ff0455b93f27153c9bc0887c96ddb3b698b16e1c7cb5bab",
+    "sizeBytes": 3819030,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-013.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "23e39952adcfcd172c26b507c5911b89069f6b57f3e1fcab4feec389b943afcf",
+    "sizeBytes": 3773380,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-014.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "928c2b3d7d59fe789e0614cc82c16d9d0753c0273ad6316d238c2da8334677e4",
+    "sizeBytes": 3553895,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-015.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "ad0464f3d1520e185be24fe5410033c72b87785b3f686e58cf2a0dad326c9e40",
+    "sizeBytes": 3767793,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-016.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "6c88bece58d7b65095ab4a1db9ec999bc248c63e971d0c16d898a0978f95caf1",
+    "sizeBytes": 3964304,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-017.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "538ca8d9035934efcf64f3e1f0ddf8ae6993705c1e757455385ba29c6fda3003",
+    "sizeBytes": 3858719,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-018.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "fe207be3961092433689751b901fcbbb0b55a4b5b1b17dcffaf88fc489ad8fa3",
+    "sizeBytes": 3761825,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-019.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "6adb7f3f5f21070a6a0306f1c295c8e6330a1bd843ca60caf2dd00ea6290d607",
+    "sizeBytes": 3707416,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-020.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "001d4daf313edc92e85aa9eee07e5a7f710c76b2542ed71eba7f976edd172653",
+    "sizeBytes": 3997757,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-021.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "85f409fcdec202271ddbdaddb26ca2a3eefe38604a4d5ae2c505c6fb9920d7e8",
+    "sizeBytes": 3707754,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-022.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "13e1c23613971c692b5ef0c902346f319c570a4f63907eb2cc6b49aabe87294d",
+    "sizeBytes": 3866777,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-023.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "d765f881de8789c73645b9bbb6b4b836fe03e09223cfbbc5c470b46f078f3de7",
+    "sizeBytes": 3238594,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-024.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "aa83bae7285fd5c2825a0fb7a8d50f6e92ecb9d72b4200825b7dab3e305f4850",
+    "sizeBytes": 3016021,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-025.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "592a86ce8dde03ec5ba91faec0a406d9a318d35685dc1beecacc01ed5e23e7c1",
+    "sizeBytes": 3043270,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-026.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "47186df7d48f3622150c5305de519b19262ba3969a30546334d04f4eaa88fd18",
+    "sizeBytes": 2969881,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-027.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "2d9f309e8ef3ea0438443f3fb6dd82f989f4fa4e1a258e1f5bde39542ec24a89",
+    "sizeBytes": 3128623,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-028.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "00140b9525bd730cb161ff72e6b8c422cb68fb70814a8d7b59a3468bb21d9281",
+    "sizeBytes": 3012281,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-029.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "5f09b8f04c9b37729ad2d08f00f235481cc9fcd8a9c252617445691a3677fa8d",
+    "sizeBytes": 3189010,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-030.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "733983989b1f30ea70dffce474f0259b5e90339bbc52a55560ea75f9df95b94f",
+    "sizeBytes": 3143345,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-031.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "ccbd7d165254e41e18d3cc88069f9f57efb9287f4ab829521a295093093c93b8",
+    "sizeBytes": 3369527,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-032.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "9dc5dd1cdfd8ba2fa3762689310cea7bfa28e5bfdcf7bb38b8e4faa6ea334dae",
+    "sizeBytes": 3101740,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-033.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "315fb6fd392bdb9ef2b8300eff3b5bfc42b85754621949cd723c2fc10824a800",
+    "sizeBytes": 3037126,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-034.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "ac6e5f70b8a0aca38d5db8c70586ab2fba0310e469e8bff5fd7f31c179d1a302",
+    "sizeBytes": 3645426,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-035.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "c8dc6dce06f12c74b8a1017305e1ad3e8646a565ae873b039e098303e3516d8c",
+    "sizeBytes": 3432333,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-036.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "939283609ff85bd08cd98fcd4468f43edfc13c14ef313102d111c73b0d334277",
+    "sizeBytes": 3494712,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-037.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "8f65ebfcb4d263c2353119a0fe419df4df261ac9acdc4139cd543efcc5fe6747",
+    "sizeBytes": 3551886,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-038.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "d6d6efd7b41d02d330e215b42732cce1ec8ce29bc4535731b34121f2ad6389b7",
+    "sizeBytes": 3420656,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-039.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "cf03f36fa324cddf2adbe8a4b324fa776dc4c11ac277627e737119a507e1f48b",
+    "sizeBytes": 3520126,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-040.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "9d2d6448385039c41474ae2ce6df11cbd133749f3fb022e3d5666cebdb949b62",
+    "sizeBytes": 3524035,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-041.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "7a4a8f717f5bd12eafc0657d988a2b43aa0c765fb6688c591f5c8303f09c14cb",
+    "sizeBytes": 3516652,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-042.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "774a21041fe46edddf9a008380e46e789d95fe60e7f301d233782c8e3c088285",
+    "sizeBytes": 3657280,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-043.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "1f097df74c72316c57b91ade481f14f2eb1898bbac8cdc4887cfcceff978a1c0",
+    "sizeBytes": 3400097,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "q44-044.png": {
+    "dimensions": {
+      "width": 1254,
+      "height": 1254
+    },
+    "sha256": "2a5552f7a0e972fde85505fb038726b854aab5294672a6b4ac946e51835ba2e9",
+    "sizeBytes": 3549477,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "michael-apparel-board.png": {
+    "dimensions": {
+      "width": 1536,
+      "height": 1024
+    },
+    "sha256": "b1ea34b2a96771c5bb661b5b9dcae732859ef3b87790cc7dd7921240a1710e2b",
+    "sizeBytes": 2499565,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "quanta-leader-apparel-board.png": {
+    "dimensions": {
+      "width": 1536,
+      "height": 1024
+    },
+    "sha256": "433ba81c9b7db42c8056b010cbadc462067eacc64804031e5934dc9837b0c384",
+    "sizeBytes": 2436717,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "quantana-apparel-board.png": {
+    "dimensions": {
+      "width": 1536,
+      "height": 1024
+    },
+    "sha256": "fcbcb517fa391bd7bc36bcd0ad7ae417d440a2cdb18f76ed665fa090701f4a4e",
+    "sizeBytes": 2642032,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "draco-apparel-board.png": {
+    "dimensions": {
+      "width": 1536,
+      "height": 1024
+    },
+    "sha256": "77ee213e14c037e915aba00e4e6538bf8a0a4259c64aaf2922cb64f81d3894b7",
+    "sizeBytes": 2505172,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "wolf-apparel-board.png": {
+    "dimensions": {
+      "width": 1536,
+      "height": 1024
+    },
+    "sha256": "525a004c8473d8b053b3d0de209b2aee5c86f848caab48f84f1c60f7a3cb78a0",
+    "sizeBytes": 2821315,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "falcon-apparel-board.png": {
+    "dimensions": {
+      "width": 1536,
+      "height": 1024
+    },
+    "sha256": "68ec998f4cbc222081ca0f84a4ed4d402df28d1b78be5176fd511e1c47406e2f",
+    "sizeBytes": 2463470,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "quantum-fox-apparel-board.png": {
+    "dimensions": {
+      "width": 1536,
+      "height": 1024
+    },
+    "sha256": "9c78d8d64e04be7c61a12a553ca02228f87f5bdfdb945108e7a57fb6693fc011",
+    "sizeBytes": 2535251,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "sentinel-apparel-board.png": {
+    "dimensions": {
+      "width": 1536,
+      "height": 1024
+    },
+    "sha256": "89862e0223174febbe57ac0b0e0c97aa4671bf1861ef4340767815a88f02b75c",
+    "sizeBytes": 2566891,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "kraken-apparel-board.png": {
+    "dimensions": {
+      "width": 1536,
+      "height": 1024
+    },
+    "sha256": "ab6d55fe571fe6b363c8fccffe871b4e6875ba070a7e7cb1be3bf26e5c631b6e",
+    "sizeBytes": 2778374,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "lion-apparel-board.png": {
+    "dimensions": {
+      "width": 1536,
+      "height": 1024
+    },
+    "sha256": "55d6078bddcc163827b3bfd4c97ba76ee92e51b9ab4e828e0be1ecf816c17da3",
+    "sizeBytes": 2673512,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "phoenix-apparel-board.png": {
+    "dimensions": {
+      "width": 1536,
+      "height": 1024
+    },
+    "sha256": "f9548eda43f06f599d36933692e344778bd6de1e6f8adad3fcc5622b61af0440",
+    "sizeBytes": 2633733,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "king-royal-galactic-board.png": {
+    "dimensions": {
+      "width": 1536,
+      "height": 1024
+    },
+    "sha256": "397f3589645b4e844876e8989342da00a8731282cc082d31c50b2a5fff44a225",
+    "sizeBytes": 3043844,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "queen-royal-galactic-board.png": {
+    "dimensions": {
+      "width": 1536,
+      "height": 1024
+    },
+    "sha256": "3488729510c4d3fa7376f31ccd9b5846d04230f7cbb3be16a4df5396e26b9d48",
+    "sizeBytes": 3354910,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  },
+  "elite-eleven-campaign-portrait.png": {
+    "dimensions": {
+      "width": 1920,
+      "height": 1080
+    },
+    "sha256": "4bf42be61a693f03d8983c8e45d3f374d56b03899c4c938da6f111b01fb6d547",
+    "sizeBytes": 3618460,
+    "mimeType": "image/png",
+    "decodedSuccessfully": true
+  }
+}

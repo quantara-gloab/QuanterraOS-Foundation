@@ -48,7 +48,7 @@ export const ASSISTANT_WIDGET_HTML = `
         </div>
         <div>
           <div class="qos-header-title"><span id="qos-header-name-txt">Quanta</span> <span class="qos-title-badge">Cosmic Pilot</span></div>
-          <div class="qos-header-sub" id="qos-header-role-sub">King of the Galaxy · Flight Deck &amp; Metaverse Guide</div>
+          <div class="qos-header-sub" id="qos-header-role-sub">Celestial Man · Flight Deck &amp; Metaverse Guide</div>
         </div>
       </div>
       <div class="qos-header-actions">
@@ -59,15 +59,15 @@ export const ASSISTANT_WIDGET_HTML = `
       </div>
     </div>
 
-    <!-- Persona Switcher Bar (Quanta King vs Quantana Queen) -->
+    <!-- Persona Switcher Bar (Quanta Celestial Man vs Quantana Celestial Woman) -->
     <div class="qos-persona-bar">
       <span class="qos-persona-lbl">Cosmic Pilot Captain:</span>
       <div class="qos-persona-btns">
-        <button type="button" class="qos-persona-btn active" id="btn-persona-quanta" onclick="setAssistantIdentity('quanta')" title="Quanta (King of the Galaxy Cosmic Pilot Captain)">
-          👑 Quanta (King)
+        <button type="button" class="qos-persona-btn active" id="btn-persona-quanta" onclick="setAssistantIdentity('quanta')" title="Quanta (Celestial Man Cosmic Pilot Captain)">
+          ✨ Quanta (Celestial Man)
         </button>
-        <button type="button" class="qos-persona-btn" id="btn-persona-quantana" onclick="setAssistantIdentity('quantana')" title="Quantana (Queen of the Galaxy Cosmic Pilot Captain)">
-          👑 Quantana (Queen)
+        <button type="button" class="qos-persona-btn" id="btn-persona-quantana" onclick="setAssistantIdentity('quantana')" title="Quantana (Celestial Woman Cosmic Pilot Captain)">
+          ✨ Quantana (Celestial Woman)
         </button>
       </div>
     </div>
@@ -90,7 +90,7 @@ export const ASSISTANT_WIDGET_HTML = `
       <div class="qos-aria-hero-card">
         <img id="qos-hero-avatar-img" src="/assets/quanta-avatar.jpg" alt="Virtual Assistant" class="qos-hero-img" />
         <div class="qos-hero-body">
-          <div class="qos-hero-name"><span id="qos-hero-name-txt">Quanta</span> <span class="qos-hero-verified" id="qos-hero-badge-txt">✓ King of the Galaxy</span></div>
+          <div class="qos-hero-name"><span id="qos-hero-name-txt">Quanta</span> <span class="qos-hero-verified" id="qos-hero-badge-txt">✓ Celestial Man</span></div>
           <div class="qos-hero-tagline" id="qos-hero-tagline-txt">Cosmic Flight Pilot Captain &amp; Metaverse Guide</div>
           <div class="qos-hero-desc">Ask me to explain contract costs, verify settlement rules, or connect with our live 1-800 assistant team.</div>
         </div>
@@ -101,7 +101,7 @@ export const ASSISTANT_WIDGET_HTML = `
         <img id="qos-initial-msg-avatar" src="/assets/quanta-avatar.jpg" alt="Virtual Assistant" class="qos-msg-avatar" />
         <div class="qos-msg-content">
           <div class="qos-msg-bubble" id="qos-greeting-bubble">
-Greetings, Pilot! I am <strong id="qos-greeting-strong">Quanta</strong>, your Cosmic Flight Pilot Captain and King of the Galaxy.
+Greetings, Pilot! I am <strong id="qos-greeting-strong">Quanta</strong>, your Cosmic Flight Pilot Captain and Celestial Man.
 <br><br>
 I'm here to guide your flight deck, <strong>explain your contract costs</strong>, decode settlement rules, and <strong>revisit your decision records</strong>.
 <br><br>
@@ -683,7 +683,7 @@ Need to talk to a live assistant right now? Call toll-free at <strong><a href="t
   function updateIdentityUI() {
     const isQuanta = currentIdentity === 'quanta';
     const name = isQuanta ? 'Quanta' : 'Quantana';
-    const titleRole = isQuanta ? 'King of the Galaxy' : 'Queen of the Galaxy';
+    const titleRole = isQuanta ? 'Celestial Man' : 'Celestial Woman';
     const avatar = isQuanta ? '/assets/quanta-avatar.jpg' : '/assets/quantana-avatar.jpg';
 
     if (btnQuanta) btnQuanta.classList.toggle('active', isQuanta);
@@ -722,7 +722,7 @@ Need to talk to a live assistant right now? Call toll-free at <strong><a href="t
     try { localStorage.setItem('qos_assistant_identity', currentIdentity); } catch (e) {}
     updateIdentityUI();
     if (isVoiceEnabled) {
-      const titleRole = currentIdentity === 'quanta' ? 'King of the Galaxy' : 'Queen of the Galaxy';
+      const titleRole = currentIdentity === 'quanta' ? 'Celestial Man' : 'Celestial Woman';
       speakText('Switched virtual assistant identity to ' + (currentIdentity === 'quanta' ? 'Quanta' : 'Quantana') + ', ' + titleRole + '. Cosmic Flight Pilot Captain active.');
     }
   };
@@ -1034,3 +1034,7 @@ Need to talk to a live assistant right now? Call toll-free at <strong><a href="t
 })();
 </script>
 `;
+
+export function renderAssistantWidget(): string {
+  return ASSISTANT_WIDGET_HTML;
+}

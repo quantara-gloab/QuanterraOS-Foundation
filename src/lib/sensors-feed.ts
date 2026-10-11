@@ -27,13 +27,15 @@ export interface LargeTradePrint {
   netLossIfLoseDollars: number;
   feeDragBps: number;
   requiredBreakevenPct: number;
-  settlementSource: "CME CF BRTI (60s TWAP)" | "UMA Decentralized Oracle";
-  strikePrice: number;
-  currentSpot: number;
-  strikeDistanceDollars: number;
-  secondsToExpiry: number;
-  settlementRiskLevel: "HAZARD_COIN_FLIP" | "HIGH_VOLATILITY" | "MODERATE" | "SAFE";
+  settlementSource: "CME CF BRTI (60s TWAP)" | "UMA Decentralized Oracle" | string;
+  strikePrice?: number;
+  currentSpot?: number;
+  strikeDistanceDollars?: number;
+  secondsToExpiry?: number;
+  settlementRiskLevel: "HAZARD_COIN_FLIP" | "HIGH_VOLATILITY" | "MODERATE" | "SAFE" | "NORMAL_PROBABILITY" | string;
   walletIdentifier: string; // Truncated on-chain wallet for Polymarket, "CFTC-PUBLIC-TAPE" for Kalshi
+  walletAddress?: string;
+  timestampIso?: string;
 }
 
 export interface LargeTradeFeedFilter {

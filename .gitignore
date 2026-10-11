@@ -35,6 +35,7 @@ backups/*.json
 scratch/
 tmp-check.mjs
 tmp-*.mjs
+extracted_kit/
 
 # OS/editor noise
 .DS_Store

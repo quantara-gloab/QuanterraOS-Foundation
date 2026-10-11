@@ -929,6 +929,8 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
       </div>
       <div style="display:flex; align-items:center; gap:12px;">
         <button type="button" class="btn-strip-download" onclick="openMobileAppDownloadModal()">Install / Download App &rarr;</button>
+        <a href="/platforms" style="color:#00E5FF; text-decoration:none; font-size:0.75rem; font-family:var(--public-font-mono); font-weight:700;">Platforms</a>
+        <a href="/hangar" style="color:#CBFF69; text-decoration:none; font-size:0.75rem; font-family:var(--public-font-mono); font-weight:700;">Pilot Hangar</a>
         <a href="/check" style="color:var(--public-accent-purple); text-decoration:none; font-size:0.75rem; font-family:var(--public-font-mono);">Check</a>
         <a href="/journal" style="color:#CBD5E1; text-decoration:none; font-size:0.75rem; font-family:var(--public-font-mono);">Journal</a>
         <a href="/learn" style="color:#CBD5E1; text-decoration:none; font-size:0.75rem; font-family:var(--public-font-mono);">Learn</a>
@@ -962,11 +964,27 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
 
         <div class="hero-split-grid">
           <div class="hero-text-col">
-            <h1 class="flight-headline">SEE THE COST. UNDERSTAND THE RULES.<br><em>OWN YOUR DECISION.</em></h1>
-            <div class="flight-sublead-legacy">Trade like a pilot,<br>not a passenger.</div>
+            <h1 class="flight-headline">Assemble your crew. See the evidence.<br><em>Own your decision.</em></h1>
+            <div class="flight-sublead-legacy" style="display:none;">Trade like a pilot,<br>not a passenger. Run Free Check &rarr; Enter the Flight Deck</div>
             <p class="flight-lead">
-              QuanterraOS turns supported prediction markets into clear decision receipts—with cost assumptions, settlement sources and a private record of your reasoning. Check fees, spreads and settlement rules before you decide.
+              Quanta and the QuanterraOS Fighter Pilots bring market data, costs and settlement rules into one clear cockpit—so you can investigate supported Kalshi and Polymarket markets before you act.
             </p>
+
+            <!-- Primary and Secondary CTAs -->
+            <div style="display:flex; gap:12px; margin: 16px 0 20px; flex-wrap:wrap;">
+              <a href="/cockpit" class="btn-intake-submit" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; padding:12px 24px; font-weight:800; font-size:1rem; border-radius:10px; background:#9B6CFF; color:#FFFFFF;">
+                Enter the Cockpit &rarr;
+              </a>
+              <a href="/hangar" class="btn-example-preview" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; padding:12px 20px; font-size:0.95rem; border-radius:10px; background:rgba(203,255,105,0.14); border:1px solid #CBFF69; color:#CBFF69; font-weight:700;">
+                🚀 Customize Pilot &amp; Embark &rarr;
+              </a>
+              <a href="/platforms" class="btn-example-preview" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; padding:12px 20px; font-size:0.95rem; border-radius:10px; background:rgba(0,229,255,0.08); border:1px solid rgba(0,229,255,0.35); color:#00E5FF; font-weight:600;">
+                ⚡ Platforms &amp; True Cost
+              </a>
+              <a href="/crew" class="btn-example-preview" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; padding:12px 20px; font-size:0.95rem; border-radius:10px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); color:#F4F3FA;">
+                Meet the QuanterraOS Fighter Pilots
+              </a>
+            </div>
 
             <!-- Above-Fold Intake Form -->
             <div class="hero-intake-card">
@@ -990,7 +1008,7 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
           <div class="hero-art-col">
             <img src="/assets/hero-flight-deck.png" alt="Flight Deck Pilot Quanta" class="hero-quanta-img">
             <div class="hero-quanta-caption">
-              <strong>Founder Mission:</strong> Michael Quantara created QuanterraOS to help people make better decisions with evidence they can revisit. Meet <strong>Quanta</strong> and the Flight Crew (clear decisions, receipts, provenance, and outcome review).
+              <strong>Founder Mission:</strong> Michael Quanterra created QuanterraOS to help people make better decisions with evidence they can revisit. Meet <strong>Quanta (Celestial Man)</strong> and <strong>Quantana (Celestial Woman)</strong> with the Flight Crew (clear decisions, receipts, provenance, and outcome review).
             </div>
           </div>
         </div>
@@ -1381,8 +1399,27 @@ export function renderLandingPage(report?: MarketPriceCalibrationReport | null):
         Seven specialized instrument stations engineered for empirical discipline. Zero live capital deployment (RULE B5 LOCKED: zero live capital exposure), venue-neutral pricing, and automated post-flight calibration audits.
       </p>
 
-      <!-- 6 Specialized Terminal Cards -->
+      <!-- 8 Specialized Terminal Cards -->
       <div class="cockpit-cards-grid">
+        <!-- Card 0A: Pilot Hangar & Spaceship Embarkation -->
+        <a href="/hangar" class="cockpit-tool-card" style="border-color: rgba(203, 255, 105, 0.4); background: rgba(203, 255, 105, 0.04);">
+          <div>
+            <div class="tool-tag" style="color: #CBFF69;">Pilot Customizer &bull; Spaceship Embarkation</div>
+            <div class="tool-title">Customize Pilot &amp; Meet the Crew</div>
+            <div class="tool-desc">Select from 6 archetypes, 6 QuanterraOS apparel lines, 7 hair styles, and 6 visor expressions, then enter the starship to meet Quanta (Celestial Man), Quantana (Celestial Woman) and crew.</div>
+          </div>
+          <div class="tool-action" style="color: #CBFF69;">Open Pilot Hangar &rarr;</div>
+        </a>
+
+        <!-- Card 0B: Platforms Page -->
+        <a href="/platforms" class="cockpit-tool-card" style="border-color: rgba(0, 229, 255, 0.4); background: rgba(0, 229, 255, 0.04);">
+          <div>
+            <div class="tool-tag" style="color: #00E5FF;">Command Suite &bull; Venue Multi-Architecture</div>
+            <div class="tool-title">Platforms &amp; True Cost Check</div>
+            <div class="tool-desc">Flight Deck at the top with live BRTI spot basis and Kalshi/Polymarket spreads, followed by venue architectures and the interactive True Cost Check right above pricing.</div>
+          </div>
+          <div class="tool-action" style="color: #00E5FF;">Explore Platforms &rarr;</div>
+        </a>
         <!-- Card 1: Realistic Paper Mode -->
         <a href="/paper" class="cockpit-tool-card">
           <div>

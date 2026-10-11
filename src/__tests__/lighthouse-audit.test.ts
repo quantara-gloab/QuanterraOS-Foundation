@@ -21,7 +21,7 @@ describe("Lighthouse Mobile >= 90 Performance & Accessibility Audit (Task 3.6)",
       name: "Bitcoin Expiry & Oracle Radar (/radar)",
       path: "/radar",
       getHtml: () => {
-        const state = computeExpiryRadarState("kxbtc15m", 91250, null, 14.5);
+        const state = computeExpiryRadarState({ series: "15m", spotPrice: 91250 });
         return renderExpiryRadarPageHtml(state, null);
       },
     },

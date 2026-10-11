@@ -464,6 +464,15 @@ import {
 } from "./lib/crew-pass.ts";
 import { renderArtGallery144PageHtml } from "./art-gallery-144-page.ts";
 import { THE_144_CATALOG, getArtworkById, getArtworkBySlug } from "./lib/art-144-catalog.ts";
+import { renderArtGallery44PageHtml } from "./art-gallery-44-page.ts";
+import { THE_44_CATALOG, getArtwork44ById, getArtwork44BySlug } from "./lib/art-44-catalog.ts";
+import { renderCockpitPageHtml } from "./cockpit-page.ts";
+import { renderCrewPageHtml } from "./crew-page.ts";
+import { renderGearPageHtml } from "./gear-page.ts";
+import { renderPlatformsPageHtml } from "./platforms-page.ts";
+import { renderPilotHangarPageHtml } from "./pilot-hangar-page.ts";
+import { MERCHANDISE_78_CATALOG, getGarmentBySku } from "./lib/merchandise-44-catalog.ts";
+import { ELITE_ELEVEN_REGISTRY } from "./lib/elite-eleven-catalog.ts";
 import { renderOddsDefendersPageHtml } from "./odds-defenders-page.ts";
 import { isCampaignEnabled, recordCampaignEvent } from "./config/campaign.ts";
 import { renderMerchandisePageHtml } from "./merchandise-page.ts";
@@ -559,8 +568,11 @@ app.get("/growth", (_req, res) => {
 const growth = startGrowthEngine({ pagePath: path.resolve("public/growth.html") });
 app.use(growth.handler);
 
-// Legacy / Unneeded Preview & Corporate Pitch Routes -> Redirect to Core Proof & Tools
-app.get(["/preview", "/home-v2"], (_req, res) => {
+// Interactive Complete Website & Mobile Preview Route
+app.get(["/preview", "/interactive", "/demo"], (_req, res) => {
+  res.sendFile(path.resolve("public/website-mobile-preview.html"));
+});
+app.get("/home-v2", (_req, res) => {
   res.redirect(301, "/");
 });
 app.get("/fleet.jpg", (_req, res) => {
@@ -592,7 +604,7 @@ app.post("/api/gtm/drafts/new", requireFounderAuth, (req, res) => {
 
 app.post("/api/gtm/drafts/approve", requireFounderAuth, (req, res) => {
   try {
-    const result = approveContentDraft(req.body.draftId, req.body.approvedBy || "Michael Quantara");
+    const result = approveContentDraft(req.body.draftId, req.body.approvedBy || "Michael Quanterra");
     res.json(result);
   } catch (err) {
     res.status(400).json({ error: (err as Error).message });
@@ -1358,8 +1370,8 @@ app.post(["/api/assistant/chat", "/api/council/:agentId/chat", "/api/council/:id
       const selectedId = isQuantana ? "quantana" : "quanta";
       const selectedName = isQuantana ? "Quantana" : "Quanta";
       const selectedRole = isQuantana
-        ? "Queen of the Galaxy // Cosmic Flight Pilot Captain"
-        : "King of the Galaxy // Cosmic Flight Pilot Captain";
+        ? "Celestial Woman // Cosmic Flight Pilot Captain"
+        : "Celestial Man // Cosmic Flight Pilot Captain";
       return res.json({
         agentId: selectedId,
         agentName: selectedName,
@@ -1378,8 +1390,8 @@ app.post(["/api/assistant/chat", "/api/council/:agentId/chat", "/api/council/:id
       const selectedId = isQuantana ? "quantana" : "quanta";
       const selectedName = isQuantana ? "Quantana" : "Quanta";
       const selectedRole = isQuantana
-        ? "Queen of the Galaxy // Cosmic Flight Pilot Captain"
-        : "King of the Galaxy // Cosmic Flight Pilot Captain";
+        ? "Celestial Woman // Cosmic Flight Pilot Captain"
+        : "Celestial Man // Cosmic Flight Pilot Captain";
       return res.json({
         agentId: selectedId,
         agentName: selectedName,
@@ -1389,7 +1401,7 @@ app.post(["/api/assistant/chat", "/api/council/:agentId/chat", "/api/council/:id
         disclaimer: "Non-advisory response. QuanterraOS does not provide trading advice.",
         citations: assistantRes.citations,
         suggestedActions: assistantRes.suggestedActions,
-        isAdvisoryRefusal: assistantRes.isRefusal,
+        isAdvisoryRefusal: assistantRes.isAdvisoryRefusal,
       });
     }
 
@@ -2125,17 +2137,26 @@ window.addEventListener("load", async function () {
 
 // Exclusive Access Terminal rendered via src/access-terminal-page.ts
 
-app.get(["/", "/home"], async (_req, res) => {
-  let report: MarketPriceCalibrationReport | null = null;
-  try {
-    report = await getOrComputeCalibrationReport();
-  } catch (_e) {
-    // continue with default fallback values
+app.get(["/", "/home"], async (req, res) => {
+  if (req.query.report === "true" || req.query.v1 === "true" || req.query.classic === "true") {
+    let report: MarketPriceCalibrationReport | null = null;
+    try {
+      report = await getOrComputeCalibrationReport();
+    } catch (_e) {
+      // continue with default fallback values
+    }
+    return res.type("html").send(renderLandingPage(report));
   }
-  res.type("html").send(renderLandingPage(report));
+  // Live flagship website & terminal: Founder Welcome (Page 1) -> Tactical Terminal (Page 2) -> Hangar -> 44 NFTs
+  res.sendFile(path.resolve("public/index.html"));
 });
 
-app.get(["/access", "/login", "/terminal", "/command", "/clearance"], (req, res) => {
+// Tactical Market Terminal direct route
+app.get("/terminal", (_req, res) => {
+  res.sendFile(path.resolve("public/index.html"));
+});
+
+app.get(["/access", "/login", "/command", "/clearance"], (req, res) => {
   const error = req.query.error ? String(req.query.error) : undefined;
   res.type("html").send(renderAccessTerminalPage(error));
 });
@@ -2191,9 +2212,70 @@ app.post("/api/campaign/event", (req, res) => {
 // Official Mascot Merchandise, Raffles & Calibration Tournaments
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// QuanterraOS Fighter Pilots Canonical Routes: Cockpit, Crew, Gear
+// ---------------------------------------------------------------------------
+
+// Canonical Cockpit Decision Workspace
+app.get("/cockpit", (req, res) => {
+  const auth = getUserAuth(req);
+  const venue = req.query.venue === "polymarket" ? "polymarket" : "kalshi";
+  const side = req.query.side === "NO" ? "NO" : "YES";
+  res.type("html").send(renderCockpitPageHtml({
+    user: auth.user,
+    venue,
+    side,
+  }));
+});
+
+// The QuanterraOS Fighter Pilots Roster & Provenance
+app.get("/crew", (req, res) => {
+  const auth = getUserAuth(req);
+  res.type("html").send(renderCrewPageHtml({ user: auth.user }));
+});
+
+// QuanterraOS Fighter Pilots Apparel Concepts (5 Collections, 78 Concepts)
+app.get("/gear", (req, res) => {
+  const auth = getUserAuth(req);
+  res.type("html").send(renderGearPageHtml({ user: auth.user }));
+});
+
+// Platforms Page: Flight Deck at Top, True Cost Check at Bottom Above Pricing
+app.get(["/platforms", "/platform"], (req, res) => {
+  const auth = getUserAuth(req);
+  res.type("html").send(renderPlatformsPageHtml({ user: auth.user }));
+});
+
+// Pilot Hangar & Spaceship Embarkation Experience
+app.get(["/hangar", "/embark", "/customizer", "/pilot"], (req, res) => {
+  const auth = getUserAuth(req);
+  res.type("html").send(renderPilotHangarPageHtml({ user: auth.user }));
+});
+
+// API for Elite Eleven Roster
+app.get("/api/crew/eleven", (_req, res) => {
+  res.json({
+    success: true,
+    totalMembers: ELITE_ELEVEN_REGISTRY.length,
+    members: ELITE_ELEVEN_REGISTRY,
+  });
+});
+
+// API for 78 Garment Concepts
+app.get("/api/gear/concepts", (_req, res) => {
+  res.json({
+    success: true,
+    totalConcepts: MERCHANDISE_78_CATALOG.length,
+    concepts: MERCHANDISE_78_CATALOG,
+  });
+});
+
 // Public Storefront Page
 app.get("/merchandise", (req, res) => {
   const auth = getUserAuth(req);
+  if (req.query.concepts === "true" || req.query.gear === "true") {
+    return res.type("html").send(renderGearPageHtml({ user: auth.user }));
+  }
   res.type("html").send(renderMerchandisePageHtml(auth.user));
 });
 
@@ -2333,7 +2415,7 @@ app.post("/api/merchandise/tournament/join", (req, res) => {
 
     const result = joinTournament({
       userId: auth.user?.id || "cadet_pilot",
-      callsign: callsign || auth.user?.callsign || "CADET-PILOT",
+      callsign: callsign || (auth.user as any)?.callsign || "CADET-PILOT",
       tournamentId,
     });
 
@@ -2368,20 +2450,29 @@ app.get("/pass", (req, res) => {
   res.type("html").send(renderCrewPassClaimPageHtml(auth.user, pass));
 });
 
-// QuanterraOS: The 144 Artwork Gallery
-app.get("/art-gallery", (req, res) => {
+// QuanterraOS: The 44 Artwork Gallery (Active collection: QuanterraOS 44 NFTs)
+app.get(["/art-gallery", "/art", "/gallery", "/nfts", "/the-44", "/art-44"], (req, res) => {
   const auth = getUserAuth(req);
-  const isRollback = req.query.archive === "rollback" || req.query.rollback === "true";
+  const isRollback = req.query.archive === "rollback" || req.query.rollback === "true" || req.query.archive === "144";
   const artSlug = req.query.art ? String(req.query.art) : undefined;
-  res.type("html").send(renderArtGallery144PageHtml({
+  
+  if (isRollback || req.query.collection === "144") {
+    return res.type("html").send(renderArtGallery144PageHtml({
+      user: auth.user,
+      activeArtIdOrSlug: artSlug,
+      showRollbackArchive: true
+    }));
+  }
+
+  res.type("html").send(renderArtGallery44PageHtml({
     user: auth.user,
     activeArtIdOrSlug: artSlug,
-    showRollbackArchive: isRollback
+    showRollbackArchive: false
   }));
 });
 
 // Artwork Gallery Rollback Archive route
-app.get("/art-gallery/rollback", (req, res) => {
+app.get(["/art-gallery/rollback", "/art/rollback", "/nfts/rollback"], (req, res) => {
   const auth = getUserAuth(req);
   res.type("html").send(renderArtGallery144PageHtml({
     user: auth.user,
@@ -2390,7 +2481,7 @@ app.get("/art-gallery/rollback", (req, res) => {
 });
 
 // Artwork Gallery Deep Link route /art-gallery/:artworkSlug
-app.get("/art-gallery/:artworkSlug", (req, res) => {
+app.get(["/art-gallery/:artworkSlug", "/art/:artworkSlug", "/nfts/:artworkSlug"], (req, res) => {
   const auth = getUserAuth(req);
   const slug = req.params.artworkSlug;
   if (slug === "rollback") {
@@ -2399,23 +2490,53 @@ app.get("/art-gallery/:artworkSlug", (req, res) => {
       showRollbackArchive: true
     }));
   }
-  const art = getArtworkById(slug) || getArtworkBySlug(slug);
-  if (!art) {
-    return res.status(404).send(renderArtGallery144PageHtml({
+
+  // 1. Check active The 44 catalog
+  const art44 = getArtwork44ById(slug) || getArtwork44BySlug(slug);
+  if (art44) {
+    return res.type("html").send(renderArtGallery44PageHtml({
       user: auth.user,
-      showRollbackArchive: false
+      activeArtIdOrSlug: art44.id
     }));
   }
-  res.type("html").send(renderArtGallery144PageHtml({
+
+  // 2. Check legacy 144 catalog
+  const art144 = getArtworkById(slug) || getArtworkBySlug(slug);
+  if (art144) {
+    return res.type("html").send(renderArtGallery144PageHtml({
+      user: auth.user,
+      activeArtIdOrSlug: art144.id
+    }));
+  }
+
+  // Fallback to active 44 gallery
+  res.status(404).send(renderArtGallery44PageHtml({
     user: auth.user,
-    activeArtIdOrSlug: art.id
+    showRollbackArchive: false
   }));
 });
 
-// Artwork Catalog 144 APIs
-app.get("/api/art-gallery/144", (req, res) => {
+// Artwork Catalog 44 APIs (Active Collection)
+app.get("/api/art-gallery/44", (_req, res) => {
   res.json({
-    collection: "QuanterraOS: The 144",
+    collection: "QuanterraOS: The 44 — QuanterraOS Fighter Pilots",
+    totalCount: THE_44_CATALOG.length,
+    artworks: THE_44_CATALOG
+  });
+});
+
+app.get("/api/art-gallery/44/:idOrSlug", (req, res) => {
+  const art = getArtwork44ById(req.params.idOrSlug) || getArtwork44BySlug(req.params.idOrSlug);
+  if (!art) {
+    return res.status(404).json({ error: "Artwork not found in The 44" });
+  }
+  res.json({ artwork: art });
+});
+
+// Artwork Catalog 144 APIs (Historical Rollback Archive)
+app.get("/api/art-gallery/144", (_req, res) => {
+  res.json({
+    collection: "QuanterraOS: The 144 (Rollback Archive)",
     totalCount: THE_144_CATALOG.length,
     artworks: THE_144_CATALOG
   });
@@ -2905,7 +3026,7 @@ app.get("/api/radar/card.svg", (req, res) => {
 
 // Helper to extract common embed widget query parameters
 function parseEmbedWidgetOptions(req: any) {
-  const theme = req.query.theme === "light" ? "light" : "dark";
+  const theme: "light" | "dark" = req.query.theme === "light" ? "light" : "dark";
   const whiteLabel = req.query.whiteLabel === "true" || req.query.whitelabel === "true" || req.query.wl === "1";
   const price = req.query.price ? Number(req.query.price) : undefined;
   const count = req.query.count ? Number(req.query.count) : undefined;

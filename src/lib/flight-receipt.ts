@@ -64,6 +64,7 @@ export interface ResolveReceiptInput {
   quantity?: number;
   entryMode?: "ask" | "midpoint" | "fill";
   userFillPrice?: number;
+  entryPrice?: number;
   userId?: string | null;
 }
 

@@ -1,9 +1,9 @@
 {
-  "name": "QuanterraOS Flight Deck",
+  "name": "QuanterraOS — Elite Eleven & The 44 NFTs",
   "short_name": "QuanterraOS",
-  "description": "Independent flight deck for prediction-market traders across Kalshi and Polymarket. True cost, settlement radar, and personal calibration.",
-  "start_url": "/deck",
-  "id": "/deck",
+  "description": "QuanterraOS: Founder Welcome, Tactical Terminal attacking Kalshi & Polymarket, Pilot Customizer, and QuanterraOS 44 NFTs.",
+  "start_url": "/",
+  "id": "/",
   "display": "standalone",
   "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
   "orientation": "portrait-primary",
