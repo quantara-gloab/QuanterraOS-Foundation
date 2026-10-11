@@ -909,11 +909,11 @@ export function renderMobilePageHtml(): string {
   </a>
 
   <div class="nav-actions">
-    <a href="/dashboard" class="nav-link">Live Cockpit</a>
-    <a href="/calculator" class="nav-link">Taker Drag</a>
-    <a href="/vs" class="nav-link">Vs Contenders</a>
-    <a href="/dashboard" class="btn-outline-gold">
-      ⚡ Launch Terminal
+    <a href="/cockpit" class="nav-link">Fighter Cockpit</a>
+    <a href="/track-record" class="nav-link">Track Record (8,145)</a>
+    <a href="/check" class="nav-link">True-Cost Check</a>
+    <a href="/cockpit" class="btn-outline-gold">
+      ⚡ Launch Cockpit
     </a>
   </div>
 </header>
@@ -1254,6 +1254,61 @@ export function renderMobilePageHtml(): string {
           </div>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- AI Fighter Pilots Mobile Cockpit & Empirical Track Record -->
+  <section style="background: linear-gradient(135deg, rgba(12, 16, 26, 0.98) 0%, rgba(18, 24, 40, 0.95) 100%); border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 18px; padding: 36px 30px; margin-bottom: 48px; box-shadow: 0 16px 40px rgba(0,0,0,0.6);">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; margin-bottom:24px;">
+      <div>
+        <div style="display:inline-flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:11px; color:var(--cyan); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;">
+          <span style="width:8px; height:8px; border-radius:50%; background:var(--cyan); box-shadow:0 0 8px var(--cyan);"></span>
+          EMPIRICAL SHADOW TRACK RECORD // 8,145+ EVALUATED DECISIONS
+        </div>
+        <h3 style="font-size:clamp(22px, 3.2vw, 32px); font-weight:800; color:#FFFFFF; margin:0 0 8px; line-height:1.2;">
+          Why Subscribers Pay: Deterministic Fee Savings &amp; Calibrated Protection
+        </h3>
+        <p style="color:var(--text-muted); font-size:14px; max-width:760px; line-height:1.6; margin:0;">
+          Raw directional betting is an unpredictable coin-flip (our models audit at an honest 45.0% win rate). The reason professional traders subscribe to QuanterraOS is mathematical fee preservation: Maker-order execution saves <strong style="color:var(--gold);">$183.75 to $367.50/month</strong>, while the AI Fighter Pilots filtered out 8,036 high-drag traps.
+        </p>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <a href="/cockpit" class="btn-outline-gold" style="padding:10px 18px; font-size:13px;">
+          🚀 Open Live Cockpit &rarr;
+        </a>
+        <a href="/track-record" style="background:rgba(0,242,254,0.12); border:1px solid rgba(0,242,254,0.4); color:var(--cyan); padding:10px 18px; border-radius:6px; font-size:13px; font-weight:700; font-family:var(--font-mono); text-decoration:none;">
+          📊 Audit 8,145 Ledger
+        </a>
+      </div>
+    </div>
+
+    <!-- Live Performance Metric Cards -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:24px;">
+      <div style="background:rgba(6,7,10,0.7); border:1px solid var(--border-subtle); border-radius:12px; padding:16px;">
+        <div style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono); margin-bottom:6px;">TOTAL EVALUATED SCENARIOS</div>
+        <div style="font-size:24px; font-weight:800; color:var(--cyan); font-family:var(--font-mono);">8,145</div>
+        <div style="font-size:11px; color:#10B981; margin-top:4px;">100% Shadow Provenance</div>
+      </div>
+      <div style="background:rgba(6,7,10,0.7); border:1px solid var(--border-subtle); border-radius:12px; padding:16px;">
+        <div style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono); margin-bottom:6px;">DISCIPLINED FILTER RATE</div>
+        <div style="font-size:24px; font-weight:800; color:var(--gold); font-family:var(--font-mono);">98.66%</div>
+        <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">8,036 Toxic Traps Skipped</div>
+      </div>
+      <div style="background:rgba(6,7,10,0.7); border:1px solid var(--border-subtle); border-radius:12px; padding:16px;">
+        <div style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono); margin-bottom:6px;">CALIBRATED WIN RATE</div>
+        <div style="font-size:24px; font-weight:800; color:#FFFFFF; font-family:var(--font-mono);">45.0%</div>
+        <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Audited Honest Benchmark</div>
+      </div>
+      <div style="background:rgba(6,7,10,0.7); border:1px solid var(--border-subtle); border-radius:12px; padding:16px;">
+        <div style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono); margin-bottom:6px;">SUBSCRIBER FEE SAVINGS</div>
+        <div style="font-size:24px; font-weight:800; color:#10B981; font-family:var(--font-mono);">+$367.50/mo</div>
+        <div style="font-size:11px; color:#10B981; margin-top:4px;">Deterministic Maker Offset</div>
+      </div>
+    </div>
+
+    <!-- CFTC 4.41 Compliance Note -->
+    <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:12px 16px; font-size:11px; color:var(--text-muted); line-height:1.5;">
+      <strong style="color:#CBD5E1;">CFTC RULE 4.41 HYPOTHETICAL DISCLAIMER:</strong> Simulated and paper performance results have certain inherent limitations. Unlike an actual performance record, simulated results do not represent actual trading. QuanterraOS enforces Rule B5 permanent circuit breakers: $0.00 live capital deployed, zero order routing.
     </div>
   </section>
 

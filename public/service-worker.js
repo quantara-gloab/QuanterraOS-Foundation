@@ -1,11 +1,12 @@
 // QuanterraOS Progressive Web App Service Worker
-// Version: 2.2.0 (Flight Deck Celestial Shell + Non-Advisory Web Push + Rule B5 Offline Guard)
+// Version: 2.3.0 (Flight Deck Cockpit & AI Fighter Pilots Track Record + Rule B5 Offline Guard)
 
-const CACHE_NAME = 'quanterraos-flightdeck-v2.2';
+const CACHE_NAME = 'quanterraos-flightdeck-v2.3';
 
 // Safe static shell assets ONLY.
 const STATIC_ASSETS = [
   '/manifest.json',
+  '/manifest.webmanifest',
   '/offline.html',
   '/index.css',
   '/assets/icon.svg',

@@ -48,6 +48,20 @@
   ],
   "shortcuts": [
     {
+      "name": "Fighter Pilots Cockpit",
+      "short_name": "Cockpit",
+      "description": "Live AI Fighter Pilots mission telemetry and scenario verification",
+      "url": "/cockpit",
+      "icons": [{ "src": "/assets/icon-192.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Empirical Track Record",
+      "short_name": "Track Record",
+      "description": "Audited 8,145+ paper trades and fee-optimized subscriber value ledger",
+      "url": "/track-record",
+      "icons": [{ "src": "/assets/icon-192.svg", "sizes": "192x192" }]
+    },
+    {
       "name": "Pilot Hangar & Customizer",
       "short_name": "Pilot Hangar",
       "description": "Customize your pilot avatar, apparel, hair & visor, and embark spaceship",
