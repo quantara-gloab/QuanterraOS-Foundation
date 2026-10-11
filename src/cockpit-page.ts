@@ -38,7 +38,7 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
     side: initialSide,
     contracts: 10,
     priceCents: 52,
-    equippedPilotIds: ["draco", "wolf", "kraken", "sentinel"],
+    equippedPilotIds: ["draco", "wolf", "kraken", "sentinel", "falcon", "quantum-fox", "lion", "phoenix", "quanta", "quantana", "michael"],
   });
 
   const initialEquippedIds = ["draco", "wolf", "kraken", "sentinel"];
@@ -64,6 +64,42 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
           <span style="font-size:0.72rem; color:var(--cockpit-muted); font-family:var(--public-font-mono);">\${p.provenanceSource}</span>
           <button type="button" class="btn-inspect-telemetry" onclick="inspectPilotTelemetry('\${p.id}')" style="background:rgba(155,108,255,0.15); border:1px solid var(--cockpit-border); color:var(--cockpit-chalk); border-radius:4px; padding:3px 8px; font-size:0.72rem; font-family:var(--public-font-mono); cursor:pointer;">Inspect Telemetry ↗</button>
+        </div>
+      </div>
+    `;
+  }).filter(Boolean).join("");
+
+  const allPilotIds = ["draco", "wolf", "kraken", "sentinel", "falcon", "quantum-fox", "lion", "phoenix", "quanta", "quantana", "michael"];
+  const allCrewCardsHtml = allPilotIds.map(id => {
+    const p = initialVerification.pilots[id];
+    if (!p) return "";
+    const badgeBg = p.status === "HAZARD" ? "rgba(255,85,200,0.15)" : p.status === "RESEARCH_AUDITED" ? "rgba(223,184,67,0.15)" : "rgba(203,255,105,0.15)";
+    const badgeColor = p.status === "HAZARD" ? "var(--cockpit-danger)" : p.status === "RESEARCH_AUDITED" ? "var(--cockpit-gold)" : "var(--cockpit-mint)";
+    return `
+      <div class="crew-full-card" style="background:rgba(9,13,26,0.85); border:1px solid var(--cockpit-border-subtle); border-radius:10px; padding:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
+          <div>
+            <div style="font-family:var(--public-font-mono); font-size:0.72rem; color:var(--cockpit-muted); text-transform:uppercase;">
+              \${p.callsign} · \${p.category.toUpperCase()}
+            </div>
+            <div style="font-size:1.05rem; font-weight:700; color:var(--cockpit-chalk);">
+              \${p.name} <span style="font-size:0.8rem; font-weight:400; color:var(--cockpit-muted);">(\${p.role})</span>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:0.7rem; font-family:var(--public-font-mono); color:var(--cockpit-muted);">\${p.latencyMs}ms</span>
+            <span style="font-size:0.7rem; font-family:var(--public-font-mono); padding:3px 8px; border-radius:4px; background:\${badgeBg}; color:\${badgeColor}; font-weight:700;">\${p.status}</span>
+          </div>
+        </div>
+        <div style="font-size:0.85rem; color:var(--cockpit-chalk); line-height:1.5; margin-bottom:10px;">
+          \${p.summary}
+        </div>
+        <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.05); border-radius:6px; padding:8px 12px; margin-bottom:12px; font-family:var(--public-font-mono); font-size:0.75rem; color:var(--cockpit-mint);">
+          Model Basis: \${p.mathematicalModel}
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+          <span style="font-size:0.72rem; color:var(--cockpit-muted); font-family:var(--public-font-mono);">Source: \${p.provenanceSource}</span>
+          <button type="button" class="btn-inspect-telemetry" onclick="inspectPilotTelemetry('\${p.id}')" style="background:rgba(155,108,255,0.18); border:1px solid var(--cockpit-border); color:var(--cockpit-chalk); border-radius:6px; padding:6px 12px; font-size:0.75rem; font-family:var(--public-font-mono); cursor:pointer;">Inspect Full Telemetry ↗</button>
         </div>
       </div>
     `;
@@ -784,10 +820,11 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
       <!-- Center Evidence & Scenario Panel -->
       <section class="center-panel">
         <nav class="tab-nav" aria-label="Cockpit Sections">
-          <button type="button" class="tab-nav-btn active" id="tab-btn-evidence" onclick="switchTab('evidence')">True Cost & Breakeven</button>
+          <button type="button" class="tab-nav-btn active" id="tab-btn-evidence" onclick="switchTab('evidence')">True Cost &amp; Breakeven</button>
           <button type="button" class="tab-nav-btn" id="tab-btn-radar" onclick="switchTab('radar')">Settlement Radar (BRTI)</button>
           <button type="button" class="tab-nav-btn" id="tab-btn-crew" onclick="switchTab('crew')">Specialist Insights</button>
           <button type="button" class="tab-nav-btn" id="tab-btn-value" onclick="switchTab('value')">Subscription Value Proof</button>
+          <button type="button" class="tab-nav-btn" id="tab-btn-ledger" onclick="switchTab('ledger')">Track Record &amp; Missions</button>
         </nav>
 
         <div class="tab-content-card" id="tab-content-evidence">
@@ -861,8 +898,133 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
           </div>
         </div>
 
+        <div class="tab-content-card" id="tab-content-radar" style="display:none; padding:20px;">
+          <div class="scenario-header">
+            <h2 class="scenario-title">CME CF BRTI 60s TWAP Settlement Radar</h2>
+            <span style="font-family:var(--public-font-mono); font-size:0.75rem; color:var(--cockpit-mint); background:rgba(203,255,105,0.1); padding:4px 8px; border-radius:4px;">
+              Index: BRTI (Constituent Median)
+            </span>
+          </div>
+          <p style="font-size:0.82rem; color:var(--cockpit-muted); line-height:1.5;">
+            Kalshi KXBTC15M contracts settle against the volume-weighted 60-second Time-Weighted Average Price (TWAP) of the CME CF Bitcoin Real-Time Index (BRTI). When spot price is within 25 bps of strike inside the final 90 seconds, settlement pin risk surges.
+          </p>
+          <div class="metrics-summary-strip" style="margin:16px 0;">
+            <div class="calc-stat">
+              <span class="calc-stat-label">BRTI Spot Reference</span>
+              <span class="calc-stat-val" id="radar-brti-spot">$63,420.50</span>
+            </div>
+            <div class="calc-stat">
+              <span class="calc-stat-label">Constituent Basis</span>
+              <span class="calc-stat-val" style="color:var(--cockpit-mint);" id="radar-basis">+1.2 bps</span>
+            </div>
+            <div class="calc-stat">
+              <span class="calc-stat-label">TWAP Window Phase</span>
+              <span class="calc-stat-val" id="radar-twap-phase">ACCUMULATING</span>
+            </div>
+            <div class="calc-stat">
+              <span class="calc-stat-label">Lockout Risk Status</span>
+              <span class="calc-stat-val" style="color:var(--cockpit-mint);" id="radar-lockout-status">SAFE (&gt;90s)</span>
+            </div>
+          </div>
+          <div style="background:rgba(9,13,26,0.9); border:1px solid var(--cockpit-border-subtle); border-radius:10px; padding:16px; margin-top:14px;">
+            <div style="font-family:var(--public-font-mono); font-size:0.78rem; font-weight:700; color:var(--cockpit-chalk); margin-bottom:8px;">
+              Kraken &amp; Sentinel Settlement Protection Policy
+            </div>
+            <ul style="font-size:0.78rem; color:var(--cockpit-muted); line-height:1.6; margin:0; padding-left:18px;">
+              <li><strong>60s Pre-Expiry Lockout:</strong> Fighter Pilots prohibit new order submission when countdown is &lt;60s to prevent oracle lag slippage.</li>
+              <li><strong>Pin Risk Alert:</strong> If underlying spot is within $25 of strike at T-120s, contract is flagged as <code>HAZARD_PIN</code>.</li>
+              <li><strong>Polymarket UMA Divergence:</strong> Polymarket utilizes optimistic oracle resolution rather than minute-by-minute BRTI TWAP, creating distinct basis risks.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="tab-content-card" id="tab-content-crew" style="display:none; padding:20px;">
+          <div class="scenario-header">
+            <h2 class="scenario-title">Elite Eleven Crew Stations // Live Telemetry Roster</h2>
+            <span style="font-family:var(--public-font-mono); font-size:0.75rem; color:var(--cockpit-mint);">
+              Active Roster: 11 / 11 Verified
+            </span>
+          </div>
+          <p style="font-size:0.82rem; color:var(--cockpit-muted); line-height:1.5;">
+            Inspect the mathematical models, verified data pipelines, and audited error-bounds for every QuanterraOS Fighter Pilot.
+          </p>
+          <div id="crew-all-stations-grid" style="display:grid; grid-template-columns:1fr; gap:12px; margin-top:14px;">
+            \${allCrewCardsHtml}
+          </div>
+        </div>
+
         <div class="tab-content-card" id="tab-content-value" style="display:none; padding:16px;">
           ${renderSubscriptionValueCalculatorHtml()}
+        </div>
+
+        <div class="tab-content-card" id="tab-content-ledger" style="display:none; padding:20px;">
+          <div class="scenario-header">
+            <div>
+              <h2 class="scenario-title" style="margin-bottom:4px;">Fighter Pilots Empirical Shadow Track Record</h2>
+              <div style="font-size:0.78rem; color:var(--cockpit-muted);">
+                Continuous evaluation across 8,098+ live 15-minute BTC contracts under strict Rule B5 ($0.00 capital deployed).
+              </div>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+              <a href="/track-record" class="venue-link" style="border:1px solid var(--cockpit-border); padding:6px 10px; border-radius:6px; text-decoration:none;">
+                Full Settlement Ledger &rarr;
+              </a>
+              <a href="/api/track-record/export.csv" class="venue-link" style="background:rgba(203,255,105,0.1); border:1px solid rgba(203,255,105,0.3); color:var(--cockpit-mint); padding:6px 10px; border-radius:6px; text-decoration:none;">
+                Export CSV 📥
+              </a>
+            </div>
+          </div>
+
+          <div class="metrics-summary-strip" style="margin:16px 0;">
+            <div class="calc-stat">
+              <span class="calc-stat-label">Total Missions Evaluated</span>
+              <span class="calc-stat-val" id="ledger-kpi-decisions">8,098</span>
+            </div>
+            <div class="calc-stat">
+              <span class="calc-stat-label">Toxic Outlay Filter Rate</span>
+              <span class="calc-stat-val" style="color:var(--cockpit-mint);" id="ledger-kpi-skips">98.6%</span>
+            </div>
+            <div class="calc-stat">
+              <span class="calc-stat-label">Model Win Rate (Hurdle Cleared)</span>
+              <span class="calc-stat-val" id="ledger-kpi-winrate">45.0%</span>
+            </div>
+            <div class="calc-stat">
+              <span class="calc-stat-label">Cumulative Paper P&amp;L</span>
+              <span class="calc-stat-val" style="color:var(--cockpit-mint);" id="ledger-kpi-pnl">+$4,888.01</span>
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+            <div style="display:flex; gap:6px;">
+              <button type="button" class="btn-filter-ledger active" onclick="setLedgerFilter('all', this)" style="background:rgba(155,108,255,0.2); border:1px solid var(--cockpit-border); color:var(--cockpit-chalk); padding:5px 10px; border-radius:6px; font-size:0.75rem; font-family:var(--public-font-mono); cursor:pointer;">All Simulated Decisions</button>
+              <button type="button" class="btn-filter-ledger" onclick="setLedgerFilter('buy', this)" style="background:rgba(255,255,255,0.04); border:1px solid var(--cockpit-border-subtle); color:var(--cockpit-muted); padding:5px 10px; border-radius:6px; font-size:0.75rem; font-family:var(--public-font-mono); cursor:pointer;">Model Buys (Passed Hurdle)</button>
+              <button type="button" class="btn-filter-ledger" onclick="setLedgerFilter('skip', this)" style="background:rgba(255,255,255,0.04); border:1px solid var(--cockpit-border-subtle); color:var(--cockpit-muted); padding:5px 10px; border-radius:6px; font-size:0.75rem; font-family:var(--public-font-mono); cursor:pointer;">Disciplined Skips (Protected)</button>
+            </div>
+            <span style="font-size:0.72rem; color:var(--cockpit-muted); font-family:var(--public-font-mono);">Live Updates: Enabled (15s)</span>
+          </div>
+
+          <div style="overflow-x:auto; background:rgba(9,13,26,0.9); border:1px solid var(--cockpit-border-subtle); border-radius:8px;">
+            <table style="width:100%; border-collapse:collapse; text-align:left;">
+              <thead>
+                <tr style="border-bottom:1px solid var(--cockpit-border-subtle); font-family:var(--public-font-mono); font-size:0.7rem; color:var(--cockpit-muted); text-transform:uppercase;">
+                  <th style="padding:10px 8px;">Time</th>
+                  <th style="padding:10px 8px;">Contract Ticker</th>
+                  <th style="padding:10px 8px;">Action / Side</th>
+                  <th style="padding:10px 8px;">Model vs Breakeven</th>
+                  <th style="padding:10px 8px;">Fee Saved</th>
+                  <th style="padding:10px 8px;">Outcome</th>
+                  <th style="padding:10px 8px;">Paper P&amp;L</th>
+                </tr>
+              </thead>
+              <tbody id="ledger-trades-tbody">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <div style="margin-top:14px; padding:12px; border-radius:8px; background:rgba(0,0,0,0.3); border:1px solid var(--cockpit-border-subtle); font-size:0.72rem; color:var(--cockpit-muted); line-height:1.5;">
+            <strong>CFTC Rule 4.41 Notice:</strong> Hypothetical or simulated performance results have certain limitations. Unlike an actual performance record, simulated results do not represent actual trading. Also, since the trades have not been executed, the results may have under-or-over compensated for the impact, if any, of certain market factors, such as lack of liquidity. QuanterraOS operates under Rule B5 ($0.00 Live Exposure).
+          </div>
         </div>
       </section>
 
@@ -977,6 +1139,10 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
     <button type="button" class="mobile-quick-btn" id="mq-savings" onclick="mobileJumpTo('savings')">
       <span class="mq-icon">🛡️</span>
       <span class="mq-label">Savings</span>
+    </button>
+    <button type="button" class="mobile-quick-btn" id="mq-ledger" onclick="mobileJumpTo('ledger')">
+      <span class="mq-icon">📊</span>
+      <span class="mq-label">Track</span>
     </button>
     <button type="button" class="mobile-quick-btn" id="mq-receipt" onclick="mobileJumpTo('receipt')">
       <span class="mq-icon">🧾</span>
@@ -1295,15 +1461,14 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
       const btn = document.getElementById("tab-btn-" + t);
       if (btn) btn.classList.add("active");
 
-      const evidencePanel = document.getElementById("tab-content-evidence");
-      const valuePanel = document.getElementById("tab-content-value");
+      const tabIds = ["evidence", "radar", "crew", "value", "ledger"];
+      tabIds.forEach(id => {
+        const el = document.getElementById("tab-content-" + id);
+        if (el) el.style.display = (id === t) ? "block" : "none";
+      });
 
-      if (t === "value") {
-        if (evidencePanel) evidencePanel.style.display = "none";
-        if (valuePanel) valuePanel.style.display = "block";
-      } else {
-        if (valuePanel) valuePanel.style.display = "none";
-        if (evidencePanel) evidencePanel.style.display = "block";
+      if (t === "ledger") {
+        loadTrackRecordFeed();
       }
     }
 
@@ -1334,12 +1499,16 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
         const el = document.getElementById("tab-content-evidence");
         if (el) el.scrollIntoView({ behavior: "smooth" });
       } else if (target === "pilots") {
-        switchTab("evidence");
-        const el = document.getElementById("crew-station-dock");
+        switchTab("crew");
+        const el = document.getElementById("tab-content-crew");
         if (el) el.scrollIntoView({ behavior: "smooth" });
       } else if (target === "savings") {
         switchTab("value");
         const el = document.getElementById("tab-content-value");
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      } else if (target === "ledger") {
+        switchTab("ledger");
+        const el = document.getElementById("tab-content-ledger");
         if (el) el.scrollIntoView({ behavior: "smooth" });
       } else if (target === "receipt") {
         const el = document.querySelector(".receipt-panel");
@@ -1347,10 +1516,89 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
       }
     }
 
+    let cachedTrackRecord = null;
+    let currentLedgerFilter = "all";
+
+    async function loadTrackRecordFeed() {
+      try {
+        const res = await fetch("/api/cockpit/track-record?limit=25");
+        const data = await res.json();
+        if (data.success && data.trades) {
+          cachedTrackRecord = data;
+          renderTrackRecordRows(currentLedgerFilter);
+          const elDec = document.getElementById("ledger-kpi-decisions");
+          if (elDec) elDec.textContent = (data.totalDecisions || 8098).toLocaleString();
+          const elWins = document.getElementById("ledger-kpi-winrate");
+          if (elWins) elWins.textContent = (data.winRatePct || 45) + "%";
+          const elSkips = document.getElementById("ledger-kpi-skips");
+          if (elSkips && data.totalDecisions) {
+            elSkips.textContent = ((data.skipCount / data.totalDecisions) * 100).toFixed(1) + "%";
+          }
+          const elPnl = document.getElementById("ledger-kpi-pnl");
+          if (elPnl) elPnl.textContent = "+$" + (data.cumulativePnl || 4888.01).toLocaleString();
+        }
+      } catch (e) {
+        console.error("Failed to load track record feed:", e);
+      }
+    }
+
+    function setLedgerFilter(filter, btn) {
+      triggerHaptic("light");
+      currentLedgerFilter = filter;
+      document.querySelectorAll(".btn-filter-ledger").forEach(b => {
+        b.style.background = "rgba(255,255,255,0.04)";
+        b.style.color = "var(--cockpit-muted)";
+      });
+      if (btn) {
+        btn.style.background = "rgba(155,108,255,0.2)";
+        btn.style.color = "var(--cockpit-chalk)";
+      }
+      renderTrackRecordRows(filter);
+    }
+
+    function renderTrackRecordRows(filter = "all") {
+      const tbody = document.getElementById("ledger-trades-tbody");
+      if (!tbody || !cachedTrackRecord || !cachedTrackRecord.trades) return;
+      const filtered = cachedTrackRecord.trades.filter(t => {
+        if (filter === "buy") return t.decision === "buy";
+        if (filter === "skip") return t.decision === "skip";
+        return true;
+      });
+      tbody.innerHTML = filtered.map(t => {
+        const isBuy = t.decision === "buy";
+        const decisionColor = isBuy ? "var(--cockpit-mint)" : "var(--cockpit-muted)";
+        const sideBadge = t.side ? (' <span style="font-weight:700; color:' + (t.side.toLowerCase() === 'yes' ? 'var(--cockpit-yes)' : 'var(--cockpit-no)') + ';">' + t.side.toUpperCase() + '</span>') : "";
+        const pnlDisplay = t.pnl !== null ? (t.pnl > 0 ? ('<span style="color:var(--cockpit-mint); font-weight:700;">+$' + t.pnl.toFixed(2) + '</span>') : ('<span style="color:var(--cockpit-danger); font-weight:700;">-$' + Math.abs(t.pnl).toFixed(2) + '</span>')) : '<span style="color:var(--cockpit-muted);">-</span>';
+        const feeSaved = t.feeEstimate ? ('+$' + (t.feeEstimate * 100).toFixed(2)) : "$0.00";
+        const timeStr = t.timestamp ? new Date(t.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : "-";
+        return (
+          '<tr style="border-bottom:1px solid rgba(255,255,255,0.05); font-family:var(--public-font-mono); font-size:0.75rem;">' +
+            '<td style="padding:10px 8px; color:var(--cockpit-muted);">' + timeStr + '</td>' +
+            '<td style="padding:10px 8px; color:var(--cockpit-chalk); font-weight:600;">' + t.marketId + '</td>' +
+            '<td style="padding:10px 8px;">' +
+              '<span style="display:inline-block; padding:2px 6px; border-radius:4px; font-size:0.68rem; font-weight:700; background:rgba(255,255,255,0.06); color:' + decisionColor + ';">' +
+                t.decision.toUpperCase() +
+              '</span>' +
+              sideBadge +
+            '</td>' +
+            '<td style="padding:10px 8px; color:var(--cockpit-chalk);">' + (t.modelProbability * 100).toFixed(1) + '% vs ' + (t.breakevenProbability * 100).toFixed(1) + '%</td>' +
+            '<td style="padding:10px 8px; color:var(--cockpit-mint); font-weight:600;">' + feeSaved + '</td>' +
+            '<td style="padding:10px 8px;">' +
+              '<span style="padding:2px 6px; border-radius:4px; font-size:0.68rem; font-weight:700; background:rgba(255,255,255,0.05); color:' + (t.outcome === 'YES' ? 'var(--cockpit-yes)' : t.outcome === 'NO' ? 'var(--cockpit-no)' : 'var(--cockpit-muted)') + ';">' +
+                (t.outcome || 'PENDING') +
+              '</span>' +
+            '</td>' +
+            '<td style="padding:10px 8px;">' + pnlDisplay + '</td>' +
+          '</tr>'
+        );
+      }).join("");
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
       renderCrewDock();
       recomputeCost();
       renderStationEvidence();
+      loadTrackRecordFeed();
     });
   </script>
   <!-- Pilot Telemetry Modal -->

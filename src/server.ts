@@ -2345,6 +2345,33 @@ app.get("/api/cockpit/specialists-telemetry", (_req, res) => {
   }
 });
 
+// Live Fighter Pilots Empirical Shadow Track Record API
+app.get("/api/cockpit/track-record", (req, res) => {
+  try {
+    const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 20));
+    const ledger = getAutopilotLedger(limit, "pro");
+    res.json({
+      success: true,
+      mode: ledger.mode,
+      capital: ledger.capital,
+      ruleB5Locked: ledger.ruleB5Locked,
+      totalDecisions: ledger.totalDecisions,
+      buyCount: ledger.buyCount,
+      skipCount: ledger.skipCount,
+      resolvedCount: ledger.resolvedCount,
+      winCount: ledger.winCount,
+      lossCount: ledger.lossCount,
+      winRatePct: ledger.winRatePct,
+      cumulativePnl: ledger.cumulativePnl,
+      cumulativeBaselinePnl: ledger.cumulativeBaselinePnl,
+      averageFeeDrag: ledger.averageFeeDrag,
+      trades: ledger.trades,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "track_record_failed", message: (error as Error).message });
+  }
+});
+
 // ---------------------------------------------------------------------------
 // Subscription Value Proof & Fighter Pilot Savings Engine
 // ---------------------------------------------------------------------------
