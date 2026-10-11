@@ -16,6 +16,7 @@
 
 import { ELITE_ELEVEN_REGISTRY, type EliteCrewMember } from "./lib/elite-eleven-catalog.ts";
 import { executeFighterPilotVerification } from "./lib/fighter-pilots-verifier.ts";
+import { renderSubscriptionValueCalculatorHtml } from "./lib/subscription-value-proof.ts";
 import { renderPublicHeader, renderPublicFooter, PUBLIC_LAYOUT_CSS } from "./components/public-layout.ts";
 
 export interface CockpitPageOptions {
@@ -701,6 +702,7 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
           <button type="button" class="tab-nav-btn active" id="tab-btn-evidence" onclick="switchTab('evidence')">True Cost & Breakeven</button>
           <button type="button" class="tab-nav-btn" id="tab-btn-radar" onclick="switchTab('radar')">Settlement Radar (BRTI)</button>
           <button type="button" class="tab-nav-btn" id="tab-btn-crew" onclick="switchTab('crew')">Specialist Insights</button>
+          <button type="button" class="tab-nav-btn" id="tab-btn-value" onclick="switchTab('value')">Subscription Value Proof</button>
         </nav>
 
         <div class="tab-content-card" id="tab-content-evidence">
@@ -772,6 +774,10 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
           <div id="station-evidence-box" style="display:flex; flex-direction:column; gap:12px;">
             \${initialEvidenceCardsHtml}
           </div>
+        </div>
+
+        <div class="tab-content-card" id="tab-content-value" style="display:none; padding:16px;">
+          ${renderSubscriptionValueCalculatorHtml()}
         </div>
       </section>
 
@@ -1178,7 +1184,19 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
 
     function switchTab(t) {
       document.querySelectorAll(".tab-nav-btn").forEach(btn => btn.classList.remove("active"));
-      document.getElementById("tab-btn-" + t).classList.add("active");
+      const btn = document.getElementById("tab-btn-" + t);
+      if (btn) btn.classList.add("active");
+
+      const evidencePanel = document.getElementById("tab-content-evidence");
+      const valuePanel = document.getElementById("tab-content-value");
+
+      if (t === "value") {
+        if (evidencePanel) evidencePanel.style.display = "none";
+        if (valuePanel) valuePanel.style.display = "block";
+      } else {
+        if (valuePanel) valuePanel.style.display = "none";
+        if (evidencePanel) evidencePanel.style.display = "block";
+      }
     }
 
     function onMarketChange(val) {

@@ -474,6 +474,11 @@ import { renderPilotHangarPageHtml } from "./pilot-hangar-page.ts";
 import { MERCHANDISE_78_CATALOG, getGarmentBySku } from "./lib/merchandise-44-catalog.ts";
 import { ELITE_ELEVEN_REGISTRY } from "./lib/elite-eleven-catalog.ts";
 import { executeFighterPilotVerification } from "./lib/fighter-pilots-verifier.ts";
+import {
+  computeSubscriptionValueProof,
+  generateSubscriptionValueProofSvgReceipt,
+  renderSubscriptionValueCalculatorHtml,
+} from "./lib/subscription-value-proof.ts";
 import { renderOddsDefendersPageHtml } from "./odds-defenders-page.ts";
 import { isCampaignEnabled, recordCampaignEvent } from "./config/campaign.ts";
 import { renderMerchandisePageHtml } from "./merchandise-page.ts";
@@ -2337,6 +2342,71 @@ app.get("/api/cockpit/specialists-telemetry", (_req, res) => {
     });
   } catch (error) {
     res.status(500).json({ error: "telemetry_batch_failed", message: (error as Error).message });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Subscription Value Proof & Fighter Pilot Savings Engine
+// ---------------------------------------------------------------------------
+
+// Compute deterministic value proof and fee savings
+app.all("/api/cockpit/value-proof", (req, res) => {
+  try {
+    const src = req.method === "POST" ? (req.body || {}) : req.query;
+    const contractsPerTrade = Number(src.contractsPerTrade || src.contracts) || 10;
+    const tradesPerDay = Number(src.tradesPerDay || src.trades) || 5;
+    const daysPerMonth = Number(src.daysPerMonth || src.days) || 20;
+    const averagePriceCents = Number(src.averagePriceCents || src.price) || 50;
+    const makerAdoptionRatePct = src.makerAdoptionRatePct !== undefined ? Number(src.makerAdoptionRatePct) : (src.maker !== undefined ? Number(src.maker) : 50);
+    const tier = (src.tier === "commander" ? "commander" : "pilot") as "pilot" | "commander";
+    const venue = (src.venue === "polymarket" ? "polymarket" : "kalshi") as "kalshi" | "polymarket";
+
+    const audit = computeSubscriptionValueProof({
+      contractsPerTrade,
+      tradesPerDay,
+      daysPerMonth,
+      averagePriceCents,
+      makerAdoptionRatePct,
+      tier,
+      venue,
+    });
+
+    res.json({
+      success: true,
+      ...audit,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "value_proof_failed", message: (error as Error).message });
+  }
+});
+
+// Stream institutional SVG Audit Receipt for subscription value proof
+app.get("/api/cockpit/value-proof/receipt.svg", (req, res) => {
+  try {
+    const contractsPerTrade = Number(req.query.contractsPerTrade || req.query.contracts) || 10;
+    const tradesPerDay = Number(req.query.tradesPerDay || req.query.trades) || 5;
+    const daysPerMonth = Number(req.query.daysPerMonth || req.query.days) || 20;
+    const averagePriceCents = Number(req.query.averagePriceCents || req.query.price) || 50;
+    const makerAdoptionRatePct = req.query.makerAdoptionRatePct !== undefined ? Number(req.query.makerAdoptionRatePct) : (req.query.maker !== undefined ? Number(req.query.maker) : 50);
+    const tier = (req.query.tier === "commander" ? "commander" : "pilot") as "pilot" | "commander";
+    const venue = (req.query.venue === "polymarket" ? "polymarket" : "kalshi") as "kalshi" | "polymarket";
+
+    const audit = computeSubscriptionValueProof({
+      contractsPerTrade,
+      tradesPerDay,
+      daysPerMonth,
+      averagePriceCents,
+      makerAdoptionRatePct,
+      tier,
+      venue,
+    });
+
+    const svg = generateSubscriptionValueProofSvgReceipt(audit);
+    res.setHeader("Content-Type", "image/svg+xml");
+    res.setHeader("Cache-Control", "public, max-age=60");
+    res.send(svg);
+  } catch (error) {
+    res.status(500).send(`<svg width="300" height="80"><text x="10" y="30" fill="red">Error: ${(error as Error).message}</text></svg>`);
   }
 });
 

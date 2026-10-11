@@ -19,6 +19,7 @@ import {
   renderPublicFooter,
   PUBLIC_LAYOUT_CSS
 } from "./components/public-layout.ts";
+import { renderSubscriptionValueCalculatorHtml } from "./lib/subscription-value-proof.ts";
 
 export function renderPricingPageHtml(userTier: string = "free"): string {
   const cadet = PRICING_PLANS.find((p) => p.id === "cadet")!;
@@ -584,6 +585,9 @@ export function renderPricingPageHtml(userTier: string = "free"): string {
     <div style="max-width:860px; margin: 0 auto 48px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 18px 24px; font-size: 0.8rem; color: var(--text-dim); line-height: 1.5;">
       <strong style="color:#FFF;">🧑‍✈️ ${COACHING_ADDON.name} (${COACHING_ADDON.priceDisplay}):</strong> ${COACHING_ADDON.description}
     </div>
+
+    <!-- Fighter Pilot Subscription Value Proof & Fee Savings Calculator -->
+    ${renderSubscriptionValueCalculatorHtml()}
 
     <!-- Billing FAQ Section -->
     <section class="faq-section" aria-label="Billing Frequently Asked Questions">
