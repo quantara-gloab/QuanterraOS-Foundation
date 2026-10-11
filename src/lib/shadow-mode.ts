@@ -405,10 +405,11 @@ export function getShadowModeSummary(trades: ShadowPaperPosition[] = shadowTrade
 export function renderShadowModeTabHtml(
   summary: ShadowModeSummary,
   rules: ShadowTrackingRule[],
-  trades: ShadowPaperPosition[]
+  trades: ShadowPaperPosition[],
+  containerId: string = "mission-shadow-mode-panel"
 ): string {
   return `
-    <div id="mission-shadow-mode-panel" style="margin-top:16px;">
+    <div id="${containerId}" style="margin-top:16px;">
       <!-- Mandatory CFTC Rule 4.41 Hypothetical Disclosure Banner -->
       <div style="background:rgba(229,72,77,0.08); border:1px solid rgba(229,72,77,0.3); border-left:4px solid var(--alert-red); border-radius:6px; padding:14px 18px; margin-bottom:20px; font-family:var(--font-mono); font-size:0.7rem; color:var(--alert-red); line-height:1.45;">
         <div style="font-weight:700; margin-bottom:6px; display:flex; align-items:center; gap:8px;">

@@ -2361,162 +2361,235 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
           </p>
         </div>
 
-        <div class="deck-grid-3">
-          <div class="hud-card">
-            <div class="hud-card-title">
-              <span>WHALE PRINTS (24H)</span>
-              <span>&gt; 500 CT</span>
-            </div>
-            <div class="hud-stat-val">${SAMPLE_LARGE_TRADE_PRINTS.length}</div>
-            <div class="hud-stat-label">Net taker fee drag: $${SAMPLE_LARGE_TRADE_PRINTS.reduce((sum, p) => sum + p.takerFeeDollars, 0).toFixed(2)}</div>
-          </div>
-
-          <div class="hud-card" style="cursor:pointer;" onclick="switchStation('mission-log'); switchMissionTab('shadow');" title="Open Shadow Mode Paper Simulator in Mission Log">
-            <div class="hud-card-title">
-              <span>SHADOW MODE</span>
-              <span>PAPER SIM</span>
-            </div>
-            <div class="hud-stat-val" style="color:var(--hud-cyan);">ACTIVE</div>
-            <div class="hud-stat-label">Simulating order fills with 0 live capital &rarr;</div>
-          </div>
-
-          <div class="hud-card">
-            <div class="hud-card-title">
-              <span>CROSS-VENUE BASIS</span>
-              <span>KALSHI VS POLY</span>
-            </div>
-            <div class="hud-stat-val">±$14.20</div>
-            <div class="hud-stat-label">BRTI vs UMA resolution delta</div>
-          </div>
+        <!-- Station 5 Segmented Sub-Views: Whale Flow vs Shadow Mode vs Wallet Cards -->
+        <div style="display:flex; gap:8px; margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px; flex-wrap:wrap;">
+          <button type="button" class="btn-aria-action active" id="btn-sensors-tab-tape" onclick="switchSensorsTab('tape')">
+            🐋 Whale Flow Tape (Net-of-Fees)
+          </button>
+          <button type="button" class="btn-aria-action" id="btn-sensors-tab-shadow" onclick="switchSensorsTab('shadow')">
+            👁️ Shadow Mode (Paper-Follow)
+          </button>
+          <button type="button" class="btn-aria-action" id="btn-sensors-tab-wallets" onclick="switchSensorsTab('wallets')">
+            📊 Polymarket Wallet Cards
+          </button>
         </div>
 
-        <!-- Large-Trade Feed Scanner (Task 6.1 / Part 3.4) -->
-        <div class="hud-card" id="sensors-whale-feed-card" style="margin-top:20px;">
-          <div class="hud-card-title" style="display:flex; justify-content:space-between; align-items:center;">
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--ok-green); box-shadow:0 0 8px var(--ok-green);"></span>
-              <span>LARGE-TRADE FLOW TELEMETRY // NET-AFTER-FEES &amp; SETTLEMENT CONTEXT</span>
+        <!-- Sub-View 1: Whale Flow Tape & Net-of-Fees Scanners -->
+        <div id="sensors-view-tape" style="display:block;">
+          <div class="deck-grid-3">
+            <div class="hud-card">
+              <div class="hud-card-title">
+                <span>WHALE PRINTS (24H)</span>
+                <span>&gt; 500 CT</span>
+              </div>
+              <div class="hud-stat-val">${SAMPLE_LARGE_TRADE_PRINTS.length}</div>
+              <div class="hud-stat-label">Net taker fee drag: $${SAMPLE_LARGE_TRADE_PRINTS.reduce((sum, p) => sum + p.takerFeeDollars, 0).toFixed(2)}</div>
             </div>
-            <span style="color:var(--hud-cyan); font-family:var(--font-mono); font-size:0.72rem;">CFTC &amp; ON-CHAIN TAPE</span>
-          </div>
 
-          <div style="font-size:0.78rem; color:var(--fg-muted); margin-bottom:14px; line-height:1.5;">
-            Every transaction is enriched with exact regulatory taker fee friction, required breakeven shifts, and settlement proximity. Volume is never an indicator of predictive edge.
-          </div>
-
-          <!-- Feed Venue Filter Selector -->
-          <div style="display:flex; gap:8px; margin-bottom:14px;">
-            <button type="button" class="btn-aria-action active" id="btn-feed-filter-all" style="padding:6px 12px; font-size:0.75rem;" onclick="filterSensorsFeed('all')">
-              All Venues
-            </button>
-            <button type="button" class="btn-aria-action" id="btn-feed-filter-kalshi" style="padding:6px 12px; font-size:0.75rem;" onclick="filterSensorsFeed('kalshi')">
-              Kalshi Tape (Anonymous)
-            </button>
-            <button type="button" class="btn-aria-action" id="btn-feed-filter-poly" style="padding:6px 12px; font-size:0.75rem;" onclick="filterSensorsFeed('polymarket')">
-              Polymarket (On-Chain)
-            </button>
-          </div>
-
-          <!-- Large-Trade Table -->
-          <div style="overflow-x:auto;">
-            <table style="width:100%; border-collapse:collapse; font-size:0.78rem; font-family:var(--font-mono);" id="sensors-feed-table">
-              <thead>
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.1); color:var(--fg-muted); text-align:left;">
-                  <th style="padding:8px 6px;">VENUE</th>
-                  <th style="padding:8px 6px;">TICKER &amp; SIDE</th>
-                  <th style="padding:8px 6px;">SIZE &amp; NOTIONAL</th>
-                  <th style="padding:8px 6px;">EXEC PRICE</th>
-                  <th style="padding:8px 6px; color:var(--hud-gold);">NET-AFTER-FEES</th>
-                  <th style="padding:8px 6px; color:var(--hud-cyan);">SETTLEMENT CONTEXT</th>
-                  <th style="padding:8px 6px;">IDENTITY</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${SAMPLE_LARGE_TRADE_PRINTS.map(p => `
-                  <tr class="sensor-trade-row venue-${p.venue}" style="border-bottom:1px solid rgba(255,255,255,0.05); color:#FFF;">
-                    <td style="padding:8px 6px;">
-                      <span style="font-size:0.65rem; padding:2px 6px; border-radius:3px; font-weight:700; background:${p.venue === 'kalshi' ? 'rgba(79,209,232,0.15)' : 'rgba(201,162,74,0.15)'}; color:${p.venue === 'kalshi' ? 'var(--hud-cyan)' : 'var(--hud-gold)'};">
-                        ${p.venue.toUpperCase()}
-                      </span>
-                    </td>
-                    <td style="padding:8px 6px;">
-                      <div style="font-weight:600; color:#FFF;">${p.ticker}</div>
-                      <div style="font-size:0.68rem; color:${p.side === 'YES' ? 'var(--ok-green)' : 'var(--alert-red)'}; font-weight:700;">${p.side} &bull; ${p.orderType.toUpperCase()}</div>
-                    </td>
-                    <td style="padding:8px 6px;">
-                      <div style="color:#FFF; font-weight:600;">${p.contracts.toLocaleString()} ct</div>
-                      <div style="font-size:0.68rem; color:var(--fg-muted);">$${p.notionalDollars.toFixed(2)}</div>
-                    </td>
-                    <td style="padding:8px 6px; color:#FFF; font-weight:700;">
-                      ${p.priceCents}¢
-                    </td>
-                    <td style="padding:8px 6px;">
-                      <div style="color:${p.orderType === 'maker' ? 'var(--ok-green)' : 'var(--alert-red)'}; font-weight:700;">
-                        Fee: $${p.takerFeeDollars.toFixed(2)}
-                      </div>
-                      <div style="font-size:0.68rem; color:var(--hud-cyan);">
-                        Breakeven: ${p.requiredBreakevenPct.toFixed(2)}%
-                      </div>
-                      <div style="font-size:0.65rem; color:var(--fg-muted);">
-                        Net Max Loss: $${p.netLossIfLoseDollars.toFixed(2)}
-                      </div>
-                    </td>
-                    <td style="padding:8px 6px;">
-                      <div style="font-size:0.7rem; color:#FFF;">${p.settlementSource}</div>
-                      <div style="font-size:0.68rem; color:${p.settlementRiskLevel === 'HAZARD_COIN_FLIP' ? 'var(--alert-red)' : 'var(--ok-green)'}; font-weight:${p.settlementRiskLevel === 'HAZARD_COIN_FLIP' ? '700' : '400'};">
-                        ${p.settlementRiskLevel === 'HAZARD_COIN_FLIP' ? '⚠️ HAZARD: ±$' + p.strikeDistanceDollars + ' (' + p.secondsToExpiry + 's)' : 'Dist: $' + p.strikeDistanceDollars + ' (' + p.secondsToExpiry + 's)'}
-                      </div>
-                    </td>
-                    <td style="padding:8px 6px; font-size:0.68rem; color:var(--fg-muted);">
-                      ${p.walletIdentifier}
-                    </td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-          </div>
-
-          <div style="border-top:1px solid rgba(255,255,255,0.08); padding-top:10px; margin-top:14px; font-size:0.7rem; color:var(--fg-muted); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-            <span>QuanterraOS Sensors Layer · Rule B5 Compliant (Zero Live Execution / No Order Routing)</span>
-            <span style="color:var(--hud-cyan);">CFTC Rule 4.41 Compliant</span>
-          </div>
-        </div>
-
-        <!-- Polymarket Wallet Calibration Track Record Cards (Task 6.2 / Part 3.4) -->
-        <div class="hud-card" id="sensors-wallet-cards-card" style="margin-top:20px;">
-          <div class="hud-card-title" style="display:flex; justify-content:space-between; align-items:center;">
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--hud-cyan); box-shadow:0 0 8px var(--hud-cyan);"></span>
-              <span>POLYMARKET WALLET CALIBRATION TRACK RECORD CARDS // PROBABILISTIC BRIER SCORING</span>
+            <div class="hud-card" style="cursor:pointer;" onclick="switchStation('mission-log'); switchMissionTab('shadow');" title="Open Shadow Mode Paper Simulator in Mission Log">
+              <div class="hud-card-title">
+                <span>SHADOW MODE</span>
+                <span>PAPER SIM</span>
+              </div>
+              <div class="hud-stat-val" style="color:var(--hud-cyan);">ACTIVE</div>
+              <div class="hud-stat-label">Simulating order fills with 0 live capital &rarr;</div>
+              <div style="margin-top:6px;">
+                <button type="button" class="btn-aria-action" style="font-size:0.65rem; padding:2px 6px;" onclick="event.stopPropagation(); switchSensorsTab('shadow');">Open In Sensors Tab &rarr;</button>
+              </div>
             </div>
-            <span style="color:var(--hud-gold); font-family:var(--font-mono); font-size:0.72rem;">ON-CHAIN CALIBRATION AUDIT</span>
+
+            <div class="hud-card">
+              <div class="hud-card-title">
+                <span>CROSS-VENUE BASIS</span>
+                <span>KALSHI VS POLY</span>
+              </div>
+              <div class="hud-stat-val">±$14.20</div>
+              <div class="hud-stat-label">BRTI vs UMA resolution delta</div>
+            </div>
           </div>
 
-          <div style="font-size:0.78rem; color:var(--fg-muted); margin-bottom:14px; line-height:1.5;">
-            Evaluating public on-chain Polymarket wallets by <strong>probabilistic calibration (Brier score &amp; reliability)</strong> rather than misleading raw P&amp;L or high win rates. Exposes the Favorite-Chaser Paradox (traders winning 80% of trades on 90&cent; contracts while underperforming a naive coin flip).
-          </div>
+          <!-- Large-Trade Feed Scanner (Task 6.1 / Part 3.4) -->
+          <div class="hud-card" id="sensors-whale-feed-card" style="margin-top:20px;">
+            <div class="hud-card-title" style="display:flex; justify-content:space-between; align-items:center;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--ok-green); box-shadow:0 0 8px var(--ok-green);"></span>
+                <span>LARGE-TRADE FLOW TELEMETRY // NET-AFTER-FEES &amp; SETTLEMENT CONTEXT</span>
+              </div>
+              <span style="color:var(--hud-cyan); font-family:var(--font-mono); font-size:0.72rem;">CFTC &amp; ON-CHAIN TAPE</span>
+            </div>
 
-          <!-- Address Lookup and Benchmark Quick Chips -->
-          <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:14px;">
-            <div style="display:flex; gap:8px; flex-wrap:wrap;">
-              <input type="text" id="wallet-address-input" placeholder="Enter Polymarket wallet address (0x...) or select a benchmark" style="flex:1; min-width:260px; background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.15); border-radius:4px; padding:8px 12px; color:#FFF; font-family:var(--font-mono); font-size:0.8rem;" value="0x71c828b6d8efec4f0c86bb0b784a9e29a39ec70a" />
-              <button type="button" class="btn-aria-action active" id="btn-lookup-wallet" style="padding:8px 16px; font-size:0.8rem;" onclick="lookupWalletCard()">
-                Audit Calibration
+            <div style="font-size:0.78rem; color:var(--fg-muted); margin-bottom:14px; line-height:1.5;">
+              Every transaction is enriched with exact regulatory taker fee friction, required breakeven shifts, and settlement proximity. Volume is never an indicator of predictive edge.
+            </div>
+
+            <!-- Feed Venue Filter Selector -->
+            <div style="display:flex; gap:8px; margin-bottom:14px;">
+              <button type="button" class="btn-aria-action active" id="btn-feed-filter-all" style="padding:6px 12px; font-size:0.75rem;" onclick="filterSensorsFeed('all')">
+                All Venues
+              </button>
+              <button type="button" class="btn-aria-action" id="btn-feed-filter-kalshi" style="padding:6px 12px; font-size:0.75rem;" onclick="filterSensorsFeed('kalshi')">
+                Kalshi Tape (Anonymous)
+              </button>
+              <button type="button" class="btn-aria-action" id="btn-feed-filter-poly" style="padding:6px 12px; font-size:0.75rem;" onclick="filterSensorsFeed('polymarket')">
+                Polymarket (On-Chain)
               </button>
             </div>
-            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:0.72rem; color:var(--fg-muted);">
-              <span>Benchmark Profiles:</span>
-              ${initialBenchmarkWallets.map(b => `
-                <button type="button" class="btn-aria-action" style="padding:3px 8px; font-size:0.7rem; font-family:var(--font-mono);" onclick="loadBenchmarkWallet('${b.address}')">
-                  ${b.callsign} (${b.grade === 'EXEMPLARY_CALIBRATED' ? 'Alpha' : b.grade === 'WELL_CALIBRATED' ? 'Well Calibrated' : 'Paradox'})
-                </button>
-              `).join('')}
+
+            <!-- Large-Trade Table -->
+            <div style="overflow-x:auto;">
+              <table style="width:100%; border-collapse:collapse; font-size:0.78rem; font-family:var(--font-mono);" id="sensors-feed-table">
+                <thead>
+                  <tr style="border-bottom:1px solid rgba(255,255,255,0.1); color:var(--fg-muted); text-align:left;">
+                    <th style="padding:8px 6px;">VENUE</th>
+                    <th style="padding:8px 6px;">TICKER &amp; SIDE</th>
+                    <th style="padding:8px 6px;">SIZE &amp; NOTIONAL</th>
+                    <th style="padding:8px 6px;">EXEC PRICE</th>
+                    <th style="padding:8px 6px; color:var(--hud-gold);">NET-AFTER-FEES</th>
+                    <th style="padding:8px 6px; color:var(--hud-cyan);">SETTLEMENT CONTEXT</th>
+                    <th style="padding:8px 6px;">IDENTITY</th>
+                    <th style="padding:8px 6px; text-align:right;">ACTIONS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${SAMPLE_LARGE_TRADE_PRINTS.map(p => `
+                    <tr class="sensor-trade-row venue-${p.venue}" style="border-bottom:1px solid rgba(255,255,255,0.05); color:#FFF;" id="trade-row-${p.id}">
+                      <td style="padding:8px 6px;">
+                        <span style="font-size:0.65rem; padding:2px 6px; border-radius:3px; font-weight:700; background:${p.venue === 'kalshi' ? 'rgba(79,209,232,0.15)' : 'rgba(201,162,74,0.15)'}; color:${p.venue === 'kalshi' ? 'var(--hud-cyan)' : 'var(--hud-gold)'};">
+                          ${p.venue.toUpperCase()}
+                        </span>
+                      </td>
+                      <td style="padding:8px 6px;">
+                        <div style="font-weight:600; color:#FFF;">${p.ticker}</div>
+                        <div style="font-size:0.68rem; color:${p.side === 'YES' ? 'var(--ok-green)' : 'var(--alert-red)'}; font-weight:700;">${p.side} &bull; ${p.orderType.toUpperCase()}</div>
+                      </td>
+                      <td style="padding:8px 6px;">
+                        <div style="color:#FFF; font-weight:600;">${p.contracts.toLocaleString()} ct</div>
+                        <div style="font-size:0.68rem; color:var(--fg-muted);">$${p.notionalDollars.toFixed(2)}</div>
+                      </td>
+                      <td style="padding:8px 6px; color:#FFF; font-weight:700;">
+                        ${p.priceCents}¢
+                      </td>
+                      <td style="padding:8px 6px;">
+                        <div style="color:${p.orderType === 'maker' ? 'var(--ok-green)' : 'var(--alert-red)'}; font-weight:700;">
+                          Fee: $${p.takerFeeDollars.toFixed(2)}
+                        </div>
+                        <div style="font-size:0.68rem; color:var(--hud-cyan);">
+                          Breakeven: ${p.requiredBreakevenPct.toFixed(2)}%
+                        </div>
+                        <div style="font-size:0.65rem; color:var(--fg-muted);">
+                          Net Max Loss: $${p.netLossIfLoseDollars.toFixed(2)}
+                        </div>
+                      </td>
+                      <td style="padding:8px 6px;">
+                        <div style="font-size:0.7rem; color:#FFF;">${p.settlementSource}</div>
+                        <div style="font-size:0.68rem; color:${p.settlementRiskLevel === 'HAZARD_COIN_FLIP' ? 'var(--alert-red)' : 'var(--ok-green)'}; font-weight:${p.settlementRiskLevel === 'HAZARD_COIN_FLIP' ? '700' : '400'};">
+                          ${p.settlementRiskLevel === 'HAZARD_COIN_FLIP' ? '⚠️ HAZARD: ±$' + p.strikeDistanceDollars + ' (' + p.secondsToExpiry + 's)' : 'Dist: $' + p.strikeDistanceDollars + ' (' + p.secondsToExpiry + 's)'}
+                        </div>
+                      </td>
+                      <td style="padding:8px 6px; font-size:0.68rem; color:var(--fg-muted);">
+                        ${p.walletIdentifier}
+                      </td>
+                      <td style="padding:8px 6px; text-align:right;">
+                        <div style="display:flex; gap:4px; justify-content:flex-end;">
+                          <button type="button" class="btn-aria-action" style="padding:3px 7px; font-size:0.68rem;" onclick="toggleInspectPrint('${p.id}')" title="Inspect fee breakdown">
+                            🔍 Audit
+                          </button>
+                          <button type="button" class="btn-aria-action" style="padding:3px 7px; font-size:0.68rem; border-color:var(--hud-cyan); color:var(--hud-cyan);" onclick="shadowFollowPrint('${p.id}', '${p.venue}', '${p.ticker}', '${p.side}', ${p.contracts}, ${p.priceDollars}, '${p.walletAddress || p.walletIdentifier}')" title="Paper-follow trade in Shadow Mode (0 live capital)">
+                            👁️ Shadow
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr id="inspect-row-${p.id}" class="sensor-trade-row venue-${p.venue}" style="display:none; background:rgba(8,11,20,0.95); border-bottom:1px solid rgba(79,209,232,0.25);">
+                      <td colspan="8" style="padding:12px 16px;">
+                        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; font-size:0.75rem; font-family:var(--font-mono);">
+                          <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); padding:8px 10px; border-radius:4px;">
+                            <div style="color:var(--fg-muted); font-size:0.68rem;">TAKER FEE FORMULA</div>
+                            <div style="color:#FFF; font-weight:700; margin-top:2px;">
+                              ${p.venue === 'kalshi' ? '0.07 × C × P × (1 - P)' : '0.00% maker / 0.00% gas-free'}
+                            </div>
+                            <div style="color:var(--alert-red); margin-top:2px;">-$${p.takerFeeDollars.toFixed(2)} (${p.feeDragBps} bps drag)</div>
+                          </div>
+                          <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); padding:8px 10px; border-radius:4px;">
+                            <div style="color:var(--fg-muted); font-size:0.68rem;">BREAKEVEN HURDLE SHIFT</div>
+                            <div style="color:var(--hud-cyan); font-weight:700; margin-top:2px;">
+                              ${p.priceCents.toFixed(1)}% &rarr; ${p.requiredBreakevenPct.toFixed(2)}% (+${(p.requiredBreakevenPct - p.priceCents).toFixed(2)}%)
+                            </div>
+                            <div style="color:var(--fg-muted); margin-top:2px;">Must win ${p.requiredBreakevenPct.toFixed(1)}% to break even</div>
+                          </div>
+                          <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); padding:8px 10px; border-radius:4px;">
+                            <div style="color:var(--fg-muted); font-size:0.68rem;">SETTLEMENT ORACLE STATUS</div>
+                            <div style="color:${p.settlementRiskLevel === 'HAZARD_COIN_FLIP' ? 'var(--alert-red)' : 'var(--ok-green)'}; font-weight:700; margin-top:2px;">
+                              ${p.settlementRiskLevel === 'HAZARD_COIN_FLIP' ? '⚠️ COIN-FLIP HAZARD' : '✓ NORMAL RESOLUTION'}
+                            </div>
+                            <div style="color:var(--fg-muted); margin-top:2px;">${p.settlementSource} &bull; ${p.secondsToExpiry || 0}s to expiry</div>
+                          </div>
+                          <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); padding:8px 10px; border-radius:4px;">
+                            <div style="color:var(--fg-muted); font-size:0.68rem;">DISCIPLINE AUDIT ACTION</div>
+                            <div style="color:var(--hud-gold); font-weight:700; margin-top:2px;">ZERO LIVE CAPITAL</div>
+                            <div style="margin-top:4px;">
+                              <button type="button" class="btn-aria-action" style="padding:2px 8px; font-size:0.68rem; border-color:var(--hud-cyan); color:var(--hud-cyan);" onclick="shadowFollowPrint('${p.id}', '${p.venue}', '${p.ticker}', '${p.side}', ${p.contracts}, ${p.priceDollars}, '${p.walletAddress || p.walletIdentifier}')">
+                                ⚡ Paper-Follow This Fill (+10 XP)
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+
+            <div style="border-top:1px solid rgba(255,255,255,0.08); padding-top:10px; margin-top:14px; font-size:0.7rem; color:var(--fg-muted); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+              <span>QuanterraOS Sensors Layer · Rule B5 Compliant (Zero Live Execution / No Order Routing)</span>
+              <span style="color:var(--hud-cyan);">CFTC Rule 4.41 Compliant</span>
             </div>
           </div>
+        </div>
 
-          <!-- Dynamic Wallet Card Container -->
-          <div id="wallet-card-container">
-            ${renderWalletCardDetailsHtml(initialDefaultWalletCard)}
+        <!-- Sub-View 2: Shadow Mode Paper-Following (Task 6.3 / Part 3.4) -->
+        <div id="sensors-view-shadow" style="display:none;">
+          ${renderShadowModeTabHtml(initialShadowSummary, initialShadowRules, initialShadowTrades, "sensors-shadow-mode-panel")}
+        </div>
+
+        <!-- Sub-View 3: Polymarket Wallet Calibration Track Record Cards (Task 6.2 / Part 3.4) -->
+        <div id="sensors-view-wallets" style="display:block;">
+          <div class="hud-card" id="sensors-wallet-cards-card" style="margin-top:20px;">
+            <div class="hud-card-title" style="display:flex; justify-content:space-between; align-items:center;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--hud-cyan); box-shadow:0 0 8px var(--hud-cyan);"></span>
+                <span>POLYMARKET WALLET CALIBRATION TRACK RECORD CARDS // PROBABILISTIC BRIER SCORING</span>
+              </div>
+              <span style="color:var(--hud-gold); font-family:var(--font-mono); font-size:0.72rem;">ON-CHAIN CALIBRATION AUDIT</span>
+            </div>
+
+            <div style="font-size:0.78rem; color:var(--fg-muted); margin-bottom:14px; line-height:1.5;">
+              Evaluating public on-chain Polymarket wallets by <strong>probabilistic calibration (Brier score &amp; reliability)</strong> rather than misleading raw P&amp;L or high win rates. Exposes the Favorite-Chaser Paradox (traders winning 80% of trades on 90&cent; contracts while underperforming a naive coin flip).
+            </div>
+
+            <!-- Address Lookup and Benchmark Quick Chips -->
+            <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:14px;">
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <input type="text" id="wallet-address-input" placeholder="Enter Polymarket wallet address (0x...) or select a benchmark" style="flex:1; min-width:260px; background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.15); border-radius:4px; padding:8px 12px; color:#FFF; font-family:var(--font-mono); font-size:0.8rem;" value="0x71c828b6d8efec4f0c86bb0b784a9e29a39ec70a" />
+                <button type="button" class="btn-aria-action active" id="btn-lookup-wallet" style="padding:8px 16px; font-size:0.8rem;" onclick="lookupWalletCard()">
+                  Audit Calibration
+                </button>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:0.72rem; color:var(--fg-muted);">
+                <span>Benchmark Profiles:</span>
+                ${initialBenchmarkWallets.map(b => `
+                  <button type="button" class="btn-aria-action" style="padding:3px 8px; font-size:0.7rem; font-family:var(--font-mono);" onclick="loadBenchmarkWallet('${b.address}')">
+                    ${b.callsign} (${b.grade === 'EXEMPLARY_CALIBRATED' ? 'Alpha' : b.grade === 'WELL_CALIBRATED' ? 'Well Calibrated' : 'Paradox'})
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- Dynamic Wallet Card Container -->
+            <div id="wallet-card-container">
+              ${renderWalletCardDetailsHtml(initialDefaultWalletCard)}
+            </div>
           </div>
         </div>
       </section>
@@ -3175,6 +3248,22 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
     // Navigation Station Interactive Engine
     let navSecondsRemaining = 138;
     let stoodDown = false;
+    let navTickerTimer = null;
+
+    function initNavTicker() {
+      if (navTickerTimer) clearInterval(navTickerTimer);
+      navTickerTimer = setInterval(function() {
+        if (navSecondsRemaining > 0) {
+          setNavCountdown(navSecondsRemaining - 1);
+        } else {
+          // When 15-minute cycle completes, cycle rolls over to 900s
+          setNavCountdown(900);
+        }
+      }, 1000);
+    }
+    try {
+      initNavTicker();
+    } catch(e) {}
 
     function standDownCoinFlip() {
       if (stoodDown) return;
@@ -3212,6 +3301,7 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
       const hazardPill = document.getElementById('nav-hazard-status-pill');
       const hazardCard = document.getElementById('nav-hazard-card');
       const coinFlipBanner = document.getElementById('nav-coinflip-banner');
+      const hazardDesc = document.getElementById('nav-hazard-distance-desc');
 
       // Update phase
       if (sec === 0) {
@@ -3221,6 +3311,8 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
           hazardPill.textContent = 'WINDOW CLOSED';
           hazardPill.style.color = 'var(--ok-green)';
         }
+        if (hazardCard) hazardCard.style.borderColor = 'rgba(48,164,108,0.4)';
+        if (coinFlipBanner) coinFlipBanner.style.borderColor = 'rgba(48,164,108,0.4)';
       } else if (sec <= 60) {
         const subInterval = Math.min(12, Math.floor((60 - sec) / 5) + 1);
         if (phaseBadge) phaseBadge.textContent = 'TWAP_SAMPLING_ACTIVE';
@@ -3229,6 +3321,8 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
           hazardPill.textContent = 'CRITICAL HAZARD';
           hazardPill.style.color = 'var(--alert-red)';
         }
+        if (hazardCard) hazardCard.style.borderColor = 'rgba(229,72,77,0.6)';
+        if (coinFlipBanner) coinFlipBanner.style.borderColor = 'rgba(229,72,77,0.6)';
       } else if (sec <= 180) {
         if (phaseBadge) phaseBadge.textContent = 'PRE_SETTLEMENT';
         if (twapStatus) twapStatus.textContent = 'STANDBY (ORACLE ACTIVATES AT T-60s)';
@@ -3236,6 +3330,8 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
           hazardPill.textContent = 'CRITICAL HAZARD';
           hazardPill.style.color = 'var(--alert-red)';
         }
+        if (hazardCard) hazardCard.style.borderColor = 'rgba(229,72,77,0.6)';
+        if (coinFlipBanner) coinFlipBanner.style.borderColor = 'rgba(229,72,77,0.6)';
       } else {
         if (phaseBadge) phaseBadge.textContent = 'REGULAR_TRADING';
         if (twapStatus) twapStatus.textContent = 'STANDBY (ORACLE ACTIVATES AT T-60s)';
@@ -3243,20 +3339,28 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
           hazardPill.textContent = 'NOMINAL';
           hazardPill.style.color = 'var(--ok-green)';
         }
+        if (hazardCard) hazardCard.style.borderColor = 'rgba(255,255,255,0.1)';
+        if (coinFlipBanner) coinFlipBanner.style.borderColor = 'rgba(255,255,255,0.1)';
+      }
+
+      if (hazardDesc) {
+        hazardDesc.textContent = 'Spot is $18.50 from $91,250 strike with ' + sec + 's remaining.';
       }
 
       // Update 12 TWAP indicator blocks
       const elapsedTwapSec = Math.max(0, 60 - sec);
-      const activeBlocks = sec <= 60 ? Math.min(12, Math.floor(elapsedTwapSec / 5) + 1) : (sec === 0 ? 12 : 0);
+      const activeBlocks = sec <= 60 && sec > 0 ? Math.min(12, Math.floor(elapsedTwapSec / 5) + 1) : (sec === 0 ? 12 : 0);
       for (let i = 1; i <= 12; i++) {
         const block = document.getElementById('twap-block-' + i);
         if (block) {
           if (i <= activeBlocks) {
             block.style.background = 'var(--hud-cyan)';
             block.style.color = '#05060B';
+            block.style.boxShadow = '0 0 10px rgba(79,209,232,0.5)';
           } else {
             block.style.background = 'rgba(255,255,255,0.06)';
             block.style.color = 'var(--fg-muted)';
+            block.style.boxShadow = 'none';
           }
         }
       }
@@ -3961,6 +4065,69 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
     // ===================================================================
     // SENSORS STATION ENGINES (Task 6.1 & 6.2 / Part 3.4)
     // ===================================================================
+    function switchSensorsTab(tab) {
+      const viewTape = document.getElementById('sensors-view-tape');
+      const viewShadow = document.getElementById('sensors-view-shadow');
+      const viewWallets = document.getElementById('sensors-view-wallets');
+      const btnTape = document.getElementById('btn-sensors-tab-tape');
+      const btnShadow = document.getElementById('btn-sensors-tab-shadow');
+      const btnWallets = document.getElementById('btn-sensors-tab-wallets');
+
+      if (viewTape) viewTape.style.display = tab === 'tape' ? 'block' : 'none';
+      if (viewShadow) viewShadow.style.display = tab === 'shadow' ? 'block' : 'none';
+      if (viewWallets) viewWallets.style.display = tab === 'wallets' ? 'block' : 'none';
+
+      if (btnTape) btnTape.classList.toggle('active', tab === 'tape');
+      if (btnShadow) btnShadow.classList.toggle('active', tab === 'shadow');
+      if (btnWallets) btnWallets.classList.toggle('active', tab === 'wallets');
+    }
+
+    function toggleInspectPrint(printId) {
+      const row = document.getElementById('inspect-row-' + printId);
+      if (row) {
+        row.style.display = (row.style.display === 'none' || !row.style.display) ? 'table-row' : 'none';
+      }
+    }
+
+    function shadowFollowPrint(id, venue, ticker, side, contracts, priceDollars, source) {
+      const printPayload = {
+        id: id,
+        venue: venue,
+        ticker: ticker,
+        marketTitle: ticker,
+        side: side,
+        contracts: contracts,
+        priceDollars: priceDollars,
+        priceCents: Math.round(priceDollars * 100),
+        orderType: 'taker',
+        settlementSource: venue === 'kalshi' ? 'CME CF BRTI (60s TWAP)' : 'UMA Decentralized Oracle',
+        walletIdentifier: source,
+        walletAddress: (source && source.startsWith('0x')) ? source : undefined,
+      };
+
+      fetch('/api/deck/shadow/simulate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ print: printPayload }),
+      })
+      .then(res => res.json())
+      .then(data => {
+        // Increment pilot discipline XP by +10
+        const xpPills = document.querySelectorAll('.pilot-xp-pill, #deck-pilot-xp');
+        xpPills.forEach(el => {
+          const current = parseInt(el.textContent.replace(/[^0-9]/g, ''), 10) || 140;
+          el.textContent = (current + 10) + ' XP';
+        });
+
+        alert('✓ Print ' + ticker + ' paper-followed in Shadow Mode!\n\n• Simulated Notional: $' + (data.position ? data.position.notionalDollars.toFixed(2) : (contracts * priceDollars).toFixed(2)) + '\n• Taker Fee Drag: -$' + (data.position ? data.position.simulatedTakerFeeDollars.toFixed(2) : '0.00') + '\n• Slippage Friction: -$' + (data.position ? data.position.slippageDragDollars.toFixed(2) : '0.00') + '\n• Live Capital Deployed: $0.00 (Rule B5 Compliant)\n\n+10 XP Awarded. Switching to Shadow Mode Paper Ledger.');
+
+        switchSensorsTab('shadow');
+      })
+      .catch(err => {
+        alert('Simulation failed: ' + err.message);
+      });
+    }
+
     function filterSensorsFeed(venue) {
       const rows = document.querySelectorAll('.sensor-trade-row');
       const btnAll = document.getElementById('btn-feed-filter-all');
@@ -4009,6 +4176,7 @@ export function renderFlightDeckPageHtml(options: FlightDeckRenderOptions = {}):
     }
 
     function loadBenchmarkWallet(addr) {
+      switchSensorsTab('wallets');
       const input = document.getElementById('wallet-address-input');
       if (input) input.value = addr;
       lookupWalletCard();
