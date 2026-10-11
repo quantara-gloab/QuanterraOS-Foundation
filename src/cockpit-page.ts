@@ -24,6 +24,9 @@ export interface CockpitPageOptions {
   venue?: "kalshi" | "polymarket";
   ticker?: string;
   side?: "YES" | "NO";
+  contracts?: number;
+  priceCents?: number;
+  sharedLink?: string;
 }
 
 export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
@@ -31,13 +34,16 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
   const initialVenue = options?.venue || "kalshi";
   const initialSide = options?.side || "YES";
   const initialTicker = options?.ticker || "KXBTC15M-SAMPLE";
+  const initialContracts = options?.contracts || 10;
+  const initialPriceCents = options?.priceCents || 52;
+  const initialSharedLink = options?.sharedLink || "";
 
   const initialVerification = executeFighterPilotVerification({
     ticker: initialTicker,
     venue: initialVenue,
     side: initialSide,
-    contracts: 10,
-    priceCents: 52,
+    contracts: initialContracts,
+    priceCents: initialPriceCents,
     equippedPilotIds: ["draco", "wolf", "kraken", "sentinel", "falcon", "quantum-fox", "lion", "phoenix", "quanta", "quantana", "michael"],
   });
 
@@ -853,6 +859,24 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
             </div>
           </div>
 
+          <div class="market-import-strip" style="background:rgba(223,184,67,0.06); border:1px solid rgba(223,184,67,0.25); border-radius:10px; padding:12px 16px; margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px;">
+              <span style="font-family:var(--public-font-mono); font-size:0.75rem; font-weight:700; color:var(--cockpit-gold);">
+                ⚡ KALSHI &amp; POLYMARKET INSTANT TRADE AUDITOR
+              </span>
+              <a href="/transfer" style="font-size:0.72rem; color:var(--cockpit-mint); text-decoration:none;">
+                Why transfer from retail? &rarr;
+              </a>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <input type="text" id="shared-link-input" value="\${initialSharedLink}" placeholder="Paste Kalshi / Polymarket URL or ticker (e.g. kalshi.com/markets/kxbtc15m or KXBTC15M)" style="flex:1; background:rgba(6,7,10,0.85); border:1px solid rgba(255,255,255,0.15); color:#FFF; padding:8px 12px; border-radius:6px; font-size:0.82rem; font-family:var(--public-font-mono);">
+              <button type="button" onclick="auditSharedLink()" style="background:var(--cockpit-gold); color:#000; border:none; padding:8px 14px; border-radius:6px; font-weight:700; font-size:0.8rem; cursor:pointer; font-family:var(--public-font-mono); white-space:nowrap;">
+                Audit Market 🔍
+              </button>
+            </div>
+            <div id="shared-link-feedback" style="display:none; margin-top:8px; font-size:0.75rem; font-family:var(--public-font-mono);"></div>
+          </div>
+
           <div class="inputs-grid">
             <div class="input-field">
               <label>Outcome Side</label>
@@ -864,12 +888,12 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
 
             <div class="input-field">
               <label for="order-quantity">Quantity (Contracts)</label>
-              <input type="number" id="order-quantity" value="10" min="1" max="1000" oninput="recomputeCost()">
+              <input type="number" id="order-quantity" value="\${initialContracts}" min="1" max="1000" oninput="recomputeCost()">
             </div>
 
             <div class="input-field">
               <label for="assumed-fill-price">Executable Ask (Cents)</label>
-              <input type="number" id="assumed-fill-price" value="52" min="1" max="99" oninput="recomputeCost()">
+              <input type="number" id="assumed-fill-price" value="\${initialPriceCents}" min="1" max="99" oninput="recomputeCost()">
             </div>
           </div>
 
@@ -1223,6 +1247,44 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
       document.getElementById("receipt-max-payout").textContent = "$" + maxPayout.toFixed(2);
       document.getElementById("receipt-net-pl").textContent = (netPl >= 0 ? "+$" : "-$") + Math.abs(netPl).toFixed(2);
       document.getElementById("receipt-breakeven").textContent = breakevenPct.toFixed(1) + "%";
+    }
+
+    async function auditSharedLink() {
+      const inputEl = document.getElementById("shared-link-input");
+      const fb = document.getElementById("shared-link-feedback");
+      if (!inputEl) return;
+      const input = inputEl.value.trim();
+      if (!input) return;
+
+      try {
+        const res = await fetch("/api/share/parse?input=" + encodeURIComponent(input));
+        const data = await res.json();
+        const contract = data.contract;
+
+        if (contract && (contract.isRecognized || contract.priceCents)) {
+          if (contract.contracts) document.getElementById("order-quantity").value = contract.contracts;
+          if (contract.priceCents) document.getElementById("assumed-fill-price").value = contract.priceCents;
+          if (contract.venue === "polymarket") {
+            setVenue("polymarket");
+          } else {
+            setVenue("kalshi");
+          }
+          recomputeCost();
+          runMissionVerification();
+
+          fb.style.display = "block";
+          fb.style.color = "var(--cockpit-mint)";
+          fb.innerHTML = "✓ Auto-loaded: <strong>" + (contract.ticker || "Contract") + "</strong> (" + (contract.venue || "venue").toUpperCase() + ") @ " + (contract.priceCents || 50) + "¢ × " + (contract.contracts || 10) + " contracts. Recomputing Maker savings...";
+        } else {
+          fb.style.display = "block";
+          fb.style.color = "var(--cockpit-gold)";
+          fb.textContent = "Contract format recognized. Auto-populated defaults.";
+        }
+      } catch (e) {
+        fb.style.display = "block";
+        fb.style.color = "var(--cockpit-danger)";
+        fb.textContent = "Unable to parse link automatically. Enter values manually.";
+      }
     }
 
     function renderStationEvidence() {

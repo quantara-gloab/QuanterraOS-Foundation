@@ -28,9 +28,11 @@ export const EXPLORE_GROUPS = [
   {
     title: "Research Tools",
     items: [
+      { label: "Transfer from Kalshi / Polymarket", href: "/transfer", desc: "Audit fees, stop donating 35% drag & switch" },
       { label: "True-Cost Check", href: "/check", desc: "Live exchange fee & breakeven calculation" },
       { label: "Settlement Radar", href: "/radar", desc: "TWAP & oracle settlement verification" },
       { label: "Decision Journal", href: "/journal", desc: "Hypothesis, friction & outcome ledger" },
+      { label: "Empirical Track Record", href: "/track-record", desc: "Audited 8,145 shadow trades & Murphy calibration" },
       { label: "Calibration Proof", href: "/proof", desc: "Reconciled Brier score track record" },
     ]
   },

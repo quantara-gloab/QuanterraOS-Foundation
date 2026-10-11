@@ -467,6 +467,7 @@ import { THE_144_CATALOG, getArtworkById, getArtworkBySlug } from "./lib/art-144
 import { renderArtGallery44PageHtml } from "./art-gallery-44-page.ts";
 import { THE_44_CATALOG, getArtwork44ById, getArtwork44BySlug } from "./lib/art-44-catalog.ts";
 import { renderCockpitPageHtml } from "./cockpit-page.ts";
+import { renderTransferPageHtml } from "./transfer-page.ts";
 import { renderCrewPageHtml } from "./crew-page.ts";
 import { renderGearPageHtml } from "./gear-page.ts";
 import { renderPlatformsPageHtml } from "./platforms-page.ts";
@@ -2235,13 +2236,30 @@ app.post("/api/campaign/event", (req, res) => {
 // Canonical Cockpit Decision Workspace
 app.get("/cockpit", (req, res) => {
   const auth = getUserAuth(req);
-  const venue = req.query.venue === "polymarket" ? "polymarket" : "kalshi";
+  const rawShare = (req.query.share || req.query.url || req.query.text) as string | undefined;
+  const parsed = rawShare ? parseSharedContractInput(rawShare) : undefined;
+
+  const venue = parsed?.venue === "polymarket" || req.query.venue === "polymarket" ? "polymarket" : "kalshi";
   const side = req.query.side === "NO" ? "NO" : "YES";
+  const ticker = parsed?.ticker || (req.query.ticker as string | undefined);
+  const contracts = parsed?.contracts;
+  const priceCents = parsed?.priceCents;
+
   res.type("html").send(renderCockpitPageHtml({
     user: auth.user,
     venue,
     side,
+    ticker,
+    contracts,
+    priceCents,
+    sharedLink: rawShare,
   }));
+});
+
+// Transfer & Customer Migration Gateway from Kalshi and Polymarket
+app.get(["/transfer", "/switch", "/migrate"], (req, res) => {
+  const auth = getUserAuth(req);
+  res.type("html").send(renderTransferPageHtml({ user: auth.user }));
 });
 
 // The QuanterraOS Fighter Pilots Roster & Provenance
