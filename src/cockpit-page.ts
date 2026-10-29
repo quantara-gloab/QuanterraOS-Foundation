@@ -1910,6 +1910,29 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
 })();
 </script>
 
+
+<script id="radar-live-sse">
+(function() {
+  if (typeof window === "undefined") return;
+  const evtSource = new EventSource("/api/radar/stream");
+  evtSource.onmessage = function(event) {
+    try {
+      const data = JSON.parse(event.data);
+      const spotEl = document.getElementById("radar-spot-price");
+      const bpsEl = document.getElementById("radar-basis-bps");
+      const statusPill = document.getElementById("radar-status-badge");
+
+      if (spotEl) spotEl.textContent = "$" + data.spotPriceUsd.toLocaleString(undefined, {minimumFractionDigits: 2});
+      if (bpsEl) bpsEl.textContent = (data.basisBps >= 0 ? "+" : "") + data.basisBps + " bps";
+      if (statusPill) {
+        statusPill.textContent = data.status;
+        statusPill.style.color = data.status === "SAFE" ? "#00ff66" : data.status === "CONTESTED" ? "#ffb800" : "#ff0055";
+      }
+    } catch (e) {}
+  };
+})();
+</script>
+
 </body>
 </html>`;
 }

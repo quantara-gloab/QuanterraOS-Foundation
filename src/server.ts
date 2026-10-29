@@ -1,3 +1,4 @@
+import { handleRadarStream } from "./routes/radar-stream.js";
 import { renderLandingPage } from "./landing-page.ts";
 /**
  * The actual running server. This is what turns everything else in
@@ -565,6 +566,7 @@ app.get("/api/mobile/config", (_req, res) => {
 
 // 301 Permanent Redirects for all retired v1 routes (Part 2.1 & Task 3.4)
 app.use(retiredRouteRedirectMiddleware);
+app.get("/api/radar/stream", handleRadarStream);
 
 // Production / Platform Health Check
 app.get(["/health", "/healthz"], (_req, res) => {
