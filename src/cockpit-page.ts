@@ -882,19 +882,19 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
             <div class="input-field">
               <label>Outcome Side</label>
               <div class="side-pill-group">
-                <button type="button" class="side-btn yes \${initialSide === 'YES' ? 'active' : ''}" onclick="setSide('YES')">YES</button>
-                <button type="button" class="side-btn no \${initialSide === 'NO' ? 'active' : ''}" onclick="setSide('NO')">NO</button>
+                <button type="button" class="side-btn yes ${initialSide === 'YES' ? 'active' : ''}" onclick="setSide('YES')">YES</button>
+                <button type="button" class="side-btn no ${initialSide === 'NO' ? 'active' : ''}" onclick="setSide('NO')">NO</button>
               </div>
             </div>
 
             <div class="input-field">
               <label for="order-quantity">Quantity (Contracts)</label>
-              <input type="number" id="order-quantity" value="\${initialContracts}" min="1" max="1000" oninput="recomputeCost()">
+              <input type="number" id="order-quantity" value="${initialContracts}" min="1" max="1000" oninput="recomputeCost()">
             </div>
 
             <div class="input-field">
               <label for="assumed-fill-price">Executable Ask (Cents)</label>
-              <input type="number" id="assumed-fill-price" value="\${initialPriceCents}" min="1" max="99" oninput="recomputeCost()">
+              <input type="number" id="assumed-fill-price" value="${initialPriceCents}" min="1" max="99" oninput="recomputeCost()">
             </div>
           </div>
 
