@@ -764,11 +764,185 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
       letter-spacing: 0.03em;
     }
   </style>
+
+<style id="elite-hud-styles">
+  :root {
+    --hud-neon-cyan: #00f3ff;
+    --hud-neon-amber: #ffb800;
+    --hud-neon-emerald: #00ff66;
+    --hud-neon-crimson: #ff0055;
+    --hud-dark-hull: #080c14;
+    --hud-glass: rgba(8, 18, 34, 0.75);
+    --hud-border: rgba(0, 243, 255, 0.25);
+  }
+
+  body {
+    background-color: var(--hud-dark-hull) !important;
+    background-image:
+      radial-gradient(circle at 50% 0%, rgba(0, 243, 255, 0.08) 0%, transparent 60%),
+      linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px) !important;
+    background-size: 100% 100%, 32px 32px, 32px 32px !important;
+  }
+
+  /* Scanline FX */
+  body::before {
+    content: " ";
+    display: block;
+    position: fixed;
+    top: 0; left: 0; bottom: 0; right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+    background-size: 100% 4px;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.35;
+  }
+
+  /* Elite HUD Status Bar */
+  .pilot-command-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--hud-glass);
+    border: 1px solid var(--hud-border);
+    backdrop-filter: blur(12px);
+    border-radius: 8px;
+    padding: 10px 18px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 25px rgba(0, 243, 255, 0.1), inset 0 0 15px rgba(0, 243, 255, 0.05);
+  }
+
+  .pilot-identity {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .pilot-callsign {
+    font-family: var(--public-font-mono, monospace);
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--hud-neon-cyan);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+  }
+
+  .discipline-gauge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .gauge-track {
+    width: 140px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 243, 255, 0.3);
+  }
+
+  .gauge-fill {
+    height: 100%;
+    width: 68%;
+    background: linear-gradient(90deg, var(--hud-neon-cyan), var(--hud-neon-emerald));
+    box-shadow: 0 0 10px var(--hud-neon-emerald);
+    transition: width 0.4s ease;
+  }
+
+  /* Tactile Launch Button */
+  .launch-btn-elite {
+    background: linear-gradient(135deg, rgba(0, 243, 255, 0.2), rgba(0, 255, 102, 0.3)) !important;
+    border: 1px solid var(--hud-neon-emerald) !important;
+    color: #fff !important;
+    text-shadow: 0 0 10px var(--hud-neon-emerald);
+    font-family: var(--public-font-mono, monospace);
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    box-shadow: 0 0 15px rgba(0, 255, 102, 0.25), inset 0 0 10px rgba(0, 255, 102, 0.15);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .launch-btn-elite:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 0 25px rgba(0, 255, 102, 0.5), inset 0 0 15px rgba(0, 255, 102, 0.3);
+  }
+
+  .launch-btn-elite:active {
+    transform: translateY(1px) scale(0.98);
+  }
+</style>
+
+<script id="elite-audio-telemetry">
+  const AudioHUD = (() => {
+    let ctx = null;
+    const init = () => {
+      if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    };
+
+    const blip = (freq = 880, type = "sine", duration = 0.08) => {
+      try {
+        init();
+        if (ctx.state === "suspended") ctx.resume();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(0.04, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch (e) {}
+    };
+
+    return {
+      click: () => blip(1200, "triangle", 0.04),
+      lock: () => {
+        blip(600, "square", 0.05);
+        setTimeout(() => blip(900, "sine", 0.08), 50);
+      },
+      alarm: () => {
+        blip(400, "sawtooth", 0.12);
+        setTimeout(() => blip(300, "sawtooth", 0.12), 100);
+      }
+    };
+  })();
+
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll("button, input, select").forEach(el => {
+      el.addEventListener("click", () => AudioHUD.click());
+    });
+  });
+</script>
+
 </head>
 <body>
   ${renderPublicHeader({ activePath: "/cockpit", user })}
 
   <div class="cockpit-shell">
+
+  <!-- TACTICAL COMMAND BAR -->
+  <div class="pilot-command-bar">
+    <div class="pilot-identity">
+      <div style="font-size: 1.4rem;">⚡</div>
+      <div>
+        <div class="pilot-callsign">PILOT // QUANT-FOUNDER-1</div>
+        <div style="font-size: 0.72rem; color: #8fa3bf; font-family: monospace;">RANK: LEAD COMMANDER // SQUADRON: APEX</div>
+      </div>
+    </div>
+    <div class="discipline-gauge">
+      <div style="font-size: 0.72rem; color: var(--hud-neon-cyan); font-family: monospace; letter-spacing: 0.1em;">ANTI-VOLUME XP</div>
+      <div class="gauge-track">
+        <div class="gauge-fill"></div>
+      </div>
+      <div style="font-size: 0.8rem; font-weight: bold; color: var(--hud-neon-emerald); font-family: monospace;">1,420 XP</div>
+    </div>
+  </div>
+
     <!-- Market Selector Bar -->
     <header class="market-bar" aria-label="Market selection and telemetry">
       <div class="market-bar-left">
