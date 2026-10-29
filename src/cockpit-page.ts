@@ -851,7 +851,7 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
             </div>
             <div style="display:flex; align-items:center; gap:10px;">
               <span id="mission-status-pill" style="font-family:var(--public-font-mono); font-size:0.72rem; padding:4px 8px; border-radius:4px; background:rgba(203,255,105,0.15); color:var(--cockpit-mint); font-weight:700;">
-                ✓ \${initialVerification.decisionReceiptSeal.sealText}
+                ✓ ${initialVerification.decisionReceiptSeal.sealText}
               </span>
               <button type="button" id="btn-verify-mission" onclick="runMissionVerification()" style="background:var(--cockpit-mint); color:#090A14; border:none; border-radius:6px; padding:8px 14px; font-weight:700; font-size:0.8rem; cursor:pointer; font-family:var(--public-font-mono);">
                 Execute Verification Mission ⚡
@@ -1109,10 +1109,10 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
         <div class="receipt-box receipt-seal-box" id="receipt-seal-box" style="margin-top:10px; border-color:rgba(203,255,105,0.3); background:rgba(203,255,105,0.03);">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
             <strong style="color:var(--cockpit-mint); font-family:var(--public-font-mono); font-size:0.78rem;">QUANTA DECISION RECEIPT SEAL</strong>
-            <span id="receipt-seal-badge" style="font-family:var(--public-font-mono); font-size:0.7rem; color:var(--cockpit-mint); font-weight:700;">✓ \${initialVerification.decisionReceiptSeal.sealText}</span>
+            <span id="receipt-seal-badge" style="font-family:var(--public-font-mono); font-size:0.7rem; color:var(--cockpit-mint); font-weight:700;">✓ ${initialVerification.decisionReceiptSeal.sealText}</span>
           </div>
           <div style="font-family:var(--public-font-mono); font-size:0.72rem; color:var(--cockpit-muted); word-break:break-all;">
-            SHA-256: <span id="receipt-seal-hash" style="color:var(--cockpit-chalk);">\${initialVerification.decisionReceiptSeal.sha256Short}…</span>
+            SHA-256: <span id="receipt-seal-hash" style="color:var(--cockpit-chalk);">${initialVerification.decisionReceiptSeal.sha256Short}…</span>
           </div>
           <div style="margin-top:6px; font-size:0.72rem; color:var(--cockpit-muted);">
             Pure research model. Live capital deployed: <strong style="color:var(--cockpit-mint);">$0.00</strong>. Rule B5 protocol invariant active.
