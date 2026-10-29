@@ -1057,7 +1057,38 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
           <div class="inputs-grid">
             <div class="input-field">
               <label>Outcome Side</label>
-              <div class="side-pill-group">
+              
+  <!-- LIVE PARABOLIC FRICTION GAUGE OVERLAY -->
+  <div id="friction-radar-gauge" style="margin-top: 14px; padding: 12px; background: rgba(8, 18, 34, 0.85); border: 1px solid rgba(0, 243, 255, 0.2); border-radius: 6px;">
+    <div style="display: flex; justify-content: space-between; font-family: monospace; font-size: 0.72rem; color: #8fa3bf; margin-bottom: 6px;">
+      <span>EXECUTION DRAG BENCHMARK</span>
+      <span id="drag-status-tag" style="color: var(--hud-neon-emerald);">OPTIMAL SPREAD</span>
+    </div>
+
+    <!-- Kalshi Track -->
+    <div style="margin-bottom: 8px;">
+      <div style="display: flex; justify-content: space-between; font-size: 0.7rem; font-family: monospace; color: #00f3ff; margin-bottom: 2px;">
+        <span>KALSHI BINARY CURVE</span>
+        <span id="kalshi-drag-val">--</span>
+      </div>
+      <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+        <div id="kalshi-drag-bar" style="height: 100%; width: 18%; background: #00f3ff; transition: width 0.3s ease;"></div>
+      </div>
+    </div>
+
+    <!-- Polymarket Track -->
+    <div>
+      <div style="display: flex; justify-content: space-between; font-size: 0.7rem; font-family: monospace; color: #a855f7; margin-bottom: 2px;">
+        <span>POLYMARKET CTF + RELAYER</span>
+        <span id="poly-drag-val">--</span>
+      </div>
+      <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+        <div id="poly-drag-bar" style="height: 100%; width: 12%; background: #a855f7; transition: width 0.3s ease;"></div>
+      </div>
+    </div>
+  </div>
+
+<div class="side-pill-group">
                 <button type="button" class="side-btn yes ${initialSide === 'YES' ? 'active' : ''}" onclick="setSide('YES')">YES</button>
                 <button type="button" class="side-btn no ${initialSide === 'NO' ? 'active' : ''}" onclick="setSide('NO')">NO</button>
               </div>
@@ -1880,6 +1911,40 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
 <script id="elite-hud-runtime">
 (function() {
   window.addEventListener("DOMContentLoaded", () => {
+
+    // Update live friction drag bars
+    const updateFrictionBars = function() {
+      const qty = parseInt(document.getElementById("order-quantity")?.value || "10", 10);
+      const price = parseInt(document.getElementById("assumed-fill-price")?.value || "52", 10);
+
+      // Kalshi Parabolic formula: 0.07 * C * (100 - C) / 100
+      const kalshiRate = 0.07 * price * (100 - price) / 100;
+      const kalshiFeeCents = Math.ceil(kalshiRate * qty);
+      const kalshiDragPct = ((kalshiFeeCents / (price * qty)) * 100).toFixed(1);
+
+      // Polymarket CTF equivalent: flat buffer + slippage
+      const polyFeeCents = Math.round(qty * 0.5);
+      const polyDragPct = ((polyFeeCents / (price * qty)) * 100).toFixed(1);
+
+      const kVal = document.getElementById("kalshi-drag-val");
+      const kBar = document.getElementById("kalshi-drag-bar");
+      const pVal = document.getElementById("poly-drag-val");
+      const pBar = document.getElementById("poly-drag-bar");
+
+      if (kVal) kVal.textContent = "$" + (kalshiFeeCents / 100).toFixed(2) + " (" + kalshiDragPct + "% DRAG)";
+      if (kBar) kBar.style.width = Math.min(100, Math.max(8, kalshiDragPct * 8)) + "%";
+
+      if (pVal) pVal.textContent = "$" + (polyFeeCents / 100).toFixed(2) + " (" + polyDragPct + "% DRAG)";
+      if (pBar) pBar.style.width = Math.min(100, Math.max(8, polyDragPct * 8)) + "%";
+    };
+
+    const origRecompute = window.recomputeCost;
+    window.recomputeCost = function() {
+      if (typeof origRecompute === "function") origRecompute();
+      updateFrictionBars();
+    };
+    updateFrictionBars();
+
     // Tactile Stepper Controller
     const qtyEl = document.getElementById("order-quantity");
     const priceEl = document.getElementById("assumed-fill-price");
