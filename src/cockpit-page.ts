@@ -1,4 +1,8 @@
 export function renderCockpitPage(): string {
+  return renderCockpitPageHtml();
+}
+
+export function renderCockpitPageHtml(): string {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,7 +22,6 @@ export function renderCockpitPage(): string {
       --txt-main: #f8fafc;
       --font-mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       background-color: var(--bg-void);
@@ -32,7 +35,6 @@ export function renderCockpitPage(): string {
         linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
       background-size: 100% 100%, 30px 30px, 30px 30px;
     }
-
     header {
       display: flex;
       justify-content: space-between;
@@ -47,7 +49,6 @@ export function renderCockpitPage(): string {
     .badge-metric { display: flex; flex-direction: column; }
     .badge-metric .label { color: var(--txt-dim); font-size: 0.65rem; }
     .badge-metric .val { font-weight: 700; color: var(--txt-main); }
-
     .cockpit-grid {
       display: grid;
       grid-template-columns: 340px 1fr 380px;
@@ -56,7 +57,6 @@ export function renderCockpitPage(): string {
       max-width: 1750px;
       margin: 0 auto;
     }
-
     .panel {
       background: var(--bg-panel);
       border: 1px solid var(--border-panel);
@@ -77,7 +77,6 @@ export function renderCockpitPage(): string {
       color: var(--cyan-glow);
       letter-spacing: 0.1em;
     }
-
     .radar-box {
       width: 260px;
       height: 260px;
@@ -98,13 +97,11 @@ export function renderCockpitPage(): string {
       animation: sweep 4s linear infinite;
     }
     @keyframes sweep { 100% { transform: rotate(360deg); } }
-
     .badge-card {
       padding: 10px;
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 6px;
-      transition: all 0.3s ease;
       margin-bottom: 8px;
     }
     .badge-card.active-emerald {
@@ -117,7 +114,6 @@ export function renderCockpitPage(): string {
       background: rgba(0, 243, 255, 0.08);
       box-shadow: 0 0 12px rgba(0, 243, 255, 0.2);
     }
-
     .ctrl-row { margin-bottom: 12px; }
     .ctrl-label { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--txt-dim); margin-bottom: 4px; }
     .stepper { display: flex; gap: 8px; }
@@ -142,7 +138,6 @@ export function renderCockpitPage(): string {
       font-family: var(--font-mono);
       font-size: 0.95rem;
     }
-
     .btn-fire {
       width: 100%;
       padding: 12px;
@@ -155,13 +150,8 @@ export function renderCockpitPage(): string {
       letter-spacing: 0.1em;
       border-radius: 4px;
       cursor: pointer;
-      transition: transform 0.1s ease, box-shadow 0.2s ease;
     }
-    .btn-fire:hover {
-      box-shadow: 0 0 20px rgba(0, 243, 255, 0.5);
-    }
-    .btn-fire:active { transform: scale(0.98); }
-
+    .btn-fire:hover { box-shadow: 0 0 20px rgba(0, 243, 255, 0.5); }
     .audit-log {
       height: 220px;
       background: rgba(3, 7, 18, 0.85);
@@ -176,13 +166,12 @@ export function renderCockpitPage(): string {
   </style>
 </head>
 <body>
-
   <header>
     <div class="brand">QUANTERRA // TACTICAL RADAR HUD</div>
     <div class="telemetry-row">
       <div class="badge-metric"><span class="label">SETTLEMENT ORACLE</span><span class="val" style="color:var(--emerald-glow)">CME CF BRTI LIVE</span></div>
       <div class="badge-metric"><span class="label">DISCIPLINE XP</span><span class="val" id="xp-val">1,420 XP</span></div>
-      <div class="badge-metric"><span class="label">ENGINE LATENCY</span><span class="val" id="latency-val">4.2 ms</span></div>
+      <div class="badge-metric"><span class="label">ENGINE LATENCY</span><span class="val">4.2 ms</span></div>
     </div>
   </header>
 
@@ -192,7 +181,6 @@ export function renderCockpitPage(): string {
         <span>SETTLEMENT BASIS RADAR</span>
         <span id="radar-status-badge" style="color:var(--emerald-glow); border: 1px solid var(--emerald-glow); padding: 1px 6px; border-radius: 4px;">SAFE</span>
       </div>
-
       <div class="radar-box">
         <div class="radar-sweep"></div>
         <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%;">
@@ -201,17 +189,15 @@ export function renderCockpitPage(): string {
           <div id="radar-basis-bps" style="font-size: 0.78rem; font-weight: 700; color: var(--emerald-glow); margin-top: 4px;">+0.0 bps</div>
         </div>
       </div>
-
       <div style="margin-top: 20px;">
         <div class="panel-header" style="margin-bottom: 8px;"><span>PILOT COMMENDATIONS</span><span>EVENT AUDITED</span></div>
         <div id="badge-friction-shield" class="badge-card active-emerald">
           <div style="display:flex; justify-content:space-between; font-size:0.72rem; font-weight:bold;">
             <span style="color:var(--emerald-glow);">🛡️ FRICTION SHIELD</span>
-            <span id="friction-pct-tag">&le; 4.5%</span>
+            <span>&le; 4.5%</span>
           </div>
           <div style="font-size:0.62rem; color:var(--txt-dim); margin-top:2px;">Parabolic fee drag mitigated</div>
         </div>
-
         <div id="badge-oracle-sniper" class="badge-card active-cyan">
           <div style="display:flex; justify-content:space-between; font-size:0.72rem; font-weight:bold;">
             <span style="color:var(--cyan-glow);">🎯 ORACLE SNIPER</span>
@@ -224,7 +210,6 @@ export function renderCockpitPage(): string {
 
     <div class="panel">
       <div class="panel-header"><span>TACTICAL LOADOUT BUILDER</span><span>BTC 15-MIN ABOVE STRIKE</span></div>
-
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 14px;">
         <div class="ctrl-row">
           <div class="ctrl-label"><span>CONTRACT QTY</span><span id="qty-disp">10 contracts</span></div>
@@ -249,7 +234,6 @@ export function renderCockpitPage(): string {
           <span>VENUE DRAG BENCHMARK</span>
           <span style="color:var(--emerald-glow);">TRUE-COST FRICTION ENGINE</span>
         </div>
-
         <div style="margin-bottom: 10px;">
           <div style="display:flex; justify-content:space-between; font-size:0.68rem; margin-bottom:2px;">
             <span style="color:var(--cyan-glow);">KALSHI PARABOLIC TAKER</span>
@@ -259,7 +243,6 @@ export function renderCockpitPage(): string {
             <div id="kalshi-drag-bar" style="height:100%; width:15%; background:var(--cyan-glow); border-radius:3px; transition:width 0.3s;"></div>
           </div>
         </div>
-
         <div>
           <div style="display:flex; justify-content:space-between; font-size:0.68rem; margin-bottom:2px;">
             <span style="color:#c084fc;">POLYMARKET CTF + BUFFER</span>
