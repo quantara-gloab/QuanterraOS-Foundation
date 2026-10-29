@@ -2008,6 +2008,7 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
   evtSource.onmessage = function(event) {
     try {
       const data = JSON.parse(event.data);
+      window.dispatchEvent(new CustomEvent('radar-tick', { detail: data }));
       const spotEl = document.getElementById("radar-spot-price");
       const bpsEl = document.getElementById("radar-basis-bps");
       const statusPill = document.getElementById("radar-status-badge");
@@ -2020,6 +2021,56 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
       }
     } catch (e) {}
   };
+})();
+</script>
+
+
+<script id="tactical-badge-unlocks">
+(function() {
+  if (typeof window === "undefined") return;
+
+  function setBadgeState(id, unlocked, glowColor) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (unlocked) {
+      el.style.opacity = "1";
+      el.style.borderColor = glowColor;
+      el.style.background = glowColor.replace(")", ", 0.12)").replace("rgb", "rgba").replace("#00ff66", "rgba(0, 255, 102, 0.15)").replace("#00f3ff", "rgba(0, 243, 255, 0.15)");
+      el.style.boxShadow = "0 0 14px " + glowColor;
+    } else {
+      el.style.opacity = "0.45";
+      el.style.borderColor = "rgba(255, 255, 255, 0.12)";
+      el.style.background = "rgba(8, 18, 34, 0.4)";
+      el.style.boxShadow = "none";
+    }
+  }
+
+  // Hook into cost recomputation for Friction Shield
+  const prevRecompute = window.recomputeCost;
+  window.recomputeCost = function() {
+    if (typeof prevRecompute === "function") prevRecompute();
+    try {
+      const price = parseInt(document.getElementById("assumed-fill-price")?.value || "52", 10);
+      const qty = parseInt(document.getElementById("order-quantity")?.value || "10", 10);
+      const kalshiRate = 0.07 * price * (100 - price) / 100;
+      const kalshiFeeCents = Math.ceil(kalshiRate * qty);
+      const dragPct = (kalshiFeeCents / (price * qty)) * 100;
+      setBadgeState("badge-friction-shield", dragPct <= 4.5, "#00ff66");
+    } catch(e) {}
+  };
+
+  // Hook into Radar SSE messages for Oracle Sniper
+  window.addEventListener("radar-tick", function(ev) {
+    if (!ev.detail) return;
+    const bps = Math.abs(ev.detail.basisBps || 0);
+    setBadgeState("badge-oracle-sniper", bps <= 5, "#00f3ff");
+  });
+
+  // Default Discipline Lock to active audit verified
+  setTimeout(function() {
+    setBadgeState("badge-iron-discipline", true, "#ffb800");
+    if (typeof window.recomputeCost === "function") window.recomputeCost();
+  }, 200);
 })();
 </script>
 
