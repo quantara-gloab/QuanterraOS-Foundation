@@ -1,4 +1,4 @@
-import { handleRadarStream } from "./routes/radar-stream.js";
+import { handleRadarStream } from "./routes/radar-stream.ts";
 import { renderLandingPage } from "./landing-page.ts";
 /**
  * The actual running server. This is what turns everything else in
