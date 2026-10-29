@@ -800,6 +800,8 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
 
   /* Elite HUD Status Bar */
   .pilot-command-bar {
+    flex-wrap: wrap;
+    gap: 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1874,6 +1876,40 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
       </div>
     </div>
   </div>
+
+<script id="elite-hud-runtime">
+(function() {
+  window.addEventListener("DOMContentLoaded", () => {
+    // Tactile Stepper Controller
+    const qtyEl = document.getElementById("order-quantity");
+    const priceEl = document.getElementById("assumed-fill-price");
+
+    window.adjustHUDParam = function(param, delta) {
+      if (param === "qty" && qtyEl) {
+        let val = Math.max(1, Math.min(1000, (parseInt(qtyEl.value, 10) || 10) + delta));
+        qtyEl.value = val;
+        if (window.AudioHUD) window.AudioHUD.click();
+        if (typeof recomputeCost === "function") recomputeCost();
+      } else if (param === "price" && priceEl) {
+        let val = Math.max(1, Math.min(99, (parseInt(priceEl.value, 10) || 50) + delta));
+        priceEl.value = val;
+        if (window.AudioHUD) window.AudioHUD.lock();
+        if (typeof recomputeCost === "function") recomputeCost();
+      }
+    };
+
+    // Mission Fire Telemetry
+    const launchBtn = document.querySelector(".launch-btn-elite") || document.getElementById("launch-simulation");
+    if (launchBtn) {
+      launchBtn.addEventListener("click", () => {
+        if (window.AudioHUD) window.AudioHUD.lock();
+        console.log("[TELEMETRY] Simulation Mission Fired - Recording Discipline XP.");
+      });
+    }
+  });
+})();
+</script>
+
 </body>
 </html>`;
 }
