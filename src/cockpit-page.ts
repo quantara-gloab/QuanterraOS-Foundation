@@ -935,6 +935,31 @@ export function renderCockpitPageHtml(options?: CockpitPageOptions): string {
         <div class="pilot-callsign">PILOT // QUANT-FOUNDER-1</div>
         <div style="font-size: 0.72rem; color: #8fa3bf; font-family: monospace;">RANK: LEAD COMMANDER // SQUADRON: APEX</div>
       </div>
+<!-- TACTICAL COMMENDATION BADGES -->
+  <div id="pilot-achievements-tray" style="margin-top: 16px; margin-bottom: 16px; padding: 14px; background: rgba(8, 18, 34, 0.85); border: 1px solid rgba(0, 243, 255, 0.25); border-radius: 8px; backdrop-filter: blur(10px);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <span style="font-family: monospace; font-size: 0.76rem; font-weight: 800; color: #00f3ff; letter-spacing: 0.1em;">TACTICAL COMMENDATIONS & BADGES</span>
+      <span style="font-family: monospace; font-size: 0.68rem; color: #00ff66;">AUDIT VERIFIED</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+      <div style="text-align: center; padding: 10px 6px; background: rgba(0, 243, 255, 0.05); border: 1px solid rgba(0, 243, 255, 0.3); border-radius: 6px;">
+        <div style="font-size: 1.25rem;">🛡️</div>
+        <div style="font-family: monospace; font-size: 0.72rem; font-weight: bold; color: #00f3ff; margin-top: 4px;">FRICTION SHIELD</div>
+        <div style="font-size: 0.65rem; color: #8fa3bf; margin-top: 2px;">Evaded Drag</div>
+      </div>
+      <div style="text-align: center; padding: 10px 6px; background: rgba(0, 255, 102, 0.05); border: 1px solid rgba(0, 255, 102, 0.3); border-radius: 6px;">
+        <div style="font-size: 1.25rem;">🎯</div>
+        <div style="font-family: monospace; font-size: 0.72rem; font-weight: bold; color: #00ff66; margin-top: 4px;">ORACLE SNIPER</div>
+        <div style="font-size: 0.65rem; color: #8fa3bf; margin-top: 2px;">Delta &lt; 5 bps</div>
+      </div>
+      <div style="text-align: center; padding: 10px 6px; background: rgba(255, 184, 0, 0.05); border: 1px solid rgba(255, 184, 0, 0.3); border-radius: 6px;">
+        <div style="font-size: 1.25rem;">⚔️</div>
+        <div style="font-family: monospace; font-size: 0.72rem; font-weight: bold; color: #ffb800; margin-top: 4px;">DISCIPLINE</div>
+        <div style="font-size: 0.65rem; color: #8fa3bf; margin-top: 2px;">Zero Volume Churn</div>
+      </div>
+    </div>
+  </div>
+<!-- END TACTICAL COMMENDATIONS -->
     </div>
     <div class="discipline-gauge">
       <div style="font-size: 0.72rem; color: var(--hud-neon-cyan); font-family: monospace; letter-spacing: 0.1em;">ANTI-VOLUME XP</div>
