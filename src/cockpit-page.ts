@@ -1,3 +1,4 @@
+import { computeOracleDivergence } from "./lib/oracle-divergence.ts";
 /**
  * QuanterraOS Canonical Cockpit Decision Workspace (/cockpit)
  *
